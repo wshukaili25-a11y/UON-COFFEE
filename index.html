@@ -1,1 +1,786 @@
+<!DOCTYPE html>
 
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UoN Coffee — بوابة طلاب جامعة نزوى</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@200;300;400;700;900&family=Amiri:wght@400;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --coffee: #5c1a28;
+  --espresso: #2d0a14;
+  --latte: #d4899c;
+  --cream: #faeaed;
+  --foam: #fdf5f7;
+  --caramel: #9b2335;
+  --caramel-light: #c94060;
+  --green: #7b1525;
+  --green-light: #9b2335;
+  --mint: #e8758a;
+  --blue: #5c1a28;
+  --blue-light: #7b2535;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  color-scheme: dark;
+background: #2d0a14;
+font-family: ‘Tajawal’, sans-serif;
+color: var(--foam);
+overflow-x: hidden;
+}
+
+/* ══ SCROLLBAR ══ */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: #2d0a14; }
+::-webkit-scrollbar-thumb { background: var(--caramel); border-radius: 3px; }
+
+/* ══ NAV ══ */
+nav {
+position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+background: rgba(26,15,7,0.85);
+backdrop-filter: blur(20px);
+border-bottom: 1px solid rgba(212,130,42,0.15);
+padding: 14px 24px;
+display: flex; align-items: center; justify-content: space-between;
+}
+
+.nav-logo {
+display: flex; align-items: center; gap: 10px;
+}
+
+.nav-cup {
+width: 36px; height: 36px;
+background: linear-gradient(135deg, var(--caramel), var(--caramel-light));
+border-radius: 8px 8px 12px 12px;
+display: flex; align-items: center; justify-content: center;
+font-size: 16px; font-weight: 900;
+color: var(--espresso);
+font-family: ‘Amiri’, serif;
+position: relative;
+}
+
+.nav-cup::after {
+content: ‘’;
+position: absolute; right: -8px; top: 8px;
+width: 8px; height: 14px;
+border: 2px solid var(--caramel); border-left: none;
+border-radius: 0 6px 6px 0;
+}
+
+.nav-name {
+font-weight: 900; font-size: 16px; color: var(--foam);
+}
+
+.nav-name span { color: var(--caramel-light); }
+
+.nav-links {
+display: flex; gap: 24px; list-style: none;
+}
+
+.nav-links a {
+color: rgba(245,230,211,0.5);
+text-decoration: none; font-size: 13px;
+transition: color 0.3s;
+}
+
+.nav-links a:hover { color: var(--caramel-light); }
+
+.nav-badge {
+background: linear-gradient(135deg, var(--caramel), var(--caramel-light));
+color: var(--espresso); font-size: 11px; font-weight: 900;
+padding: 6px 16px; border-radius: 50px; letter-spacing: 1px;
+text-decoration: none;
+}
+
+/* ══ HERO ══ */
+.hero {
+min-height: 100vh;
+display: flex; flex-direction: column;
+align-items: center; justify-content: center;
+padding: 120px 24px 80px;
+position: relative; overflow: hidden;
+text-align: center;
+}
+
+.hero-rings .ring {
+position: absolute; border-radius: 50%;
+border: 1px solid rgba(212,130,42,0.07);
+top: 50%; left: 50%;
+transform: translate(-50%, -50%);
+animation: ringPulse 6s ease-in-out infinite;
+}
+
+.hero-rings .ring:nth-child(1) { width: 300px; height: 300px; }
+.hero-rings .ring:nth-child(2) { width: 500px; height: 500px; animation-delay: 1.5s; }
+.hero-rings .ring:nth-child(3) { width: 700px; height: 700px; animation-delay: 3s; }
+.hero-rings .ring:nth-child(4) { width: 900px; height: 900px; animation-delay: 4.5s; }
+
+@keyframes ringPulse {
+0%,100% { opacity: 0.15; transform: translate(-50%,-50%) scale(0.97); }
+50% { opacity: 0.04; transform: translate(-50%,-50%) scale(1.03); }
+}
+
+.hero-glow {
+position: absolute; inset: 0;
+background: radial-gradient(ellipse at center, rgba(155,35,53,0.2) 0%, transparent 60%);
+}
+
+.hero-content { position: relative; z-index: 1; max-width: 700px; }
+
+.hero-badge {
+display: inline-block;
+background: rgba(212,130,42,0.12);
+border: 1px solid rgba(212,130,42,0.3);
+color: var(--caramel-light);
+font-size: 11px; font-weight: 700;
+padding: 6px 18px; border-radius: 50px;
+margin-bottom: 28px; letter-spacing: 2px;
+animation: fadeUp 0.8s ease both;
+}
+
+.hero-cup-big {
+width: 100px; height: 100px;
+background: linear-gradient(145deg, var(--caramel), var(--caramel-light));
+border-radius: 22px 22px 30px 30px;
+display: flex; align-items: center; justify-content: center;
+font-family: ‘Amiri’, serif; font-size: 48px;
+color: var(--espresso);
+margin: 0 auto 28px;
+position: relative;
+box-shadow: 0 16px 48px rgba(212,130,42,0.3);
+animation: floatCup 5s ease-in-out infinite, fadeUp 0.8s ease 0.1s both;
+}
+
+.hero-cup-big::after {
+content: ‘’;
+position: absolute; right: -18px; top: 20px;
+width: 18px; height: 36px;
+border: 4px solid var(--caramel); border-left: none;
+border-radius: 0 14px 14px 0;
+}
+
+/* steam */
+.steam-hero {
+position: absolute; top: -50px; left: 50%;
+transform: translateX(-50%);
+}
+
+.sp {
+position: absolute; width: 3px;
+background: linear-gradient(to top, transparent, rgba(212,130,42,0.3), transparent);
+border-radius: 10px;
+animation: steamUp 3s ease-in-out infinite;
+}
+
+.sp:nth-child(1) { height: 50px; left: -16px; animation-delay: 0s; }
+.sp:nth-child(2) { height: 65px; left: 0; animation-delay: 0.5s; }
+.sp:nth-child(3) { height: 45px; left: 16px; animation-delay: 1s; }
+
+@keyframes steamUp {
+0% { opacity: 0; transform: translateY(0) scaleX(1); }
+50% { opacity: 1; transform: translateY(-25px) scaleX(1.4); }
+100% { opacity: 0; transform: translateY(-50px) scaleX(0.8); }
+}
+
+@keyframes floatCup {
+0%,100% { transform: translateY(0) rotate(-1deg); }
+50% { transform: translateY(-12px) rotate(1deg); }
+}
+
+.hero-title {
+font-family: ‘Amiri’, serif;
+font-size: clamp(32px, 6vw, 56px);
+line-height: 1.4; color: var(--foam);
+margin-bottom: 16px;
+animation: fadeUp 0.8s ease 0.2s both;
+}
+
+.hero-title span { color: var(--caramel-light); }
+
+.hero-sub {
+font-size: 15px; color: rgba(245,230,211,0.45);
+line-height: 1.8; margin-bottom: 36px;
+animation: fadeUp 0.8s ease 0.3s both;
+}
+
+.hero-btns {
+display: flex; gap: 12px; justify-content: center;
+flex-wrap: wrap;
+animation: fadeUp 0.8s ease 0.4s both;
+}
+
+.btn-primary {
+background: linear-gradient(135deg, var(--caramel), var(--caramel-light));
+color: var(--espresso); font-size: 13px; font-weight: 900;
+padding: 14px 28px; border-radius: 8px;
+text-decoration: none; letter-spacing: 1px;
+box-shadow: 0 8px 24px rgba(212,130,42,0.3);
+transition: all 0.3s;
+}
+
+.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 12px 32px rgba(212,130,42,0.4); }
+
+.btn-secondary {
+background: rgba(255,255,255,0.05);
+border: 1px solid rgba(212,130,42,0.25);
+color: var(--caramel-light); font-size: 13px; font-weight: 700;
+padding: 14px 28px; border-radius: 8px;
+text-decoration: none; letter-spacing: 1px;
+transition: all 0.3s;
+}
+
+.btn-secondary:hover { background: rgba(212,130,42,0.1); border-color: rgba(212,130,42,0.5); }
+
+/* stats */
+.hero-stats {
+display: flex; gap: 32px; justify-content: center;
+margin-top: 52px; flex-wrap: wrap;
+animation: fadeUp 0.8s ease 0.5s both;
+}
+
+.stat { text-align: center; }
+.stat-num {
+font-family: ‘Space Mono’, monospace;
+font-size: 28px; font-weight: 700;
+color: var(--caramel-light); line-height: 1;
+}
+
+.stat-label { font-size: 11px; color: rgba(245,230,211,0.35); margin-top: 4px; letter-spacing: 1px; }
+.stat-div { width: 1px; background: rgba(212,130,42,0.15); align-self: stretch; }
+
+/* ══ SECTIONS ══ */
+section { padding: 80px 24px; max-width: 1100px; margin: 0 auto; }
+
+.sec-header { text-align: center; margin-bottom: 48px; }
+.sec-tag {
+display: inline-block;
+font-family: ‘Space Mono’, monospace;
+font-size: 9px; letter-spacing: 4px; text-transform: uppercase;
+color: rgba(212,130,42,0.4); margin-bottom: 12px;
+}
+
+.sec-title {
+font-family: ‘Amiri’, serif;
+font-size: clamp(24px, 4vw, 36px);
+color: var(--foam); line-height: 1.4;
+}
+
+.sec-sub { font-size: 13px; color: rgba(245,230,211,0.35); margin-top: 8px; line-height: 1.8; }
+
+/* ══ FEATURES ══ */
+.features-grid {
+display: grid;
+grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+gap: 16px;
+}
+
+.feat-card {
+background: rgba(255,255,255,0.07);
+border: 1px solid rgba(255,255,255,0.07);
+border-radius: 16px; padding: 28px;
+transition: all 0.3s;
+position: relative; overflow: hidden;
+}
+
+.feat-card::before {
+content: ‘’;
+position: absolute; top: 0; left: 0; right: 0; height: 3px;
+background: linear-gradient(90deg, transparent, var(--caramel), transparent);
+opacity: 0; transition: opacity 0.3s;
+}
+
+.feat-card:hover { border-color: rgba(212,130,42,0.2); transform: translateY(-4px); }
+.feat-card:hover::before { opacity: 1; }
+
+.feat-icon {
+width: 52px; height: 52px;
+border-radius: 14px;
+display: flex; align-items: center; justify-content: center;
+font-size: 24px; margin-bottom: 18px;
+}
+
+.feat-icon.caramel { background: rgba(212,130,42,0.12); }
+.feat-icon.green { background: rgba(45,90,61,0.3); }
+.feat-icon.blue { background: rgba(30,58,95,0.4); }
+
+.feat-title { font-size: 16px; font-weight: 900; color: var(--foam); margin-bottom: 8px; }
+.feat-desc { font-size: 12px; color: rgba(245,230,211,0.4); line-height: 1.8; }
+
+.feat-badge {
+display: inline-block;
+background: rgba(212,130,42,0.12);
+border: 1px solid rgba(212,130,42,0.2);
+color: var(--caramel-light);
+font-size: 9px; font-weight: 700;
+padding: 3px 10px; border-radius: 50px;
+margin-top: 14px; letter-spacing: 1px;
+}
+
+.feat-badge.new { background: rgba(109,186,138,0.12); border-color: rgba(109,186,138,0.2); color: var(--mint); }
+
+/* ══ CALCULATOR ══ */
+.calc-section {
+background: rgba(255,255,255,0.02);
+border: 1px solid rgba(255,255,255,0.06);
+border-radius: 24px; padding: 48px;
+max-width: 600px; margin: 0 auto;
+}
+
+.calc-title { font-family: ‘Amiri’, serif; font-size: 26px; color: var(--foam); margin-bottom: 8px; text-align: center; }
+.calc-sub { font-size: 12px; color: rgba(245,230,211,0.35); text-align: center; margin-bottom: 32px; }
+
+.courses { display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px; }
+
+.course-row {
+display: flex; gap: 10px; align-items: center;
+}
+
+.course-row input, .course-row select {
+background: rgba(255,255,255,0.05);
+border: 1px solid rgba(255,255,255,0.1);
+border-radius: 10px; padding: 12px 14px;
+color: var(--foam); font-family: ‘Tajawal’, sans-serif; font-size: 13px;
+outline: none; transition: border-color 0.3s;
+flex: 1;
+}
+
+.course-row input:focus, .course-row select:focus {
+border-color: rgba(212,130,42,0.4);
+}
+
+.course-row input::placeholder { color: rgba(245,230,211,0.2); }
+
+.course-row select option { background: var(--coffee); color: var(--foam); }
+
+.remove-btn {
+width: 36px; height: 36px;
+background: rgba(255,80,80,0.1);
+border: 1px solid rgba(255,80,80,0.2);
+border-radius: 8px; color: #ff6b6b;
+font-size: 16px; cursor: pointer;
+display: flex; align-items: center; justify-content: center;
+transition: all 0.3s; flex-shrink: 0;
+}
+
+.remove-btn:hover { background: rgba(255,80,80,0.2); }
+
+.calc-add {
+width: 100%;
+background: rgba(255,255,255,0.07);
+border: 1px dashed rgba(212,130,42,0.2);
+border-radius: 10px; padding: 12px;
+color: rgba(212,130,42,0.5); font-size: 13px; font-weight: 700;
+cursor: pointer; transition: all 0.3s; font-family: ‘Tajawal’, sans-serif;
+margin-bottom: 20px;
+}
+
+.calc-add:hover { background: rgba(212,130,42,0.06); border-color: rgba(212,130,42,0.4); color: var(--caramel-light); }
+
+.calc-btn {
+width: 100%;
+background: linear-gradient(135deg, var(--caramel), var(--caramel-light));
+color: var(--espresso); font-size: 14px; font-weight: 900;
+padding: 14px; border-radius: 10px; border: none;
+cursor: pointer; font-family: ‘Tajawal’, sans-serif;
+transition: all 0.3s; letter-spacing: 1px;
+}
+
+.calc-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(212,130,42,0.3); }
+
+.calc-result {
+margin-top: 20px;
+background: rgba(212,130,42,0.08);
+border: 1px solid rgba(212,130,42,0.2);
+border-radius: 14px; padding: 20px;
+text-align: center; display: none;
+}
+
+.result-label { font-size: 11px; letter-spacing: 2px; color: rgba(212,130,42,0.5); text-transform: uppercase; margin-bottom: 8px; }
+.result-num { font-family: ‘Space Mono’, monospace; font-size: 48px; color: var(--caramel-light); font-weight: 700; line-height: 1; }
+.result-grade { font-size: 14px; color: rgba(245,230,211,0.5); margin-top: 6px; }
+
+/* ══ LINKS ══ */
+.links-grid {
+display: grid;
+grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+gap: 14px;
+}
+
+.link-card {
+background: rgba(255,255,255,0.07);
+border: 1px solid rgba(255,255,255,0.07);
+border-radius: 14px; padding: 20px;
+text-decoration: none; display: flex;
+align-items: center; gap: 14px;
+transition: all 0.3s;
+}
+
+.link-card:hover { background: rgba(212,130,42,0.07); border-color: rgba(212,130,42,0.2); transform: translateX(-4px); }
+
+.link-icon { font-size: 28px; flex-shrink: 0; }
+.link-name { font-size: 14px; font-weight: 700; color: var(--foam); margin-bottom: 3px; }
+.link-desc { font-size: 11px; color: rgba(245,230,211,0.35); }
+.link-arrow { margin-right: auto; color: rgba(212,130,42,0.3); font-size: 18px; transition: all 0.3s; }
+.link-card:hover .link-arrow { color: var(--caramel-light); transform: translateX(-4px); }
+
+/* ══ GROUPS ══ */
+.groups-grid {
+display: grid;
+grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+gap: 14px;
+}
+
+.group-card {
+background: rgba(255,255,255,0.07);
+border: 1px solid rgba(255,255,255,0.07);
+border-radius: 14px; padding: 20px;
+text-align: center; transition: all 0.3s;
+cursor: pointer;
+}
+
+.group-card:hover { background: rgba(45,90,61,0.15); border-color: rgba(109,186,138,0.3); transform: translateY(-3px); }
+
+.group-emoji { font-size: 32px; margin-bottom: 10px; }
+.group-name { font-size: 14px; font-weight: 900; color: var(--foam); margin-bottom: 4px; }
+.group-count { font-size: 11px; color: rgba(245,230,211,0.3); margin-bottom: 14px; }
+
+.group-btn {
+background: rgba(109,186,138,0.12);
+border: 1px solid rgba(109,186,138,0.25);
+color: var(--mint); font-size: 11px; font-weight: 700;
+padding: 6px 16px; border-radius: 50px;
+cursor: pointer; transition: all 0.3s; font-family: ‘Tajawal’, sans-serif;
+}
+
+.group-card:hover .group-btn { background: rgba(109,186,138,0.2); }
+
+/* ══ STUDENT HUB ══ */
+.hub-section {
+background: linear-gradient(135deg, rgba(45,90,61,0.15), rgba(30,58,95,0.15));
+border: 1px solid rgba(109,186,138,0.15);
+border-radius: 24px; padding: 48px;
+display: grid; grid-template-columns: 1fr 1fr;
+gap: 48px; align-items: center;
+}
+
+.hub-left {}
+.hub-tag { font-size: 9px; letter-spacing: 4px; text-transform: uppercase; color: var(--mint); margin-bottom: 12px; font-family: ‘Space Mono’, monospace; }
+.hub-title { font-family: ‘Amiri’, serif; font-size: 30px; color: var(--foam); line-height: 1.5; margin-bottom: 16px; }
+.hub-desc { font-size: 13px; color: rgba(245,230,211,0.4); line-height: 1.9; margin-bottom: 24px; }
+
+.hub-items { display: flex; flex-direction: column; gap: 12px; margin-bottom: 28px; }
+.hub-item { display: flex; align-items: center; gap: 12px; }
+.hub-dot { width: 8px; height: 8px; background: var(--mint); border-radius: 50%; flex-shrink: 0; }
+.hub-item-text { font-size: 13px; color: rgba(245,230,211,0.6); }
+
+.hub-cta {
+display: inline-flex; align-items: center; gap: 8px;
+background: linear-gradient(135deg, var(--green), var(--green-light));
+color: var(--foam); font-size: 13px; font-weight: 900;
+padding: 14px 24px; border-radius: 10px; text-decoration: none;
+box-shadow: 0 8px 24px rgba(45,90,61,0.3); transition: all 0.3s;
+}
+
+.hub-cta:hover { transform: translateY(-2px); box-shadow: 0 12px 32px rgba(45,90,61,0.4); }
+
+.hub-right { display: flex; flex-direction: column; gap: 12px; }
+
+.hub-card {
+background: rgba(255,255,255,0.04);
+border: 1px solid rgba(255,255,255,0.07);
+border-radius: 14px; padding: 18px 20px;
+display: flex; align-items: center; gap: 14px;
+transition: all 0.3s;
+}
+
+.hub-card:hover { background: rgba(109,186,138,0.08); border-color: rgba(109,186,138,0.2); }
+
+.hub-card-icon { font-size: 24px; flex-shrink: 0; }
+.hub-card-name { font-size: 13px; font-weight: 700; color: var(--foam); }
+.hub-card-price { font-size: 11px; color: var(--mint); margin-top: 2px; }
+.hub-card-badge {
+margin-right: auto;
+background: rgba(212,130,42,0.12);
+border: 1px solid rgba(212,130,42,0.2);
+color: var(--caramel-light); font-size: 9px; font-weight: 700;
+padding: 3px 8px; border-radius: 50px; letter-spacing: 1px;
+}
+
+/* ══ FOOTER ══ */
+footer {
+background: rgba(0,0,0,0.3);
+border-top: 1px solid rgba(212,130,42,0.1);
+padding: 48px 24px;
+text-align: center;
+}
+
+.footer-logo { font-weight: 900; font-size: 22px; color: var(--foam); margin-bottom: 8px; }
+.footer-logo span { color: var(--caramel-light); }
+.footer-sub { font-size: 12px; color: rgba(245,230,211,0.25); margin-bottom: 24px; font-family: ‘Space Mono’, monospace; letter-spacing: 2px; }
+
+.footer-links { display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; margin-bottom: 24px; }
+.footer-links a { color: rgba(245,230,211,0.3); text-decoration: none; font-size: 12px; transition: color 0.3s; }
+.footer-links a:hover { color: var(--caramel-light); }
+
+.footer-copy { font-size: 11px; color: rgba(245,230,211,0.15); font-family: ‘Space Mono’, monospace; }
+
+/* ══ ANIMATIONS ══ */
+@keyframes fadeUp {
+from { opacity: 0; transform: translateY(24px); }
+to { opacity: 1; transform: translateY(0); }
+}
+
+.fade-in {
+opacity: 0; transform: translateY(20px);
+transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+.fade-in.visible { opacity: 1; transform: translateY(0); }
+
+/* ══ MOBILE ══ */
+@media (max-width: 768px) {
+.nav-links { display: none; }
+.hub-section { grid-template-columns: 1fr; }
+.hero-stats { gap: 20px; }
+.calc-section { padding: 28px 20px; }
+}
+</style>
+
+</head>
+<body>
+
+<!-- ══ NAV ══ -->
+
+<nav>
+  <div class="nav-logo">
+    <div class="nav-cup" style="font-size:10px;font-family:Space Mono,monospace;">UoN</div>
+    <div class="nav-name">UoN <span>Coffee</span></div>
+  </div>
+  <ul class="nav-links">
+    <li><a href="#features">المميزات</a></li>
+    <li><a href="#calculator">حاسبة المعدل</a></li>
+    <li><a href="#groups">المجموعات</a></li>
+    <li><a href="#links">روابط مفيدة</a></li>
+    <li><a href="#hub">Student Hub</a></li>
+    <li><a href="#contact">التواصل</a></li>
+  </ul>
+  <a href="https://instagram.com/unizwacoffee" class="nav-badge">📱 Instagram</a>
+</nav>
+
+<!-- ══ HERO ══ -->
+
+<div class="hero">
+  <div class="hero-rings">
+    <div class="ring"></div><div class="ring"></div>
+    <div class="ring"></div><div class="ring"></div>
+  </div>
+  <div class="hero-glow"></div>
+
+  <div class="hero-content">
+    <div class="hero-badge">☕ مو رسمي.. بس أحسن من الرسمي 😏</div>
+
+```
+<div class="hero-cup-big" style="position:relative;">
+  <div class="steam-hero">
+    <div class="sp"></div><div class="sp"></div><div class="sp"></div>
+  </div>
+  <span style="font-size:16px;font-family:'Space Mono',monospace;font-weight:900;">UoN</span>
+</div>
+
+<h1 class="hero-title">
+  كل ما يحتاجه<br>
+  <span>طالب جامعة نزوى</span><br>
+  في مكان واحد ☕
+</h1>
+
+<p class="hero-sub">
+  ملخصات · حاسبة معدل · مجموعات دراسة · روابط مفيدة<br>
+  خدمات Student Hub · وكل جديد عن جامعتك
+</p>
+
+<div class="hero-btns">
+  <a href="#calculator" class="btn-primary">احسب معدلك الآن ⚡</a>
+  <a href="#hub" class="btn-secondary">خدمات Student Hub 🎓</a>
+</div>
+
+<div class="hero-stats">
+  <div class="stat">
+    <div class="stat-num">500+</div>
+    <div class="stat-label">طالب مستفيد</div>
+  </div>
+  <div class="stat-div"></div>
+  <div class="stat">
+    <div class="stat-num">50+</div>
+    <div class="stat-label">ملخص متاح</div>
+  </div>
+  <div class="stat-div"></div>
+  <div class="stat">
+    <div class="stat-num">24h</div>
+    <div class="stat-label">وقت التوصيل</div>
+  </div>
+  <div class="stat-div"></div>
+  <div class="stat">
+    <div class="stat-num">5★</div>
+    <div class="stat-label">تقييم الطلاب</div>
+  </div>
+</div>
+```
+
+  </div>
+</div>
+
+<!-- ══ FEATURES ══ -->
+
+<section id="features">
+  <div class="sec-header fade-in">
+    <div class="sec-tag">ما الذي نقدمه</div>
+    <div class="sec-title">كل شيء صُمّم لطلاب جامعة نزوى 🎓</div>
+    <div class="sec-sub">منصة شاملة تجمع كل أدوات النجاح الجامعي</div>
+  </div>
+
+  <div class="features-grid">
+    <div class="feat-card fade-in">
+      <div class="feat-icon caramel">📊</div>
+      <div class="feat-title">حاسبة المعدل</div>
+      <div class="feat-desc">احسب معدلك الفصلي والتراكمي بسهولة. أضف موادك وساعاتها وتقديراتك.</div>
+      <div class="feat-badge">✅ مجاني</div>
+    </div>
+
+```
+<div class="feat-card fade-in">
+  <div class="feat-icon green">💬</div>
+  <div class="feat-title">مجموعات الدراسة</div>
+  <div class="feat-desc">روابط مجموعات واتساب لكل كلية وتخصص في جامعة نزوى.</div>
+  <div class="feat-badge">✅ مجاني</div>
+</div>
+
+<div class="feat-card fade-in">
+  <div class="feat-icon blue">📚</div>
+  <div class="feat-title">ملخصات المواد</div>
+  <div class="feat-desc">ملخصات احترافية لمواد جامعة نزوى. بعضها مجاني وبعضها عبر Student Hub.</div>
+  <div class="feat-badge new">🔥 جديد</div>
+</div>
+
+<div class="feat-card fade-in">
+  <div class="feat-icon caramel">🔗</div>
+  <div class="feat-title">روابط مفيدة</div>
+  <div class="feat-desc">كل الروابط المهمة في مكان واحد — البوابة الطلابية، المكتبة، الجدول.</div>
+  <div class="feat-badge">✅ مجاني</div>
+</div>
+
+<div class="feat-card fade-in">
+  <div class="feat-icon green">🎓</div>
+  <div class="feat-title">Student Hub</div>
+  <div class="feat-desc">خدمات دراسية داخل الجامعة — طباعة، تجليد، قرطاسية، توصيل مجاني.</div>
+  <div class="feat-badge new">⚡ داخل الجامعة</div>
+</div>
+
+<div class="feat-card fade-in">
+  <div class="feat-icon blue">📢</div>
+  <div class="feat-title">أخبار الجامعة</div>
+  <div class="feat-desc">آخر أخبار وإعلانات جامعة نزوى. تابع حساب إنستا للتحديثات اليومية.</div>
+  <div class="feat-badge new">📱 إنستاقرام</div>
+</div>
+```
+
+  </div>
+</section>
+
+<!-- ══ CALCULATOR ══ -->
+
+<section id="calculator" style="max-width:700px;">
+  <div class="sec-header fade-in">
+    <div class="sec-tag">أداة مجانية</div>
+    <div class="sec-title">حاسبة المعدل الفصلي 📊</div>
+    <div class="sec-sub">أضف موادك وساعاتها وتقديراتها واحسب معدلك فوراً</div>
+  </div>
+
+  <div class="calc-section fade-in">
+    <div class="courses" id="courses">
+      <div class="course-row">
+        <input type="text" placeholder="اسم المادة (اختياري)">
+        <select>
+          <option value="">الساعات</option>
+          <option value="1">1</option>
+          <option value="2">2</option>
+          <option value="3">3</option>
+          <option value="4">4</option>
+        </select>
+        <select class="grade-select">
+          <option value="">التقدير</option>
+          <option value="4.0">A+ (4.0)</option>
+          <option value="4.0">A (4.0)</option>
+          <option value="3.7">A- (3.7)</option>
+          <option value="3.3">B+ (3.3)</option>
+          <option value="3.0">B (3.0)</option>
+          <option value="2.7">B- (2.7)</option>
+          <option value="2.3">C+ (2.3)</option>
+          <option value="2.0">C (2.0)</option>
+          <option value="1.7">C- (1.7)</option>
+          <option value="1.0">D (1.0)</option>
+          <option value="0">F (0.0)</option>
+        </select>
+        <button class="remove-btn" onclick="removeRow(this)">×</button>
+      </div>
+    </div>
+
+```
+<button class="calc-add" onclick="addRow()">+ إضافة مادة</button>
+<button class="calc-btn" onclick="calculate()">احسب المعدل ⚡</button>
+
+<div class="calc-result" id="result">
+  <div class="result-label">معدلك الفصلي</div>
+  <div class="result-num" id="result-num">0.00</div>
+  <div class="result-grade" id="result-grade"></div>
+</div>
+```
+
+  </div>
+</section>
+
+<!-- ══ GROUPS ══ -->
+
+<section id="groups">
+  <div class="sec-header fade-in">
+    <div class="sec-tag">تواصل مع زملائك</div>
+    <div class="sec-title">مجموعات الكليات 💬</div>
+    <div class="sec-sub">انضم لمجموعة كليتك وتواصل مع زملائك</div>
+  </div>
+
+  <div class="groups-grid">
+    <div class="group-card fade-in">
+      <div class="group-emoji">💼</div>
+      <div class="group-name">كلية الاقتصاد ونظم المعلومات</div>
+      <div class="group-count">مجموعة واتساب</div>
+      <button class="group-btn" onclick="window.open('https://chat.whatsapp.com/DfetMZZOpMbGMuiiTGvj04?mode=ac_t','_blank')">انضم الآن 💬</button>
+    </div>
+    <div class="group-card fade-in">
+      <div class="group-emoji">🏗️</div>
+      <div class="group-name">كلية الهندسة والعمارة</div>
+      <div class="group-count">قريباً</div>
+      <button class="group-btn" style="opacity:0.5;cursor:not-allowed;">Coming Soon 🔜</button>
+    </div>
+    <div class="group-card fade-in">
+      <div class="group-emoji">🔬</div>
+      <div class="group-name">كلية العلوم والآداب</div>
+      <div class="group-count">قريباً</div>
+      <button class="group-btn" style="opacity:0.5;cursor:not-allowed;">Coming Soon 🔜</button>
+    </div>
+    <div class="group-card fade-in">
+      <div class="group-emoji">⚕️</div>
+      <div class="group-name">كلية العلوم الصحية</div>
+      <div class="group-count">قريباً</div>
+      <button class="group-btn" style="opacity:0.5;cursor:not-allowed;">Coming Soon 🔜</button>
+    </div>
+    <div class="group-card fade-in">
+      <div class="group-emoji">📖</div>
+      <div class="group-name">معهد التأسيس</div>
+      <div class="group-count">قريباً</div>
+      <button class="group-btn" style="opacity:0.5;cursor:not-allowed;">Coming Soon 🔜</button>
+    </div>
+  </div>>
