@@ -8,18 +8,18 @@
 <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@200;300;400;700;900&family=Amiri:wght@400;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
 :root {
-  --coffee: #3d0a14;
-  --espresso: #1a0007;
-  --latte: #c8758c;
-  --cream: #f5e0e5;
-  --foam: #fdf0f2;
-  --caramel: #8b1a2e;
-  --caramel-light: #c4304a;
-  --green: #6b1020;
-  --green-light: #8b1a2e;
-  --mint: #e8607a;
-  --blue: #3d0a14;
-  --blue-light: #6b1020;
+  --coffee: #5c1a28;
+  --espresso: #2d0a14;
+  --latte: #d4899c;
+  --cream: #faeaed;
+  --foam: #fdf5f7;
+  --caramel: #9b2335;
+  --caramel-light: #c94060;
+  --green: #7b1525;
+  --green-light: #9b2335;
+  --mint: #e8758a;
+  --blue: #5c1a28;
+  --blue-light: #7b2535;
 }
 
 * { margin:0; padding:0; box-sizing:border-box; }
@@ -28,7 +28,7 @@ html { scroll-behavior: smooth; }
 
 body {
   color-scheme: dark;
-background: var(--espresso);
+background: #2d0a14;
 font-family: ‘Tajawal’, sans-serif;
 color: var(--foam);
 overflow-x: hidden;
@@ -36,7 +36,7 @@ overflow-x: hidden;
 
 /* ══ SCROLLBAR ══ */
 ::-webkit-scrollbar { width: 6px; }
-::-webkit-scrollbar-track { background: var(--espresso); }
+::-webkit-scrollbar-track { background: #2d0a14; }
 ::-webkit-scrollbar-thumb { background: var(--caramel); border-radius: 3px; }
 
 /* ══ NAV ══ */
@@ -127,7 +127,7 @@ animation: ringPulse 6s ease-in-out infinite;
 
 .hero-glow {
 position: absolute; inset: 0;
-background: radial-gradient(ellipse at center, rgba(212,130,42,0.08) 0%, transparent 60%);
+background: radial-gradient(ellipse at center, rgba(155,35,53,0.2) 0%, transparent 60%);
 }
 
 .hero-content { position: relative; z-index: 1; max-width: 700px; }
@@ -280,7 +280,7 @@ gap: 16px;
 }
 
 .feat-card {
-background: rgba(255,255,255,0.03);
+background: rgba(255,255,255,0.07);
 border: 1px solid rgba(255,255,255,0.07);
 border-radius: 16px; padding: 28px;
 transition: all 0.3s;
@@ -371,7 +371,7 @@ transition: all 0.3s; flex-shrink: 0;
 
 .calc-add {
 width: 100%;
-background: rgba(255,255,255,0.03);
+background: rgba(255,255,255,0.07);
 border: 1px dashed rgba(212,130,42,0.2);
 border-radius: 10px; padding: 12px;
 color: rgba(212,130,42,0.5); font-size: 13px; font-weight: 700;
@@ -412,7 +412,7 @@ gap: 14px;
 }
 
 .link-card {
-background: rgba(255,255,255,0.03);
+background: rgba(255,255,255,0.07);
 border: 1px solid rgba(255,255,255,0.07);
 border-radius: 14px; padding: 20px;
 text-decoration: none; display: flex;
@@ -436,7 +436,7 @@ gap: 14px;
 }
 
 .group-card {
-background: rgba(255,255,255,0.03);
+background: rgba(255,255,255,0.07);
 border: 1px solid rgba(255,255,255,0.07);
 border-radius: 14px; padding: 20px;
 text-align: center; transition: all 0.3s;
