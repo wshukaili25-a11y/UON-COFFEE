@@ -3,298 +3,284 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>UoN Coffee</title>
-<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;700;900&family=Amiri:wght@400;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<title>UoN Coffee Pro</title>
+
 <style>
-*{margin:0;padding:0;box-sizing:border-box}html{scroll-behavior:smooth}
-body{background:#1a0a10;color:#fdf0f2;font-family:'Tajawal',sans-serif;overflow-x:hidden}
-nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(26,10,16,.93);backdrop-filter:blur(20px);border-bottom:1px solid rgba(155,35,53,.3);padding:14px 24px;display:flex;align-items:center;justify-content:space-between}
-.nl{display:flex;align-items:center;gap:10px}
-.nc{width:38px;height:38px;background:linear-gradient(135deg,#9b2335,#c94060);border-radius:8px 8px 12px 12px;display:flex;align-items:center;justify-content:center;font-family:'Space Mono',monospace;font-size:9px;font-weight:700;color:#fff;position:relative}
-.nc::after{content:'';position:absolute;right:-8px;top:8px;width:8px;height:14px;border:2px solid #9b2335;border-left:none;border-radius:0 6px 6px 0}
-.nn{font-weight:900;font-size:16px;color:#fdf0f2}.nn span{color:#c94060}
-.nls{display:flex;gap:20px;list-style:none}
-.nls a{color:rgba(253,240,242,.5);text-decoration:none;font-size:12px;transition:color .3s}
-.nls a:hover{color:#c94060}
-.nb{background:linear-gradient(135deg,#9b2335,#c94060);color:#fff;font-size:11px;font-weight:700;padding:7px 16px;border-radius:50px;text-decoration:none}
-@media(max-width:768px){.nls{display:none}}
+body{
+margin:0;
+font-family:'Tajawal',sans-serif;
+background:linear-gradient(135deg,#1a0a10,#2d0a14);
+color:#fff;
+animation:fade .8s ease;
+}
 
-.hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:120px 24px 80px;text-align:center;position:relative;overflow:hidden}
-.hbg{position:absolute;inset:0;background:radial-gradient(ellipse at 50% 40%,rgba(155,35,53,.15) 0%,transparent 65%)}
-.hr{position:absolute;border-radius:50%;border:1px solid rgba(155,35,53,.1);top:50%;left:50%;transform:translate(-50%,-50%);animation:pulse 5s ease-in-out infinite}
-@keyframes pulse{0%,100%{opacity:.15;transform:translate(-50%,-50%) scale(.97)}50%{opacity:.04;transform:translate(-50%,-50%) scale(1.03)}}
-.hc{position:relative;z-index:1;max-width:680px}
-.hbadge{display:inline-block;background:rgba(155,35,53,.15);border:1px solid rgba(155,35,53,.4);color:#c94060;font-size:12px;font-weight:700;padding:6px 20px;border-radius:50px;margin-bottom:32px}
-.hcup{width:100px;height:100px;background:linear-gradient(145deg,#9b2335,#c94060);border-radius:22px 22px 30px 30px;display:flex;align-items:center;justify-content:center;font-family:'Space Mono',monospace;font-size:16px;font-weight:700;color:#fff;margin:0 auto 32px;position:relative;box-shadow:0 16px 48px rgba(155,35,53,.4);animation:float 5s ease-in-out infinite}
-.hcup::after{content:'';position:absolute;right:-18px;top:20px;width:18px;height:36px;border:4px solid #9b2335;border-left:none;border-radius:0 14px 14px 0}
-@keyframes float{0%,100%{transform:translateY(0) rotate(-1deg)}50%{transform:translateY(-12px) rotate(1deg)}}
-.ht{font-family:'Amiri',serif;font-size:clamp(30px,6vw,52px);color:#fdf0f2;line-height:1.5;margin-bottom:16px}.ht span{color:#c94060}
-.hs{font-size:14px;color:rgba(253,240,242,.4);line-height:1.9;margin-bottom:36px}
-.hbtns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
-.bm{background:linear-gradient(135deg,#9b2335,#c94060);color:#fff;font-size:14px;font-weight:900;padding:14px 28px;border-radius:10px;text-decoration:none;box-shadow:0 8px 24px rgba(155,35,53,.4);transition:all .3s}
-.bm:hover{transform:translateY(-2px)}
-.bs{background:rgba(155,35,53,.1);border:1px solid rgba(155,35,53,.3);color:#c94060;font-size:14px;font-weight:700;padding:14px 28px;border-radius:10px;text-decoration:none;transition:all .3s}
-.bs:hover{background:rgba(155,35,53,.2)}
-.stats{display:flex;gap:28px;justify-content:center;margin-top:52px;flex-wrap:wrap}
-.stat{text-align:center}.sn{font-family:'Space Mono',monospace;font-size:26px;font-weight:700;color:#c94060}
-.sl{font-size:11px;color:rgba(253,240,242,.3);margin-top:4px}
-.sd{width:1px;background:rgba(155,35,53,.2);align-self:stretch}
+@keyframes fade{
+from{opacity:0;transform:translateY(10px)}
+to{opacity:1}
+}
 
-.sec{padding:80px 24px;max-width:1100px;margin:0 auto}
-.shd{text-align:center;margin-bottom:48px}
-.stag{display:block;font-family:'Space Mono',monospace;font-size:9px;letter-spacing:4px;text-transform:uppercase;color:rgba(201,64,96,.5);margin-bottom:12px}
-.stit{font-family:'Amiri',serif;font-size:clamp(22px,4vw,34px);color:#fdf0f2}
-.ssub{font-size:13px;color:rgba(253,240,242,.3);margin-top:8px;line-height:1.8}
+/* HEADER */
+h1{text-align:center;margin-top:40px}
 
-.g3{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px}
-.g2{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px}
-.g5{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px}
+/* CARDS */
+.container{padding:20px;text-align:center}
+.card{
+background:rgba(255,255,255,0.05);
+backdrop-filter:blur(10px);
+padding:20px;
+margin:10px;
+border-radius:15px;
+cursor:pointer;
+transition:.3s;
+}
+.card:hover{transform:scale(1.05)}
 
-.card{background:rgba(155,35,53,.07);border:1px solid rgba(155,35,53,.18);border-radius:16px;padding:28px;transition:all .3s}
-.card:hover{border-color:rgba(155,35,53,.38);transform:translateY(-4px)}
-.ci{width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;margin-bottom:16px;background:rgba(155,35,53,.14)}
-.ct{font-size:15px;font-weight:900;color:#fdf0f2;margin-bottom:8px}
-.cd{font-size:12px;color:rgba(253,240,242,.4);line-height:1.8}
-.bdg{display:inline-block;font-size:10px;font-weight:700;padding:4px 12px;border-radius:50px;margin-top:14px}
-.bfree{background:rgba(155,35,53,.14);border:1px solid rgba(155,35,53,.28);color:#c94060}
-.bsoon{background:rgba(200,117,140,.1);border:1px solid rgba(200,117,140,.22);color:#d4899c}
+/* GPA */
+select,input,button{
+padding:10px;
+margin:5px;
+border:none;
+border-radius:8px;
+}
 
-.cw{background:rgba(155,35,53,.06);border:1px solid rgba(155,35,53,.18);border-radius:20px;padding:40px;max-width:580px;margin:0 auto}
-.crs{display:flex;flex-direction:column;gap:10px;margin-bottom:16px}
-.cr{display:flex;gap:8px;align-items:center}
-.cr input,.cr select{background:rgba(255,255,255,.05);border:1px solid rgba(155,35,53,.22);border-radius:10px;padding:11px 12px;color:#fdf0f2;font-family:'Tajawal',sans-serif;font-size:13px;outline:none;flex:1}
-.cr input::placeholder{color:rgba(253,240,242,.2)}
-.cr select option{background:#2d0a14;color:#fdf0f2}
-.rmb{width:34px;height:34px;flex-shrink:0;background:rgba(255,80,80,.08);border:1px solid rgba(255,80,80,.15);border-radius:8px;color:#ff6b6b;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center}
-.addb{width:100%;background:rgba(155,35,53,.05);border:1px dashed rgba(155,35,53,.25);border-radius:10px;padding:11px;color:rgba(201,64,96,.5);font-size:13px;font-weight:700;cursor:pointer;font-family:'Tajawal',sans-serif;margin-bottom:16px}
-.calb{width:100%;background:linear-gradient(135deg,#9b2335,#c94060);color:#fff;font-size:14px;font-weight:900;padding:14px;border-radius:10px;border:none;cursor:pointer;font-family:'Tajawal',sans-serif}
-.res{display:none;margin-top:20px;background:rgba(155,35,53,.08);border:1px solid rgba(155,35,53,.22);border-radius:14px;padding:20px;text-align:center}
-.rn{font-family:'Space Mono',monospace;font-size:48px;color:#c94060;font-weight:700}
-.rg{font-size:14px;color:rgba(253,240,242,.4);margin-top:6px}
+button{
+background:#c94060;
+color:#fff;
+cursor:pointer;
+}
 
-.gc{background:rgba(155,35,53,.07);border:1px solid rgba(155,35,53,.18);border-radius:14px;padding:22px;text-align:center;transition:all .3s}
-.gc:hover{background:rgba(155,35,53,.14);border-color:rgba(155,35,53,.34);transform:translateY(-3px)}
-.ge{font-size:30px;margin-bottom:10px}.gn{font-size:14px;font-weight:900;color:#fdf0f2;margin-bottom:4px}
-.gs{font-size:11px;color:rgba(253,240,242,.3);margin-bottom:14px}
-.gb{background:rgba(155,35,53,.14);border:1px solid rgba(155,35,53,.3);color:#c94060;font-size:11px;font-weight:700;padding:7px 18px;border-radius:50px;cursor:pointer;font-family:'Tajawal',sans-serif}
+/* TABLE */
+.schedule{
+display:grid;
+grid-template-columns:repeat(2,1fr);
+gap:10px;
+margin-top:20px;
+}
 
-.lc{background:rgba(155,35,53,.07);border:1px solid rgba(155,35,53,.18);border-radius:14px;padding:20px;text-decoration:none;display:flex;align-items:center;gap:14px;transition:all .3s}
-.lc:hover{background:rgba(155,35,53,.14);border-color:rgba(155,35,53,.34);transform:translateX(-4px)}
-.li{font-size:26px;flex-shrink:0}
-.ln{font-size:14px;font-weight:700;color:#fdf0f2;margin-bottom:3px}
-.lu{font-size:11px;color:rgba(253,240,242,.3)}
-.la{margin-right:auto;color:rgba(155,35,53,.4);font-size:18px}
-.lc:hover .la{color:#c94060}
+.cell{
+background:rgba(255,255,255,0.05);
+padding:10px;
+border-radius:10px;
+position:relative;
+}
 
-.hw{background:rgba(155,35,53,.07);border:1px solid rgba(155,35,53,.2);border-radius:24px;padding:48px;display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center}
-@media(max-width:768px){.hw{grid-template-columns:1fr;padding:28px}}
-.htag{font-size:9px;letter-spacing:4px;text-transform:uppercase;color:#c94060;margin-bottom:12px;font-family:'Space Mono',monospace;display:block}
-.htit{font-family:'Amiri',serif;font-size:28px;color:#fdf0f2;line-height:1.5;margin-bottom:14px}
-.hdes{font-size:13px;color:rgba(253,240,242,.4);line-height:1.9;margin-bottom:24px}
-.hlist{display:flex;flex-direction:column;gap:10px;margin-bottom:28px}
-.hi{display:flex;align-items:center;gap:10px}
-.hdot{width:6px;height:6px;background:#9b2335;border-radius:50%;flex-shrink:0}
-.hit{font-size:13px;color:rgba(253,240,242,.5)}
-.hbtn{display:inline-block;background:rgba(155,35,53,.15);border:1px solid rgba(155,35,53,.3);color:#c94060;font-size:13px;font-weight:700;padding:12px 24px;border-radius:10px;opacity:.7}
-.hsvcs{display:flex;flex-direction:column;gap:10px}
-.hsvc{background:rgba(155,35,53,.06);border:1px solid rgba(155,35,53,.14);border-radius:12px;padding:16px 18px;display:flex;align-items:center;gap:12px}
-.hsi{font-size:22px;flex-shrink:0}
-.hsn{font-size:13px;font-weight:700;color:#fdf0f2}
-.hsp{font-size:11px;color:#c94060;margin-top:2px}
-.hsb{margin-right:auto;background:rgba(155,35,53,.14);border:1px solid rgba(155,35,53,.24);color:#c94060;font-size:9px;font-weight:700;padding:2px 8px;border-radius:50px}
+.del{
+position:absolute;
+top:5px;
+left:5px;
+cursor:pointer;
+color:red;
+}
 
-.cg{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px}
-.cc{background:rgba(155,35,53,.07);border:1px solid rgba(155,35,53,.18);border-radius:14px;padding:20px;display:flex;align-items:center;gap:14px;transition:all .3s}
-.cc:hover{border-color:rgba(155,35,53,.35);transform:translateY(-2px)}
-.cic{width:44px;height:44px;background:rgba(155,35,53,.14);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
-.clab{font-size:12px;color:rgba(253,240,242,.4);margin-bottom:4px}
-.cval{font-family:'Space Mono',monospace;font-size:14px;color:#c94060;text-decoration:none;display:block;direction:ltr;text-align:right}
+/* BOT */
+#chatBtn{
+position:fixed;
+bottom:20px;
+left:20px;
+background:#c94060;
+width:60px;
+height:60px;
+border-radius:50%;
+display:flex;
+align-items:center;
+justify-content:center;
+cursor:pointer;
+box-shadow:0 5px 20px rgba(0,0,0,.3);
+}
 
-footer{background:rgba(0,0,0,.3);border-top:1px solid rgba(155,35,53,.15);padding:48px 24px;text-align:center}
-.flogo{font-weight:900;font-size:20px;color:#fdf0f2;margin-bottom:6px}.flogo span{color:#c94060}
-.fsub{font-size:11px;color:rgba(253,240,242,.2);margin-bottom:24px;font-family:'Space Mono',monospace;letter-spacing:2px}
-.flinks{display:flex;gap:20px;justify-content:center;flex-wrap:wrap;margin-bottom:24px}
-.flinks a{color:rgba(253,240,242,.25);text-decoration:none;font-size:12px}
-.flinks a:hover{color:#c94060}
-.fcopy{font-size:11px;color:rgba(253,240,242,.1);font-family:'Space Mono',monospace}
+#chatBox{
+position:fixed;
+bottom:90px;
+left:20px;
+width:320px;
+background:#2d0a14;
+border-radius:15px;
+display:none;
+flex-direction:column;
+}
+
+.chat-header{background:#c94060;padding:10px;text-align:center}
+.chat-body{height:240px;overflow:auto;padding:10px}
+.user{text-align:right;margin:5px}
+.bot{color:#ff8aa0;margin:5px}
+
+.chat-input{display:flex}
+.chat-input input{flex:1;padding:10px;border:none}
+.chat-input button{background:#c94060;border:none;color:#fff}
+
+/* TOP BUTTON */
+#topBtn{
+position:fixed;
+bottom:20px;
+right:20px;
+background:#c94060;
+padding:10px;
+border-radius:50%;
+cursor:pointer;
+display:none;
+}
+
 </style>
 </head>
 <body>
 
-<nav>
-  <div class="nl">
-    <div class="nc">UoN</div>
-    <div class="nn">UoN <span>Coffee</span></div>
-  </div>
-  <ul class="nls">
-    <li><a href="#feat">المميزات</a></li>
-    <li><a href="#calc">حاسبة المعدل</a></li>
-    <li><a href="#grp">المجموعات</a></li>
-    <li><a href="#lnk">روابط مفيدة</a></li>
-    <li><a href="#hub">Student Hub</a></li>
-    <li><a href="#con">التواصل</a></li>
-  </ul>
-  <a href="https://instagram.com/unizwacoffee" target="_blank" class="nb">Instagram</a>
-</nav>
+<h1>☕ UoN Coffee Pro</h1>
 
-<div class="hero">
-  <div class="hbg"></div>
-  <div class="hr" style="width:300px;height:300px"></div>
-  <div class="hr" style="width:500px;height:500px;animation-delay:1.5s"></div>
-  <div class="hr" style="width:700px;height:700px;animation-delay:3s"></div>
-  <div class="hc">
-    <div class="hbadge">☕ مو رسمي.. بس أحسن من الرسمي 😏</div>
-    <div class="hcup">UoN</div>
-    <h1 class="ht">كل ما يحتاجه<br><span>طالب جامعة نزوى</span><br>في مكان واحد ☕</h1>
-    <p class="hs">ملخصات · حاسبة معدل · مجموعات دراسة · روابط مفيدة<br>خدمات Student Hub · وكل جديد عن جامعتك</p>
-    <div class="hbtns">
-      <a href="#calc" class="bm">احسب معدلك الآن ⚡</a>
-      <a href="#hub" class="bs">خدمات Student Hub 🎓</a>
-    </div>
-    <div class="stats">
-      <div class="stat"><div class="sn">+500</div><div class="sl">طالب مستفيد</div></div>
-      <div class="sd"></div>
-      <div class="stat"><div class="sn">+50</div><div class="sl">ملخص متاح</div></div>
-      <div class="sd"></div>
-      <div class="stat"><div class="sn">24h</div><div class="sl">وقت التوصيل</div></div>
-      <div class="sd"></div>
-      <div class="stat"><div class="sn">5★</div><div class="sl">تقييم الطلاب</div></div>
-    </div>
-  </div>
+<div class="container">
+
+<div class="card" onclick="show('gpa')">📊 حاسبة المعدل</div>
+<div class="card" onclick="show('table')">📅 الجدول</div>
+
+<!-- GPA -->
+<div id="gpa" style="display:none">
+<h3>حاسبة المعدل</h3>
+<div id="rows"></div>
+<button onclick="addRow()">+ مادة</button>
+<button onclick="calc()">احسب</button>
+<h2 id="result"></h2>
+<p id="rate"></p>
 </div>
 
-<section id="feat" class="sec">
-  <div class="shd">
-    <span class="stag">ما الذي نقدمه</span>
-    <div class="stit">كل شيء صُمّم لطلاب جامعة نزوى 🎓</div>
-    <div class="ssub">منصة شاملة تجمع كل أدوات النجاح الجامعي</div>
-  </div>
-  <div class="g3">
-    <div class="card"><div class="ci">📊</div><div class="ct">حاسبة المعدل</div><div class="cd">احسب معدلك الفصلي والتراكمي بسهولة.</div><span class="bdg bfree">✅ مجاني</span></div>
-    <div class="card"><div class="ci">💬</div><div class="ct">مجموعات الدراسة</div><div class="cd">روابط مجموعات واتساب لكل كلية في جامعة نزوى.</div><span class="bdg bfree">✅ مجاني</span></div>
-    <div class="card"><div class="ci">📚</div><div class="ct">ملخصات المواد</div><div class="cd">ملخصات احترافية لمواد جامعة نزوى — قريباً!</div><span class="bdg bsoon">Coming Soon 🔜</span></div>
-    <div class="card"><div class="ci">🔗</div><div class="ct">روابط مفيدة</div><div class="cd">كل الروابط المهمة — البوابة، المكتبة، الجدول.</div><span class="bdg bfree">✅ مجاني</span></div>
-    <div class="card"><div class="ci">🎓</div><div class="ct">Student Hub</div><div class="cd">خدمات دراسية داخل الجامعة — قريباً!</div><span class="bdg bsoon">Coming Soon 🔜</span></div>
-    <div class="card"><div class="ci">📢</div><div class="ct">أخبار الجامعة</div><div class="cd">تابع حساب Instagram لآخر أخبار جامعة نزوى.</div><span class="bdg bfree">📱 Instagram</span></div>
-  </div>
-</section>
+<!-- TABLE -->
+<div id="table" style="display:none">
+<h3>جدولك</h3>
+<input id="sub" placeholder="المادة">
+<input id="time" placeholder="الوقت">
+<button onclick="addClass()">إضافة</button>
+<div class="schedule" id="schedule"></div>
+</div>
 
-<section id="calc" class="sec" style="max-width:680px">
-  <div class="shd">
-    <span class="stag">أداة مجانية</span>
-    <div class="stit">حاسبة المعدل الفصلي 📊</div>
-    <div class="ssub">أضف موادك وساعاتها وتقديراتها واحسب معدلك فوراً</div>
-  </div>
-  <div class="cw">
-    <div class="crs" id="crs">
-      <div class="cr">
-        <input type="text" placeholder="اسم المادة">
-        <select><option value="">الساعات</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option></select>
-        <select><option value="">التقدير</option><option value="4.0">A (4.0)</option><option value="3.7">A- (3.7)</option><option value="3.3">B+ (3.3)</option><option value="3.0">B (3.0)</option><option value="2.7">B- (2.7)</option><option value="2.3">C+ (2.3)</option><option value="2.0">C (2.0)</option><option value="1.0">D (1.0)</option><option value="0">F (0.0)</option></select>
-        <button class="rmb" onclick="rmRow(this)">x</button>
-      </div>
-    </div>
-    <button class="addb" onclick="addRow()">+ اضافة مادة</button>
-    <button class="calb" onclick="calc()">احسب المعدل ⚡</button>
-    <div class="res" id="res">
-      <div style="font-size:11px;color:rgba(201,64,96,.5);margin-bottom:8px;">معدلك الفصلي</div>
-      <div class="rn" id="rn">0.00</div>
-      <div class="rg" id="rg"></div>
-    </div>
-  </div>
-</section>
+</div>
 
-<section id="grp" class="sec">
-  <div class="shd">
-    <span class="stag">تواصل مع زملائك</span>
-    <div class="stit">مجموعات الكليات والجامعة 💬</div>
-    <div class="ssub">انضم لمجموعة كليتك</div>
-  </div>
-  <div class="g5">
-    <div class="gc"><div class="ge">🎓</div><div class="gn">جامعة نزوى (مجموعة غير رسمية)</div><div class="gs">قريباً</div><button class="gb" style="opacity:.4;cursor:not-allowed">Coming Soon 🔜</button></div>
-    <div class="gc"><div class="ge">💼</div><div class="gn">كلية الاقتصاد ونظم المعلومات</div><div class="gs">مجموعة واتساب</div><button class="gb" onclick="window.open('https://chat.whatsapp.com/DfetMZZOpMbGMuiiTGvj04?mode=ac_t','_blank')">انضم الآن 💬</button></div>
-    <div class="gc"><div class="ge">🏗️</div><div class="gn">كلية الهندسة والعمارة</div><div class="gs">قريباً</div><button class="gb" style="opacity:.4;cursor:not-allowed">Coming Soon 🔜</button></div>
-    <div class="gc"><div class="ge">🔬</div><div class="gn">كلية العلوم والآداب</div><div class="gs">قريباً</div><button class="gb" style="opacity:.4;cursor:not-allowed">Coming Soon 🔜</button></div>
-    <div class="gc"><div class="ge">⚕️</div><div class="gn">كلية العلوم الصحية</div><div class="gs">قريباً</div><button class="gb" style="opacity:.4;cursor:not-allowed">Coming Soon 🔜</button></div>
-    <div class="gc"><div class="ge">📖</div><div class="gn">معهد التأسيس</div><div class="gs">قريباً</div><button class="gb" style="opacity:.4;cursor:not-allowed">Coming Soon 🔜</button></div>
-  </div>
-</section>
+<!-- BOT -->
+<div id="chatBtn" onclick="toggleChat()">💬</div>
 
-<section id="lnk" class="sec">
-  <div class="shd">
-    <span class="stag">روابط سريعة</span>
-    <div class="stit">كل الروابط المهمة 🔗</div>
-    <div class="ssub">كل شيء في مكان واحد</div>
-  </div>
-  <div class="g2">
-    <a href="https://portal.unizwa.edu.om" target="_blank" class="lc"><div class="li">🎓</div><div><div class="ln">البوابة الطلابية</div><div class="lu">portal.unizwa.edu.om</div></div><div class="la">&#8592;</div></a>
-    <a href="https://moodle.unizwa.edu.om/login/index.php" target="_blank" class="lc"><div class="li">📚</div><div><div class="ln">Moodle</div><div class="lu">moodle.unizwa.edu.om</div></div><div class="la">&#8592;</div></a>
-    <a href="https://elearning.unizwa.edu.om/EduWavehe/login.aspx" target="_blank" class="lc"><div class="li">🌊</div><div><div class="ln">EduWave</div><div class="lu">elearning.unizwa.edu.om</div></div><div class="la">&#8592;</div></a>
-    <a href="https://library.unizwa.edu.om" target="_blank" class="lc"><div class="li">🏛️</div><div><div class="ln">مكتبة الجامعة</div><div class="lu">library.unizwa.edu.om</div></div><div class="la">&#8592;</div></a>
-    <a href="https://www.unizwa.edu.om/content_files/01071-1420.pdf" target="_blank" class="lc"><div class="li">📅</div><div><div class="ln">التقويم الاكاديمي</div><div class="lu">unizwa.edu.om</div></div><div class="la">&#8592;</div></a>
-    <a href="https://www.unizwa.edu.om" target="_blank" class="lc"><div class="li">🌐</div><div><div class="ln">الموقع الرسمي</div><div class="lu">unizwa.edu.om</div></div><div class="la">&#8592;</div></a>
-  </div>
-</section>
+<div id="chatBox">
+<div class="chat-header">🤖 UoN Bot</div>
+<div class="chat-body" id="chatBody"></div>
+<div class="chat-input">
+<input id="msg" placeholder="اسألني...">
+<button onclick="sendMsg()">إرسال</button>
+</div>
+</div>
 
-<section id="hub" class="sec">
-  <div style="text-align:center;padding:80px 24px;background:rgba(155,35,53,.07);border:1px solid rgba(155,35,53,.2);border-radius:24px;position:relative;overflow:hidden;">
-    <div style="font-size:52px;margin-bottom:20px;color:#fdf0f2;">&#8594;</div>
-    <div style="font-family:'Space Mono',monospace;font-size:12px;letter-spacing:6px;color:rgba(201,64,96,.4);margin-bottom:12px;">STUDENT HUB</div>
-    <div style="font-family:'Amiri',serif;font-size:48px;color:#fdf0f2;margin-bottom:8px;">Coming Soon</div>
-    <div style="width:60px;height:1px;background:rgba(155,35,53,.4);margin:16px auto;"></div>
-    <div style="font-size:13px;color:rgba(253,240,242,.35);">☕ قريباً — ترقبوا الإطلاق</div>
-  </div>
-</section>
-
-<section id="con" class="sec">
-  <div class="shd">
-    <span class="stag">تواصل مع الجامعة</span>
-    <div class="stit">أرقام جامعة نزوى 📞</div>
-    <div class="ssub">اضغط على الرقم للاتصال مباشرة</div>
-  </div>
-  <div class="cg">
-    <div class="cc"><div class="cic">🏦</div><div><div class="clab">حساب البنك</div><span class="cval">0317008949900017</span></div></div>
-    <div class="cc"><div class="cic">💰</div><div><div class="clab">المالية</div><a href="tel:92596648" class="cval">92596648</a></div></div>
-    <div class="cc"><div class="cic">📋</div><div><div class="clab">القبول والتسجيل</div><a href="tel:25446234" class="cval">25446234</a></div></div>
-    <div class="cc"><div class="cic">🤝</div><div><div class="clab">الرعاية الاجتماعية 1</div><a href="tel:91313951" class="cval">91313951</a></div></div>
-    <div class="cc"><div class="cic">🤝</div><div><div class="clab">الرعاية الاجتماعية 2</div><a href="tel:25446247" class="cval">25446247</a></div></div>
-  </div>
-</section>
-
-<footer>
-  <div class="flogo">UoN <span>Coffee</span> ☕</div>
-  <div class="fsub">غير رسمي · بس أحسن من الرسمي 😏</div>
-  <div class="flinks">
-    <a href="#feat">المميزات</a>
-    <a href="#calc">حاسبة المعدل</a>
-    <a href="#grp">المجموعات</a>
-    <a href="#lnk">الروابط</a>
-    <a href="#hub">Student Hub</a>
-    <a href="#con">التواصل</a>
-    <a href="https://instagram.com/unizwacoffee" target="_blank">Instagram</a>
-  </div>
-  <div class="fcopy">2025 UoN Coffee · جامعة نزوى 🇴🇲</div>
-</footer>
+<div id="topBtn" onclick="scrollTop()">↑</div>
 
 <script>
+
+/* NAV */
+function show(id){
+document.getElementById('gpa').style.display='none';
+document.getElementById('table').style.display='none';
+document.getElementById(id).style.display='block';
+}
+
+/* GPA */
 function addRow(){
-  var r=document.createElement('div');r.className='cr';
-  r.innerHTML='<input type="text" placeholder="اسم المادة"><select><option value="">الساعات</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option></select><select><option value="">التقدير</option><option value="4.0">A (4.0)</option><option value="3.7">A- (3.7)</option><option value="3.3">B+ (3.3)</option><option value="3.0">B (3.0)</option><option value="2.7">B- (2.7)</option><option value="2.3">C+ (2.3)</option><option value="2.0">C (2.0)</option><option value="1.0">D (1.0)</option><option value="0">F (0.0)</option></select><button class="rmb" onclick="rmRow(this)">x</button>';
-  document.getElementById('crs').appendChild(r);
+let div=document.createElement("div");
+div.innerHTML=`
+<select><option value="3">3 ساعات</option></select>
+<select>
+<option value="4">A</option>
+<option value="3.7">A-</option>
+<option value="3">B</option>
+<option value="2">C</option>
+</select>`;
+document.getElementById("rows").appendChild(div);
 }
-function rmRow(b){if(document.querySelectorAll('.cr').length>1)b.parentElement.remove();}
+
 function calc(){
-  var rows=document.querySelectorAll('.cr'),p=0,h=0;
-  rows.forEach(function(r){
-    var s=r.querySelectorAll('select'),hr=parseFloat(s[0].value),gr=parseFloat(s[1].value);
-    if(hr&&!isNaN(gr)){p+=hr*gr;h+=hr;}
-  });
-  if(!h){alert('أضف مادة واحدة على الأقل!');return;}
-  var g=(p/h).toFixed(2);
-  document.getElementById('rn').textContent=g;
-  document.getElementById('rg').textContent=g>=3.7?'🌟 ممتاز!':g>=3.0?'✅ جيد جداً':g>=2.0?'📚 جيد':'💪 استمر!';
-  document.getElementById('res').style.display='block';
+let rows=document.querySelectorAll("#rows div");
+let total=0,hours=0;
+
+rows.forEach(r=>{
+let s=r.querySelectorAll("select");
+total+=s[0].value*s[1].value;
+hours+=parseFloat(s[0].value);
+});
+
+let g=(total/hours).toFixed(2);
+document.getElementById("result").textContent=g;
+
+let msg="";
+if(g>=3.7) msg="🔥 أسطوري";
+else if(g>=3) msg="💪 ممتاز";
+else if(g>=2) msg="🙂 جيد";
+else msg="🚨 شد حيلك";
+
+document.getElementById("rate").textContent=msg;
+
+localStorage.setItem("gpa",g);
 }
+
+/* LOAD */
+window.onload=function(){
+let g=localStorage.getItem("gpa");
+if(g) document.getElementById("result").textContent=g;
+
+let data=JSON.parse(localStorage.getItem("schedule")||"[]");
+data.forEach(addToUI);
+}
+
+/* TABLE */
+function addClass(){
+let sub=document.getElementById("sub").value;
+let time=document.getElementById("time").value;
+
+let obj={sub,time};
+let data=JSON.parse(localStorage.getItem("schedule")||"[]");
+
+data.push(obj);
+localStorage.setItem("schedule",JSON.stringify(data));
+
+addToUI(obj);
+}
+
+function addToUI(c){
+let div=document.createElement("div");
+div.className="cell";
+div.innerHTML=`<span class="del" onclick="del(this)">x</span>${c.sub}<br>${c.time}`;
+document.getElementById("schedule").appendChild(div);
+}
+
+function del(el){
+el.parentElement.remove();
+}
+
+/* BOT */
+function toggleChat(){
+let box=document.getElementById('chatBox');
+box.style.display=box.style.display==='flex'?'none':'flex';
+}
+
+function sendMsg(){
+let msg=document.getElementById("msg").value;
+let body=document.getElementById("chatBody");
+
+body.innerHTML+=`<div class="user">${msg}</div>`;
+
+let reply="🤖 حاول بصيغة ثانية";
+
+if(msg.includes("معدل")) reply="📊 احسبه من فوق";
+else if(msg.includes("جدول")) reply="📅 سو جدولك بسهولة";
+else if(msg.includes("مرحبا")) reply="هلا وغلا 😎";
+else if(msg.includes("تسجيل")) reply="📋 تواصل مع القبول والتسجيل";
+else if(msg.includes("وقت")) reply="⏰ يعتمد على جدولك الدراسي";
+
+body.innerHTML+=`<div class="bot">${reply}</div>`;
+}
+
+/* SCROLL TOP */
+window.onscroll=function(){
+document.getElementById("topBtn").style.display=
+window.scrollY>200?"block":"none";
+}
+
+function scrollTop(){
+window.scrollTo({top:0,behavior:"smooth"});
+}
+
 </script>
+
 </body>
 </html>
