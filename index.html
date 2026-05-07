@@ -3,284 +3,545 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>UoN Coffee Pro</title>
-
+<title>UoN Coffee — بوابة طلاب جامعة نزوى</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;700;900&family=Amiri:wght@400;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
-body{
-margin:0;
-font-family:'Tajawal',sans-serif;
-background:linear-gradient(135deg,#1a0a10,#2d0a14);
-color:#fff;
-animation:fade .8s ease;
-}
+:root{--m:#1a0a10;--mm:#2d0f1a;--ms:#3d1525;--r:#9b2335;--rb:#c94060;--rl:#e8607a;--t:#fdf0f2;--td:rgba(253,240,242,0.5);--tf:rgba(253,240,242,0.25)}
+*{margin:0;padding:0;box-sizing:border-box}html{scroll-behavior:smooth}
+body{background:var(--m);color:var(--t);font-family:'Tajawal',sans-serif;overflow-x:hidden}
+::-webkit-scrollbar{width:3px}::-webkit-scrollbar-track{background:var(--m)}::-webkit-scrollbar-thumb{background:var(--r);border-radius:2px}
 
-@keyframes fade{
-from{opacity:0;transform:translateY(10px)}
-to{opacity:1}
-}
+nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:16px 28px;display:flex;align-items:center;justify-content:space-between;background:rgba(26,10,16,.93);backdrop-filter:blur(24px);border-bottom:1px solid rgba(155,35,53,.2)}
+.nl{display:flex;align-items:center;gap:10px;text-decoration:none}
+.nc{width:36px;height:36px;background:linear-gradient(135deg,var(--r),var(--rb));border-radius:8px 8px 12px 12px;display:flex;align-items:center;justify-content:center;font-family:'Space Mono',monospace;font-size:8px;font-weight:700;color:#fff;position:relative;flex-shrink:0}
+.nc::after{content:'';position:absolute;right:-8px;top:8px;width:8px;height:14px;border:2px solid var(--r);border-left:none;border-radius:0 6px 6px 0}
+.nn{font-weight:900;font-size:15px;color:var(--t)}.nn span{color:var(--rb)}
+.nls{display:flex;gap:18px;list-style:none}.nls a{color:var(--td);text-decoration:none;font-size:12px;transition:color .3s}.nls a:hover{color:var(--rb)}
+.nbtn{display:flex;align-items:center;gap:8px;background:linear-gradient(135deg,var(--r),var(--rb));color:#fff;font-size:11px;font-weight:700;padding:8px 18px;border-radius:50px;border:none;cursor:pointer;font-family:'Tajawal',sans-serif;transition:all .3s}
+.nbtn:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(155,35,53,.4)}
+.bd{width:6px;height:6px;background:#4ade80;border-radius:50%;animation:blink 1.5s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+@media(max-width:768px){.nls{display:none}}
 
-/* HEADER */
-h1{text-align:center;margin-top:40px}
-
-/* CARDS */
-.container{padding:20px;text-align:center}
-.card{
-background:rgba(255,255,255,0.05);
-backdrop-filter:blur(10px);
-padding:20px;
-margin:10px;
-border-radius:15px;
-cursor:pointer;
-transition:.3s;
-}
-.card:hover{transform:scale(1.05)}
-
-/* GPA */
-select,input,button{
-padding:10px;
-margin:5px;
-border:none;
-border-radius:8px;
-}
-
-button{
-background:#c94060;
-color:#fff;
-cursor:pointer;
-}
-
-/* TABLE */
-.schedule{
-display:grid;
-grid-template-columns:repeat(2,1fr);
-gap:10px;
-margin-top:20px;
-}
-
-.cell{
-background:rgba(255,255,255,0.05);
-padding:10px;
-border-radius:10px;
-position:relative;
-}
-
-.del{
-position:absolute;
-top:5px;
-left:5px;
-cursor:pointer;
-color:red;
-}
+.hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:120px 24px 80px;text-align:center;position:relative;overflow:hidden}
+.hbg{position:absolute;inset:0;background:radial-gradient(ellipse at 50% 40%,rgba(155,35,53,.15) 0%,transparent 65%)}
+.hr{position:absolute;border-radius:50%;border:1px solid rgba(155,35,53,.08);top:50%;left:50%;transform:translate(-50%,-50%);animation:rp 6s ease-in-out infinite}
+@keyframes rp{0%,100%{opacity:.12;transform:translate(-50%,-50%) scale(.97)}50%{opacity:.03;transform:translate(-50%,-50%) scale(1.03)}}
+.hc{position:relative;z-index:1;max-width:700px}
+.hbadge{display:inline-flex;align-items:center;gap:8px;background:rgba(155,35,53,.15);border:1px solid rgba(155,35,53,.35);color:var(--rb);font-size:11px;font-weight:700;padding:6px 18px;border-radius:50px;margin-bottom:32px;animation:fu .8s ease both}
+.hcup{width:100px;height:100px;background:linear-gradient(145deg,var(--r),var(--rb));border-radius:22px 22px 30px 30px;display:flex;align-items:center;justify-content:center;font-family:'Space Mono',monospace;font-size:16px;font-weight:700;color:#fff;margin:0 auto 32px;position:relative;box-shadow:0 0 60px rgba(155,35,53,.4);animation:fl 5s ease-in-out infinite,fu .8s ease .1s both}
+.hcup::after{content:'';position:absolute;right:-18px;top:20px;width:18px;height:36px;border:4px solid var(--r);border-left:none;border-radius:0 14px 14px 0}
+@keyframes fl{0%,100%{transform:translateY(0) rotate(-1deg)}50%{transform:translateY(-12px) rotate(1deg)}}
+.ht{font-family:'Amiri',serif;font-size:clamp(32px,6vw,56px);color:var(--t);line-height:1.5;margin-bottom:16px;animation:fu .8s ease .2s both}.ht span{color:var(--rb)}
+.hs{font-size:14px;color:var(--td);line-height:1.9;margin-bottom:40px;animation:fu .8s ease .3s both;font-weight:300}
+.hbtns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;animation:fu .8s ease .4s both}
+.bmain{background:linear-gradient(135deg,var(--r),var(--rb));color:#fff;font-size:13px;font-weight:900;padding:14px 28px;border-radius:10px;text-decoration:none;letter-spacing:1px;transition:all .3s;box-shadow:0 8px 24px rgba(155,35,53,.4);border:none;cursor:pointer;font-family:'Tajawal',sans-serif}
+.bmain:hover{transform:translateY(-2px)}
+.bout{background:rgba(155,35,53,.1);border:1px solid rgba(155,35,53,.3);color:var(--rb);font-size:13px;font-weight:700;padding:14px 28px;border-radius:10px;text-decoration:none;transition:all .3s}
+.bout:hover{background:rgba(155,35,53,.2)}
+.stats{display:flex;gap:28px;justify-content:center;margin-top:52px;flex-wrap:wrap;animation:fu .8s ease .5s both}
+.stat{text-align:center}.sn{font-family:'Space Mono',monospace;font-size:26px;font-weight:700;color:var(--rb)}.sl{font-size:11px;color:var(--tf);margin-top:4px}.sd{width:1px;background:rgba(155,35,53,.2);align-self:stretch}
 
 /* BOT */
-#chatBtn{
-position:fixed;
-bottom:20px;
-left:20px;
-background:#c94060;
-width:60px;
-height:60px;
-border-radius:50%;
-display:flex;
-align-items:center;
-justify-content:center;
-cursor:pointer;
-box-shadow:0 5px 20px rgba(0,0,0,.3);
-}
+.bsec{padding:90px 24px;max-width:900px;margin:0 auto}
+.bhd{text-align:center;margin-bottom:48px}
+.btag{display:block;font-family:'Space Mono',monospace;font-size:9px;letter-spacing:4px;text-transform:uppercase;color:rgba(201,64,96,.5);margin-bottom:12px}
+.btit{font-family:'Amiri',serif;font-size:clamp(24px,4vw,36px);color:var(--t);margin-bottom:8px}
+.bsub{font-size:13px;color:var(--td)}
 
-#chatBox{
-position:fixed;
-bottom:90px;
-left:20px;
-width:320px;
-background:#2d0a14;
-border-radius:15px;
-display:none;
-flex-direction:column;
-}
+.bwrap{background:var(--mm);border:1px solid rgba(155,35,53,.2);border-radius:20px;overflow:hidden;box-shadow:0 30px 80px rgba(0,0,0,.4)}
+.btop{background:rgba(155,35,53,.1);border-bottom:1px solid rgba(155,35,53,.15);padding:16px 20px;display:flex;align-items:center;gap:12px}
+.bav{width:38px;height:38px;background:linear-gradient(135deg,var(--r),var(--rb));border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.binfo{flex:1}.bname{font-size:14px;font-weight:700;color:var(--t)}.bst{font-size:11px;color:#4ade80;display:flex;align-items:center;gap:4px}.bst::before{content:'';width:6px;height:6px;background:#4ade80;border-radius:50%;display:inline-block;animation:blink 1.5s infinite}
+.bclr{background:rgba(255,80,80,.1);border:1px solid rgba(255,80,80,.2);color:#ff6b6b;font-size:11px;padding:5px 12px;border-radius:50px;cursor:pointer;font-family:'Tajawal',sans-serif;transition:all .3s}
+.bclr:hover{background:rgba(255,80,80,.2)}
 
-.chat-header{background:#c94060;padding:10px;text-align:center}
-.chat-body{height:240px;overflow:auto;padding:10px}
-.user{text-align:right;margin:5px}
-.bot{color:#ff8aa0;margin:5px}
+/* learning badge */
+.blearn{display:flex;align-items:center;gap:8px;padding:8px 20px;background:rgba(74,222,128,.05);border-bottom:1px solid rgba(74,222,128,.1);font-size:11px;color:rgba(74,222,128,.7)}
+.blearn-dot{width:5px;height:5px;background:#4ade80;border-radius:50%;animation:blink 2s infinite}
 
-.chat-input{display:flex}
-.chat-input input{flex:1;padding:10px;border:none}
-.chat-input button{background:#c94060;border:none;color:#fff}
+.bmsgs{height:420px;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:16px}
+.bmsgs::-webkit-scrollbar{width:3px}.bmsgs::-webkit-scrollbar-thumb{background:rgba(155,35,53,.3);border-radius:2px}
 
-/* TOP BUTTON */
-#topBtn{
-position:fixed;
-bottom:20px;
-right:20px;
-background:#c94060;
-padding:10px;
-border-radius:50%;
-cursor:pointer;
-display:none;
-}
+.msg{display:flex;gap:10px;animation:mi .4s ease both}
+@keyframes mi{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.msg.user{flex-direction:row-reverse}
+.mav{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.msg.bot .mav{background:linear-gradient(135deg,var(--r),var(--rb))}.msg.user .mav{background:rgba(155,35,53,.2);border:1px solid rgba(155,35,53,.3)}
+.mbub{max-width:78%;padding:12px 16px;border-radius:16px;font-size:13px;line-height:1.8}
+.msg.bot .mbub{background:rgba(155,35,53,.1);border:1px solid rgba(155,35,53,.15);color:var(--t);border-radius:4px 16px 16px 16px}
+.msg.user .mbub{background:linear-gradient(135deg,var(--r),var(--rb));color:#fff;border-radius:16px 4px 16px 16px}
 
+.typing{display:flex;align-items:center;gap:4px;padding:12px 16px}
+.td{width:6px;height:6px;background:var(--rb);border-radius:50%;animation:td 1.2s ease-in-out infinite}
+.td:nth-child(2){animation-delay:.2s}.td:nth-child(3){animation-delay:.4s}
+@keyframes td{0%,100%{transform:translateY(0);opacity:.4}50%{transform:translateY(-5px);opacity:1}}
+
+.qbtns{padding:12px 20px;display:flex;gap:8px;flex-wrap:wrap;border-top:1px solid rgba(155,35,53,.1)}
+.qb{background:rgba(155,35,53,.1);border:1px solid rgba(155,35,53,.2);color:var(--rb);font-size:11px;font-weight:700;padding:6px 14px;border-radius:50px;cursor:pointer;font-family:'Tajawal',sans-serif;transition:all .3s;white-space:nowrap}
+.qb:hover{background:rgba(155,35,53,.2);transform:translateY(-1px)}
+
+.binrow{padding:16px 20px;border-top:1px solid rgba(155,35,53,.15);display:flex;gap:10px}
+.bin{flex:1;background:rgba(255,255,255,.05);border:1px solid rgba(155,35,53,.2);border-radius:12px;padding:12px 16px;color:var(--t);font-family:'Tajawal',sans-serif;font-size:13px;outline:none;transition:border-color .3s;resize:none}
+.bin:focus{border-color:rgba(155,35,53,.5)}.bin::placeholder{color:var(--tf)}
+.bsnd{width:44px;height:44px;background:linear-gradient(135deg,var(--r),var(--rb));border-radius:12px;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:18px;transition:all .3s;flex-shrink:0}
+.bsnd:hover{transform:scale(1.05)}.bsnd:disabled{opacity:.5;cursor:not-allowed}
+
+/* SECTIONS */
+.sec{padding:90px 24px;max-width:1100px;margin:0 auto}
+.shd{text-align:center;margin-bottom:48px}.stag{display:block;font-family:'Space Mono',monospace;font-size:9px;letter-spacing:4px;text-transform:uppercase;color:rgba(201,64,96,.5);margin-bottom:12px}
+.stit{font-family:'Amiri',serif;font-size:clamp(22px,4vw,34px);color:var(--t)}.ssub{font-size:13px;color:var(--tf);margin-top:8px;line-height:1.8}
+
+.g3{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px}
+.g2{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px}
+.g5{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px}
+
+.card{background:rgba(155,35,53,.07);border:1px solid rgba(155,35,53,.18);border-radius:16px;padding:28px;transition:all .3s;position:relative;overflow:hidden}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--r),transparent);opacity:0;transition:opacity .3s}
+.card:hover{border-color:rgba(155,35,53,.38);transform:translateY(-4px)}.card:hover::before{opacity:1}
+.ci{width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;margin-bottom:16px;background:rgba(155,35,53,.14)}
+.ct{font-size:15px;font-weight:900;color:var(--t);margin-bottom:8px}.cd{font-size:12px;color:var(--td);line-height:1.8}
+.cbdg{display:inline-block;font-size:10px;font-weight:700;padding:4px 12px;border-radius:50px;margin-top:14px}
+.cfree{background:rgba(155,35,53,.14);border:1px solid rgba(155,35,53,.28);color:var(--rb)}
+.csoon{background:rgba(200,117,140,.1);border:1px solid rgba(200,117,140,.22);color:#d4899c}
+
+.cw{background:rgba(155,35,53,.06);border:1px solid rgba(155,35,53,.18);border-radius:20px;padding:40px;max-width:580px;margin:0 auto}
+.crs{display:flex;flex-direction:column;gap:10px;margin-bottom:16px}.cr{display:flex;gap:8px;align-items:center}
+.cr input,.cr select{background:rgba(255,255,255,.05);border:1px solid rgba(155,35,53,.22);border-radius:10px;padding:11px 12px;color:var(--t);font-family:'Tajawal',sans-serif;font-size:13px;outline:none;flex:1}
+.cr input::placeholder{color:var(--tf)}.cr select option{background:#2d0a14;color:var(--t)}
+.rmb{width:34px;height:34px;flex-shrink:0;background:rgba(255,80,80,.08);border:1px solid rgba(255,80,80,.15);border-radius:8px;color:#ff6b6b;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center}
+.addb{width:100%;background:rgba(155,35,53,.05);border:1px dashed rgba(155,35,53,.25);border-radius:10px;padding:11px;color:rgba(201,64,96,.5);font-size:13px;font-weight:700;cursor:pointer;font-family:'Tajawal',sans-serif;margin-bottom:16px;transition:all .3s}
+.addb:hover{background:rgba(155,35,53,.12);color:var(--rb)}
+.calb{width:100%;background:linear-gradient(135deg,var(--r),var(--rb));color:#fff;font-size:14px;font-weight:900;padding:14px;border-radius:10px;border:none;cursor:pointer;font-family:'Tajawal',sans-serif;letter-spacing:1px;transition:all .3s}
+.calb:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(155,35,53,.4)}
+.res{display:none;margin-top:20px;background:rgba(155,35,53,.08);border:1px solid rgba(155,35,53,.22);border-radius:14px;padding:20px;text-align:center;animation:fu .5s ease}
+.rn{font-family:'Space Mono',monospace;font-size:48px;color:var(--rb);font-weight:700}.rg{font-size:14px;color:var(--tf);margin-top:6px}
+
+.gc{background:rgba(155,35,53,.07);border:1px solid rgba(155,35,53,.18);border-radius:14px;padding:22px;text-align:center;transition:all .3s}
+.gc:hover{background:rgba(155,35,53,.14);border-color:rgba(155,35,53,.34);transform:translateY(-3px)}
+.ge{font-size:30px;margin-bottom:10px}.gn{font-size:13px;font-weight:900;color:var(--t);margin-bottom:4px}.gs{font-size:11px;color:var(--tf);margin-bottom:14px}
+.gb{background:rgba(155,35,53,.14);border:1px solid rgba(155,35,53,.3);color:var(--rb);font-size:11px;font-weight:700;padding:7px 18px;border-radius:50px;cursor:pointer;font-family:'Tajawal',sans-serif;transition:all .3s}
+.gc:hover .gb{background:rgba(155,35,53,.24)}
+
+.lc{background:rgba(155,35,53,.07);border:1px solid rgba(155,35,53,.18);border-radius:14px;padding:20px;text-decoration:none;display:flex;align-items:center;gap:14px;transition:all .3s}
+.lc:hover{background:rgba(155,35,53,.14);border-color:rgba(155,35,53,.34);transform:translateX(-4px)}
+.li{font-size:26px;flex-shrink:0}.ln{font-size:14px;font-weight:700;color:var(--t);margin-bottom:3px}.lu{font-size:11px;color:var(--tf)}.la{margin-right:auto;color:rgba(155,35,53,.4);font-size:18px}
+.lc:hover .la{color:var(--rb)}
+
+.hub-cs{text-align:center;padding:80px 24px;background:rgba(155,35,53,.07);border:1px solid rgba(155,35,53,.2);border-radius:24px}
+.hub-ar{font-size:52px;color:var(--t);margin-bottom:20px;animation:ap 2s ease-in-out infinite}
+@keyframes ap{0%,100%{transform:translateX(0)}50%{transform:translateX(-8px)}}
+.hub-sl{font-family:'Space Mono',monospace;font-size:12px;letter-spacing:6px;color:rgba(201,64,96,.4);margin-bottom:12px}
+.hub-tt{font-family:'Amiri',serif;font-size:48px;color:var(--t);margin-bottom:8px}
+.hub-dv{width:60px;height:1px;background:rgba(155,35,53,.4);margin:16px auto}
+.hub-sb{font-size:13px;color:var(--tf)}
+
+.cg{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px}
+.cc{background:rgba(155,35,53,.07);border:1px solid rgba(155,35,53,.18);border-radius:14px;padding:20px;display:flex;align-items:center;gap:14px;transition:all .3s}
+.cc:hover{border-color:rgba(155,35,53,.35);transform:translateY(-2px)}
+.cic{width:44px;height:44px;background:rgba(155,35,53,.14);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.clab{font-size:12px;color:var(--tf);margin-bottom:4px}.cval{font-family:'Space Mono',monospace;font-size:14px;color:var(--rb);text-decoration:none;display:block;direction:ltr;text-align:right}
+
+footer{border-top:1px solid rgba(155,35,53,.15);padding:48px 24px;text-align:center}
+.fl{font-weight:900;font-size:20px;color:var(--t);margin-bottom:6px}.fl span{color:var(--rb)}
+.fs{font-size:11px;color:var(--tf);margin-bottom:24px;font-family:'Space Mono',monospace;letter-spacing:2px}
+.fls{display:flex;gap:20px;justify-content:center;flex-wrap:wrap;margin-bottom:24px}
+.fls a{color:var(--tf);text-decoration:none;font-size:12px;transition:color .3s}.fls a:hover{color:var(--rb)}
+.fc{font-size:11px;color:rgba(253,240,242,.1);font-family:'Space Mono',monospace}
+
+@keyframes fu{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+.rv{opacity:0;transform:translateY(30px);transition:opacity .7s ease,transform .7s ease}.rv.vis{opacity:1;transform:translateY(0)}
 </style>
 </head>
 <body>
 
-<h1>☕ UoN Coffee Pro</h1>
+<nav>
+  <a href="#" class="nl">
+    <div class="nc">UoN</div>
+    <div class="nn">UoN <span>Coffee</span></div>
+  </a>
+  <ul class="nls">
+    <li><a href="#bot">المساعد الذكي</a></li>
+    <li><a href="#feat">المميزات</a></li>
+    <li><a href="#calc">المعدل</a></li>
+    <li><a href="#grp">المجموعات</a></li>
+    <li><a href="#lnk">الروابط</a></li>
+    <li><a href="#con">التواصل</a></li>
+  </ul>
+  <button class="nbtn" onclick="document.getElementById('bot').scrollIntoView({behavior:'smooth'})">
+    <div class="bd"></div>المساعد الذكي 🤖
+  </button>
+</nav>
 
-<div class="container">
-
-<div class="card" onclick="show('gpa')">📊 حاسبة المعدل</div>
-<div class="card" onclick="show('table')">📅 الجدول</div>
-
-<!-- GPA -->
-<div id="gpa" style="display:none">
-<h3>حاسبة المعدل</h3>
-<div id="rows"></div>
-<button onclick="addRow()">+ مادة</button>
-<button onclick="calc()">احسب</button>
-<h2 id="result"></h2>
-<p id="rate"></p>
+<div class="hero">
+  <div class="hbg"></div>
+  <div class="hr" style="width:300px;height:300px"></div>
+  <div class="hr" style="width:500px;height:500px;animation-delay:2s"></div>
+  <div class="hr" style="width:700px;height:700px;animation-delay:4s"></div>
+  <div class="hc">
+    <div class="hbadge"><div class="bd"></div>☕ مو رسمي.. بس أحسن من الرسمي 😏</div>
+    <div class="hcup">UoN</div>
+    <h1 class="ht">مساعدك الذكي<br><span>لجامعة نزوى</span> ☕</h1>
+    <p class="hs">بوت ذكي يتعلم ويتطور من أسئلة الطلاب<br>حاسبة معدل · مجموعات · روابط · Student Hub</p>
+    <div class="hbtns">
+      <button class="bmain" onclick="document.getElementById('bot').scrollIntoView({behavior:'smooth'})">جرب المساعد الذكي 🤖</button>
+      <a href="#calc" class="bout">احسب معدلك ⚡</a>
+    </div>
+    <div class="stats">
+      <div class="stat"><div class="sn">+500</div><div class="sl">طالب مستفيد</div></div>
+      <div class="sd"></div>
+      <div class="stat"><div class="sn">AI</div><div class="sl">بوت متطور</div></div>
+      <div class="sd"></div>
+      <div class="stat"><div class="sn">24/7</div><div class="sl">متاح دائماً</div></div>
+      <div class="sd"></div>
+      <div class="stat"><div class="sn">5★</div><div class="sl">تقييم الطلاب</div></div>
+    </div>
+  </div>
 </div>
 
-<!-- TABLE -->
-<div id="table" style="display:none">
-<h3>جدولك</h3>
-<input id="sub" placeholder="المادة">
-<input id="time" placeholder="الوقت">
-<button onclick="addClass()">إضافة</button>
-<div class="schedule" id="schedule"></div>
-</div>
+<section id="bot" class="bsec">
+  <div class="bhd rv">
+    <span class="btag">يتعلم ويتطور تلقائياً</span>
+    <div class="btit">مساعد UoN Coffee الذكي 🤖</div>
+    <div class="bsub">اسألني عن أي شيء يخص جامعة نزوى — أتعلم من كل سؤال وأتطور!</div>
+  </div>
+  <div class="bwrap rv">
+    <div class="btop">
+      <div class="bav">☕</div>
+      <div class="binfo">
+        <div class="bname">مساعد UoN Coffee</div>
+        <div class="bst">متصل الآن · يتعلم من أسئلتك</div>
+      </div>
+      <button class="bclr" onclick="clearChat()">مسح</button>
+    </div>
+    <div class="blearn">
+      <div class="blearn-dot"></div>
+      <span id="learnCount">تعلّم 0 سؤال جديد من الطلاب حتى الآن</span>
+    </div>
+    <div class="bmsgs" id="msgs">
+      <div class="msg bot">
+        <div class="mav">☕</div>
+        <div class="mbub">مرحباً بك في UoN Coffee! 👋<br><br>أنا مساعدك الذكي لجامعة نزوى 🎓<br>أتعلم من كل سؤال يسألني الطلاب وأتطور مع الوقت!<br><br>يمكنني مساعدتك في:<br>• معلومات الكليات والجامعة<br>• حساب المعدل والتقديرات<br>• الروابط والأرقام المهمة<br>• نصائح الحياة الجامعية ☕</div>
+      </div>
+    </div>
+    <div class="qbtns" id="quickBtns">
+      <button class="qb" onclick="sq('ما هي كليات جامعة نزوى؟')">🏛️ الكليات</button>
+      <button class="qb" onclick="sq('كيف أحسب معدلي؟')">📊 المعدل</button>
+      <button class="qb" onclick="sq('ما هي روابط أنظمة الجامعة؟')">🔗 الروابط</button>
+      <button class="qb" onclick="sq('نصائح للنجاح في الجامعة')">💡 نصائح</button>
+      <button class="qb" onclick="sq('ما هي أرقام التواصل مع الجامعة؟')">📞 الأرقام</button>
+    </div>
+    <div class="binrow">
+      <textarea class="bin" id="binput" placeholder="اكتب سؤالك هنا..." rows="1" onkeydown="hk(event)"></textarea>
+      <button class="bsnd" id="sndBtn" onclick="send()">➤</button>
+    </div>
+  </div>
+</section>
 
-</div>
+<section id="feat" class="sec">
+  <div class="shd rv">
+    <span class="stag">ما الذي نقدمه</span>
+    <div class="stit">كل شيء صُمّم لطلاب جامعة نزوى 🎓</div>
+    <div class="ssub">منصة شاملة تجمع كل أدوات النجاح الجامعي</div>
+  </div>
+  <div class="g3">
+    <div class="card rv"><div class="ci">🤖</div><div class="ct">مساعد AI متطور</div><div class="cd">بوت يتعلم من أسئلة الطلاب ويتطور ويحفظ الأسئلة الشائعة تلقائياً.</div><span class="cbdg cfree">✅ مجاني</span></div>
+    <div class="card rv"><div class="ci">📊</div><div class="ct">حاسبة المعدل</div><div class="cd">احسب معدلك الفصلي والتراكمي بسهولة وسرعة.</div><span class="cbdg cfree">✅ مجاني</span></div>
+    <div class="card rv"><div class="ci">💬</div><div class="ct">مجموعات الدراسة</div><div class="cd">روابط مجموعات واتساب لكل كلية في جامعة نزوى.</div><span class="cbdg cfree">✅ مجاني</span></div>
+    <div class="card rv"><div class="ci">📚</div><div class="ct">ملخصات المواد</div><div class="cd">ملخصات احترافية لمواد جامعة نزوى — قريباً!</div><span class="cbdg csoon">Coming Soon 🔜</span></div>
+    <div class="card rv"><div class="ci">🔗</div><div class="ct">روابط مفيدة</div><div class="cd">البوابة، Moodle، EduWave، المكتبة — كل شيء هنا.</div><span class="cbdg cfree">✅ مجاني</span></div>
+    <div class="card rv"><div class="ci">🎓</div><div class="ct">Student Hub</div><div class="cd">خدمات دراسية داخل الجامعة — طباعة، تجليد، قرطاسية.</div><span class="cbdg csoon">Coming Soon 🔜</span></div>
+  </div>
+</section>
 
-<!-- BOT -->
-<div id="chatBtn" onclick="toggleChat()">💬</div>
+<section id="calc" class="sec" style="max-width:680px">
+  <div class="shd rv">
+    <span class="stag">أداة مجانية</span>
+    <div class="stit">حاسبة المعدل الفصلي 📊</div>
+    <div class="ssub">أضف موادك وتقديراتها واحسب معدلك فوراً</div>
+  </div>
+  <div class="cw rv">
+    <div class="crs" id="crs">
+      <div class="cr">
+        <input type="text" placeholder="اسم المادة">
+        <select><option value="">الساعات</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option></select>
+        <select><option value="">التقدير</option><option value="4.0">A (4.0)</option><option value="3.7">A- (3.7)</option><option value="3.3">B+ (3.3)</option><option value="3.0">B (3.0)</option><option value="2.7">B- (2.7)</option><option value="2.3">C+ (2.3)</option><option value="2.0">C (2.0)</option><option value="1.0">D (1.0)</option><option value="0">F (0.0)</option></select>
+        <button class="rmb" onclick="rmR(this)">×</button>
+      </div>
+    </div>
+    <button class="addb" onclick="addR()">+ إضافة مادة</button>
+    <button class="calb" onclick="calcG()">احسب المعدل ⚡</button>
+    <div class="res" id="res">
+      <div style="font-size:11px;color:rgba(201,64,96,.5);margin-bottom:8px;letter-spacing:2px">معدلك الفصلي</div>
+      <div class="rn" id="rn">0.00</div>
+      <div class="rg" id="rg"></div>
+    </div>
+  </div>
+</section>
 
-<div id="chatBox">
-<div class="chat-header">🤖 UoN Bot</div>
-<div class="chat-body" id="chatBody"></div>
-<div class="chat-input">
-<input id="msg" placeholder="اسألني...">
-<button onclick="sendMsg()">إرسال</button>
-</div>
-</div>
+<section id="grp" class="sec">
+  <div class="shd rv">
+    <span class="stag">تواصل مع زملائك</span>
+    <div class="stit">مجموعات الكليات والجامعة 💬</div>
+  </div>
+  <div class="g5">
+    <div class="gc rv"><div class="ge">🎓</div><div class="gn">جامعة نزوى (غير رسمية)</div><div class="gs">قريباً</div><button class="gb" style="opacity:.4;cursor:not-allowed">Coming Soon 🔜</button></div>
+    <div class="gc rv"><div class="ge">💼</div><div class="gn">كلية الاقتصاد ونظم المعلومات</div><div class="gs">مجموعة واتساب</div><button class="gb" onclick="window.open('https://chat.whatsapp.com/DfetMZZOpMbGMuiiTGvj04?mode=ac_t','_blank')">انضم الآن 💬</button></div>
+    <div class="gc rv"><div class="ge">🏗️</div><div class="gn">كلية الهندسة والعمارة</div><div class="gs">قريباً</div><button class="gb" style="opacity:.4;cursor:not-allowed">Coming Soon 🔜</button></div>
+    <div class="gc rv"><div class="ge">🔬</div><div class="gn">كلية العلوم والآداب</div><div class="gs">قريباً</div><button class="gb" style="opacity:.4;cursor:not-allowed">Coming Soon 🔜</button></div>
+    <div class="gc rv"><div class="ge">⚕️</div><div class="gn">كلية العلوم الصحية</div><div class="gs">قريباً</div><button class="gb" style="opacity:.4;cursor:not-allowed">Coming Soon 🔜</button></div>
+    <div class="gc rv"><div class="ge">📖</div><div class="gn">معهد التأسيس</div><div class="gs">قريباً</div><button class="gb" style="opacity:.4;cursor:not-allowed">Coming Soon 🔜</button></div>
+  </div>
+</section>
 
-<div id="topBtn" onclick="scrollTop()">↑</div>
+<section id="lnk" class="sec">
+  <div class="shd rv">
+    <span class="stag">روابط سريعة</span>
+    <div class="stit">كل الروابط المهمة 🔗</div>
+  </div>
+  <div class="g2">
+    <a href="https://portal.unizwa.edu.om" target="_blank" class="lc rv"><div class="li">🎓</div><div><div class="ln">البوابة الطلابية</div><div class="lu">portal.unizwa.edu.om</div></div><div class="la">&#8592;</div></a>
+    <a href="https://moodle.unizwa.edu.om/login/index.php" target="_blank" class="lc rv"><div class="li">📚</div><div><div class="ln">Moodle</div><div class="lu">moodle.unizwa.edu.om</div></div><div class="la">&#8592;</div></a>
+    <a href="https://elearning.unizwa.edu.om/EduWavehe/login.aspx" target="_blank" class="lc rv"><div class="li">🌊</div><div><div class="ln">EduWave</div><div class="lu">elearning.unizwa.edu.om</div></div><div class="la">&#8592;</div></a>
+    <a href="https://library.unizwa.edu.om" target="_blank" class="lc rv"><div class="li">🏛️</div><div><div class="ln">مكتبة الجامعة</div><div class="lu">library.unizwa.edu.om</div></div><div class="la">&#8592;</div></a>
+    <a href="https://www.unizwa.edu.om/content_files/01071-1420.pdf" target="_blank" class="lc rv"><div class="li">📅</div><div><div class="ln">التقويم الاكاديمي</div><div class="lu">unizwa.edu.om</div></div><div class="la">&#8592;</div></a>
+    <a href="https://www.unizwa.edu.om" target="_blank" class="lc rv"><div class="li">🌐</div><div><div class="ln">الموقع الرسمي</div><div class="lu">unizwa.edu.om</div></div><div class="la">&#8592;</div></a>
+  </div>
+</section>
+
+<section id="hub" class="sec">
+  <div class="shd rv"><span class="stag">خدمات حصرية</span><div class="stit">Student Hub 🎓</div></div>
+  <div class="hub-cs rv">
+    <div class="hub-ar">&#8594;</div>
+    <div class="hub-sl">STUDENT HUB</div>
+    <div class="hub-tt">Coming Soon</div>
+    <div class="hub-dv"></div>
+    <div class="hub-sb">☕ قريباً — ترقبوا الإطلاق</div>
+  </div>
+</section>
+
+<section id="con" class="sec">
+  <div class="shd rv"><span class="stag">تواصل مع الجامعة</span><div class="stit">أرقام جامعة نزوى 📞</div><div class="ssub">اضغط على الرقم للاتصال مباشرة</div></div>
+  <div class="cg">
+    <div class="cc rv"><div class="cic">🏦</div><div><div class="clab">حساب البنك</div><span class="cval">0317008949900017</span></div></div>
+    <div class="cc rv"><div class="cic">💰</div><div><div class="clab">المالية</div><a href="tel:92596648" class="cval">92596648</a></div></div>
+    <div class="cc rv"><div class="cic">📋</div><div><div class="clab">القبول والتسجيل</div><a href="tel:25446234" class="cval">25446234</a></div></div>
+    <div class="cc rv"><div class="cic">🤝</div><div><div class="clab">الرعاية الاجتماعية 1</div><a href="tel:91313951" class="cval">91313951</a></div></div>
+    <div class="cc rv"><div class="cic">🤝</div><div><div class="clab">الرعاية الاجتماعية 2</div><a href="tel:25446247" class="cval">25446247</a></div></div>
+  </div>
+</section>
+
+<footer>
+  <div class="fl">UoN <span>Coffee</span> ☕</div>
+  <div class="fs">غير رسمي · بس أحسن من الرسمي 😏</div>
+  <div class="fls">
+    <a href="#bot">المساعد الذكي</a><a href="#feat">المميزات</a><a href="#calc">حاسبة المعدل</a>
+    <a href="#grp">المجموعات</a><a href="#lnk">الروابط</a><a href="#con">التواصل</a>
+    <a href="https://instagram.com/unizwacoffee" target="_blank">Instagram</a>
+  </div>
+  <div class="fc">2025 UoN Coffee · جامعة نزوى 🇴🇲</div>
+</footer>
 
 <script>
+// ── KNOWLEDGE BASE ──
+const KB = {
+  كليات: { keywords:['كلية','كليات','تخصص','قسم','برنامج'], answer:'كليات جامعة نزوى 🏛️\n\n• كلية الاقتصاد ونظم المعلومات 💼\n• كلية الهندسة والعمارة 🏗️\n• كلية العلوم والآداب 🔬\n• كلية العلوم الصحية ⚕️\n• معهد التأسيس 📖' },
+  معدل: { keywords:['معدل','gpa','تراكمي','فصلي','درجة','نقطة'], answer:'نظام التقديرات في جامعة نزوى 📊\n\nA+ / A = 4.0 نقطة\nA- = 3.7 نقطة\nB+ = 3.3 نقطة\nB = 3.0 نقطة\nB- = 2.7 نقطة\nC+ = 2.3 نقطة\nC = 2.0 نقطة\nC- = 1.7 نقطة\nD = 1.0 نقطة\nF = 0.0 نقطة\n\n💡 استخدم حاسبة المعدل أسفل الصفحة!' },
+  روابط: { keywords:['رابط','موقع','بوابة','portal','moodle','eduwave','نظام','إلكتروني'], answer:'روابط أنظمة جامعة نزوى 🔗\n\n🎓 البوابة الطلابية: portal.unizwa.edu.om\n📚 Moodle: moodle.unizwa.edu.om\n🌊 EduWave: elearning.unizwa.edu.om\n🏛️ المكتبة: library.unizwa.edu.om\n🌐 الموقع الرسمي: unizwa.edu.om' },
+  أرقام: { keywords:['رقم','هاتف','تواصل','اتصال','مالية','تسجيل','رعاية'], answer:'أرقام التواصل مع جامعة نزوى 📞\n\n💰 المالية: 92596648\n📋 القبول والتسجيل: 25446234\n🤝 الرعاية الاجتماعية: 91313951\n🤝 الرعاية الاجتماعية: 25446247\n🏦 حساب البنك: 0317008949900017' },
+  نصائح: { keywords:['نصيحة','نصائح','نجاح','مذاكرة','دراسة','تفوق','امتحان'], answer:'نصائح للنجاح في جامعة نزوى 💡\n\n📚 ذاكر بتقنية Pomodoro — 25 دقيقة تركيز + 5 راحة\n👥 انضم لمجموعات الدراسة الخاصة بكليتك\n📅 راجع التقويم الأكاديمي دائماً\n🎯 راجع أسئلة الاختبارات السابقة\n☕ UoN Coffee دائماً معك!' },
+  تسجيل: { keywords:['تسجيل','قبول','التحاق','انتساب','مستجد'], answer:'للتسجيل والقبول في جامعة نزوى 📋\n\n📞 اتصل بدائرة القبول والتسجيل: 25446234\n🌐 أو زر الموقع: unizwa.edu.om\n📧 أو تواصل عبر البوابة الطلابية\n\n⏰ تأكد من متابعة مواعيد التسجيل في التقويم الأكاديمي' },
+  مكتبة: { keywords:['مكتبة','كتاب','مرجع','بحث'], answer:'مكتبة جامعة نزوى 🏛️\n\n🔗 library.unizwa.edu.om\n\nتحتوي على آلاف المراجع والكتب الإلكترونية\nمتاحة لجميع طلاب الجامعة مجاناً!' },
+  hub: { keywords:['hub','student hub','خدمات','طباعة','تجليد','قرطاسية','ملخصات'], answer:'Student Hub 🎓\n\nخدمات دراسية داخل جامعة نزوى — قريباً!\n\nستشمل:\n📝 ملخصات احترافية\n🖨️ طباعة وتجليد\n📦 قرطاسية بالجملة\n⚡ توصيل مجاني داخل الجامعة\n\n🔜 ترقبوا الإطلاق قريباً!' },
+  instagram: { keywords:['انستا','instagram','حساب','تواصل اجتماعي'], answer:'حساب UoN Coffee على Instagram 📱\n\n@unizwacoffee\n\nتابعنا لآخر أخبار جامعة نزوى وميمات تعرف نفسك فيها 😏☕' },
+};
 
-/* NAV */
-function show(id){
-document.getElementById('gpa').style.display='none';
-document.getElementById('table').style.display='none';
-document.getElementById(id).style.display='block';
+// ── LEARNING SYSTEM ──
+let learned = JSON.parse(localStorage.getItem('uon_learned') || '{}');
+let learnCount = parseInt(localStorage.getItem('uon_count') || '0');
+
+function updateLearnBadge() {
+  document.getElementById('learnCount').textContent = `تعلّم ${learnCount} سؤال جديد من الطلاب حتى الآن`;
+}
+updateLearnBadge();
+
+function learnQuestion(q, a) {
+  const key = q.trim().toLowerCase();
+  if (!learned[key]) {
+    learned[key] = a;
+    learnCount++;
+    localStorage.setItem('uon_learned', JSON.stringify(learned));
+    localStorage.setItem('uon_count', learnCount);
+    updateLearnBadge();
+    // add as quick button if asked 3+ times
+    const freq = JSON.parse(localStorage.getItem('uon_freq') || '{}');
+    freq[key] = (freq[key] || 0) + 1;
+    localStorage.setItem('uon_freq', JSON.stringify(freq));
+    if (freq[key] === 3) addDynamicBtn(q);
+  }
 }
 
-/* GPA */
-function addRow(){
-let div=document.createElement("div");
-div.innerHTML=`
-<select><option value="3">3 ساعات</option></select>
-<select>
-<option value="4">A</option>
-<option value="3.7">A-</option>
-<option value="3">B</option>
-<option value="2">C</option>
-</select>`;
-document.getElementById("rows").appendChild(div);
+function addDynamicBtn(q) {
+  const container = document.getElementById('quickBtns');
+  if (container.children.length < 8) {
+    const btn = document.createElement('button');
+    btn.className = 'qb';
+    btn.textContent = '🔥 ' + (q.length > 20 ? q.substring(0,20) + '...' : q);
+    btn.onclick = () => sq(q);
+    container.appendChild(btn);
+  }
 }
 
-function calc(){
-let rows=document.querySelectorAll("#rows div");
-let total=0,hours=0;
+// ── BOT LOGIC ──
+function getBotReply(q) {
+  const lower = q.toLowerCase().trim();
 
-rows.forEach(r=>{
-let s=r.querySelectorAll("select");
-total+=s[0].value*s[1].value;
-hours+=parseFloat(s[0].value);
-});
+  // Check learned questions first
+  if (learned[lower]) return learned[lower];
 
-let g=(total/hours).toFixed(2);
-document.getElementById("result").textContent=g;
+  // Check knowledge base
+  for (const [key, data] of Object.entries(KB)) {
+    if (data.keywords.some(kw => lower.includes(kw))) {
+      return data.answer;
+    }
+  }
 
-let msg="";
-if(g>=3.7) msg="🔥 أسطوري";
-else if(g>=3) msg="💪 ممتاز";
-else if(g>=2) msg="🙂 جيد";
-else msg="🚨 شد حيلك";
+  // Greeting
+  if (/^(مرحبا|هلا|السلام|اهلا|هاي|هي|hi|hello|اهل)/.test(lower)) {
+    return 'هلا وغلا! 👋☕\nكيف أقدر أساعدك اليوم؟\n\nاسألني عن الكليات، الروابط، الأرقام، نصائح الدراسة أو أي شيء يخص جامعة نزوى! 🎓';
+  }
 
-document.getElementById("rate").textContent=msg;
+  // Thanks
+  if (/(شكر|thank|مشكور|يسلم)/.test(lower)) {
+    return 'العفو! 😊☕\nأنا دائماً هنا لمساعدتك.\nبالتوفيق في دراستك يا بطل! 🌟';
+  }
 
-localStorage.setItem("gpa",g);
+  // Calc
+  if (/(احسب|حسب|كيف احسب)/.test(lower) && /(معدل|gpa)/.test(lower)) {
+    return 'لحساب معدلك 📊\n\nانتقل لقسم "حاسبة المعدل" في الصفحة وأضف مواد الفصل مع ساعاتها وتقديراتها!\n\nأو اضغط هنا 👇';
+  }
+
+  // Unknown — learn and ask
+  learnQuestion(q, null);
+  const unknownReplies = [
+    'سؤال ممتاز! 🤔\nهذا السؤال جديد علي — سأتعلمه وأجيب عليه في المرة القادمة!\n\nللحين يمكنك التواصل مع الجامعة مباشرة:\n📞 25446234',
+    'لم أفهم سؤالك بشكل كامل 😅\nحاول إعادة صياغته أو اختر من الأزرار السريعة!\n\nأنا أتعلم من كل سؤال وسأتحسن مع الوقت 📈',
+    'هذا خارج معلوماتي الحالية 🙏\nلكنني حفظت سؤالك وسأتعلم منه!\n\nجرب الأزرار السريعة أو اسأل عن: الكليات، المعدل، الروابط، الأرقام'
+  ];
+  return unknownReplies[Math.floor(Math.random() * unknownReplies.length)];
 }
 
-/* LOAD */
-window.onload=function(){
-let g=localStorage.getItem("gpa");
-if(g) document.getElementById("result").textContent=g;
+// ── CHAT ──
+const history = [];
 
-let data=JSON.parse(localStorage.getItem("schedule")||"[]");
-data.forEach(addToUI);
+function addMsg(type, text) {
+  const c = document.getElementById('msgs');
+  const d = document.createElement('div');
+  d.className = `msg ${type}`;
+  d.innerHTML = `<div class="mav">${type==='bot'?'☕':'🎓'}</div><div class="mbub">${text.replace(/\n/g,'<br>')}</div>`;
+  c.appendChild(d);
+  c.scrollTop = c.scrollHeight;
 }
 
-/* TABLE */
-function addClass(){
-let sub=document.getElementById("sub").value;
-let time=document.getElementById("time").value;
-
-let obj={sub,time};
-let data=JSON.parse(localStorage.getItem("schedule")||"[]");
-
-data.push(obj);
-localStorage.setItem("schedule",JSON.stringify(data));
-
-addToUI(obj);
+function showTyping() {
+  const c = document.getElementById('msgs');
+  const id = 'typ_'+Date.now();
+  const d = document.createElement('div');
+  d.className = 'msg bot'; d.id = id;
+  d.innerHTML = `<div class="mav">☕</div><div class="mbub"><div class="typing"><div class="td"></div><div class="td"></div><div class="td"></div></div></div>`;
+  c.appendChild(d); c.scrollTop = c.scrollHeight;
+  return id;
 }
 
-function addToUI(c){
-let div=document.createElement("div");
-div.className="cell";
-div.innerHTML=`<span class="del" onclick="del(this)">x</span>${c.sub}<br>${c.time}`;
-document.getElementById("schedule").appendChild(div);
+function send() {
+  const inp = document.getElementById('binput');
+  const text = inp.value.trim();
+  if (!text) return;
+  inp.value = '';
+  addMsg('user', text);
+  history.push(text);
+
+  document.getElementById('sndBtn').disabled = true;
+  const tid = showTyping();
+
+  // Simulate thinking delay
+  const delay = 600 + Math.random() * 800;
+  setTimeout(() => {
+    document.getElementById(tid)?.remove();
+    const reply = getBotReply(text);
+    addMsg('bot', reply);
+    document.getElementById('sndBtn').disabled = false;
+    // If unknown, offer to learn
+    if (reply.includes('تعلمه') || reply.includes('خارج معلوماتي')) {
+      setTimeout(() => suggestLearn(text), 500);
+    }
+  }, delay);
 }
 
-function del(el){
-el.parentElement.remove();
+function suggestLearn(q) {
+  const c = document.getElementById('msgs');
+  const d = document.createElement('div');
+  d.className = 'msg bot';
+  d.innerHTML = `<div class="mav">☕</div><div class="mbub">هل تريد أن تعلمني الإجابة على سؤالك؟ 📚<br><small style="color:rgba(253,240,242,.5)">سيساعد ذلك بقية الطلاب!</small><br><br><button class="qb" style="margin-top:8px" onclick="teachBot('${q.replace(/'/g,"\\'")}', this)">✏️ علّمني الإجابة</button></div>`;
+  c.appendChild(d);
+  c.scrollTop = c.scrollHeight;
 }
 
-/* BOT */
-function toggleChat(){
-let box=document.getElementById('chatBox');
-box.style.display=box.style.display==='flex'?'none':'flex';
+function teachBot(q, btn) {
+  const answer = prompt('اكتب الإجابة الصحيحة لـ: "' + q + '"');
+  if (answer && answer.trim()) {
+    learned[q.toLowerCase()] = answer.trim();
+    learnCount++;
+    localStorage.setItem('uon_learned', JSON.stringify(learned));
+    localStorage.setItem('uon_count', learnCount);
+    updateLearnBadge();
+    btn.parentElement.innerHTML += '<br>✅ شكراً! تعلمت الإجابة وسأجيب عليها للطلاب القادمين!';
+    btn.remove();
+  }
 }
 
-function sendMsg(){
-let msg=document.getElementById("msg").value;
-let body=document.getElementById("chatBody");
-
-body.innerHTML+=`<div class="user">${msg}</div>`;
-
-let reply="🤖 حاول بصيغة ثانية";
-
-if(msg.includes("معدل")) reply="📊 احسبه من فوق";
-else if(msg.includes("جدول")) reply="📅 سو جدولك بسهولة";
-else if(msg.includes("مرحبا")) reply="هلا وغلا 😎";
-else if(msg.includes("تسجيل")) reply="📋 تواصل مع القبول والتسجيل";
-else if(msg.includes("وقت")) reply="⏰ يعتمد على جدولك الدراسي";
-
-body.innerHTML+=`<div class="bot">${reply}</div>`;
+function sq(text) {
+  document.getElementById('binput').value = text;
+  send();
 }
 
-/* SCROLL TOP */
-window.onscroll=function(){
-document.getElementById("topBtn").style.display=
-window.scrollY>200?"block":"none";
+function hk(e) {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); }
 }
 
-function scrollTop(){
-window.scrollTo({top:0,behavior:"smooth"});
+function clearChat() {
+  history.length = 0;
+  document.getElementById('msgs').innerHTML = '';
+  addMsg('bot', 'تمت مسح المحادثة! ☕\nكيف أقدر أساعدك؟');
 }
 
+// ── CALCULATOR ──
+function addR() {
+  const r = document.createElement('div'); r.className = 'cr';
+  r.innerHTML = `<input type="text" placeholder="اسم المادة"><select><option value="">الساعات</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option></select><select><option value="">التقدير</option><option value="4.0">A (4.0)</option><option value="3.7">A- (3.7)</option><option value="3.3">B+ (3.3)</option><option value="3.0">B (3.0)</option><option value="2.7">B- (2.7)</option><option value="2.3">C+ (2.3)</option><option value="2.0">C (2.0)</option><option value="1.0">D (1.0)</option><option value="0">F (0.0)</option></select><button class="rmb" onclick="rmR(this)">×</button>`;
+  document.getElementById('crs').appendChild(r);
+}
+function rmR(b) { if (document.querySelectorAll('.cr').length > 1) b.parentElement.remove(); }
+function calcG() {
+  const rows = document.querySelectorAll('.cr'); let pts=0, hrs=0;
+  rows.forEach(r => { const s=r.querySelectorAll('select'),h=parseFloat(s[0].value),g=parseFloat(s[1].value); if(h&&!isNaN(g)){pts+=h*g;hrs+=h;} });
+  if (!hrs) { alert('أضف مادة واحدة على الأقل!'); return; }
+  const gpa = (pts/hrs).toFixed(2);
+  document.getElementById('rn').textContent = gpa;
+  document.getElementById('rg').textContent = gpa>=3.7?'🌟 ممتاز!':gpa>=3.0?'✅ جيد جداً':gpa>=2.0?'📚 جيد':'💪 استمر!';
+  document.getElementById('res').style.display = 'block';
+  document.getElementById('res').scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+// ── SCROLL REVEAL ──
+const obs = new IntersectionObserver(entries => {
+  entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('vis'); });
+}, {threshold:0.1});
+document.querySelectorAll('.rv').forEach(el => obs.observe(el));
+
+// Load dynamic buttons from freq
+const freq = JSON.parse(localStorage.getItem('uon_freq') || '{}');
+Object.entries(freq).forEach(([q, count]) => { if (count >= 3) addDynamicBtn(q); });
 </script>
-
 </body>
 </html>
