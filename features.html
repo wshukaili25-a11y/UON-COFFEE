@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UoN Coffee — خرائط · اعترافات · مطاعم</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;700;900&family=Amiri:wght@400;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--m:#1a0a10;--mm:#2d0f1a;--r:#9b2335;--rb:#c94060;--t:#fdf0f2;--td:rgba(253,240,242,0.5);--tf:rgba(253,240,242,0.2)}
+*{margin:0;padding:0;box-sizing:border-box}html{scroll-behavior:smooth}
+body{background:var(--m);color:var(--t);font-family:'Tajawal',sans-serif;overflow-x:hidden}
+::-webkit-scrollbar{width:3px}::-webkit-scrollbar-thumb{background:var(--r);border-radius:2px}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:14px 24px;display:flex;align-items:center;justify-content:space-between;background:rgba(26,10,16,.93);backdrop-filter:blur(20px);border-bottom:1px solid rgba(155,35,53,.2)}
+.nl{display:flex;align-items:center;gap:10px;text-decoration:none}
+.nc{width:34px;height:34px;background:linear-gradient(135deg,var(--r),var(--rb));border-radius:8px 8px 11px 11px;display:flex;align-items:center;justify-content:center;font-family:'Space Mono',monospace;font-size:7px;font-weight:700;color:#fff;position:relative}
+.nc::after{content:'';position:absolute;right:-7px;top:7px;width:7px;height:13px;border:2px solid var(--r);border-left:none;border-radius:0 5px 5px 0}
+.nn{font-weight:900;font-size:14px;color:var(--t)}.nn span{color:var(--rb)}
+.ntabs{display:flex;gap:4px}
+.ntab{padding:7px 14px;border-radius:50px;font-size:12px;font-weight:700;cursor:pointer;border:1px solid rgba(155,35,53,.2);color:var(--td);background:transparent;font-family:'Tajawal',sans-serif;transition:all .3s}
+.ntab.active,.ntab:hover{background:linear-gradient(135deg,var(--r),var(--rb));color:#fff;border-color:transparent}
+.nhome{font-size:11px;color:var(--td);text-decoration:none;border:1px solid rgba(155,35,53,.2);padding:6px 14px;border-radius:50px;transition:all .3s}
+.nhome:hover{color:var(--rb);border-color:rgba(155,35,53,.5)}
+@media(max-width:600px){.ntabs{display:none}}
+
+/* PAGES */
+.page{display:none;min-height:100vh;padding:80px 24px 60px}
+.page.active{display:block}
+
+/* ═══ PAGE HEADERS ═══ */
+.ph{text-align:center;padding:40px 0 50px;position:relative}
+.ph-tag{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:4px;text-transform:uppercase;color:rgba(201,64,96,.5);margin-bottom:12px;display:block}
+.ph-title{font-family:'Amiri',serif;font-size:clamp(28px,5vw,48px);color:var(--t);margin-bottom:8px}
+.ph-sub{font-size:13px;color:var(--td);line-height:1.8}
+
+/* ═══════════════════════
+   MAP PAGE
+═══════════════════════ */
+.map-wrap{max-width:900px;margin:0 auto}
+
+.map-board{background:var(--mm);border:1px solid rgba(155,35,53,.2);border-radius:20px;padding:32px;margin-bottom:24px;position:relative;overflow:hidden;min-height:500px}
+.map-grid{display:grid;grid-template-columns:repeat(12,1fr);grid-template-rows:repeat(10,48px);gap:4px;position:relative}
+
+.mb{border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transition:all .3s;position:relative;border:1px solid transparent}
+.mb:hover{transform:scale(1.05);z-index:10;box-shadow:0 8px 24px rgba(0,0,0,.4)}
+.mb-icon{font-size:22px;margin-bottom:4px}
+.mb-name{font-size:9px;font-weight:700;text-align:center;line-height:1.3;color:#fff}
+
+/* Building colors */
+.mb-main{background:linear-gradient(135deg,#1e3a5f,#2d5a8e);grid-column:4/9;grid-row:1/4}
+.mb-eco{background:linear-gradient(135deg,#1a5c1a,#2d8b2d);grid-column:1/4;grid-row:2/5}
+.mb-eng{background:linear-gradient(135deg,#5c3d1a,#8b5e2d);grid-column:9/13;grid-row:2/5}
+.mb-sci{background:linear-gradient(135deg,#1a1a5c,#2d2d8b);grid-column:1/5;grid-row:6/9}
+.mb-health{background:linear-gradient(135deg,#5c1a1a,#8b2d2d);grid-column:5/9;grid-row:5/8}
+.mb-found{background:linear-gradient(135deg,#3d1a5c,#5c2d8b);grid-column:9/13;grid-row:6/9}
+.mb-lib{background:linear-gradient(135deg,#1a4d3d,#2d7a5e);grid-column:3/7;grid-row:8/11}
+.mb-sport{background:linear-gradient(135deg,#4d3d1a,#7a5e2d);grid-column:7/11;grid-row:8/11}
+.mb-park{background:rgba(155,35,53,.15);border:1px dashed rgba(155,35,53,.3) !important;grid-column:1/3;grid-row:1/3}
+.mb-park2{background:rgba(155,35,53,.15);border:1px dashed rgba(155,35,53,.3) !important;grid-column:11/13;grid-row:1/3}
+.mb-cafe{background:linear-gradient(135deg,#5c1a2d,#9b2335);grid-column:5/8;grid-row:4/6}
+.mb-gate{background:linear-gradient(135deg,#2a1a0e,#4d3d1a);grid-column:4/6;grid-row:10/11;border-radius:0 0 10px 10px}
+.mb-gate2{background:linear-gradient(135deg,#2a1a0e,#4d3d1a);grid-column:8/10;grid-row:10/11;border-radius:0 0 10px 10px}
+
+/* road */
+.road-h{background:rgba(255,255,255,.06);border-radius:4px;grid-column:1/13;grid-row:5/6;z-index:0}
+.road-v{background:rgba(255,255,255,.06);border-radius:4px;grid-column:6/7;grid-row:1/11;z-index:0}
+
+.map-legend{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:16px}
+.leg-item{display:flex;align-items:center;gap:8px;background:rgba(155,35,53,.07);border:1px solid rgba(155,35,53,.15);border-radius:50px;padding:6px 14px;font-size:11px;color:var(--td);cursor:pointer;transition:all .3s}
+.leg-item:hover{background:rgba(155,35,53,.15);color:var(--t)}
+.leg-dot{width:8px;height:8px;border-radius:2px;flex-shrink:0}
+
+/* Tooltip */
+.tooltip{position:fixed;background:var(--mm);border:1px solid rgba(155,35,53,.3);border-radius:12px;padding:14px 18px;pointer-events:none;z-index:1000;display:none;max-width:220px;box-shadow:0 12px 32px rgba(0,0,0,.4)}
+.tt-title{font-weight:900;font-size:14px;color:var(--t);margin-bottom:6px}
+.tt-desc{font-size:12px;color:var(--td);line-height:1.7}
+.tt-tag{display:inline-block;font-size:9px;background:rgba(155,35,53,.2);border:1px solid rgba(155,35,53,.3);color:var(--rb);padding:2px 8px;border-radius:50px;margin-top:8px}
+
+/* search */
+.map-search{display:flex;gap:10px;margin-bottom:20px;max-width:500px;margin-inline:auto}
+.ms-inp{flex:1;background:rgba(255,255,255,.05);border:1px solid rgba(155,35,53,.2);border-radius:12px;padding:12px 16px;color:var(--t);font-family:'Tajawal',sans-serif;font-size:13px;outline:none}
+.ms-inp::placeholder{color:var(--tf)}
+.ms-btn{background:linear-gradient(135deg,var(--r),var(--rb));color:#fff;border:none;border-radius:12px;padding:12px 20px;font-size:13px;cursor:pointer;font-family:'Tajawal',sans-serif;font-weight:700}
+
+/* ═══════════════════════
+   CONFESSIONS PAGE  
+═══════════════════════ */
+.conf-wrap{max-width:700px;margin:0 auto}
+
+.conf-form{background:var(--mm);border:1px solid rgba(155,35,53,.2);border-radius:20px;padding:28px;margin-bottom:32px}
+.cf-title{font-family:'Amiri',serif;font-size:20px;color:var(--t);margin-bottom:16px}
+.cf-cats{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.cf-cat{background:rgba(155,35,53,.1);border:1px solid rgba(155,35,53,.2);color:var(--td);font-size:11px;font-weight:700;padding:5px 14px;border-radius:50px;cursor:pointer;font-family:'Tajawal',sans-serif;transition:all .3s}
+.cf-cat.sel{background:linear-gradient(135deg,var(--r),var(--rb));color:#fff;border-color:transparent}
+.cf-ta{width:100%;background:rgba(255,255,255,.05);border:1px solid rgba(155,35,53,.2);border-radius:12px;padding:14px 16px;color:var(--t);font-family:'Tajawal',sans-serif;font-size:13px;resize:none;outline:none;line-height:1.8;min-height:100px;margin-bottom:14px}
+.cf-ta::placeholder{color:var(--tf)}
+.cf-row{display:flex;gap:10px;align-items:center}
+.cf-anon{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--td);flex:1}
+.cf-anon input{accent-color:var(--rb)}
+.cf-send{background:linear-gradient(135deg,var(--r),var(--rb));color:#fff;font-size:13px;font-weight:700;padding:10px 24px;border-radius:10px;border:none;cursor:pointer;font-family:'Tajawal',sans-serif;transition:all .3s}
+.cf-send:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(155,35,53,.4)}
+
+/* conf cards */
+.conf-feed{display:flex;flex-direction:column;gap:16px}
+.cc-card{background:var(--mm);border:1px solid rgba(155,35,53,.15);border-radius:16px;padding:22px;transition:all .3s;animation:ci .4s ease both}
+@keyframes ci{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.cc-card:hover{border-color:rgba(155,35,53,.3);transform:translateY(-2px)}
+.cc-top{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.cc-avatar{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--r),var(--rb));display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.cc-meta{flex:1}.cc-user{font-size:12px;font-weight:700;color:var(--rb)}.cc-time{font-size:10px;color:var(--tf)}
+.cc-cat-badge{font-size:9px;background:rgba(155,35,53,.15);border:1px solid rgba(155,35,53,.25);color:var(--rb);padding:2px 8px;border-radius:50px}
+.cc-text{font-size:13px;color:var(--t);line-height:1.9;margin-bottom:14px}
+.cc-actions{display:flex;gap:8px}
+.cc-act{background:rgba(155,35,53,.08);border:1px solid rgba(155,35,53,.15);color:var(--td);font-size:11px;padding:5px 12px;border-radius:50px;cursor:pointer;font-family:'Tajawal',sans-serif;transition:all .3s}
+.cc-act:hover{background:rgba(155,35,53,.18);color:var(--rb)}
+.cc-act.liked{background:rgba(155,35,53,.2);color:var(--rb);border-color:rgba(155,35,53,.4)}
+
+.conf-filter{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px}
+.cf-f{background:rgba(155,35,53,.08);border:1px solid rgba(155,35,53,.15);color:var(--td);font-size:11px;font-weight:700;padding:6px 14px;border-radius:50px;cursor:pointer;font-family:'Tajawal',sans-serif;transition:all .3s}
+.cf-f.active{background:linear-gradient(135deg,var(--r),var(--rb));color:#fff;border-color:transparent}
+
+/* ═══════════════════════
+   RESTAURANTS PAGE
+═══════════════════════ */
+.rest-wrap{max-width:1000px;margin:0 auto}
+
+.rest-filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:28px;justify-content:center}
+.rf{background:rgba(155,35,53,.08);border:1px solid rgba(155,35,53,.15);color:var(--td);font-size:12px;font-weight:700;padding:7px 18px;border-radius:50px;cursor:pointer;font-family:'Tajawal',sans-serif;transition:all .3s}
+.rf.active{background:linear-gradient(135deg,var(--r),var(--rb));color:#fff;border-color:transparent}
+
+.rest-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px}
+
+.rc{background:var(--mm);border:1px solid rgba(155,35,53,.15);border-radius:16px;overflow:hidden;transition:all .3s}
+.rc:hover{border-color:rgba(155,35,53,.35);transform:translateY(-4px);box-shadow:0 12px 32px rgba(0,0,0,.3)}
+.rc-img{height:130px;display:flex;align-items:center;justify-content:center;font-size:52px;position:relative}
+.rc-badge{position:absolute;top:10px;right:10px;font-size:9px;font-weight:700;padding:3px 10px;border-radius:50px;letter-spacing:1px}
+.badge-open{background:rgba(74,222,128,.15);border:1px solid rgba(74,222,128,.3);color:#4ade80}
+.badge-popular{background:rgba(251,191,36,.15);border:1px solid rgba(251,191,36,.3);color:#fbbf24}
+.badge-close{background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);color:#ef4444}
+.rc-body{padding:18px}
+.rc-name{font-family:'Amiri',serif;font-size:20px;color:var(--t);margin-bottom:4px}
+.rc-type{font-size:11px;color:var(--rb);margin-bottom:8px;letter-spacing:1px}
+.rc-desc{font-size:12px;color:var(--td);line-height:1.7;margin-bottom:12px}
+.rc-info{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+.rc-inf{display:flex;align-items:center;gap:4px;font-size:11px;color:var(--tf)}
+.rc-stars{color:#fbbf24;font-size:12px;margin-bottom:4px}
+.rc-price{font-size:12px;font-weight:700}
+.rc-price.cheap{color:#4ade80}
+.rc-price.mid{color:#fbbf24}
+.rc-price.exp{color:#f87171}
+.rc-tags{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+.rc-tag{background:rgba(155,35,53,.1);border:1px solid rgba(155,35,53,.15);color:var(--td);font-size:10px;padding:2px 8px;border-radius:50px}
+.rc-btn{width:100%;background:linear-gradient(135deg,var(--r),var(--rb));color:#fff;border:none;border-radius:10px;padding:10px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Tajawal',sans-serif;transition:all .3s}
+.rc-btn:hover{transform:translateY(-1px);box-shadow:0 4px 14px rgba(155,35,53,.4)}
+
+/* ADD REVIEW */
+.add-rest{background:rgba(155,35,53,.06);border:1px dashed rgba(155,35,53,.25);border-radius:16px;padding:24px;text-align:center;cursor:pointer;transition:all .3s;margin-top:16px}
+.add-rest:hover{background:rgba(155,35,53,.12);border-color:rgba(155,35,53,.4)}
+.add-rest-icon{font-size:32px;margin-bottom:8px}
+.add-rest-text{font-size:14px;font-weight:700;color:var(--rb)}
+.add-rest-sub{font-size:11px;color:var(--tf);margin-top:4px}
+
+/* MODAL */
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:1000;display:none;align-items:center;justify-content:center;padding:24px}
+.modal.show{display:flex}
+.modal-box{background:var(--mm);border:1px solid rgba(155,35,53,.3);border-radius:20px;padding:32px;width:100%;max-width:480px;max-height:90vh;overflow-y:auto}
+.modal-title{font-family:'Amiri',serif;font-size:22px;color:var(--t);margin-bottom:20px}
+.minp{width:100%;background:rgba(255,255,255,.05);border:1px solid rgba(155,35,53,.2);border-radius:10px;padding:11px 14px;color:var(--t);font-family:'Tajawal',sans-serif;font-size:13px;outline:none;margin-bottom:12px}
+.minp::placeholder{color:var(--tf)}
+.mstar{display:flex;gap:8px;margin-bottom:12px;font-size:24px;cursor:pointer}
+.mstar span{transition:all .2s}.mstar span:hover{transform:scale(1.2)}
+.mrow{display:flex;gap:10px}
+.mrow .minp{flex:1}
+.mbtns{display:flex;gap:10px;margin-top:4px}
+.mbtn-cancel{flex:1;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);color:var(--td);border-radius:10px;padding:12px;font-size:13px;cursor:pointer;font-family:'Tajawal',sans-serif}
+.mbtn-save{flex:2;background:linear-gradient(135deg,var(--r),var(--rb));color:#fff;border:none;border-radius:10px;padding:12px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Tajawal',sans-serif}
+
+@keyframes fu{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.rv{opacity:0;transform:translateY(24px);transition:opacity .6s ease,transform .6s ease}.rv.vis{opacity:1;transform:translateY(0)}
+</style>
+</head>
+<body>
+
+<div class="tooltip" id="tooltip">
+  <div class="tt-title" id="tt-title"></div>
+  <div class="tt-desc" id="tt-desc"></div>
+  <span class="tt-tag" id="tt-tag"></span>
+</div>
+
+<!-- NAV -->
+<nav>
+  <a href="index.html" class="nl">
+    <div class="nc">UoN</div>
+    <div class="nn">UoN <span>Coffee</span></div>
+  </a>
+  <div class="ntabs">
+    <button class="ntab active" onclick="showPage('map',this)">🗺️ الخريطة</button>
+    <button class="ntab" onclick="showPage('conf',this)">💬 الاعترافات</button>
+    <button class="ntab" onclick="showPage('rest',this)">🍕 المطاعم</button>
+  </div>
+  <a href="index.html" class="nhome">← الرئيسية</a>
+</nav>
+
+<!-- ═══════════════ MAP PAGE ═══════════════ -->
+<div class="page active" id="page-map">
+  <div class="ph rv">
+    <span class="ph-tag">تفاعلية · محدّثة</span>
+    <div class="ph-title">خريطة جامعة نزوى 🗺️</div>
+    <div class="ph-sub">اضغط على أي مبنى لتعرف موقعه وخدماته</div>
+  </div>
+
+  <div class="map-wrap">
+    <div class="map-search rv">
+      <input class="ms-inp" id="mapSearch" placeholder="ابحث عن مبنى أو كلية..." oninput="searchMap(this.value)">
+      <button class="ms-btn" onclick="searchMap(document.getElementById('mapSearch').value)">بحث</button>
+    </div>
+
+    <div class="map-board rv">
+      <div class="map-grid">
+        <!-- Roads -->
+        <div class="road-h"></div>
+        <div class="road-v"></div>
+
+        <!-- Buildings -->
+        <div class="mb mb-park" onclick="showTip(event,'موقف السيارات A','الموقف الرئيسي — يمتلئ الصبح باكر 😅','⚠️ باكر دايماً ممتلئ')">
+          <span class="mb-icon">🅿️</span><span class="mb-name">موقف A</span>
+        </div>
+        <div class="mb mb-park2" onclick="showTip(event,'موقف السيارات B','الموقف الجانبي — أحياناً فيه مكان 😅','🅿️ جانبي')">
+          <span class="mb-icon">🅿️</span><span class="mb-name">موقف B</span>
+        </div>
+        <div class="mb mb-main" onclick="showTip(event,'المبنى الرئيسي','يضم الإدارة العليا، القبول والتسجيل، المالية','🏛️ إداري')">
+          <span class="mb-icon">🏛️</span><span class="mb-name">المبنى الرئيسي</span>
+        </div>
+        <div class="mb mb-eco" onclick="showTip(event,'كلية الاقتصاد ونظم المعلومات','برامج: المحاسبة، إدارة الأعمال، نظم المعلومات','💼 كلية')">
+          <span class="mb-icon">💼</span><span class="mb-name">الاقتصاد</span>
+        </div>
+        <div class="mb mb-eng" onclick="showTip(event,'كلية الهندسة والعمارة','برامج: هندسة مدنية، كهربائية، معمارية','🏗️ كلية')">
+          <span class="mb-icon">🏗️</span><span class="mb-name">الهندسة</span>
+        </div>
+        <div class="mb mb-cafe" onclick="showTip(event,'كافيتيريا الجامعة','وجبات، مشروبات، سناكس — مفتوحة من 7ص إلى 8م','☕ مفتوحة')">
+          <span class="mb-icon">☕</span><span class="mb-name">الكافيتيريا</span>
+        </div>
+        <div class="mb mb-sci" onclick="showTip(event,'كلية العلوم والآداب','برامج: كيمياء، فيزياء، رياضيات، لغة إنجليزية','🔬 كلية')">
+          <span class="mb-icon">🔬</span><span class="mb-name">العلوم والآداب</span>
+        </div>
+        <div class="mb mb-health" onclick="showTip(event,'كلية العلوم الصحية','برامج: تمريض، صحة عامة، علوم مختبرية','⚕️ كلية')">
+          <span class="mb-icon">⚕️</span><span class="mb-name">العلوم الصحية</span>
+        </div>
+        <div class="mb mb-found" onclick="showTip(event,'معهد التأسيس','برامج تأسيسية للطلاب المستجدين — سنة أولى','📖 معهد')">
+          <span class="mb-icon">📖</span><span class="mb-name">معهد التأسيس</span>
+        </div>
+        <div class="mb mb-lib" onclick="showTip(event,'مكتبة الجامعة','آلاف الكتب والمراجع الإلكترونية — مفتوحة 8ص-9م','📚 مفتوحة')">
+          <span class="mb-icon">📚</span><span class="mb-name">المكتبة</span>
+        </div>
+        <div class="mb mb-sport" onclick="showTip(event,'الملاعب والأنشطة الرياضية','ملعب كرة قدم، كرة طائرة، صالة رياضية','⚽ رياضة')">
+          <span class="mb-icon">⚽</span><span class="mb-name">الملاعب</span>
+        </div>
+        <div class="mb mb-gate" onclick="showTip(event,'البوابة الرئيسية','المدخل الرئيسي للجامعة','🚗 مدخل')">
+          <span class="mb-icon">🚪</span><span class="mb-name">بوابة رئيسية</span>
+        </div>
+        <div class="mb mb-gate2" onclick="showTip(event,'البوابة الجانبية','مدخل جانبي للجامعة','🚗 مدخل')">
+          <span class="mb-icon">🚪</span><span class="mb-name">بوابة جانبية</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="map-legend rv">
+      <div class="leg-item"><div class="leg-dot" style="background:#2d5a8e"></div>إداري</div>
+      <div class="leg-item"><div class="leg-dot" style="background:#2d8b2d"></div>اقتصاد</div>
+      <div class="leg-item"><div class="leg-dot" style="background:#8b5e2d"></div>هندسة</div>
+      <div class="leg-item"><div class="leg-dot" style="background:#2d2d8b"></div>علوم وآداب</div>
+      <div class="leg-item"><div class="leg-dot" style="background:#8b2d2d"></div>علوم صحية</div>
+      <div class="leg-item"><div class="leg-dot" style="background:#5c2d8b"></div>تأسيس</div>
+      <div class="leg-item"><div class="leg-dot" style="background:#2d7a5e"></div>مكتبة</div>
+      <div class="leg-item"><div class="leg-dot" style="background:#9b2335"></div>كافيتيريا</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ CONFESSIONS PAGE ═══════════════ -->
+<div class="page" id="page-conf">
+  <div class="ph rv">
+    <span class="ph-tag">مجهول · آمن · مضحك 😂</span>
+    <div class="ph-title">اعترافات طلاب نزوى 💬</div>
+    <div class="ph-sub">شارك اعترافك الجامعي بشكل مجهول — كلنا نعرف الإحساس 😅</div>
+  </div>
+
+  <div class="conf-wrap">
+    <div class="conf-form rv">
+      <div class="cf-title">✍️ اكتب اعترافك</div>
+      <div class="cf-cats">
+        <button class="cf-cat sel" onclick="selCat(this,'😂 مضحك')">😂 مضحك</button>
+        <button class="cf-cat" onclick="selCat(this,'😅 محرج')">😅 محرج</button>
+        <button class="cf-cat" onclick="selCat(this,'😤 شكوى')">😤 شكوى</button>
+        <button class="cf-cat" onclick="selCat(this,'❤️ قصة حب')">❤️ قصة حب</button>
+        <button class="cf-cat" onclick="selCat(this,'📚 دراسي')">📚 دراسي</button>
+        <button class="cf-cat" onclick="selCat(this,'🚗 باركينج')">🚗 باركينج</button>
+      </div>
+      <textarea class="cf-ta" id="confText" placeholder="اكتب اعترافك هنا... كلنا في نفس الوضع 😅" maxlength="300"></textarea>
+      <div class="cf-row">
+        <label class="cf-anon"><input type="checkbox" id="anonCheck" checked> نشر بشكل مجهول 👤</label>
+        <button class="cf-send" onclick="submitConf()">نشر الاعتراف 🚀</button>
+      </div>
+    </div>
+
+    <div class="conf-filter rv">
+      <button class="cf-f active" onclick="filterConf('all',this)">الكل</button>
+      <button class="cf-f" onclick="filterConf('😂 مضحك',this)">😂 مضحك</button>
+      <button class="cf-f" onclick="filterConf('🚗 باركينج',this)">🚗 باركينج</button>
+      <button class="cf-f" onclick="filterConf('📚 دراسي',this)">📚 دراسي</button>
+      <button class="cf-f" onclick="filterConf('😤 شكوى',this)">😤 شكوى</button>
+    </div>
+
+    <div class="conf-feed" id="confFeed"></div>
+  </div>
+</div>
+
+<!-- ═══════════════ RESTAURANTS PAGE ═══════════════ -->
+<div class="page" id="page-rest">
+  <div class="ph rv">
+    <span class="ph-tag">حول جامعة نزوى</span>
+    <div class="ph-title">دليل المطاعم 🍕</div>
+    <div class="ph-sub">أقرب المطاعم والكافيهات حول الجامعة — مع التقييمات والأسعار</div>
+  </div>
+
+  <div class="rest-wrap">
+    <div class="rest-filters rv">
+      <button class="rf active" onclick="filterRest('all',this)">الكل</button>
+      <button class="rf" onclick="filterRest('مطعم',this)">🍽️ مطاعم</button>
+      <button class="rf" onclick="filterRest('كافيه',this)">☕ كافيهات</button>
+      <button class="rf" onclick="filterRest('وجبات سريعة',this)">🍔 وجبات سريعة</button>
+      <button class="rf" onclick="filterRest('مخبزة',this)">🥖 مخابز</button>
+    </div>
+
+    <div class="rest-grid rv" id="restGrid"></div>
+
+    <div class="add-rest rv" onclick="openModal()">
+      <div class="add-rest-icon">➕</div>
+      <div class="add-rest-text">أضف مطعم جديد</div>
+      <div class="add-rest-sub">ساعد زملائك وأضف مطعمك المفضل</div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div class="modal" id="modal">
+  <div class="modal-box">
+    <div class="modal-title">➕ إضافة مطعم جديد</div>
+    <input class="minp" id="rName" placeholder="اسم المطعم">
+    <input class="minp" id="rType" placeholder="النوع (مطعم / كافيه / وجبات سريعة...)">
+    <input class="minp" id="rDesc" placeholder="وصف قصير">
+    <input class="minp" id="rDist" placeholder="المسافة عن الجامعة (مثل: 5 دقائق)">
+    <div style="font-size:12px;color:var(--td);margin-bottom:8px">التقييم:</div>
+    <div class="mstar" id="mstar">
+      <span onclick="setStars(1)">⭐</span><span onclick="setStars(2)">⭐</span>
+      <span onclick="setStars(3)">⭐</span><span onclick="setStars(4)">⭐</span><span onclick="setStars(5)">⭐</span>
+    </div>
+    <select class="minp" id="rPrice">
+      <option value="">مستوى السعر</option>
+      <option value="cheap">💚 رخيص (أقل من 2 ريال)</option>
+      <option value="mid">💛 متوسط (2-5 ريال)</option>
+      <option value="exp">🔴 غالي (أكثر من 5 ريال)</option>
+    </select>
+    <input class="minp" id="rEmoji" placeholder="رمز تعبيري للمطعم (مثل 🍕)">
+    <div class="mbtns">
+      <button class="mbtn-cancel" onclick="closeModal()">إلغاء</button>
+      <button class="mbtn-save" onclick="saveRest()">إضافة المطعم ✅</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══ PAGES ═══
+function showPage(id, btn) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.ntab').forEach(b => b.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  btn.classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+// ═══ MAP ═══
+function showTip(e, title, desc, tag) {
+  const t = document.getElementById('tooltip');
+  document.getElementById('tt-title').textContent = title;
+  document.getElementById('tt-desc').textContent = desc;
+  document.getElementById('tt-tag').textContent = tag;
+  t.style.display = 'block';
+  t.style.left = Math.min(e.clientX + 12, window.innerWidth - 240) + 'px';
+  t.style.top = Math.min(e.clientY - 10, window.innerHeight - 150) + 'px';
+  setTimeout(() => t.style.display = 'none', 3000);
+}
+document.addEventListener('click', e => {
+  if (!e.target.closest('.mb')) document.getElementById('tooltip').style.display = 'none';
+});
+
+const buildings = [
+  {name:'المبنى الرئيسي',el:'.mb-main'}, {name:'كلية الاقتصاد',el:'.mb-eco'},
+  {name:'كلية الهندسة',el:'.mb-eng'}, {name:'كلية العلوم',el:'.mb-sci'},
+  {name:'كلية العلوم الصحية',el:'.mb-health'}, {name:'معهد التأسيس',el:'.mb-found'},
+  {name:'المكتبة',el:'.mb-lib'}, {name:'الملاعب',el:'.mb-sport'},
+  {name:'الكافيتيريا',el:'.mb-cafe'}, {name:'موقف',el:'.mb-park'},
+];
+
+function searchMap(q) {
+  if (!q) { buildings.forEach(b => document.querySelector(b.el)?.style.removeProperty('opacity')); return; }
+  buildings.forEach(b => {
+    const el = document.querySelector(b.el);
+    if (!el) return;
+    el.style.opacity = b.name.includes(q) ? '1' : '0.3';
+    if (b.name.includes(q)) el.style.transform = 'scale(1.1)';
+    else el.style.transform = '';
+  });
+}
+
+// ═══ CONFESSIONS ═══
+let confessions = JSON.parse(localStorage.getItem('uon_confs') || 'null') || [
+  {id:1, text:'وصلت الجامعة الساعة 7 الصبح عشان احجز باركينج... لقيت الموقف ممتلئ 😭', cat:'🚗 باركينج', anon:true, likes:47, time:'منذ يومين'},
+  {id:2, text:'اتهيأ لي الدكتور ما لاحظ إني غايب طول الفصل... طلع يعرف اسمي وكل شي 😅', cat:'😅 محرج', anon:true, likes:38, time:'منذ 3 أيام'},
+  {id:3, text:'ذاكرت كل الليل للاختبار... لقيت الاختبار من كل شي ما ذاكرته 🤦', cat:'📚 دراسي', anon:true, likes:92, time:'منذ أسبوع'},
+  {id:4, text:'أكلت في الكافيتيريا كل يوم نفس الشيء طول الفصل 😂', cat:'😂 مضحك', anon:true, likes:25, time:'منذ أسبوعين'},
+  {id:5, text:'كل يوم أقول بذاكر بكرا... الفصل خلص ولا بدأت 😪', cat:'📚 دراسي', anon:true, likes:133, time:'منذ شهر'},
+];
+
+let currentFilter = 'all';
+let selectedCat = '😂 مضحك';
+
+function selCat(btn, cat) {
+  document.querySelectorAll('.cf-cat').forEach(b => b.classList.remove('sel'));
+  btn.classList.add('sel');
+  selectedCat = cat;
+}
+
+function submitConf() {
+  const text = document.getElementById('confText').value.trim();
+  if (!text) { alert('اكتب اعترافك أولاً! 😅'); return; }
+  if (text.length < 10) { alert('الاعتراف قصير جداً!'); return; }
+  const anon = document.getElementById('anonCheck').checked;
+  const conf = { id: Date.now(), text, cat: selectedCat, anon, likes: 0, time: 'الآن' };
+  confessions.unshift(conf);
+  localStorage.setItem('uon_confs', JSON.stringify(confessions));
+  document.getElementById('confText').value = '';
+  renderConfs();
+}
+
+function filterConf(cat, btn) {
+  document.querySelectorAll('.cf-f').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  currentFilter = cat;
+  renderConfs();
+}
+
+function renderConfs() {
+  const feed = document.getElementById('confFeed');
+  const filtered = currentFilter === 'all' ? confessions : confessions.filter(c => c.cat === currentFilter);
+  feed.innerHTML = filtered.length === 0
+    ? '<div style="text-align:center;color:var(--tf);padding:40px">لا يوجد اعترافات في هذا القسم بعد! كن الأول 😏</div>'
+    : filtered.map(c => `
+      <div class="cc-card" id="conf-${c.id}">
+        <div class="cc-top">
+          <div class="cc-avatar">${c.cat.split(' ')[0]}</div>
+          <div class="cc-meta">
+            <div class="cc-user">${c.anon ? '👤 مجهول' : '🎓 طالب نزوى'}</div>
+            <div class="cc-time">${c.time}</div>
+          </div>
+          <span class="cc-cat-badge">${c.cat}</span>
+        </div>
+        <div class="cc-text">${c.text}</div>
+        <div class="cc-actions">
+          <button class="cc-act" onclick="likeConf(${c.id},this)">❤️ ${c.likes}</button>
+          <button class="cc-act" onclick="shareConf('${c.text.replace(/'/g,"\\'")}')">📤 شارك</button>
+        </div>
+      </div>`).join('');
+}
+
+function likeConf(id, btn) {
+  const c = confessions.find(c => c.id === id);
+  if (!c) return;
+  c.likes++;
+  localStorage.setItem('uon_confs', JSON.stringify(confessions));
+  btn.textContent = '❤️ ' + c.likes;
+  btn.classList.add('liked');
+}
+
+function shareConf(text) {
+  if (navigator.share) navigator.share({ title: 'اعتراف من UoN Coffee', text });
+  else { navigator.clipboard.writeText(text); alert('تم نسخ الاعتراف! 📋'); }
+}
+
+renderConfs();
+
+// ═══ RESTAURANTS ═══
+let restaurants = JSON.parse(localStorage.getItem('uon_rests') || 'null') || [
+  {id:1, name:'مطعم الرستاق', type:'مطعم', emoji:'🍖', desc:'مشاوي وكبسة — الأشهر حول الجامعة', dist:'3 دقائق', stars:4, price:'mid', status:'open', tags:['حلال','مشاوي','كبسة']},
+  {id:2, name:'كافيه القهوة العربية', type:'كافيه', emoji:'☕', desc:'قهوة عربية وحلويات محلية فاخرة', dist:'5 دقائق', stars:5, price:'mid', status:'open', tags:['قهوة','حلويات','جلسات']},
+  {id:3, name:'ماكدونالدز نزوى', type:'وجبات سريعة', emoji:'🍔', desc:'الفاست فود المعروف — مفتوح 24 ساعة', dist:'8 دقائق', stars:3, price:'mid', status:'open', tags:['فاست فود','24 ساعة']},
+  {id:4, name:'بيتزا هت', type:'وجبات سريعة', emoji:'🍕', desc:'بيتزا وباستا للجلسات الجماعية', dist:'10 دقائق', stars:4, price:'exp', status:'open', tags:['بيتزا','توصيل']},
+  {id:5, name:'مخبزة الفرن البلدي', type:'مخبزة', emoji:'🥖', desc:'خبز طازج وصموليات بأسعار ممتازة', dist:'2 دقيقة', stars:5, price:'cheap', status:'open', tags:['خبز','رخيص','طازج']},
+  {id:6, name:'كافيتيريا الجامعة', type:'كافيه', emoji:'🎓', desc:'داخل الحرم الجامعي — وجبات ومشروبات', dist:'داخل الجامعة', stars:3, price:'cheap', status:'open', tags:['داخلي','وجبات','مشروبات']},
+];
+
+let restFilter = 'all';
+let ratingSelected = 5;
+
+function filterRest(type, btn) {
+  document.querySelectorAll('.rf').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  restFilter = type;
+  renderRests();
+}
+
+function renderRests() {
+  const grid = document.getElementById('restGrid');
+  const filtered = restFilter === 'all' ? restaurants : restaurants.filter(r => r.type === restFilter);
+  grid.innerHTML = filtered.map(r => `
+    <div class="rc" data-type="${r.type}">
+      <div class="rc-img" style="background:linear-gradient(135deg,rgba(155,35,53,.2),rgba(45,15,26,.8))">
+        <span style="font-size:64px">${r.emoji}</span>
+        <span class="rc-badge ${r.status==='open'?'badge-open':'badge-close'}">${r.status==='open'?'مفتوح':'مغلق'}</span>
+      </div>
+      <div class="rc-body">
+        <div class="rc-stars">${'⭐'.repeat(r.stars)}${'☆'.repeat(5-r.stars)}</div>
+        <div class="rc-name">${r.name}</div>
+        <div class="rc-type">${r.type}</div>
+        <div class="rc-desc">${r.desc}</div>
+        <div class="rc-info">
+          <span class="rc-inf">📍 ${r.dist}</span>
+          <span class="rc-price ${r.price}">${r.price==='cheap'?'💚 رخيص':r.price==='mid'?'💛 متوسط':'🔴 غالي'}</span>
+        </div>
+        <div class="rc-tags">${r.tags.map(t=>`<span class="rc-tag">${t}</span>`).join('')}</div>
+        <button class="rc-btn" onclick="openMaps('${r.name}')">📍 الوصول عبر الخريطة</button>
+      </div>
+    </div>`).join('');
+}
+
+function openMaps(name) {
+  window.open(`https://www.google.com/maps/search/${encodeURIComponent(name + ' نزوى عمان')}`, '_blank');
+}
+
+function openModal() { document.getElementById('modal').classList.add('show'); }
+function closeModal() { document.getElementById('modal').classList.remove('show'); ratingSelected = 5; }
+
+function setStars(n) {
+  ratingSelected = n;
+  const stars = document.querySelectorAll('#mstar span');
+  stars.forEach((s, i) => { s.textContent = i < n ? '⭐' : '☆'; });
+}
+
+function saveRest() {
+  const name = document.getElementById('rName').value.trim();
+  const type = document.getElementById('rType').value.trim();
+  const desc = document.getElementById('rDesc').value.trim();
+  const dist = document.getElementById('rDist').value.trim();
+  const price = document.getElementById('rPrice').value;
+  const emoji = document.getElementById('rEmoji').value.trim() || '🍽️';
+  if (!name || !type) { alert('أدخل اسم ونوع المطعم على الأقل!'); return; }
+  const rest = { id: Date.now(), name, type, emoji, desc: desc || 'مطعم رائع!', dist: dist || 'قريب من الجامعة', stars: ratingSelected, price: price || 'mid', status: 'open', tags: [type] };
+  restaurants.unshift(rest);
+  localStorage.setItem('uon_rests', JSON.stringify(restaurants));
+  closeModal();
+  renderRests();
+  ['rName','rType','rDesc','rDist','rEmoji'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('rPrice').value = '';
+}
+
+renderRests();
+
+// ═══ SCROLL REVEAL ═══
+const obs = new IntersectionObserver(es => es.forEach(e => { if(e.isIntersecting) e.target.classList.add('vis'); }), {threshold:.1});
+document.querySelectorAll('.rv').forEach(el => obs.observe(el));
+</script>
+</body>
+</html>
