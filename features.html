@@ -178,6 +178,41 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:14px 24px;display:fl
 
 @keyframes fu{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
 .rv{opacity:0;transform:translateY(24px);transition:opacity .6s ease,transform .6s ease}.rv.vis{opacity:1;transform:translateY(0)}
+
+/* ═══ ADMIN ═══ */
+.admin-btn{position:fixed;bottom:24px;left:24px;z-index:999;width:44px;height:44px;background:rgba(155,35,53,.15);border:1px solid rgba(155,35,53,.3);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:18px;transition:all .3s;backdrop-filter:blur(8px)}
+.admin-btn:hover{background:rgba(155,35,53,.3);transform:scale(1.1)}
+.admin-panel{position:fixed;inset:0;z-index:998;display:none;align-items:flex-end;justify-content:flex-start;padding:24px}
+.admin-panel.show{display:flex}
+.admin-panel-bg{position:fixed;inset:0;background:rgba(0,0,0,.5);backdrop-filter:blur(4px)}
+.admin-box{background:#1a0a10;border:1px solid rgba(155,35,53,.4);border-radius:20px;padding:28px;width:320px;position:relative;z-index:1;margin-bottom:70px}
+.admin-title{font-family:'Amiri',serif;font-size:20px;color:#fdf0f2;margin-bottom:6px}
+.admin-sub{font-size:11px;color:rgba(253,240,242,.3);margin-bottom:20px;font-family:'Space Mono',monospace}
+.admin-inp{width:100%;background:rgba(255,255,255,.05);border:1px solid rgba(155,35,53,.2);border-radius:10px;padding:11px 14px;color:#fdf0f2;font-family:'Tajawal',sans-serif;font-size:13px;outline:none;margin-bottom:12px}
+.admin-inp::placeholder{color:rgba(253,240,242,.2)}
+.admin-login-btn{width:100%;background:linear-gradient(135deg,#9b2335,#c94060);color:#fff;font-size:13px;font-weight:700;padding:12px;border-radius:10px;border:none;cursor:pointer;font-family:'Tajawal',sans-serif}
+.admin-controls{display:none;flex-direction:column;gap:10px}
+.admin-controls.show{display:flex}
+.admin-stat{background:rgba(155,35,53,.08);border:1px solid rgba(155,35,53,.15);border-radius:12px;padding:14px;display:flex;justify-content:space-between;align-items:center}
+.admin-stat-label{font-size:12px;color:rgba(253,240,242,.5)}
+.admin-stat-val{font-family:'Space Mono',monospace;font-size:18px;color:#c94060;font-weight:700}
+.admin-action{background:rgba(155,35,53,.1);border:1px solid rgba(155,35,53,.2);color:#c94060;font-size:12px;font-weight:700;padding:10px 14px;border-radius:10px;cursor:pointer;font-family:'Tajawal',sans-serif;transition:all .3s;text-align:right;display:flex;align-items:center;gap:8px}
+.admin-action:hover{background:rgba(155,35,53,.2)}
+.admin-action.danger{color:#ff6b6b;border-color:rgba(255,107,107,.2);background:rgba(255,107,107,.05)}
+.admin-action.danger:hover{background:rgba(255,107,107,.12)}
+.admin-close{position:absolute;top:14px;left:14px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);color:rgba(253,240,242,.4);border-radius:50%;width:28px;height:28px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:12px}
+.admin-sep{height:1px;background:rgba(155,35,53,.15);margin:4px 0}
+.admin-logged{font-size:10px;color:#4ade80;font-family:'Space Mono',monospace;margin-bottom:14px;display:flex;align-items:center;gap:6px}
+.admin-logged::before{content:'';width:6px;height:6px;background:#4ade80;border-radius:50%;flex-shrink:0;animation:blink 1.5s infinite}
+
+/* admin delete btn on cards */
+.conf-del{position:absolute;top:12px;left:12px;background:rgba(255,107,107,.1);border:1px solid rgba(255,107,107,.2);color:#ff6b6b;font-size:10px;padding:3px 8px;border-radius:50px;cursor:pointer;display:none;font-family:'Tajawal',sans-serif}
+.cc-card{position:relative}
+.admin-mode .conf-del{display:block}
+.rest-del{position:absolute;top:8px;left:8px;background:rgba(255,107,107,.15);border:1px solid rgba(255,107,107,.25);color:#ff6b6b;font-size:10px;padding:3px 8px;border-radius:50px;cursor:pointer;display:none;font-family:'Tajawal',sans-serif;z-index:10}
+.admin-mode .rest-del{display:block}
+.rc{position:relative}
+
 </style>
 </head>
 <body>
@@ -415,6 +450,11 @@ function searchMap(q) {
 }
 
 // ═══ CONFESSIONS ═══
+// Clear old confessions on first load of new version
+if (!localStorage.getItem('uon_v2')) {
+  localStorage.removeItem('uon_confs');
+  localStorage.setItem('uon_v2', '1');
+}
 let confessions = JSON.parse(localStorage.getItem('uon_confs') || '[]');
 
 let currentFilter = 'all';
@@ -485,6 +525,8 @@ function shareConf(text) {
 renderConfs();
 
 // ═══ RESTAURANTS ═══
+// Clear old restaurants cache
+localStorage.removeItem('uon_rests');
 let restaurants = [
   // مطاعم
   {id:1, name:'Pizza La Pepe', type:'مطعم', emoji:'🍕', desc:'بيتزا، باستا، برغر — مشهور جداً بين الطلاب', dist:'بركة الموز', stars:5, price:'mid', status:'open', tags:['بيتزا','باستا','برغر','مشهور']},
@@ -534,6 +576,7 @@ function renderRests() {
         </div>
         <div class="rc-tags">${r.tags.map(t=>`<span class="rc-tag">${t}</span>`).join('')}</div>
         <button class="rc-btn" onclick="openMaps('${r.name}')">📍 الوصول عبر الخريطة</button>
+        <button class="rest-del" onclick="deleteRest(${r.id})">🗑️</button>
       </div>
     </div>`).join('');
 }
@@ -570,6 +613,101 @@ function saveRest() {
 
 renderRests();
 
+
+// ═══ ADMIN ═══
+const ADMIN_PASS = 'Abady***791###';
+let isAdmin = sessionStorage.getItem('uon_admin') === '1';
+
+function toggleAdmin() {
+  const p = document.getElementById('adminPanel');
+  p.classList.toggle('show');
+  if (isAdmin) showAdminControls();
+}
+
+function closeAdmin() {
+  document.getElementById('adminPanel').classList.remove('show');
+}
+
+function adminLogin() {
+  const pass = document.getElementById('adminPass').value;
+  if (pass === ADMIN_PASS) {
+    sessionStorage.setItem('uon_admin', '1');
+    isAdmin = true;
+    showAdminControls();
+    document.body.classList.add('admin-mode');
+    renderConfs();
+    renderRests();
+  } else {
+    document.getElementById('adminPass').style.borderColor = '#ff6b6b';
+    setTimeout(() => document.getElementById('adminPass').style.borderColor = '', 1000);
+  }
+}
+
+function showAdminControls() {
+  document.getElementById('adminLogin').style.display = 'none';
+  document.getElementById('adminControls').classList.add('show');
+  document.getElementById('confCount').textContent = confessions.length;
+  document.getElementById('restCount').textContent = restaurants.length;
+}
+
+function adminLogout() {
+  sessionStorage.removeItem('uon_admin');
+  isAdmin = false;
+  document.body.classList.remove('admin-mode');
+  document.getElementById('adminLogin').style.display = 'block';
+  document.getElementById('adminControls').classList.remove('show');
+  document.getElementById('adminPass').value = '';
+  closeAdmin();
+  renderConfs();
+  renderRests();
+}
+
+function adminGoConf() {
+  closeAdmin();
+  const btn = document.querySelectorAll('.ntab')[1];
+  showPage('conf', btn);
+}
+
+function adminGoRest() {
+  closeAdmin();
+  const btn = document.querySelectorAll('.ntab')[2];
+  showPage('rest', btn);
+}
+
+function clearAllConf() {
+  if (!confirm('هل أنت متأكد من حذف كل الاعترافات؟')) return;
+  confessions = [];
+  localStorage.setItem('uon_confs', '[]');
+  document.getElementById('confCount').textContent = '0';
+  renderConfs();
+}
+
+function deleteConf(id) {
+  confessions = confessions.filter(c => c.id !== id);
+  localStorage.setItem('uon_confs', JSON.stringify(confessions));
+  document.getElementById('confCount').textContent = confessions.length;
+  renderConfs();
+}
+
+function deleteRest(id) {
+  if (!confirm('حذف هذا المطعم؟')) return;
+  restaurants = restaurants.filter(r => r.id !== id);
+  document.getElementById('restCount').textContent = restaurants.length;
+  renderRests();
+}
+
+function addRestAdmin() {
+  closeAdmin();
+  const btn = document.querySelectorAll('.ntab')[2];
+  showPage('rest', btn);
+  setTimeout(() => openModal(), 300);
+}
+
+// Check if already logged in
+if (isAdmin) {
+  document.body.classList.add('admin-mode');
+}
+
 // ═══ SCROLL REVEAL ═══
 const obs = new IntersectionObserver(es => es.forEach(e => { if(e.isIntersecting) e.target.classList.add('vis'); }), {threshold:.1});
 document.querySelectorAll('.rv').forEach(el => obs.observe(el));
@@ -590,6 +728,53 @@ document.querySelectorAll('.rv').forEach(el => obs.observe(el));
   }
 })();
 </script>
+
+
+<!-- ADMIN BTN -->
+<div class="admin-btn" onclick="toggleAdmin()" title="لوحة التحكم">⚙️</div>
+
+<!-- ADMIN PANEL -->
+<div class="admin-panel" id="adminPanel">
+  <div class="admin-panel-bg" onclick="closeAdmin()"></div>
+  <div class="admin-box">
+    <div class="admin-close" onclick="closeAdmin()">✕</div>
+    <div class="admin-title">🔐 لوحة الأدمن</div>
+    <div class="admin-sub">UoN Coffee · Admin Panel</div>
+
+    <!-- LOGIN -->
+    <div id="adminLogin">
+      <input class="admin-inp" type="password" id="adminPass" placeholder="كلمة المرور..." onkeydown="if(event.key==='Enter')adminLogin()">
+      <button class="admin-login-btn" onclick="adminLogin()">دخول ⚡</button>
+    </div>
+
+    <!-- CONTROLS -->
+    <div class="admin-controls" id="adminControls">
+      <div class="admin-logged">مرحباً يا أدمن 👋</div>
+
+      <!-- Stats -->
+      <div class="admin-stat">
+        <div class="admin-stat-label">الاعترافات</div>
+        <div class="admin-stat-val" id="confCount">0</div>
+      </div>
+      <div class="admin-stat">
+        <div class="admin-stat-label">المطاعم</div>
+        <div class="admin-stat-val" id="restCount">0</div>
+      </div>
+
+      <div class="admin-sep"></div>
+
+      <!-- Actions -->
+      <button class="admin-action" onclick="adminGoConf()">💬 إدارة الاعترافات</button>
+      <button class="admin-action" onclick="adminGoRest()">🍕 إدارة المطاعم</button>
+      <button class="admin-action" onclick="addRestAdmin()">➕ إضافة مطعم</button>
+
+      <div class="admin-sep"></div>
+
+      <button class="admin-action danger" onclick="clearAllConf()">🗑️ حذف كل الاعترافات</button>
+      <button class="admin-action danger" onclick="adminLogout()">🚪 تسجيل خروج</button>
+    </div>
+  </div>
+</div>
 
 </body>
 </html>
