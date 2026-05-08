@@ -415,13 +415,7 @@ function searchMap(q) {
 }
 
 // ═══ CONFESSIONS ═══
-let confessions = JSON.parse(localStorage.getItem('uon_confs') || 'null') || [
-  {id:1, text:'وصلت الجامعة الساعة 7 الصبح عشان احجز باركينج... لقيت الموقف ممتلئ 😭', cat:'🚗 باركينج', anon:true, likes:47, time:'منذ يومين'},
-  {id:2, text:'اتهيأ لي الدكتور ما لاحظ إني غايب طول الفصل... طلع يعرف اسمي وكل شي 😅', cat:'😅 محرج', anon:true, likes:38, time:'منذ 3 أيام'},
-  {id:3, text:'ذاكرت كل الليل للاختبار... لقيت الاختبار من كل شي ما ذاكرته 🤦', cat:'📚 دراسي', anon:true, likes:92, time:'منذ أسبوع'},
-  {id:4, text:'أكلت في الكافيتيريا كل يوم نفس الشيء طول الفصل 😂', cat:'😂 مضحك', anon:true, likes:25, time:'منذ أسبوعين'},
-  {id:5, text:'كل يوم أقول بذاكر بكرا... الفصل خلص ولا بدأت 😪', cat:'📚 دراسي', anon:true, likes:133, time:'منذ شهر'},
-];
+let confessions = JSON.parse(localStorage.getItem('uon_confs') || '[]');
 
 let currentFilter = 'all';
 let selectedCat = '😂 مضحك';
@@ -491,13 +485,23 @@ function shareConf(text) {
 renderConfs();
 
 // ═══ RESTAURANTS ═══
-let restaurants = JSON.parse(localStorage.getItem('uon_rests') || 'null') || [
-  {id:1, name:'مطعم الرستاق', type:'مطعم', emoji:'🍖', desc:'مشاوي وكبسة — الأشهر حول الجامعة', dist:'3 دقائق', stars:4, price:'mid', status:'open', tags:['حلال','مشاوي','كبسة']},
-  {id:2, name:'كافيه القهوة العربية', type:'كافيه', emoji:'☕', desc:'قهوة عربية وحلويات محلية فاخرة', dist:'5 دقائق', stars:5, price:'mid', status:'open', tags:['قهوة','حلويات','جلسات']},
-  {id:3, name:'ماكدونالدز نزوى', type:'وجبات سريعة', emoji:'🍔', desc:'الفاست فود المعروف — مفتوح 24 ساعة', dist:'8 دقائق', stars:3, price:'mid', status:'open', tags:['فاست فود','24 ساعة']},
-  {id:4, name:'بيتزا هت', type:'وجبات سريعة', emoji:'🍕', desc:'بيتزا وباستا للجلسات الجماعية', dist:'10 دقائق', stars:4, price:'exp', status:'open', tags:['بيتزا','توصيل']},
-  {id:5, name:'مخبزة الفرن البلدي', type:'مخبزة', emoji:'🥖', desc:'خبز طازج وصموليات بأسعار ممتازة', dist:'2 دقيقة', stars:5, price:'cheap', status:'open', tags:['خبز','رخيص','طازج']},
-  {id:6, name:'كافيتيريا الجامعة', type:'كافيه', emoji:'🎓', desc:'داخل الحرم الجامعي — وجبات ومشروبات', dist:'داخل الجامعة', stars:3, price:'cheap', status:'open', tags:['داخلي','وجبات','مشروبات']},
+let restaurants = [
+  // مطاعم
+  {id:1, name:'Pizza La Pepe', type:'مطعم', emoji:'🍕', desc:'بيتزا، باستا، برغر — مشهور جداً بين الطلاب', dist:'بركة الموز', stars:5, price:'mid', status:'open', tags:['بيتزا','باستا','برغر','مشهور']},
+  {id:2, name:'Kariboni Cafe', type:'وجبات سريعة', emoji:'🍔', desc:'سندويشات، برغر، وجبات سريعة', dist:'بركة الموز', stars:4, price:'mid', status:'open', tags:['برغر','سندويشات','سريع']},
+  {id:3, name:'Restaurant Alkhahjwr', type:'مطعم', emoji:'🍖', desc:'رز، مشاوي، أكل عربي أصيل', dist:'بركة الموز', stars:4, price:'mid', status:'open', tags:['مشاوي','رز','عربي']},
+  {id:4, name:'Antalya Shack', type:'مطعم', emoji:'🥙', desc:'أكل تركي، كباب، شاورما — تجربة مميزة', dist:'بركة الموز', stars:4, price:'mid', status:'open', tags:['تركي','كباب','شاورما']},
+  {id:5, name:'New Al Neil Line', type:'مطعم', emoji:'🍽️', desc:'وجبات عائلية وأكل يومي متنوع', dist:'بركة الموز', stars:3, price:'cheap', status:'open', tags:['عائلي','يومي']},
+  {id:6, name:'Reem Al Yemen', type:'مطعم', emoji:'🫕', desc:'مندي، أكلات يمنية وعربية أصيلة', dist:'بركة الموز', stars:4, price:'mid', status:'open', tags:['مندي','يمني','عربي']},
+  {id:7, name:'DBites', type:'وجبات سريعة', emoji:'🍟', desc:'وجبات سريعة — قريب من الجامعة مباشرة', dist:'قريب من الجامعة', stars:4, price:'cheap', status:'open', tags:['سريع','قريب','رخيص']},
+  // كافيهات
+  {id:8, name:'Kawa Kava', type:'كافيه', emoji:'☕', desc:'أفضل مكان للمذاكرة والقهوة — الأشهر بين الطلاب', dist:'بركة الموز', stars:5, price:'mid', status:'open', tags:['مذاكرة','قهوة','مشهور']},
+  {id:9, name:'Alam علم', type:'كافيه', emoji:'🎨', desc:'كوفي جميل وجلسات مرتبة — أجواء هادئة', dist:'بركة الموز', stars:5, price:'mid', status:'open', tags:['جلسات','هادئ','قهوة']},
+  {id:10, name:'Over Value Cafe', type:'كافيه', emoji:'💚', desc:'اقتصادي ومناسب للطلاب — أسعار ممتازة', dist:'بركة الموز', stars:4, price:'cheap', status:'open', tags:['رخيص','طلاب','اقتصادي']},
+  {id:11, name:'Aroma Cafe أروما', type:'كافيه', emoji:'🌸', desc:'مشروبات وقهوة ممتازة بأجواء مريحة', dist:'بركة الموز', stars:4, price:'mid', status:'open', tags:['قهوة','مشروبات','مريح']},
+  {id:12, name:'Watad Cafe', type:'كافيه', emoji:'🏃', desc:'قريب جداً من جامعة نزوى — الأقرب للطلاب', dist:'قريب من الجامعة', stars:4, price:'mid', status:'open', tags:['قريب','سريع','جامعة']},
+  {id:13, name:'Thalej ثالج', type:'كافيه', emoji:'🧊', desc:'قهوة ومشروبات باردة — مثالي للصيف', dist:'بركة الموز', stars:4, price:'cheap', status:'open', tags:['بارد','مشروبات','صيف']},
+  {id:14, name:'Al Husn Cafe كافيه الحصن', type:'كافيه', emoji:'🏰', desc:'أجواء جميلة وإطلالة ممتازة على الحصن', dist:'بركة الموز', stars:5, price:'mid', status:'open', tags:['إطلالة','أجواء','مميز']},
 ];
 
 let restFilter = 'all';
