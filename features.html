@@ -569,20 +569,22 @@ renderRests();
 // ═══ SCROLL REVEAL ═══
 const obs = new IntersectionObserver(es => es.forEach(e => { if(e.isIntersecting) e.target.classList.add('vis'); }), {threshold:.1});
 document.querySelectorAll('.rv').forEach(el => obs.observe(el));
-</script>
 
-<script>
-// Auto open tab based on URL hash
-window.addEventListener('DOMContentLoaded', function() {
-  const hash = window.location.hash;
-  if (hash === '#conf') {
-    const btn = document.querySelector('[onclick="showPage('conf',this)"]');
-    if (btn) { showPage('conf', btn); }
-  } else if (hash === '#rest') {
-    const btn = document.querySelector('[onclick="showPage('rest',this)"]');
-    if (btn) { showPage('rest', btn); }
+// ═══ AUTO TAB FROM URL ═══
+(function() {
+  const hash = window.location.hash.replace('#','');
+  const tabMap = { 'conf': 1, 'rest': 2 };
+  const idx = tabMap[hash];
+  if (idx !== undefined) {
+    const tabs = document.querySelectorAll('.ntab');
+    const pages = document.querySelectorAll('.page');
+    pages.forEach(p => p.classList.remove('active'));
+    tabs.forEach(t => t.classList.remove('active'));
+    tabs[idx].classList.add('active');
+    const pageIds = ['map','conf','rest'];
+    document.getElementById('page-' + pageIds[idx]).classList.add('active');
   }
-});
+})();
 </script>
 
 </body>
