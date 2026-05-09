@@ -829,7 +829,11 @@ window.saveBusSchedule = async function() {
 
 // ===== INIT =====
 window.addEventListener('DOMContentLoaded', async () => {
-    await Promise.all([loadTools(), loadSettings(), loadBusData()])
+    // إخفاء الـ loading بعد 4 ثواني على أي حال
+    setTimeout(() => document.getElementById('loadingOverlay').classList.add('hidden'), 4000)
+    try {
+        await Promise.all([loadTools(), loadSettings(), loadBusData()])
+    } catch(e) { console.log('init error', e) }
     updateUI()
     initScrollReveal()
     initCounters()
