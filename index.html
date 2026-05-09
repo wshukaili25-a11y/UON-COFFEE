@@ -1,344 +1,1692 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>UoN Coffee</title>
-<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;700;900&family=Amiri:wght@400;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-<style>
-*{margin:0;padding:0;box-sizing:border-box}html{scroll-behavior:smooth}
-body{background:#1a0a10;color:#fdf0f2;font-family:'Tajawal',sans-serif;overflow-x:hidden}
-nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(26,10,16,.93);backdrop-filter:blur(20px);border-bottom:1px solid rgba(155,35,53,.3);padding:14px 24px;display:flex;align-items:center;justify-content:space-between}
-.nl{display:flex;align-items:center;gap:10px}
-.nc{width:38px;height:38px;background:linear-gradient(135deg,#9b2335,#c94060);border-radius:8px 8px 12px 12px;display:flex;align-items:center;justify-content:center;font-family:'Space Mono',monospace;font-size:9px;font-weight:700;color:#fff;position:relative}
-.nc::after{content:'';position:absolute;right:-8px;top:8px;width:8px;height:14px;border:2px solid #9b2335;border-left:none;border-radius:0 6px 6px 0}
-.nn{font-weight:900;font-size:16px;color:#fdf0f2}.nn span{color:#c94060}
-.nls{display:flex;gap:20px;list-style:none}
-.nls a{color:rgba(253,240,242,.5);text-decoration:none;font-size:12px;transition:color .3s}
-.nls a:hover{color:#c94060}
-.nb{background:linear-gradient(135deg,#9b2335,#c94060);color:#fff;font-size:11px;font-weight:700;padding:7px 16px;border-radius:50px;text-decoration:none}
-@media(max-width:768px){.nls{display:none}}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>جامعة نزوى - منصة الطالب</title>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        :root {
+            --primary: #00d4ff;
+            --secondary: #ff6b6b;
+            --accent: #ffd93d;
+            --success: #6bcb77;
+            --warning: #fb923c;
+            --danger: #ef4444;
+            --dark: #0a0e27;
+            --dark-light: #1a1f3d;
+            --dark-lighter: #2d3561;
+            --text: #e2e8f0;
+            --text-muted: #a0aec0;
+            --text-dim: #718096;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Tajawal', sans-serif;
+            background: var(--dark);
+            color: var(--text);
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: var(--dark); }
+        ::-webkit-scrollbar-thumb { background: var(--dark-lighter); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--primary); }
 
-.hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:120px 24px 80px;text-align:center;position:relative;overflow:hidden}
-.hbg{position:absolute;inset:0;background:radial-gradient(ellipse at 50% 40%,rgba(155,35,53,.15) 0%,transparent 65%)}
-.hr{position:absolute;border-radius:50%;border:1px solid rgba(155,35,53,.1);top:50%;left:50%;transform:translate(-50%,-50%);animation:pulse 5s ease-in-out infinite}
-@keyframes pulse{0%,100%{opacity:.15;transform:translate(-50%,-50%) scale(.97)}50%{opacity:.04;transform:translate(-50%,-50%) scale(1.03)}}
-.hc{position:relative;z-index:1;max-width:680px}
-.hbadge{display:inline-block;background:rgba(155,35,53,.15);border:1px solid rgba(155,35,53,.4);color:#c94060;font-size:12px;font-weight:700;padding:6px 20px;border-radius:50px;margin-bottom:32px}
-.hcup{width:100px;height:100px;background:linear-gradient(145deg,#9b2335,#c94060);border-radius:22px 22px 30px 30px;display:flex;align-items:center;justify-content:center;font-family:'Space Mono',monospace;font-size:16px;font-weight:700;color:#fff;margin:0 auto 32px;position:relative;box-shadow:0 16px 48px rgba(155,35,53,.4);animation:float 5s ease-in-out infinite}
-.hcup::after{content:'';position:absolute;right:-18px;top:20px;width:18px;height:36px;border:4px solid #9b2335;border-left:none;border-radius:0 14px 14px 0}
-@keyframes float{0%,100%{transform:translateY(0) rotate(-1deg)}50%{transform:translateY(-12px) rotate(1deg)}}
-.ht{font-family:'Amiri',serif;font-size:clamp(30px,6vw,52px);color:#fdf0f2;line-height:1.5;margin-bottom:16px}.ht span{color:#c94060}
-.hs{font-size:14px;color:rgba(253,240,242,.4);line-height:1.9;margin-bottom:36px}
-.hbtns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
-.bm{background:linear-gradient(135deg,#9b2335,#c94060);color:#fff;font-size:14px;font-weight:900;padding:14px 28px;border-radius:10px;text-decoration:none;box-shadow:0 8px 24px rgba(155,35,53,.4);transition:all .3s}
-.bm:hover{transform:translateY(-2px)}
-.bs{background:rgba(155,35,53,.1);border:1px solid rgba(155,35,53,.3);color:#c94060;font-size:14px;font-weight:700;padding:14px 28px;border-radius:10px;text-decoration:none;transition:all .3s}
-.bs:hover{background:rgba(155,35,53,.2)}
-.stats{display:flex;gap:28px;justify-content:center;margin-top:52px;flex-wrap:wrap}
-.stat{text-align:center}.sn{font-family:'Space Mono',monospace;font-size:26px;font-weight:700;color:#c94060}
-.sl{font-size:11px;color:rgba(253,240,242,.3);margin-top:4px}
-.sd{width:1px;background:rgba(155,35,53,.2);align-self:stretch}
+        @keyframes slideInUp {
+            from { opacity: 0; transform: translateY(40px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-8px); }
+            75% { transform: translateX(8px); }
+        }
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(0, 212, 255, 0.4); }
+            50% { box-shadow: 0 0 0 15px rgba(0, 212, 255, 0); }
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
 
-.sec{padding:80px 24px;max-width:1100px;margin:0 auto}
-.shd{text-align:center;margin-bottom:48px}
-.stag{display:block;font-family:'Space Mono',monospace;font-size:9px;letter-spacing:4px;text-transform:uppercase;color:rgba(201,64,96,.5);margin-bottom:12px}
-.stit{font-family:'Amiri',serif;font-size:clamp(22px,4vw,34px);color:#fdf0f2}
-.ssub{font-size:13px;color:rgba(253,240,242,.3);margin-top:8px;line-height:1.8}
+        /* ===== LOGIN OVERLAY - HIDDEN BY DEFAULT ===== */
+        .login-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(10, 14, 39, 0.98);
+            backdrop-filter: blur(20px);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.5s ease;
+            opacity: 0;
+            pointer-events: none;
+            transform: scale(1.1);
+        }
+        .login-overlay.active {
+            opacity: 1;
+            pointer-events: all;
+            transform: scale(1);
+        }
+        .login-box {
+            background: var(--dark-light);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 24px;
+            padding: 3rem;
+            width: 100%;
+            max-width: 420px;
+            text-align: center;
+            box-shadow: 0 25px 80px rgba(0,0,0,0.5);
+        }
+        .login-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #00d4ff, #0099cc);
+            border-radius: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            font-size: 2rem;
+            color: var(--dark);
+        }
+        .login-box h2 { font-size: 1.8rem; font-weight: 900; margin-bottom: 0.5rem; }
+        .login-box p { color: var(--text-dim); margin-bottom: 2rem; }
+        .input-group { position: relative; margin-bottom: 1.5rem; }
+        .input-group i {
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-dim);
+        }
+        .input-group input {
+            width: 100%;
+            padding: 1rem 3rem 1rem 1rem;
+            background: var(--dark);
+            border: 2px solid rgba(255,255,255,0.1);
+            border-radius: 14px;
+            color: white;
+            font-family: 'Tajawal', sans-serif;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+        .input-group input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.1);
+        }
+        .login-btn {
+            width: 100%;
+            padding: 1rem;
+            background: linear-gradient(135deg, #00d4ff, #0099cc);
+            border: none;
+            border-radius: 14px;
+            color: var(--dark);
+            font-weight: 800;
+            font-size: 1.1rem;
+            font-family: 'Tajawal', sans-serif;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 40px rgba(0, 212, 255, 0.4);
+        }
+        .login-error {
+            color: var(--danger);
+            font-size: 0.9rem;
+            margin-top: 1rem;
+            display: none;
+        }
+        .login-error.show { display: block; }
 
-.g3{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px}
-.g2{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px}
-.g5{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px}
+        /* ADMIN BADGE */
+        .admin-badge {
+            position: fixed;
+            top: 80px;
+            left: 20px;
+            z-index: 999;
+            background: linear-gradient(135deg, var(--secondary), #ee5a5a);
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            display: none;
+            align-items: center;
+            gap: 6px;
+            box-shadow: 0 5px 20px rgba(255, 107, 107, 0.3);
+            animation: pulse 2s infinite;
+        }
+        .admin-badge.show { display: flex; }
 
-.card{background:rgba(155,35,53,.07);border:1px solid rgba(155,35,53,.18);border-radius:16px;padding:28px;transition:all .3s}
-.card:hover{border-color:rgba(155,35,53,.38);transform:translateY(-4px)}
-.ci{width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;margin-bottom:16px;background:rgba(155,35,53,.14)}
-.ct{font-size:15px;font-weight:900;color:#fdf0f2;margin-bottom:8px}
-.cd{font-size:12px;color:rgba(253,240,242,.4);line-height:1.8}
-.bdg{display:inline-block;font-size:10px;font-weight:700;padding:4px 12px;border-radius:50px;margin-top:14px}
-.bfree{background:rgba(155,35,53,.14);border:1px solid rgba(155,35,53,.28);color:#c94060}
-.bsoon{background:rgba(200,117,140,.1);border:1px solid rgba(200,117,140,.22);color:#d4899c}
+        /* NAVBAR */
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 1rem 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+            background: rgba(10, 14, 39, 0.9);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            transition: all 0.3s ease;
+        }
+        .navbar.scrolled {
+            padding: 0.7rem 5%;
+            background: rgba(10, 14, 39, 0.98);
+        }
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+        }
+        .logo-icon {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, #00d4ff, #0099cc);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            font-size: 1.3rem;
+            color: var(--dark);
+        }
+        .logo-text { color: white; font-size: 1.3rem; font-weight: 700; }
+        .logo-text span { color: var(--primary); }
+        .nav-links { display: flex; gap: 2.5rem; list-style: none; }
+        .nav-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+            position: relative;
+        }
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            right: 0;
+            width: 0;
+            height: 2px;
+            background: var(--primary);
+            transition: width 0.3s;
+        }
+        .nav-links a:hover { color: var(--primary); }
+        .nav-links a:hover::after { width: 100%; }
+        .nav-actions { display: flex; gap: 1rem; align-items: center; }
+        .nav-btn {
+            padding: 0.6rem 1.5rem;
+            background: linear-gradient(135deg, #00d4ff, #0099cc);
+            border: none;
+            border-radius: 10px;
+            color: var(--dark);
+            font-weight: 700;
+            font-family: 'Tajawal', sans-serif;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .nav-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(0, 212, 255, 0.3);
+        }
+        .admin-btn {
+            padding: 0.6rem 1.2rem;
+            background: transparent;
+            border: 2px solid var(--warning);
+            border-radius: 10px;
+            color: var(--warning);
+            font-weight: 700;
+            font-family: 'Tajawal', sans-serif;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: none;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.9rem;
+        }
+        .admin-btn.show { display: flex; }
+        .admin-btn:hover { background: var(--warning); color: var(--dark); }
+        .logout-btn {
+            padding: 0.6rem 1.2rem;
+            background: transparent;
+            border: 2px solid var(--text-dim);
+            border-radius: 10px;
+            color: var(--text-dim);
+            font-weight: 700;
+            font-family: 'Tajawal', sans-serif;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: none;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.9rem;
+        }
+        .logout-btn.show { display: flex; }
+        .logout-btn:hover { border-color: var(--danger); color: var(--danger); }
+        .mobile-menu { display: none; font-size: 1.5rem; color: white; cursor: pointer; }
 
-.cw{background:rgba(155,35,53,.06);border:1px solid rgba(155,35,53,.18);border-radius:20px;padding:40px;max-width:580px;margin:0 auto}
-.crs{display:flex;flex-direction:column;gap:10px;margin-bottom:16px}
-.cr{display:flex;gap:8px;align-items:center}
-.cr input,.cr select{background:rgba(255,255,255,.05);border:1px solid rgba(155,35,53,.22);border-radius:10px;padding:11px 12px;color:#fdf0f2;font-family:'Tajawal',sans-serif;font-size:13px;outline:none;flex:1}
-.cr input::placeholder{color:rgba(253,240,242,.2)}
-.cr select option{background:#2d0a14;color:#fdf0f2}
-.rmb{width:34px;height:34px;flex-shrink:0;background:rgba(255,80,80,.08);border:1px solid rgba(255,80,80,.15);border-radius:8px;color:#ff6b6b;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center}
-.addb{width:100%;background:rgba(155,35,53,.05);border:1px dashed rgba(155,35,53,.25);border-radius:10px;padding:11px;color:rgba(201,64,96,.5);font-size:13px;font-weight:700;cursor:pointer;font-family:'Tajawal',sans-serif;margin-bottom:16px}
-.calb{width:100%;background:linear-gradient(135deg,#9b2335,#c94060);color:#fff;font-size:14px;font-weight:900;padding:14px;border-radius:10px;border:none;cursor:pointer;font-family:'Tajawal',sans-serif}
-.res{display:none;margin-top:20px;background:rgba(155,35,53,.08);border:1px solid rgba(155,35,53,.22);border-radius:14px;padding:20px;text-align:center}
-.rn{font-family:'Space Mono',monospace;font-size:48px;color:#c94060;font-weight:700}
-.rg{font-size:14px;color:rgba(253,240,242,.4);margin-top:6px}
+        /* HERO */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            padding: 8rem 5% 4rem;
+            overflow: hidden;
+        }
+        .hero-bg { position: absolute; width: 100%; height: 100%; top: 0; left: 0; }
+        .hero-bg .circle {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.15;
+        }
+        .hero-bg .circle-1 {
+            width: 500px; height: 500px;
+            background: var(--primary);
+            top: -10%; right: -10%;
+            animation: float 8s ease-in-out infinite;
+        }
+        .hero-bg .circle-2 {
+            width: 400px; height: 400px;
+            background: var(--secondary);
+            bottom: -10%; left: -10%;
+            animation: float 10s ease-in-out infinite reverse;
+        }
+        .hero-bg .circle-3 {
+            width: 300px; height: 300px;
+            background: var(--accent);
+            top: 40%; left: 30%;
+            animation: float 12s ease-in-out infinite;
+        }
+        .hero-content { text-align: center; z-index: 2; max-width: 800px; }
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 0.5rem 1.2rem;
+            background: rgba(0, 212, 255, 0.1);
+            border: 1px solid rgba(0, 212, 255, 0.2);
+            border-radius: 50px;
+            font-size: 0.9rem;
+            color: var(--primary);
+            margin-bottom: 2rem;
+            animation: slideInUp 0.6s ease forwards;
+        }
+        .hero h1 {
+            font-size: clamp(2.5rem, 6vw, 4.5rem);
+            font-weight: 900;
+            line-height: 1.2;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, #fff 0%, var(--primary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: slideInUp 0.8s ease 0.2s forwards;
+            opacity: 0;
+        }
+        .hero p {
+            font-size: 1.2rem;
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+            animation: slideInUp 0.8s ease 0.4s forwards;
+            opacity: 0;
+        }
+        .hero p.sub {
+            font-size: 1rem;
+            color: var(--text-dim);
+            margin-bottom: 2.5rem;
+            animation: slideInUp 0.8s ease 0.5s forwards;
+            opacity: 0;
+        }
+        .hero-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            animation: slideInUp 0.8s ease 0.6s forwards;
+            opacity: 0;
+        }
+        .btn-primary {
+            padding: 1rem 2.5rem;
+            background: linear-gradient(135deg, #00d4ff, #0099cc);
+            border: none;
+            border-radius: 14px;
+            color: var(--dark);
+            font-weight: 800;
+            font-size: 1rem;
+            font-family: 'Tajawal', sans-serif;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(0, 212, 255, 0.4);
+        }
+        .btn-secondary {
+            padding: 1rem 2.5rem;
+            background: transparent;
+            border: 2px solid var(--primary);
+            border-radius: 14px;
+            color: var(--primary);
+            font-weight: 800;
+            font-size: 1rem;
+            font-family: 'Tajawal', sans-serif;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn-secondary:hover {
+            background: var(--primary);
+            color: var(--dark);
+            transform: translateY(-3px);
+        }
 
-.gc{background:rgba(155,35,53,.07);border:1px solid rgba(155,35,53,.18);border-radius:14px;padding:22px;text-align:center;transition:all .3s}
-.gc:hover{background:rgba(155,35,53,.14);border-color:rgba(155,35,53,.34);transform:translateY(-3px)}
-.ge{font-size:30px;margin-bottom:10px}.gn{font-size:14px;font-weight:900;color:#fdf0f2;margin-bottom:4px}
-.gs{font-size:11px;color:rgba(253,240,242,.3);margin-bottom:14px}
-.gb{background:rgba(155,35,53,.14);border:1px solid rgba(155,35,53,.3);color:#c94060;font-size:11px;font-weight:700;padding:7px 18px;border-radius:50px;cursor:pointer;font-family:'Tajawal',sans-serif}
+        /* STATS */
+        .stats-bar {
+            padding: 2rem 5%;
+            display: flex;
+            justify-content: center;
+            gap: 4rem;
+            flex-wrap: wrap;
+        }
+        .stat-item {
+            text-align: center;
+            padding: 1.5rem 2rem;
+            background: var(--dark-light);
+            border-radius: 16px;
+            border: 1px solid rgba(255,255,255,0.05);
+            min-width: 150px;
+            transition: all 0.3s;
+        }
+        .stat-item:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary);
+            box-shadow: 0 10px 40px rgba(0, 212, 255, 0.1);
+        }
+        .stat-item i {
+            font-size: 2rem;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+        .stat-number { font-size: 2rem; font-weight: 900; color: white; display: block; }
+        .stat-label { color: var(--text-dim); font-size: 0.9rem; }
 
-.lc{background:rgba(155,35,53,.07);border:1px solid rgba(155,35,53,.18);border-radius:14px;padding:20px;text-decoration:none;display:flex;align-items:center;gap:14px;transition:all .3s}
-.lc:hover{background:rgba(155,35,53,.14);border-color:rgba(155,35,53,.34);transform:translateX(-4px)}
-.li{font-size:26px;flex-shrink:0}
-.ln{font-size:14px;font-weight:700;color:#fdf0f2;margin-bottom:3px}
-.lu{font-size:11px;color:rgba(253,240,242,.3)}
-.la{margin-right:auto;color:rgba(155,35,53,.4);font-size:18px}
-.lc:hover .la{color:#c94060}
+        /* TOOLS */
+        .tools-section { padding: 6rem 5%; position: relative; }
+        .section-header { text-align: center; margin-bottom: 4rem; }
+        .section-header h2 {
+            font-size: 2.5rem;
+            font-weight: 900;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, #fff 0%, var(--primary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .section-header p { color: var(--text-dim); font-size: 1.1rem; max-width: 600px; margin: 0 auto; }
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        .tool-card {
+            background: var(--dark-light);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 20px;
+            padding: 2.5rem 2rem;
+            text-align: center;
+            transition: all 0.4s;
+            position: relative;
+            overflow: hidden;
+        }
+        .tool-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: var(--card-color, var(--primary));
+            transform: scaleX(0);
+            transition: transform 0.4s;
+        }
+        .tool-card:hover::before { transform: scaleX(1); }
+        .tool-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            border-color: var(--card-color, var(--primary));
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        .tool-icon {
+            width: 70px; height: 70px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            font-size: 1.8rem;
+        }
+        .tool-card h3 { font-size: 1.3rem; font-weight: 800; margin-bottom: 0.8rem; color: white; }
+        .tool-card p { color: var(--text-dim); font-size: 0.95rem; margin-bottom: 1.5rem; line-height: 1.7; }
+        .tool-link {
+            color: var(--card-color, var(--primary));
+            text-decoration: none;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            transition: gap 0.3s;
+        }
+        .tool-link:hover { gap: 10px; }
 
-.hw{background:rgba(155,35,53,.07);border:1px solid rgba(155,35,53,.2);border-radius:24px;padding:48px;display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center}
-@media(max-width:768px){.hw{grid-template-columns:1fr;padding:28px}}
-.htag{font-size:9px;letter-spacing:4px;text-transform:uppercase;color:#c94060;margin-bottom:12px;font-family:'Space Mono',monospace;display:block}
-.htit{font-family:'Amiri',serif;font-size:28px;color:#fdf0f2;line-height:1.5;margin-bottom:14px}
-.hdes{font-size:13px;color:rgba(253,240,242,.4);line-height:1.9;margin-bottom:24px}
-.hlist{display:flex;flex-direction:column;gap:10px;margin-bottom:28px}
-.hi{display:flex;align-items:center;gap:10px}
-.hdot{width:6px;height:6px;background:#9b2335;border-radius:50%;flex-shrink:0}
-.hit{font-size:13px;color:rgba(253,240,242,.5)}
-.hbtn{display:inline-block;background:rgba(155,35,53,.15);border:1px solid rgba(155,35,53,.3);color:#c94060;font-size:13px;font-weight:700;padding:12px 24px;border-radius:10px;opacity:.7}
-.hsvcs{display:flex;flex-direction:column;gap:10px}
-.hsvc{background:rgba(155,35,53,.06);border:1px solid rgba(155,35,53,.14);border-radius:12px;padding:16px 18px;display:flex;align-items:center;gap:12px}
-.hsi{font-size:22px;flex-shrink:0}
-.hsn{font-size:13px;font-weight:700;color:#fdf0f2}
-.hsp{font-size:11px;color:#c94060;margin-top:2px}
-.hsb{margin-right:auto;background:rgba(155,35,53,.14);border:1px solid rgba(155,35,53,.24);color:#c94060;font-size:9px;font-weight:700;padding:2px 8px;border-radius:50px}
+        /* ADMIN EDIT BUTTON */
+        .admin-edit-btn {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: var(--warning);
+            border: none;
+            color: var(--dark);
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+            z-index: 10;
+        }
+        .admin-edit-btn:hover { transform: scale(1.1); }
+        .admin-mode .admin-edit-btn { display: flex; }
+        .admin-mode .tool-card { position: relative; }
 
-.cg{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px}
-.cc{background:rgba(155,35,53,.07);border:1px solid rgba(155,35,53,.18);border-radius:14px;padding:20px;display:flex;align-items:center;gap:14px;transition:all .3s}
-.cc:hover{border-color:rgba(155,35,53,.35);transform:translateY(-2px)}
-.cic{width:44px;height:44px;background:rgba(155,35,53,.14);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
-.clab{font-size:12px;color:rgba(253,240,242,.4);margin-bottom:4px}
-.cval{font-family:'Space Mono',monospace;font-size:14px;color:#c94060;text-decoration:none;display:block;direction:ltr;text-align:right}
+        /* ADMIN PANEL */
+        .admin-panel {
+            position: fixed;
+            top: 0;
+            right: -450px;
+            width: 450px;
+            max-width: 100%;
+            height: 100vh;
+            background: var(--dark-light);
+            border-left: 1px solid rgba(255,255,255,0.1);
+            z-index: 9998;
+            transition: right 0.4s;
+            overflow-y: auto;
+            padding: 2rem;
+        }
+        .admin-panel.open { right: 0; }
+        .admin-panel-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 9997;
+            display: none;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .admin-panel-overlay.show { display: block; opacity: 1; }
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .panel-header h2 { font-size: 1.5rem; font-weight: 900; display: flex; align-items: center; gap: 10px; }
+        .panel-header h2 i { color: var(--warning); }
+        .close-panel {
+            width: 40px; height: 40px;
+            border-radius: 12px;
+            background: var(--dark);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: var(--text-muted);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+        .close-panel:hover { background: var(--secondary); color: white; }
 
-footer{background:rgba(0,0,0,.3);border-top:1px solid rgba(155,35,53,.15);padding:48px 24px;text-align:center}
-.flogo{font-weight:900;font-size:20px;color:#fdf0f2;margin-bottom:6px}.flogo span{color:#c94060}
-.fsub{font-size:11px;color:rgba(253,240,242,.2);margin-bottom:24px;font-family:'Space Mono',monospace;letter-spacing:2px}
-.flinks{display:flex;gap:20px;justify-content:center;flex-wrap:wrap;margin-bottom:24px}
-.flinks a{color:rgba(253,240,242,.25);text-decoration:none;font-size:12px}
-.flinks a:hover{color:#c94060}
-.fcopy{font-size:11px;color:rgba(253,240,242,.1);font-family:'Space Mono',monospace}
-</style>
+        .panel-section {
+            margin-bottom: 2rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        .panel-section:last-child { border-bottom: none; }
+        .panel-section h3 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .form-group { margin-bottom: 1.2rem; }
+        .form-group label {
+            display: block;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            background: var(--dark);
+            border: 2px solid rgba(255,255,255,0.1);
+            border-radius: 10px;
+            color: white;
+            font-family: 'Tajawal', sans-serif;
+            font-size: 0.95rem;
+            transition: all 0.3s;
+        }
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        .form-group textarea { min-height: 80px; resize: vertical; }
+        .form-group small { color: var(--text-dim); font-size: 0.8rem; margin-top: 0.3rem; display: block; }
+
+        .color-picker-wrapper { display: flex; gap: 10px; flex-wrap: wrap; }
+        .color-option {
+            width: 40px; height: 40px;
+            border-radius: 10px;
+            cursor: pointer;
+            border: 3px solid transparent;
+            transition: all 0.3s;
+        }
+        .color-option:hover { transform: scale(1.1); }
+        .color-option.selected {
+            border-color: white;
+            box-shadow: 0 0 15px rgba(255,255,255,0.3);
+        }
+
+        .btn-save {
+            width: 100%;
+            padding: 1rem;
+            background: var(--success);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-weight: 800;
+            font-size: 1rem;
+            font-family: 'Tajawal', sans-serif;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .btn-save:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(107, 203, 119, 0.3);
+        }
+        .btn-danger {
+            width: 100%;
+            padding: 0.8rem;
+            background: transparent;
+            border: 2px solid var(--danger);
+            border-radius: 12px;
+            color: var(--danger);
+            font-weight: 700;
+            font-size: 0.9rem;
+            font-family: 'Tajawal', sans-serif;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 0.5rem;
+        }
+        .btn-danger:hover { background: var(--danger); color: white; }
+
+        .passwords-list { display: flex; flex-direction: column; gap: 0.5rem; }
+        .password-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.8rem 1rem;
+            background: var(--dark);
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+        .password-item span { font-family: monospace; font-size: 0.9rem; }
+        .password-item .role {
+            font-size: 0.8rem;
+            padding: 0.2rem 0.6rem;
+            border-radius: 6px;
+            background: rgba(0, 212, 255, 0.1);
+            color: var(--primary);
+        }
+        .password-item button {
+            background: none;
+            border: none;
+            color: var(--danger);
+            cursor: pointer;
+            font-size: 0.9rem;
+            padding: 0.3rem;
+        }
+
+        /* FEATURES */
+        .features-section {
+            padding: 6rem 5%;
+            background: linear-gradient(180deg, var(--dark) 0%, var(--dark-light) 50%, var(--dark) 100%);
+        }
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 3rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .feature-item { text-align: center; padding: 2rem; }
+        .feature-icon {
+            width: 80px; height: 80px;
+            border-radius: 24px;
+            background: rgba(0, 212, 255, 0.1);
+            border: 2px solid rgba(0, 212, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            font-size: 2rem;
+            color: var(--primary);
+            transition: all 0.3s;
+        }
+        .feature-item:hover .feature-icon {
+            background: rgba(0, 212, 255, 0.2);
+            transform: rotate(5deg) scale(1.1);
+        }
+        .feature-item h3 { font-size: 1.4rem; font-weight: 800; margin-bottom: 0.8rem; }
+        .feature-item p { color: var(--text-dim); font-size: 1rem; }
+
+        /* FOOTER */
+        .footer {
+            padding: 4rem 5% 2rem;
+            background: var(--dark-light);
+            border-top: 1px solid rgba(255,255,255,0.05);
+            text-align: center;
+        }
+        .footer-logo { font-size: 2.5rem; font-weight: 900; color: var(--primary); margin-bottom: 0.5rem; }
+        .footer-tagline { color: var(--text-muted); margin-bottom: 2rem; font-size: 1.1rem; }
+        .social-links { display: flex; justify-content: center; gap: 1.5rem; margin-bottom: 2rem; }
+        .social-links a {
+            width: 50px; height: 50px;
+            border-radius: 14px;
+            background: var(--dark);
+            border: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-muted);
+            font-size: 1.3rem;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+        .social-links a:hover {
+            background: var(--primary);
+            color: var(--dark);
+            transform: translateY(-5px);
+            border-color: var(--primary);
+        }
+        .footer-bottom { color: var(--text-dim); font-size: 0.9rem; padding-top: 2rem; border-top: 1px solid rgba(255,255,255,0.05); }
+        .footer-bottom .heart { color: var(--secondary); display: inline-block; animation: pulse 1.5s infinite; }
+
+        /* RESPONSIVE */
+        @media (max-width: 768px) {
+            .nav-links { display: none; }
+            .mobile-menu { display: block; }
+            .hero h1 { font-size: 2.2rem; }
+            .stats-bar { gap: 1rem; }
+            .stat-item { min-width: 120px; padding: 1rem; }
+            .tools-grid { grid-template-columns: 1fr; }
+            .hero-buttons { flex-direction: column; align-items: center; }
+            .btn-primary, .btn-secondary { width: 100%; max-width: 280px; justify-content: center; }
+            .admin-panel { width: 100%; right: -100%; }
+            .login-box { padding: 2rem 1.5rem; }
+        }
+
+        /* SCROLL REVEAL */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s ease;
+        }
+        .reveal.active { opacity: 1; transform: translateY(0); }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: var(--success);
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 12px;
+            font-weight: 700;
+            z-index: 10000;
+            opacity: 0;
+            transition: all 0.4s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 10px 40px rgba(107, 203, 119, 0.3);
+        }
+        .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+        .toast.error { background: var(--danger); box-shadow: 0 10px 40px rgba(239, 68, 68, 0.3); }
+    </style>
 </head>
 <body>
 
-<nav>
-  <div class="nl">
-    <div class="nc">UoN</div>
-    <div class="nn">UoN <span>Coffee</span></div>
-  </div>
-  <ul class="nls">
-    <li><a href="#feat">المميزات</a></li>
-    <li><a href="#calc">حاسبة المعدل</a></li>
-    <li><a href="#grp">المجموعات</a></li>
-    <li><a href="#lnk">روابط مفيدة</a></li>
-    <li><a href="#hub">Student Hub</a></li>
-    <li><a href="#con">التواصل</a></li>
-    <li><a href="features.html" style="color:#c94060;font-weight:700;">🔥 جديد</a></li>
-  </ul>
-  <a href="https://instagram.com/unizwacoffee" target="_blank" class="nb">Instagram</a>
-</nav>
-
-<div class="hero">
-  <div class="hbg"></div>
-  <div class="hr" style="width:300px;height:300px"></div>
-  <div class="hr" style="width:500px;height:500px;animation-delay:1.5s"></div>
-  <div class="hr" style="width:700px;height:700px;animation-delay:3s"></div>
-  <div class="hc">
-    <div class="hbadge">☕ مو رسمي.. بس أحسن من الرسمي 😏</div>
-    <div class="hcup">UoN</div>
-    <h1 class="ht">كل ما يحتاجه<br><span>طالب جامعة نزوى</span><br>في مكان واحد ☕</h1>
-    <p class="hs">ملخصات · حاسبة معدل · مجموعات دراسة · روابط مفيدة<br>خدمات Student Hub · وكل جديد عن جامعتك</p>
-    <div class="hbtns">
-      <a href="#calc" class="bm">احسب معدلك الآن ⚡</a>
-      <a href="#hub" class="bs">خدمات Student Hub 🎓</a>
+    <!-- Toast -->
+    <div class="toast" id="toast">
+        <i class="fas fa-check-circle"></i>
+        <span id="toastMsg">تم الحفظ بنجاح!</span>
     </div>
-    <div class="stats">
-      <div class="stat"><div class="sn">+500</div><div class="sl">طالب مستفيد</div></div>
-      <div class="sd"></div>
-      <div class="stat"><div class="sn">+50</div><div class="sl">ملخص متاح</div></div>
-      <div class="sd"></div>
-      <div class="stat"><div class="sn">24h</div><div class="sl">وقت التوصيل</div></div>
-      <div class="sd"></div>
-      <div class="stat"><div class="sn">5★</div><div class="sl">تقييم الطلاب</div></div>
+
+    <!-- Login Overlay - HIDDEN BY DEFAULT (no 'active' class) -->
+    <div class="login-overlay" id="loginOverlay">
+        <div class="login-box">
+            <div class="login-icon"><i class="fas fa-lock"></i></div>
+            <h2>لوحة التحكم</h2>
+            <p>هذه المنطقة مخصصة للمشرفين فقط</p>
+            <div class="input-group">
+                <input type="password" id="adminPassword" placeholder="أدخل كلمة المرور" onkeypress="if(event.key==='Enter')login()">
+                <i class="fas fa-key"></i>
+            </div>
+            <button class="login-btn" onclick="login()">
+                <i class="fas fa-sign-in-alt"></i>
+                دخول المشرف
+            </button>
+            <div class="login-error" id="loginError">
+                <i class="fas fa-exclamation-triangle"></i>
+                كلمة المرور غير صحيحة!
+            </div>
+        </div>
     </div>
-  </div>
-</div>
 
-<section id="feat" class="sec">
-  <div class="shd">
-    <span class="stag">ما الذي نقدمه</span>
-    <div class="stit">كل شيء صُمّم لطلاب جامعة نزوى 🎓</div>
-    <div class="ssub">منصة شاملة تجمع كل أدوات النجاح الجامعي</div>
-  </div>
-  <div class="g3">
-    <div class="card"><div class="ci">📊</div><div class="ct">حاسبة المعدل</div><div class="cd">احسب معدلك الفصلي والتراكمي بسهولة.</div><span class="bdg bfree">✅ مجاني</span></div>
-    <div class="card"><div class="ci">💬</div><div class="ct">مجموعات الدراسة</div><div class="cd">روابط مجموعات واتساب لكل كلية في جامعة نزوى.</div><span class="bdg bfree">✅ مجاني</span></div>
-    <div class="card"><div class="ci">📚</div><div class="ct">ملخصات المواد</div><div class="cd">ملخصات احترافية لمواد جامعة نزوى — قريباً!</div><span class="bdg bsoon">Coming Soon 🔜</span></div>
-    <div class="card"><div class="ci">🔗</div><div class="ct">روابط مفيدة</div><div class="cd">كل الروابط المهمة — البوابة، المكتبة، الجدول.</div><span class="bdg bfree">✅ مجاني</span></div>
-    <div class="card"><div class="ci">🎓</div><div class="ct">Student Hub</div><div class="cd">خدمات دراسية داخل الجامعة — قريباً!</div><span class="bdg bsoon">Coming Soon 🔜</span></div>
-    <div class="card"><div class="ci">📢</div><div class="ct">أخبار الجامعة</div><div class="cd">تابع حساب Instagram لآخر أخبار جامعة نزوى.</div><span class="bdg bfree">📱 Instagram</span></div>
-  </div>
-</section>
-
-<section id="calc" class="sec" style="max-width:680px">
-  <div class="shd">
-    <span class="stag">أداة مجانية</span>
-    <div class="stit">حاسبة المعدل الفصلي 📊</div>
-    <div class="ssub">أضف موادك وساعاتها وتقديراتها واحسب معدلك فوراً</div>
-  </div>
-  <div class="cw">
-    <div class="crs" id="crs">
-      <div class="cr">
-        <input type="text" placeholder="اسم المادة">
-        <select><option value="">الساعات</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option></select>
-        <select><option value="">التقدير</option><option value="4.0">A (4.0)</option><option value="3.7">A- (3.7)</option><option value="3.3">B+ (3.3)</option><option value="3.0">B (3.0)</option><option value="2.7">B- (2.7)</option><option value="2.3">C+ (2.3)</option><option value="2.0">C (2.0)</option><option value="1.0">D (1.0)</option><option value="0">F (0.0)</option></select>
-        <button class="rmb" onclick="rmRow(this)">x</button>
-      </div>
+    <!-- Admin Badge -->
+    <div class="admin-badge" id="adminBadge">
+        <i class="fas fa-crown"></i>
+        وضع المشرف
     </div>
-    <button class="addb" onclick="addRow()">+ اضافة مادة</button>
-    <button class="calb" onclick="calc()">احسب المعدل ⚡</button>
-    <div class="res" id="res">
-      <div style="font-size:11px;color:rgba(201,64,96,.5);margin-bottom:8px;">معدلك الفصلي</div>
-      <div class="rn" id="rn">0.00</div>
-      <div class="rg" id="rg"></div>
+
+    <!-- Admin Panel Overlay -->
+    <div class="admin-panel-overlay" id="panelOverlay" onclick="closePanel()"></div>
+
+    <!-- Admin Panel -->
+    <div class="admin-panel" id="adminPanel">
+        <div class="panel-header">
+            <h2><i class="fas fa-cog"></i> لوحة التحكم</h2>
+            <button class="close-panel" onclick="closePanel()"><i class="fas fa-times"></i></button>
+        </div>
+
+        <!-- Edit Tool -->
+        <div class="panel-section" id="editSection" style="display:none;">
+            <h3><i class="fas fa-edit"></i> تعديل الأداة</h3>
+            <div class="form-group">
+                <label>اسم الأداة</label>
+                <input type="text" id="editTitle">
+            </div>
+            <div class="form-group">
+                <label>الوصف</label>
+                <textarea id="editDesc"></textarea>
+            </div>
+            <div class="form-group">
+                <label>الأيقونة (Font Awesome)</label>
+                <input type="text" id="editIcon" placeholder="مثال: fa-robot">
+                <small>استخدم اسم الأيقونة من Font Awesome</small>
+            </div>
+            <div class="form-group">
+                <label>لون الأداة</label>
+                <div class="color-picker-wrapper">
+                    <div class="color-option selected" style="background:#00d4ff" data-color="#00d4ff" onclick="selectColor(this)"></div>
+                    <div class="color-option" style="background:#ff6b6b" data-color="#ff6b6b" onclick="selectColor(this)"></div>
+                    <div class="color-option" style="background:#ffd93d" data-color="#ffd93d" onclick="selectColor(this)"></div>
+                    <div class="color-option" style="background:#6bcb77" data-color="#6bcb77" onclick="selectColor(this)"></div>
+                    <div class="color-option" style="background:#a78bfa" data-color="#a78bfa" onclick="selectColor(this)"></div>
+                    <div class="color-option" style="background:#fb923c" data-color="#fb923c" onclick="selectColor(this)"></div>
+                    <div class="color-option" style="background:#38bdf8" data-color="#38bdf8" onclick="selectColor(this)"></div>
+                    <div class="color-option" style="background:#f472b6" data-color="#f472b6" onclick="selectColor(this)"></div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>نص الزر</label>
+                <input type="text" id="editBtnText">
+            </div>
+            <button class="btn-save" onclick="saveTool()">
+                <i class="fas fa-save"></i> حفظ التغييرات
+            </button>
+            <button class="btn-danger" onclick="deleteTool()">
+                <i class="fas fa-trash"></i> حذف الأداة
+            </button>
+        </div>
+
+        <!-- Add New Tool -->
+        <div class="panel-section">
+            <h3><i class="fas fa-plus-circle"></i> إضافة أداة جديدة</h3>
+            <div class="form-group">
+                <label>اسم الأداة</label>
+                <input type="text" id="newTitle" placeholder="مثال: دليل التخصصات">
+            </div>
+            <div class="form-group">
+                <label>الوصف</label>
+                <textarea id="newDesc" placeholder="وصف مختصر للأداة..."></textarea>
+            </div>
+            <div class="form-group">
+                <label>الأيقونة</label>
+                <input type="text" id="newIcon" placeholder="fa-graduation-cap">
+            </div>
+            <div class="form-group">
+                <label>لون الأداة</label>
+                <div class="color-picker-wrapper">
+                    <div class="color-option selected" style="background:#00d4ff" data-color="#00d4ff" onclick="selectNewColor(this)"></div>
+                    <div class="color-option" style="background:#ff6b6b" data-color="#ff6b6b" onclick="selectNewColor(this)"></div>
+                    <div class="color-option" style="background:#ffd93d" data-color="#ffd93d" onclick="selectNewColor(this)"></div>
+                    <div class="color-option" style="background:#6bcb77" data-color="#6bcb77" onclick="selectNewColor(this)"></div>
+                    <div class="color-option" style="background:#a78bfa" data-color="#a78bfa" onclick="selectNewColor(this)"></div>
+                    <div class="color-option" style="background:#fb923c" data-color="#fb923c" onclick="selectNewColor(this)"></div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>نص الزر</label>
+                <input type="text" id="newBtnText" placeholder="مثال: اكتشف التخصصات">
+            </div>
+            <button class="btn-save" onclick="addTool()">
+                <i class="fas fa-plus"></i> إضافة الأداة
+            </button>
+        </div>
+
+        <!-- Manage Passwords -->
+        <div class="panel-section">
+            <h3><i class="fas fa-key"></i> إدارة كلمات المرور</h3>
+            <div class="passwords-list" id="passwordsList"></div>
+            <div class="form-group" style="margin-top:1rem;">
+                <label>إضافة كلمة مرور جديدة</label>
+                <input type="text" id="newPassword" placeholder="كلمة المرور الجديدة">
+            </div>
+            <div class="form-group">
+                <label>الصلاحية</label>
+                <select id="newRole">
+                    <option value="admin">مشرف رئيسي (كل الصلاحيات)</option>
+                    <option value="editor">محرر (تعديل المحتوى فقط)</option>
+                    <option value="viewer">مشاهد (عرض فقط)</option>
+                </select>
+            </div>
+            <button class="btn-save" onclick="addPassword()">
+                <i class="fas fa-key"></i> إضافة كلمة المرور
+            </button>
+        </div>
+
+        <!-- Site Settings -->
+        <div class="panel-section">
+            <h3><i class="fas fa-sliders-h"></i> إعدادات الموقع</h3>
+            <div class="form-group">
+                <label>عنوان الموقع</label>
+                <input type="text" id="siteTitle" value="جامعة نزوى - منصة الطالب">
+            </div>
+            <div class="form-group">
+                <label>الشعار الرئيسي</label>
+                <input type="text" id="siteHeadline" value="منصتك الشاملة للحياة الأكاديمية">
+            </div>
+            <div class="form-group">
+                <label>الوصف</label>
+                <textarea id="siteDesc">أدوات ذكية، ملخصات، جداول دراسية، وكل ما تحتاجه للنجاح</textarea>
+            </div>
+            <button class="btn-save" onclick="saveSettings()">
+                <i class="fas fa-save"></i> حفظ الإعدادات
+            </button>
+        </div>
     </div>
-  </div>
-</section>
 
-<section id="grp" class="sec">
-  <div class="shd">
-    <span class="stag">تواصل مع زملائك</span>
-    <div class="stit">مجموعات الكليات والجامعة 💬</div>
-    <div class="ssub">انضم لمجموعة كليتك</div>
-  </div>
-  <div class="g5">
-    <div class="gc"><div class="ge">🎓</div><div class="gn">جامعة نزوى (مجموعة غير رسمية)</div><div class="gs">قريباً</div><button class="gb" style="opacity:.4;cursor:not-allowed">Coming Soon 🔜</button></div>
-    <div class="gc"><div class="ge">💼</div><div class="gn">كلية الاقتصاد ونظم المعلومات</div><div class="gs">مجموعة واتساب</div><button class="gb" onclick="window.open('https://chat.whatsapp.com/DfetMZZOpMbGMuiiTGvj04?mode=ac_t','_blank')">انضم الآن 💬</button></div>
-    <div class="gc"><div class="ge">🏗️</div><div class="gn">كلية الهندسة والعمارة</div><div class="gs">قريباً</div><button class="gb" style="opacity:.4;cursor:not-allowed">Coming Soon 🔜</button></div>
-    <div class="gc"><div class="ge">🔬</div><div class="gn">كلية العلوم والآداب</div><div class="gs">قريباً</div><button class="gb" style="opacity:.4;cursor:not-allowed">Coming Soon 🔜</button></div>
-    <div class="gc"><div class="ge">⚕️</div><div class="gn">كلية العلوم الصحية</div><div class="gs">قريباً</div><button class="gb" style="opacity:.4;cursor:not-allowed">Coming Soon 🔜</button></div>
-    <div class="gc"><div class="ge">📖</div><div class="gn">معهد التأسيس</div><div class="gs">قريباً</div><button class="gb" style="opacity:.4;cursor:not-allowed">Coming Soon 🔜</button></div>
-  </div>
-</section>
+    <!-- Navbar -->
+    <nav class="navbar" id="navbar">
+        <a href="javascript:void(0)" class="logo">
+            <div class="logo-icon">NU</div>
+            <div class="logo-text">Nizwa <span>University</span></div>
+        </a>
+        <ul class="nav-links">
+            <li><a href="#home">الرئيسية</a></li>
+            <li><a href="#tools">الأدوات</a></li>
+            <li><a href="#botSection">المساعد AI</a></li>
+            <li><a href="#calcSection">المعدل</a></li>
+            <li><a href="#contact">التواصل</a></li>
+            <li><a href="features.html" target="_blank" style="color:var(--warning)!important;">🔥 الميزات</a></li>
+        </ul>
+        <div class="nav-actions">
+            <button class="admin-btn" id="adminBtn" onclick="openPanel()">
+                <i class="fas fa-cog"></i> لوحة التحكم
+            </button>
+            <button class="logout-btn" id="logoutBtn" onclick="logout()">
+                <i class="fas fa-sign-out-alt"></i> خروج
+            </button>
+            <button class="nav-btn" id="loginBtn" onclick="showLogin()">
+                <i class="fas fa-user-shield"></i> أدمن
+            </button>
+        </div>
+        <div class="mobile-menu" onclick="toggleMenu()"><i class="fas fa-bars"></i></div>
+    </nav>
 
-<section id="lnk" class="sec">
-  <div class="shd">
-    <span class="stag">روابط سريعة</span>
-    <div class="stit">كل الروابط المهمة 🔗</div>
-    <div class="ssub">كل شيء في مكان واحد</div>
-  </div>
-  <div class="g2">
-    <a href="https://portal.unizwa.edu.om" target="_blank" class="lc"><div class="li">🎓</div><div><div class="ln">البوابة الطلابية</div><div class="lu">portal.unizwa.edu.om</div></div><div class="la">&#8592;</div></a>
-    <a href="https://moodle.unizwa.edu.om/login/index.php" target="_blank" class="lc"><div class="li">📚</div><div><div class="ln">Moodle</div><div class="lu">moodle.unizwa.edu.om</div></div><div class="la">&#8592;</div></a>
-    <a href="https://elearning.unizwa.edu.om/EduWavehe/login.aspx" target="_blank" class="lc"><div class="li">🌊</div><div><div class="ln">EduWave</div><div class="lu">elearning.unizwa.edu.om</div></div><div class="la">&#8592;</div></a>
-    <a href="https://library.unizwa.edu.om" target="_blank" class="lc"><div class="li">🏛️</div><div><div class="ln">مكتبة الجامعة</div><div class="lu">library.unizwa.edu.om</div></div><div class="la">&#8592;</div></a>
-    <a href="https://www.unizwa.edu.om/content_files/01071-1420.pdf" target="_blank" class="lc"><div class="li">📅</div><div><div class="ln">التقويم الاكاديمي</div><div class="lu">unizwa.edu.om</div></div><div class="la">&#8592;</div></a>
-    <a href="https://www.unizwa.edu.om" target="_blank" class="lc"><div class="li">🌐</div><div><div class="ln">الموقع الرسمي</div><div class="lu">unizwa.edu.om</div></div><div class="la">&#8592;</div></a>
-  </div>
-</section>
+    <!-- Hero -->
+    <section class="hero" id="home">
+        <div class="hero-bg">
+            <div class="circle circle-1"></div>
+            <div class="circle circle-2"></div>
+            <div class="circle circle-3"></div>
+        </div>
+        <div class="hero-content">
+            <div class="hero-badge">
+                <i class="fas fa-sparkles"></i>
+                منصة جديدة كلياً لطلاب جامعة نزوى
+            </div>
+            <h1 id="heroTitle">منصتك الشاملة<br>للحياة الأكاديمية</h1>
+            <p id="heroDesc">أدوات ذكية، ملخصات، جداول دراسية، وكل ما تحتاجه للنجاح</p>
+            <p class="sub">انضم لأكثر من 5,000 طالب يستخدمون المنصة يومياً</p>
+            <div class="hero-buttons">
+                <button class="btn-primary" onclick="scrollToSection('tools')">
+                    <i class="fas fa-rocket"></i> استكشف الأدوات
+                </button>
+                <button class="btn-secondary" onclick="scrollToSection('features')">
+                    <i class="fas fa-users"></i> انضم للمجتمع
+                </button>
+            </div>
+        </div>
+    </section>
 
-<section id="hub" class="sec">
-  <div style="text-align:center;padding:80px 24px;background:rgba(155,35,53,.07);border:1px solid rgba(155,35,53,.2);border-radius:24px;position:relative;overflow:hidden;">
-    <div style="font-size:52px;margin-bottom:20px;color:#fdf0f2;">&#8594;</div>
-    <div style="font-family:'Space Mono',monospace;font-size:12px;letter-spacing:6px;color:rgba(201,64,96,.4);margin-bottom:12px;">STUDENT HUB</div>
-    <div style="font-family:'Amiri',serif;font-size:48px;color:#fdf0f2;margin-bottom:8px;">Coming Soon</div>
-    <div style="width:60px;height:1px;background:rgba(155,35,53,.4);margin:16px auto;"></div>
-    <div style="font-size:13px;color:rgba(253,240,242,.35);">☕ قريباً — ترقبوا الإطلاق</div>
-  </div>
-</section>
+    <!-- Stats -->
+    <div class="stats-bar">
+        <div class="stat-item reveal">
+            <i class="fas fa-users"></i>
+            <span class="stat-number" data-target="5000">0</span>
+            <span class="stat-label">طالب نشط</span>
+        </div>
+        <div class="stat-item reveal">
+            <i class="fas fa-book"></i>
+            <span class="stat-number" data-target="1200">0</span>
+            <span class="stat-label">ملخص دراسي</span>
+        </div>
+        <div class="stat-item reveal">
+            <i class="fas fa-tools"></i>
+            <span class="stat-number" data-target="50">0</span>
+            <span class="stat-label">أداة متاحة</span>
+        </div>
+        <div class="stat-item reveal">
+            <i class="fas fa-star"></i>
+            <span class="stat-number" data-target="4.9">0</span>
+            <span class="stat-label">تقييم المنصة</span>
+        </div>
+    </div>
 
-<section id="con" class="sec">
-  <div class="shd">
-    <span class="stag">تواصل مع الجامعة</span>
-    <div class="stit">أرقام جامعة نزوى 📞</div>
-    <div class="ssub">اضغط على الرقم للاتصال مباشرة</div>
-  </div>
-  <div class="cg">
-    <div class="cc"><div class="cic">🏦</div><div><div class="clab">حساب البنك</div><span class="cval">0317008949900017</span></div></div>
-    <div class="cc"><div class="cic">💰</div><div><div class="clab">المالية</div><a href="tel:92596648" class="cval">92596648</a></div></div>
-    <div class="cc"><div class="cic">📋</div><div><div class="clab">القبول والتسجيل</div><a href="tel:25446234" class="cval">25446234</a></div></div>
-    <div class="cc"><div class="cic">🤝</div><div><div class="clab">الرعاية الاجتماعية 1</div><a href="tel:91313951" class="cval">91313951</a></div></div>
-    <div class="cc"><div class="cic">🤝</div><div><div class="clab">الرعاية الاجتماعية 2</div><a href="tel:25446247" class="cval">25446247</a></div></div>
-  </div>
-</section>
+    <!-- Tools -->
+    <section class="tools-section" id="tools">
+        <div class="section-header reveal">
+            <h2>الأدوات المتاحة</h2>
+            <p>مجموعة شاملة من الأدوات المصممة خصيصاً لتلبية احتياجاتك الأكاديمية في جامعة نزوى</p>
+        </div>
+        <div class="tools-grid" id="toolsGrid"></div>
+    </section>
+
+    <!-- Features -->
+    <section class="features-section" id="features">
+        <div class="section-header reveal">
+            <h2>لماذا منصة جامعة نزوى؟</h2>
+            <p>نحن نقدم تجربة فريدة مصممة خصيصاً لطلاب جامعة نزوى</p>
+        </div>
+        <div class="features-grid">
+            <div class="feature-item reveal">
+                <div class="feature-icon"><i class="fas fa-bolt"></i></div>
+                <h3>سريع ومجاني</h3>
+                <p>جميع الأدوات متاحة بالكامل بدون أي تكلفة أو اشتراكات مخفية</p>
+            </div>
+            <div class="feature-item reveal">
+                <div class="feature-icon"><i class="fas fa-shield-alt"></i></div>
+                <h3>آمن وموثوق</h3>
+                <p>محتوى مراجع وموثق من طلاب جامعة نزوى مع نظام تقييم ذكي</p>
+            </div>
+            <div class="feature-item reveal">
+                <div class="feature-icon"><i class="fas fa-mobile-alt"></i></div>
+                <h3>متجاوب تماماً</h3>
+                <p>تصميم يتكيف مع جميع الأجهزة من الجوال إلى سطح المكتب</p>
+            </div>
+        </div>
+    </section>
 
 
-<!-- FEATURES SECTION -->
-<section class="sec" style="max-width:900px;">
-  <div class="shd">
-    <span class="stag">🔥 جديد</span>
-    <div class="stit">ميزات حصرية لطلاب نزوى ✨</div>
-    <div class="ssub">اكتشف الخدمات الجديدة اللي أضفناها خصيصاً لك</div>
-  </div>
-  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:16px;">
+    <!-- BOT SECTION -->
+    <section style="padding:5rem 5%;max-width:900px;margin:0 auto;" id="botSection">
+        <div class="section-header reveal">
+            <h2>المساعد الذكي 🤖</h2>
+            <p>اسألني عن أي شيء يخص جامعة نزوى — أتعلم من كل سؤال وأتطور!</p>
+        </div>
+        <div style="background:var(--dark-light);border:1px solid rgba(255,255,255,0.08);border-radius:20px;overflow:hidden;">
+            <div style="background:rgba(0,212,255,0.08);border-bottom:1px solid rgba(0,212,255,0.1);padding:16px 20px;display:flex;align-items:center;gap:12px;">
+                <div style="width:38px;height:38px;background:linear-gradient(135deg,#00d4ff,#0099cc);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;">☕</div>
+                <div style="flex:1">
+                    <div style="font-size:14px;font-weight:700;">مساعد UoN Coffee</div>
+                    <div style="font-size:11px;color:#4ade80;display:flex;align-items:center;gap:4px;"><span style="width:6px;height:6px;background:#4ade80;border-radius:50%;display:inline-block;"></span>متصل الآن</div>
+                </div>
+                <button onclick="clearBotChat()" style="background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.2);color:#ef4444;font-size:11px;padding:5px 12px;border-radius:50px;cursor:pointer;font-family:Tajawal,sans-serif;">مسح</button>
+            </div>
+            <div id="botMsgs" style="height:380px;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:14px;"></div>
+            <div style="padding:10px 20px;display:flex;gap:8px;flex-wrap:wrap;border-top:1px solid rgba(255,255,255,0.05);">
+                <button onclick="botSQ('ما هي كليات جامعة نزوى؟')" style="background:rgba(0,212,255,0.08);border:1px solid rgba(0,212,255,0.15);color:#00d4ff;font-size:11px;font-weight:700;padding:5px 12px;border-radius:50px;cursor:pointer;font-family:Tajawal,sans-serif;">🏛️ الكليات</button>
+                <button onclick="botSQ('كيف أحسب معدلي؟')" style="background:rgba(0,212,255,0.08);border:1px solid rgba(0,212,255,0.15);color:#00d4ff;font-size:11px;font-weight:700;padding:5px 12px;border-radius:50px;cursor:pointer;font-family:Tajawal,sans-serif;">📊 المعدل</button>
+                <button onclick="botSQ('ما هي روابط أنظمة الجامعة؟')" style="background:rgba(0,212,255,0.08);border:1px solid rgba(0,212,255,0.15);color:#00d4ff;font-size:11px;font-weight:700;padding:5px 12px;border-radius:50px;cursor:pointer;font-family:Tajawal,sans-serif;">🔗 الروابط</button>
+                <button onclick="botSQ('نصائح للنجاح في الجامعة')" style="background:rgba(0,212,255,0.08);border:1px solid rgba(0,212,255,0.15);color:#00d4ff;font-size:11px;font-weight:700;padding:5px 12px;border-radius:50px;cursor:pointer;font-family:Tajawal,sans-serif;">💡 نصائح</button>
+                <button onclick="botSQ('ما هي أرقام التواصل مع الجامعة؟')" style="background:rgba(0,212,255,0.08);border:1px solid rgba(0,212,255,0.15);color:#00d4ff;font-size:11px;font-weight:700;padding:5px 12px;border-radius:50px;cursor:pointer;font-family:Tajawal,sans-serif;">📞 الأرقام</button>
+            </div>
+            <div style="padding:14px 20px;border-top:1px solid rgba(255,255,255,0.05);display:flex;gap:10px;">
+                <textarea id="botInput" placeholder="اكتب سؤالك هنا..." rows="1" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();botSend()}" style="flex:1;background:rgba(255,255,255,0.05);border:1px solid rgba(0,212,255,0.15);border-radius:12px;padding:11px 14px;color:white;font-family:Tajawal,sans-serif;font-size:13px;outline:none;resize:none;"></textarea>
+                <button onclick="botSend()" style="width:44px;height:44px;background:linear-gradient(135deg,#00d4ff,#0099cc);border-radius:12px;border:none;cursor:pointer;font-size:18px;flex-shrink:0;">➤</button>
+            </div>
+        </div>
+    </section>
 
-    <a href="features.html" style="text-decoration:none;">
-      <div class="card" style="cursor:pointer;text-align:center;padding:36px 20px;transition:all .3s;">
-        <div style="font-size:52px;margin-bottom:14px;">🗺️</div>
-        <div class="ct">خريطة الجامعة</div>
-        <div class="cd">خريطة تفاعلية لكل مباني جامعة نزوى — اضغط على أي مبنى</div>
-        <div style="margin-top:16px;display:inline-block;background:linear-gradient(135deg,#9b2335,#c94060);color:#fff;font-size:11px;font-weight:700;padding:7px 20px;border-radius:50px;letter-spacing:1px;">استكشف →</div>
-      </div>
-    </a>
+    <!-- CALCULATOR SECTION -->
+    <section style="padding:5rem 5%;max-width:680px;margin:0 auto;" id="calcSection">
+        <div class="section-header reveal">
+            <h2>حاسبة المعدل 📊</h2>
+            <p>أضف موادك وتقديراتها واحسب معدلك فوراً</p>
+        </div>
+        <div style="background:var(--dark-light);border:1px solid rgba(255,255,255,0.08);border-radius:20px;padding:32px;">
+            <div id="calcRows" style="display:flex;flex-direction:column;gap:10px;margin-bottom:14px;">
+                <div class="calc-row" style="display:flex;gap:8px;">
+                    <input type="text" placeholder="اسم المادة" style="flex:1;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:11px 12px;color:white;font-family:Tajawal,sans-serif;font-size:13px;outline:none;">
+                    <select style="background:var(--dark);border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:11px 8px;color:white;font-family:Tajawal,sans-serif;font-size:12px;outline:none;">
+                        <option value="">الساعات</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option>
+                    </select>
+                    <select style="background:var(--dark);border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:11px 8px;color:white;font-family:Tajawal,sans-serif;font-size:12px;outline:none;">
+                        <option value="">التقدير</option><option value="4.0">A (4.0)</option><option value="3.7">A- (3.7)</option><option value="3.3">B+ (3.3)</option><option value="3.0">B (3.0)</option><option value="2.7">B- (2.7)</option><option value="2.3">C+ (2.3)</option><option value="2.0">C (2.0)</option><option value="1.0">D (1.0)</option><option value="0">F (0.0)</option>
+                    </select>
+                    <button onclick="removeCalcRow(this)" style="width:34px;height:34px;background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.15);border-radius:8px;color:#ef4444;cursor:pointer;font-size:16px;">×</button>
+                </div>
+            </div>
+            <button onclick="addCalcRow()" style="width:100%;background:rgba(0,212,255,0.05);border:1px dashed rgba(0,212,255,0.2);border-radius:10px;padding:11px;color:rgba(0,212,255,0.5);font-size:13px;font-weight:700;cursor:pointer;font-family:Tajawal,sans-serif;margin-bottom:14px;">+ إضافة مادة</button>
+            <button onclick="calcGPA()" style="width:100%;background:linear-gradient(135deg,#00d4ff,#0099cc);color:var(--dark);font-size:14px;font-weight:900;padding:14px;border-radius:10px;border:none;cursor:pointer;font-family:Tajawal,sans-serif;">احسب المعدل ⚡</button>
+            <div id="calcResult" style="display:none;margin-top:18px;background:rgba(0,212,255,0.06);border:1px solid rgba(0,212,255,0.15);border-radius:14px;padding:20px;text-align:center;">
+                <div style="font-size:11px;letter-spacing:2px;color:rgba(0,212,255,0.5);margin-bottom:8px;">معدلك الفصلي</div>
+                <div id="calcGPANum" style="font-family:monospace;font-size:48px;color:#00d4ff;font-weight:700;">0.00</div>
+                <div id="calcGPAGrade" style="font-size:14px;color:var(--text-muted);margin-top:6px;"></div>
+            </div>
+        </div>
+    </section>
 
-    <a href="features.html#conf" style="text-decoration:none;">
-      <div class="card" style="cursor:pointer;text-align:center;padding:36px 20px;transition:all .3s;">
-        <div style="font-size:52px;margin-bottom:14px;">💬</div>
-        <div class="ct">اعترافات الطلاب</div>
-        <div class="cd">شارك اعترافك الجامعي بشكل مجهول — كلنا نعرف الإحساس 😅</div>
-        <div style="margin-top:16px;display:inline-block;background:linear-gradient(135deg,#9b2335,#c94060);color:#fff;font-size:11px;font-weight:700;padding:7px 20px;border-radius:50px;letter-spacing:1px;">اعترف →</div>
-      </div>
-    </a>
+    <!-- CONTACT NUMBERS -->
+    <section style="padding:5rem 5%;max-width:1000px;margin:0 auto;" id="contact">
+        <div class="section-header reveal">
+            <h2>أرقام جامعة نزوى 📞</h2>
+            <p>اضغط على الرقم للاتصال مباشرة</p>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;">
+            <div style="background:var(--dark-light);border:1px solid rgba(255,255,255,0.05);border-radius:14px;padding:20px;display:flex;align-items:center;gap:14px;transition:all .3s;" onmouseover="this.style.borderColor='rgba(0,212,255,0.3)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.05)'">
+                <div style="width:44px;height:44px;background:rgba(0,212,255,0.1);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;">🏦</div>
+                <div><div style="font-size:12px;color:var(--text-dim);margin-bottom:4px;">حساب البنك</div><span style="font-family:monospace;font-size:13px;color:#00d4ff;">0317008949900017</span></div>
+            </div>
+            <div style="background:var(--dark-light);border:1px solid rgba(255,255,255,0.05);border-radius:14px;padding:20px;display:flex;align-items:center;gap:14px;transition:all .3s;" onmouseover="this.style.borderColor='rgba(0,212,255,0.3)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.05)'">
+                <div style="width:44px;height:44px;background:rgba(0,212,255,0.1);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;">💰</div>
+                <div><div style="font-size:12px;color:var(--text-dim);margin-bottom:4px;">المالية</div><a href="tel:92596648" style="font-family:monospace;font-size:14px;color:#00d4ff;text-decoration:none;">92596648</a></div>
+            </div>
+            <div style="background:var(--dark-light);border:1px solid rgba(255,255,255,0.05);border-radius:14px;padding:20px;display:flex;align-items:center;gap:14px;transition:all .3s;" onmouseover="this.style.borderColor='rgba(0,212,255,0.3)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.05)'">
+                <div style="width:44px;height:44px;background:rgba(0,212,255,0.1);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;">📋</div>
+                <div><div style="font-size:12px;color:var(--text-dim);margin-bottom:4px;">القبول والتسجيل</div><a href="tel:25446234" style="font-family:monospace;font-size:14px;color:#00d4ff;text-decoration:none;">25446234</a></div>
+            </div>
+            <div style="background:var(--dark-light);border:1px solid rgba(255,255,255,0.05);border-radius:14px;padding:20px;display:flex;align-items:center;gap:14px;transition:all .3s;" onmouseover="this.style.borderColor='rgba(0,212,255,0.3)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.05)'">
+                <div style="width:44px;height:44px;background:rgba(0,212,255,0.1);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;">🤝</div>
+                <div><div style="font-size:12px;color:var(--text-dim);margin-bottom:4px;">الرعاية الاجتماعية 1</div><a href="tel:91313951" style="font-family:monospace;font-size:14px;color:#00d4ff;text-decoration:none;">91313951</a></div>
+            </div>
+            <div style="background:var(--dark-light);border:1px solid rgba(255,255,255,0.05);border-radius:14px;padding:20px;display:flex;align-items:center;gap:14px;transition:all .3s;" onmouseover="this.style.borderColor='rgba(0,212,255,0.3)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.05)'">
+                <div style="width:44px;height:44px;background:rgba(0,212,255,0.1);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;">🤝</div>
+                <div><div style="font-size:12px;color:var(--text-dim);margin-bottom:4px;">الرعاية الاجتماعية 2</div><a href="tel:25446247" style="font-family:monospace;font-size:14px;color:#00d4ff;text-decoration:none;">25446247</a></div>
+            </div>
+        </div>
 
-    <a href="features.html#rest" style="text-decoration:none;">
-      <div class="card" style="cursor:pointer;text-align:center;padding:36px 20px;transition:all .3s;">
-        <div style="font-size:52px;margin-bottom:14px;">🍕</div>
-        <div class="ct">دليل المطاعم</div>
-        <div class="cd">أقرب المطاعم حول الجامعة مع التقييمات والأسعار</div>
-        <div style="margin-top:16px;display:inline-block;background:linear-gradient(135deg,#9b2335,#c94060);color:#fff;font-size:11px;font-weight:700;padding:7px 20px;border-radius:50px;letter-spacing:1px;">شوف →</div>
-      </div>
-    </a>
+        <!-- Quick Links -->
+        <div style="margin-top:32px;">
+            <div class="section-header reveal" style="margin-bottom:24px;"><h2>روابط سريعة 🔗</h2></div>
+            <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px;">
+                <a href="https://portal.unizwa.edu.om" target="_blank" style="background:var(--dark-light);border:1px solid rgba(255,255,255,0.05);border-radius:14px;padding:18px;text-decoration:none;display:flex;align-items:center;gap:12px;transition:all .3s;" onmouseover="this.style.borderColor='rgba(0,212,255,0.3)';this.style.transform='translateX(-4px)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.05)';this.style.transform=''">
+                    <span style="font-size:24px;">🎓</span><div><div style="font-size:13px;font-weight:700;color:white;">البوابة الطلابية</div><div style="font-size:11px;color:var(--text-dim);">portal.unizwa.edu.om</div></div>
+                </a>
+                <a href="https://moodle.unizwa.edu.om/login/index.php" target="_blank" style="background:var(--dark-light);border:1px solid rgba(255,255,255,0.05);border-radius:14px;padding:18px;text-decoration:none;display:flex;align-items:center;gap:12px;transition:all .3s;" onmouseover="this.style.borderColor='rgba(0,212,255,0.3)';this.style.transform='translateX(-4px)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.05)';this.style.transform=''">
+                    <span style="font-size:24px;">📚</span><div><div style="font-size:13px;font-weight:700;color:white;">Moodle</div><div style="font-size:11px;color:var(--text-dim);">moodle.unizwa.edu.om</div></div>
+                </a>
+                <a href="https://elearning.unizwa.edu.om/EduWavehe/login.aspx" target="_blank" style="background:var(--dark-light);border:1px solid rgba(255,255,255,0.05);border-radius:14px;padding:18px;text-decoration:none;display:flex;align-items:center;gap:12px;transition:all .3s;" onmouseover="this.style.borderColor='rgba(0,212,255,0.3)';this.style.transform='translateX(-4px)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.05)';this.style.transform=''">
+                    <span style="font-size:24px;">🌊</span><div><div style="font-size:13px;font-weight:700;color:white;">EduWave</div><div style="font-size:11px;color:var(--text-dim);">elearning.unizwa.edu.om</div></div>
+                </a>
+                <a href="https://library.unizwa.edu.om" target="_blank" style="background:var(--dark-light);border:1px solid rgba(255,255,255,0.05);border-radius:14px;padding:18px;text-decoration:none;display:flex;align-items:center;gap:12px;transition:all .3s;" onmouseover="this.style.borderColor='rgba(0,212,255,0.3)';this.style.transform='translateX(-4px)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.05)';this.style.transform=''">
+                    <span style="font-size:24px;">🏛️</span><div><div style="font-size:13px;font-weight:700;color:white;">المكتبة</div><div style="font-size:11px;color:var(--text-dim);">library.unizwa.edu.om</div></div>
+                </a>
+                <a href="https://www.unizwa.edu.om/content_files/01071-1420.pdf" target="_blank" style="background:var(--dark-light);border:1px solid rgba(255,255,255,0.05);border-radius:14px;padding:18px;text-decoration:none;display:flex;align-items:center;gap:12px;transition:all .3s;" onmouseover="this.style.borderColor='rgba(0,212,255,0.3)';this.style.transform='translateX(-4px)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.05)';this.style.transform=''">
+                    <span style="font-size:24px;">📅</span><div><div style="font-size:13px;font-weight:700;color:white;">التقويم الأكاديمي</div><div style="font-size:11px;color:var(--text-dim);">unizwa.edu.om</div></div>
+                </a>
+                <a href="https://www.unizwa.edu.om" target="_blank" style="background:var(--dark-light);border:1px solid rgba(255,255,255,0.05);border-radius:14px;padding:18px;text-decoration:none;display:flex;align-items:center;gap:12px;transition:all .3s;" onmouseover="this.style.borderColor='rgba(0,212,255,0.3)';this.style.transform='translateX(-4px)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.05)';this.style.transform=''">
+                    <span style="font-size:24px;">🌐</span><div><div style="font-size:13px;font-weight:700;color:white;">الموقع الرسمي</div><div style="font-size:11px;color:var(--text-dim);">unizwa.edu.om</div></div>
+                </a>
+            </div>
+        </div>
+    </section>
 
-  </div>
-</section>
+    <!-- Footer -->
+    <footer class="footer" id="contact">
+        <div class="footer-logo">UoN <span style="color:var(--primary)">Coffee</span></div>
+        <p class="footer-tagline">مو رسمي.. بس أحسن من الرسمي 😏</p>
+        <div class="social-links">
+            <a href="https://instagram.com/unizwacoffee" target="_blank"><i class="fab fa-instagram"></i></a>
+            <a href="https://wa.me/96877144942" target="_blank"><i class="fab fa-whatsapp"></i></a>
+            <a href="features.html" target="_blank"><i class="fas fa-map-marked-alt"></i></a>
+        </div>
+        <div class="footer-bottom">
+            <p>© 2026 جامعة نزوى - جميع الحقوق محفوظة</p>
+            <p style="margin-top: 0.5rem;">صنع بحب <span class="heart">❤️</span> من طلاب جامعة نزوى</p>
+        </div>
+    </footer>
 
-<footer>
-  <div class="flogo">UoN <span>Coffee</span> ☕</div>
-  <div class="fsub">غير رسمي · بس أحسن من الرسمي 😏</div>
-  <div class="flinks">
-    <a href="#feat">المميزات</a>
-    <a href="#calc">حاسبة المعدل</a>
-    <a href="#grp">المجموعات</a>
-    <a href="#lnk">الروابط</a>
-    <a href="#hub">Student Hub</a>
-    <a href="#con">التواصل</a>
-    <a href="features.html">الخريطة 🗺️</a>
-    <a href="features.html">الاعترافات 💬</a>
-    <a href="features.html">المطاعم 🍕</a>
-    <a href="https://instagram.com/unizwacoffee" target="_blank">Instagram</a>
-  </div>
-  <div class="fcopy">2025 UoN Coffee · جامعة نزوى 🇴🇲</div>
-</footer>
+    <script>
+        // ===== DATA =====
+        const defaultPasswords = [
+            { password: "Abady***791###", role: "admin", label: "المشرف الرئيسي" }
+        ];
 
-<script>
-function addRow(){
-  var r=document.createElement('div');r.className='cr';
-  r.innerHTML='<input type="text" placeholder="اسم المادة"><select><option value="">الساعات</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option></select><select><option value="">التقدير</option><option value="4.0">A (4.0)</option><option value="3.7">A- (3.7)</option><option value="3.3">B+ (3.3)</option><option value="3.0">B (3.0)</option><option value="2.7">B- (2.7)</option><option value="2.3">C+ (2.3)</option><option value="2.0">C (2.0)</option><option value="1.0">D (1.0)</option><option value="0">F (0.0)</option></select><button class="rmb" onclick="rmRow(this)">x</button>';
-  document.getElementById('crs').appendChild(r);
-}
-function rmRow(b){if(document.querySelectorAll('.cr').length>1)b.parentElement.remove();}
-function calc(){
-  var rows=document.querySelectorAll('.cr'),p=0,h=0;
-  rows.forEach(function(r){
-    var s=r.querySelectorAll('select'),hr=parseFloat(s[0].value),gr=parseFloat(s[1].value);
-    if(hr&&!isNaN(gr)){p+=hr*gr;h+=hr;}
-  });
-  if(!h){alert('أضف مادة واحدة على الأقل!');return;}
-  var g=(p/h).toFixed(2);
-  document.getElementById('rn').textContent=g;
-  document.getElementById('rg').textContent=g>=3.7?'🌟 ممتاز!':g>=3.0?'✅ جيد جداً':g>=2.0?'📚 جيد':'💪 استمر!';
-  document.getElementById('res').style.display='block';
-}
-</script>
+        const defaultTools = [
+            { id: 1, icon: "fa-robot", title: "مساعد AI ذكي", desc: "بوت ذكي يتعلم من أسئلة الطلاب ويجيب عن كل شيء يخص جامعة نزوى — متاح 24/7", color: "#00d4ff", btnText: "جرب الآن" },
+            { id: 2, icon: "fa-calculator", title: "حاسبة المعدل", desc: "احسب معدلك الفصلي بسهولة — أضف موادك وساعاتها وتقديراتها واحصل على النتيجة فوراً", color: "#ff6b6b", btnText: "احسب معدلك" },
+            { id: 3, icon: "fa-calendar-alt", title: "مولد الجداول", desc: "أنشئ جداولك الدراسية تلقائياً مع تجنب التعارضات وعرض جميع الخيارات", color: "#ffd93d", btnText: "أنشئ جدولك" },
+            { id: 4, icon: "fa-comments", title: "اعترافات الطلاب", desc: "شارك اعترافك الجامعي بشكل مجهول — كلنا في نفس الوضع 😅", color: "#6bcb77", btnText: "اعترف الحين" },
+            { id: 5, icon: "fa-book-open", title: "مكتبة الملخصات", desc: "ملخصات وشروحات تعليمية من طلاب جامعة نزوى لجميع الكليات والمواد", color: "#a78bfa", btnText: "تصفح الملخصات" },
+            { id: 6, icon: "fa-utensils", title: "دليل المطاعم", desc: "أقرب المطاعم والكافيهات حول جامعة نزوى مع التقييمات والأسعار", color: "#fb923c", btnText: "شوف المطاعم" },
+            { id: 7, icon: "fa-map-marked-alt", title: "خريطة الجامعة", desc: "خريطة تفاعلية لمواقع الكليات، المقاهي، المكتبات، والمواقف داخل الحرم", color: "#38bdf8", btnText: "افتح الخريطة" },
+            { id: 8, icon: "fa-graduation-cap", title: "Student Hub", desc: "خدمات دراسية داخل الجامعة — طباعة، تجليد، قرطاسية، توصيل مجاني", color: "#f472b6", btnText: "Coming Soon 🔜" }
+        ];
+
+        let passwords = JSON.parse(localStorage.getItem('nu_passwords')) || [...defaultPasswords];
+        let tools = JSON.parse(localStorage.getItem('nu_tools')) || [...defaultTools];
+        let currentAdmin = JSON.parse(localStorage.getItem('nu_admin')) || null;
+        let editingToolId = null;
+        let selectedColor = "#00d4ff";
+        let selectedNewColor = "#00d4ff";
+
+        // ===== INIT =====
+        document.addEventListener('DOMContentLoaded', () => {
+            renderTools();
+            updateUI();
+            initScrollReveal();
+            initCounters();
+            initParallax();
+            loadSettings();
+        });
+
+        // ===== RENDER TOOLS =====
+        function renderTools() {
+            const grid = document.getElementById('toolsGrid');
+            grid.innerHTML = tools.map(tool => `
+                <div class="tool-card" data-id="${tool.id}" style="--card-color: ${tool.color};">
+                    <button class="admin-edit-btn" onclick="event.stopPropagation(); editTool(${tool.id})" title="تعديل">
+                        <i class="fas fa-pen"></i>
+                    </button>
+                    <div class="tool-icon" style="background: ${tool.color}20; color: ${tool.color};">
+                        <i class="fas ${tool.icon}"></i>
+                    </div>
+                    <h3>${tool.title}</h3>
+                    <p>${tool.desc}</p>
+                    <a href="javascript:void(0)" class="tool-link" style="color: ${tool.color};" onclick="event.preventDefault(); openTool(${tool.id})">
+                        ${tool.btnText} <i class="fas fa-arrow-left"></i>
+                    </a>
+                </div>
+            `).join('');
+        }
+
+        // ===== TOOL ACTIONS =====
+        function openTool(id) {
+            const actions = {
+                1: () => document.getElementById('botSection').scrollIntoView({behavior:'smooth'}),
+                2: () => document.getElementById('calcSection').scrollIntoView({behavior:'smooth'}),
+                3: () => window.open('features.html#map', '_blank'),
+                4: () => window.open('features.html#conf', '_blank'),
+                5: () => showToast('ملخصات المواد — قريباً! 🔜'),
+                6: () => showToast('تقييم المواد — قريباً! 🔜'),
+                7: () => window.open('features.html', '_blank'),
+                8: () => window.open('features.html#rest', '_blank'),
+            };
+            if (actions[id]) actions[id]();
+            else showToast(`سيتم فتح ${tools.find(t=>t.id===id)?.title} قريباً!`);
+        }
+
+        // ===== LOGIN - NOW USES 'active' CLASS =====
+        function showLogin() {
+            document.getElementById('loginOverlay').classList.add('active');
+            document.getElementById('adminPassword').focus();
+        }
+
+        function login() {
+            const input = document.getElementById('adminPassword').value;
+            const error = document.getElementById('loginError');
+            const match = passwords.find(p => p.password === input);
+
+            if (match) {
+                currentAdmin = match;
+                localStorage.setItem('nu_admin', JSON.stringify(match));
+                document.getElementById('loginOverlay').classList.remove('active');
+                document.getElementById('adminPassword').value = '';
+                error.classList.remove('show');
+                updateUI();
+                showToast(`مرحباً ${match.label}! تم تسجيل الدخول بنجاح`);
+            } else {
+                error.classList.add('show');
+                document.querySelector('.login-box').classList.add('shake');
+                setTimeout(() => document.querySelector('.login-box').classList.remove('shake'), 500);
+            }
+        }
+
+        function logout() {
+            currentAdmin = null;
+            localStorage.removeItem('nu_admin');
+            updateUI();
+            showToast('تم تسجيل الخروج', 'error');
+        }
+
+        function updateUI() {
+            const isAdmin = currentAdmin !== null;
+            const isEditor = isAdmin && (currentAdmin.role === 'admin' || currentAdmin.role === 'editor');
+
+            document.getElementById('adminBadge').classList.toggle('show', isAdmin);
+            document.getElementById('adminBtn').classList.toggle('show', isAdmin);
+            document.getElementById('logoutBtn').classList.toggle('show', isAdmin);
+            document.getElementById('loginBtn').classList.toggle('show', !isAdmin);
+            document.body.classList.toggle('admin-mode', isEditor);
+        }
+
+        // ===== ADMIN PANEL =====
+        function openPanel() {
+            if (!currentAdmin) return;
+            document.getElementById('adminPanel').classList.add('open');
+            document.getElementById('panelOverlay').classList.add('show');
+            document.getElementById('editSection').style.display = 'none';
+            renderPasswordsList();
+        }
+
+        function closePanel() {
+            document.getElementById('adminPanel').classList.remove('open');
+            document.getElementById('panelOverlay').classList.remove('show');
+            editingToolId = null;
+        }
+
+        // ===== EDIT TOOL =====
+        function editTool(id) {
+            if (!currentAdmin || (currentAdmin.role !== 'admin' && currentAdmin.role !== 'editor')) {
+                showToast('ليس لديك صلاحية التعديل', 'error');
+                return;
+            }
+            const tool = tools.find(t => t.id === id);
+            if (!tool) return;
+
+            editingToolId = id;
+            document.getElementById('editTitle').value = tool.title;
+            document.getElementById('editDesc').value = tool.desc;
+            document.getElementById('editIcon').value = tool.icon;
+            document.getElementById('editBtnText').value = tool.btnText;
+            selectedColor = tool.color;
+
+            document.querySelectorAll('#editSection .color-option').forEach(opt => {
+                opt.classList.toggle('selected', opt.dataset.color === tool.color);
+            });
+
+            document.getElementById('editSection').style.display = 'block';
+            openPanel();
+        }
+
+        function selectColor(el) {
+            document.querySelectorAll('#editSection .color-option').forEach(opt => opt.classList.remove('selected'));
+            el.classList.add('selected');
+            selectedColor = el.dataset.color;
+        }
+
+        function saveTool() {
+            if (!editingToolId) return;
+            const tool = tools.find(t => t.id === editingToolId);
+            if (tool) {
+                tool.title = document.getElementById('editTitle').value;
+                tool.desc = document.getElementById('editDesc').value;
+                tool.icon = document.getElementById('editIcon').value;
+                tool.color = selectedColor;
+                tool.btnText = document.getElementById('editBtnText').value;
+
+                localStorage.setItem('nu_tools', JSON.stringify(tools));
+                renderTools();
+                closePanel();
+                showToast('تم حفظ التغييرات بنجاح!');
+            }
+        }
+
+        function deleteTool() {
+            if (!editingToolId) return;
+            if (!confirm('هل أنت متأكد من حذف هذه الأداة؟')) return;
+
+            tools = tools.filter(t => t.id !== editingToolId);
+            localStorage.setItem('nu_tools', JSON.stringify(tools));
+            renderTools();
+            closePanel();
+            showToast('تم حذف الأداة', 'error');
+        }
+
+        // ===== ADD TOOL =====
+        function selectNewColor(el) {
+            document.querySelectorAll('.panel-section:not(#editSection) .color-option').forEach(opt => opt.classList.remove('selected'));
+            el.classList.add('selected');
+            selectedNewColor = el.dataset.color;
+        }
+
+        function addTool() {
+            const title = document.getElementById('newTitle').value;
+            const desc = document.getElementById('newDesc').value;
+            const icon = document.getElementById('newIcon').value || 'fa-tools';
+            const btnText = document.getElementById('newBtnText').value || 'جرب الآن';
+
+            if (!title || !desc) {
+                showToast('يرجى ملء جميع الحقول المطلوبة', 'error');
+                return;
+            }
+
+            const newId = Math.max(...tools.map(t => t.id), 0) + 1;
+            tools.push({
+                id: newId,
+                icon: icon,
+                title: title,
+                desc: desc,
+                color: selectedNewColor,
+                btnText: btnText
+            });
+
+            localStorage.setItem('nu_tools', JSON.stringify(tools));
+            renderTools();
+            document.getElementById('newTitle').value = '';
+            document.getElementById('newDesc').value = '';
+            document.getElementById('newIcon').value = '';
+            document.getElementById('newBtnText').value = '';
+            showToast('تم إضافة الأداة بنجاح!');
+        }
+
+
+        // ===== BOT AI =====
+        const BOT_KB = {
+          كليات: { keywords:['كلية','كليات','تخصص','قسم','برنامج'], answer:'كليات جامعة نزوى 🏛️\n\n• كلية الاقتصاد ونظم المعلومات 💼\n• كلية الهندسة والعمارة 🏗️\n• كلية العلوم والآداب 🔬\n• كلية العلوم الصحية ⚕️\n• معهد التأسيس 📖' },
+          معدل: { keywords:['معدل','gpa','تراكمي','فصلي','درجة','نقطة'], answer:'نظام التقديرات في جامعة نزوى 📊\n\nA = 4.0 نقطة\nA- = 3.7 نقطة\nB+ = 3.3 نقطة\nB = 3.0 نقطة\nB- = 2.7 نقطة\nC+ = 2.3 نقطة\nC = 2.0 نقطة\nD = 1.0 نقطة\nF = 0.0 نقطة' },
+          روابط: { keywords:['رابط','موقع','بوابة','portal','moodle','eduwave','نظام'], answer:'روابط جامعة نزوى 🔗\n\n🎓 البوابة: portal.unizwa.edu.om\n📚 Moodle: moodle.unizwa.edu.om\n🌊 EduWave: elearning.unizwa.edu.om\n🏛️ المكتبة: library.unizwa.edu.om' },
+          أرقام: { keywords:['رقم','هاتف','تواصل','اتصال','مالية','تسجيل','رعاية'], answer:'أرقام جامعة نزوى 📞\n\n💰 المالية: 92596648\n📋 القبول والتسجيل: 25446234\n🤝 الرعاية: 91313951 / 25446247\n🏦 البنك: 0317008949900017' },
+          نصائح: { keywords:['نصيحة','نصائح','نجاح','مذاكرة','دراسة','تفوق','امتحان'], answer:'نصائح للنجاح 💡\n\n📚 ذاكر بتقنية Pomodoro\n👥 انضم لمجموعات الدراسة\n📅 راجع التقويم الأكاديمي\n🎯 راجع أسئلة الاختبارات السابقة' },
+          مطاعم: { keywords:['مطعم','كافيه','اكل','طعام','قهوة','غداء'], answer:'أشهر المطاعم حول الجامعة ☕\n\n🍕 Pizza La Pepe — بيتزا وباستا\n☕ Kawa Kava — أفضل للمذاكرة\n🏰 Al Husn Cafe — إطلالة جميلة\n💚 Over Value — اقتصادي للطلاب\n\nشوف دليل المطاعم الكامل في صفحة الميزات!' },
+        };
+
+        let botLearned = JSON.parse(localStorage.getItem('uon_learned') || '{}');
+        let botLearnCount = parseInt(localStorage.getItem('uon_count') || '0');
+
+        function getBotReply(q) {
+          const lower = q.toLowerCase().trim();
+          if (botLearned[lower]) return botLearned[lower];
+          for (const [key, data] of Object.entries(BOT_KB)) {
+            if (data.keywords.some(kw => lower.includes(kw))) return data.answer;
+          }
+          if (/^(مرحبا|هلا|السلام|اهلا|هاي|hi|hello)/.test(lower)) return 'هلا وغلا! 👋\nكيف أقدر أساعدك اليوم؟\nاسألني عن الكليات، الروابط، الأرقام، أو نصائح الدراسة! 🎓';
+          if (/(شكر|thank|مشكور)/.test(lower)) return 'العفو! 😊 بالتوفيق في دراستك! 🌟';
+          return 'سؤال جديد! 🤔\nللحين ما عندي إجابة — جرب الأزرار السريعة أو تواصل مع الجامعة مباشرة.\n📞 25446234';
+        }
+
+        function botAddMsg(type, text) {
+          const c = document.getElementById('botMsgs');
+          const d = document.createElement('div');
+          d.style.cssText = `display:flex;gap:10px;animation:slideInUp .3s ease;${type==='user'?'flex-direction:row-reverse':''}`;
+          d.innerHTML = `<div style="width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#00d4ff,#0099cc);display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;">${type==='bot'?'☕':'🎓'}</div><div style="max-width:78%;padding:10px 14px;border-radius:14px;font-size:13px;line-height:1.8;${type==='bot'?'background:rgba(0,212,255,0.08);border:1px solid rgba(0,212,255,0.12);color:#e2e8f0;border-radius:4px 14px 14px 14px':'background:linear-gradient(135deg,#00d4ff,#0099cc);color:#0a0e27;border-radius:14px 4px 14px 14px'}">${text.replace(/\n/g,'<br>')}</div>`;
+          c.appendChild(d);
+          c.scrollTop = c.scrollHeight;
+        }
+
+        function botSend() {
+          const inp = document.getElementById('botInput');
+          const text = inp.value.trim();
+          if (!text) return;
+          inp.value = '';
+          botAddMsg('user', text);
+          setTimeout(() => {
+            botAddMsg('bot', getBotReply(text));
+          }, 600 + Math.random() * 600);
+        }
+
+        function botSQ(text) { document.getElementById('botInput').value = text; botSend(); }
+
+        function clearBotChat() {
+          document.getElementById('botMsgs').innerHTML = '';
+          botAddMsg('bot', 'تمت مسح المحادثة! ☕\nكيف أقدر أساعدك؟');
+        }
+
+        // ===== CALCULATOR =====
+        function addCalcRow() {
+          const r = document.createElement('div');
+          r.className = 'calc-row';
+          r.style.cssText = 'display:flex;gap:8px;';
+          r.innerHTML = `<input type="text" placeholder="اسم المادة" style="flex:1;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:11px 12px;color:white;font-family:Tajawal,sans-serif;font-size:13px;outline:none;"><select style="background:var(--dark);border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:11px 8px;color:white;font-family:Tajawal,sans-serif;font-size:12px;outline:none;"><option value="">الساعات</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option></select><select style="background:var(--dark);border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:11px 8px;color:white;font-family:Tajawal,sans-serif;font-size:12px;outline:none;"><option value="">التقدير</option><option value="4.0">A (4.0)</option><option value="3.7">A- (3.7)</option><option value="3.3">B+ (3.3)</option><option value="3.0">B (3.0)</option><option value="2.7">B- (2.7)</option><option value="2.3">C+ (2.3)</option><option value="2.0">C (2.0)</option><option value="1.0">D (1.0)</option><option value="0">F (0.0)</option></select><button onclick="removeCalcRow(this)" style="width:34px;height:34px;background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.15);border-radius:8px;color:#ef4444;cursor:pointer;font-size:16px;">×</button>`;
+          document.getElementById('calcRows').appendChild(r);
+        }
+
+        function removeCalcRow(b) {
+          if (document.querySelectorAll('.calc-row').length > 1) b.parentElement.remove();
+        }
+
+        function calcGPA() {
+          const rows = document.querySelectorAll('.calc-row');
+          let pts=0, hrs=0;
+          rows.forEach(r => {
+            const s = r.querySelectorAll('select');
+            const h = parseFloat(s[0].value), g = parseFloat(s[1].value);
+            if (h && !isNaN(g)) { pts += h*g; hrs += h; }
+          });
+          if (!hrs) { showToast('أضف مادة واحدة على الأقل!', 'error'); return; }
+          const gpa = (pts/hrs).toFixed(2);
+          document.getElementById('calcGPANum').textContent = gpa;
+          document.getElementById('calcGPAGrade').textContent = gpa>=3.7?'🌟 ممتاز!':gpa>=3.0?'✅ جيد جداً':gpa>=2.0?'📚 جيد':'💪 استمر!';
+          document.getElementById('calcResult').style.display = 'block';
+          document.getElementById('calcResult').scrollIntoView({behavior:'smooth',block:'nearest'});
+        }
+
+        // Init bot greeting
+        document.addEventListener('DOMContentLoaded', () => {
+          botAddMsg('bot', 'مرحباً بك في UoN Coffee! 👋\n\nأنا مساعدك الذكي لجامعة نزوى 🎓\nاسألني عن الكليات، الروابط، الأرقام، أو أي شيء!');
+        });
+
+        // ===== PASSWORDS =====
+        function renderPasswordsList() {
+            const list = document.getElementById('passwordsList');
+            list.innerHTML = passwords.map((p, index) => `
+                <div class="password-item">
+                    <div>
+                        <span>${'*'.repeat(p.password.length)}</span>
+                        <span class="role">${p.label}</span>
+                    </div>
+                    ${currentAdmin && currentAdmin.role === 'admin' ? `
+                        <button onclick="removePassword(${index})" title="حذف">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    ` : ''}
+                </div>
+            `).join('');
+        }
+
+        function addPassword() {
+            if (!currentAdmin || currentAdmin.role !== 'admin') {
+                showToast('فقط المشرف الرئيسي يمكنه إضافة كلمات مرور', 'error');
+                return;
+            }
+            const pass = document.getElementById('newPassword').value;
+            const role = document.getElementById('newRole').value;
+            const labels = { admin: 'المشرف الرئيسي', editor: 'المحرر', viewer: 'المشاهد' };
+
+            if (!pass) { showToast('أدخل كلمة المرور', 'error'); return; }
+            if (passwords.find(p => p.password === pass)) { showToast('كلمة المرور موجودة مسبقاً', 'error'); return; }
+
+            passwords.push({ password: pass, role: role, label: labels[role] });
+            localStorage.setItem('nu_passwords', JSON.stringify(passwords));
+            document.getElementById('newPassword').value = '';
+            renderPasswordsList();
+            showToast('تم إضافة كلمة المرور!');
+        }
+
+        function removePassword(index) {
+            if (!currentAdmin || currentAdmin.role !== 'admin') return;
+            if (passwords[index].password === 'Abady***791###') {
+                showToast('لا يمكن حذف كلمة المرور الرئيسية!', 'error');
+                return;
+            }
+            passwords.splice(index, 1);
+            localStorage.setItem('nu_passwords', JSON.stringify(passwords));
+            renderPasswordsList();
+            showToast('تم حذف كلمة المرور', 'error');
+        }
+
+        // ===== SETTINGS =====
+        function saveSettings() {
+            const title = document.getElementById('siteTitle').value;
+            const headline = document.getElementById('siteHeadline').value;
+            const desc = document.getElementById('siteDesc').value;
+
+            document.getElementById('heroTitle').innerHTML = headline.replace(/\n/g, '<br>');
+            document.getElementById('heroDesc').textContent = desc;
+            document.title = title;
+
+            localStorage.setItem('nu_settings', JSON.stringify({ title, headline, desc }));
+            showToast('تم حفظ الإعدادات!');
+        }
+
+        function loadSettings() {
+            const saved = JSON.parse(localStorage.getItem('nu_settings'));
+            if (saved) {
+                document.getElementById('siteTitle').value = saved.title;
+                document.getElementById('siteHeadline').value = saved.headline;
+                document.getElementById('siteDesc').value = saved.desc;
+                document.getElementById('heroTitle').innerHTML = saved.headline.replace(/\n/g, '<br>');
+                document.getElementById('heroDesc').textContent = saved.desc;
+                document.title = saved.title;
+            }
+        }
+
+        // ===== TOAST =====
+        function showToast(msg, type) {
+            const toast = document.getElementById('toast');
+            const toastMsg = document.getElementById('toastMsg');
+            toastMsg.textContent = msg;
+            toast.className = 'toast show' + (type === 'error' ? ' error' : '');
+            toast.querySelector('i').className = type === 'error' ? 'fas fa-exclamation-circle' : 'fas fa-check-circle';
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+
+        // ===== SCROLL REVEAL =====
+        function initScrollReveal() {
+            const revealElements = document.querySelectorAll('.reveal');
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) entry.target.classList.add('active');
+                });
+            }, { threshold: 0.1 });
+            revealElements.forEach(el => observer.observe(el));
+        }
+
+        // ===== COUNTERS =====
+        function initCounters() {
+            const counters = document.querySelectorAll('.stat-number');
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const target = parseFloat(entry.target.dataset.target);
+                        const isDecimal = target % 1 !== 0;
+                        const duration = 2000;
+                        const increment = target / (duration / 16);
+                        let current = 0;
+                        const timer = setInterval(() => {
+                            current += increment;
+                            if (current >= target) {
+                                entry.target.textContent = isDecimal ? target.toFixed(1) : target.toLocaleString() + '+';
+                                clearInterval(timer);
+                            } else {
+                                entry.target.textContent = isDecimal ? current.toFixed(1) : Math.floor(current).toLocaleString();
+                            }
+                        }, 16);
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.5 });
+            counters.forEach(counter => observer.observe(counter));
+        }
+
+        // ===== PARALLAX =====
+        function initParallax() {
+            document.addEventListener('mousemove', (e) => {
+                const circles = document.querySelectorAll('.hero-bg .circle');
+                const x = e.clientX / window.innerWidth;
+                const y = e.clientY / window.innerHeight;
+                circles.forEach((circle, index) => {
+                    const speed = (index + 1) * 20;
+                    circle.style.transform = `translate(${x * speed}px, ${y * speed}px)`;
+                });
+            });
+        }
+
+        // ===== NAVBAR SCROLL =====
+        window.addEventListener('scroll', () => {
+            const navbar = document.getElementById('navbar');
+            navbar.classList.toggle('scrolled', window.scrollY > 50);
+        });
+
+        // ===== SMOOTH SCROLL =====
+        function scrollToSection(id) {
+            document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // ===== MOBILE MENU =====
+        function toggleMenu() {
+            const navLinks = document.querySelector('.nav-links');
+            if (navLinks.style.display === 'flex') {
+                navLinks.style.display = 'none';
+            } else {
+                navLinks.style.display = 'flex';
+                navLinks.style.position = 'absolute';
+                navLinks.style.top = '100%';
+                navLinks.style.left = '0';
+                navLinks.style.right = '0';
+                navLinks.style.flexDirection = 'column';
+                navLinks.style.background = 'var(--dark-light)';
+                navLinks.style.padding = '2rem';
+                navLinks.style.gap = '1.5rem';
+                navLinks.style.zIndex = '999';
+            }
+        }
+    </script>
 </body>
 </html>
