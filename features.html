@@ -520,7 +520,8 @@ window.addEventListener('DOMContentLoaded', async () => {
     const saved = sessionStorage.getItem('uon_feat_admin')
     if (saved) try { currentAdmin = JSON.parse(saved); updateAdminUI() } catch(e) {}
 
-    await Promise.all([loadConfessions(), loadRestaurants()])
+    setTimeout(() => document.getElementById('loadingOverlay').classList.add('hidden'), 4000)
+    try { await Promise.all([loadConfessions(), loadRestaurants()]) } catch(e) { console.log(e) }
     document.getElementById('loadingOverlay').classList.add('hidden')
     initScrollReveal()
     handleUrlHash()
