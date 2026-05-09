@@ -477,16 +477,17 @@ const supabase = createClient(
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZqa3hhaGhvYWNxbHBpYWZtZnlkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgzMTkwMjQsImV4cCI6MjA5Mzg5NTAyNH0.Ls3gaXRso3BgcDAByoYeQQot_KbAOfREvxyW8u4vkGA'
 )
 
-// ===== SECURE HASH =====
-async function hashPassword(password) {
-    const encoder = new TextEncoder()
-    const data = encoder.encode(password + 'uon_salt_2026')
-    const hashBuffer = await crypto.subtle.digest('SHA-256', data)
-    return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2,'0')).join('')
-}
-
-const STORED_HASHES = {
-    'a7d2e94f8b3c1052fe6d9a4781b3c5e2d9f7a1b4e8c2d6f0a3b7e9c1d5f2a4b6': { role: 'admin', label: 'المشرف الرئيسي' }
+// ===== PASSWORD CHECK =====
+async function checkPassword(password) {
+    try {
+        const { data } = await supabase.from('admin_passwords').select('*')
+        if (data) {
+            for (const row of data) {
+                if (row.password_plain === password) return { role: row.role, label: row.label }
+            }
+        }
+    } catch(e) {}
+    return null
 }
 
 // ===== DEFAULT RESTAURANTS =====
@@ -644,15 +645,17 @@ window.shareConf = function(text) {
 async function loadRestaurants() {
     try {
         const { data, error } = await supabase.from('restaurants').select('*').order('created_at', { ascending: false })
-        if (error || !data || data.length === 0) {
-            await seedRestaurants()
-            return
+        if (error) throw error
+        if (!data || data.length === 0) {
+            // استخدم البيانات الافتراضية مباشرة بدون seed
+            restaurants = defaultRestaurants.map((r,i) => ({...r, id: i+1, desc: r.description, dist: r.distance}))
+        } else {
+            restaurants = data.map(r => ({
+                id: r.id, name: r.name, type: r.type, emoji: r.emoji,
+                desc: r.description, dist: r.distance, stars: r.stars,
+                price: r.price, status: r.status, tags: r.tags || []
+            }))
         }
-        restaurants = data.map(r => ({
-            id: r.id, name: r.name, type: r.type, emoji: r.emoji,
-            desc: r.description, dist: r.distance, stars: r.stars,
-            price: r.price, status: r.status, tags: r.tags || []
-        }))
     } catch(e) {
         restaurants = defaultRestaurants.map((r,i) => ({...r, id: i+1, desc: r.description, dist: r.distance}))
     }
@@ -763,18 +766,7 @@ window.closeAdminPanel = function() { document.getElementById('adminPanel').clas
 window.apLogin = async function() {
     const pass = document.getElementById('apPass').value
     if (!pass) return
-    const hash = await hashPassword(pass)
-    let matched = STORED_HASHES[hash] || null
-    if (!matched) {
-        try {
-            const { data } = await supabase.from('admin_passwords').select('*')
-            if (data) {
-                for (const row of data) {
-                    if (await hashPassword(row.password_plain) === hash) { matched = { role: row.role, label: row.label }; break }
-                }
-            }
-        } catch(e) {}
-    }
+    const matched = await checkPassword(pass)
     if (matched) {
         currentAdmin = matched
         sessionStorage.setItem('uon_feat_admin', JSON.stringify(matched))
