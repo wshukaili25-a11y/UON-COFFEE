@@ -651,20 +651,17 @@ const supabase = createClient(
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZqa3hhaGhvYWNxbHBpYWZtZnlkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgzMTkwMjQsImV4cCI6MjA5Mzg5NTAyNH0.Ls3gaXRso3BgcDAByoYeQQot_KbAOfREvxyW8u4vkGA'
 )
 
-// ===== SECURE PASSWORD HASH =====
-// كلمة المرور محفوظة كـ hash فقط — مو نص واضح
-async function hashPassword(password) {
-    const encoder = new TextEncoder()
-    const data = encoder.encode(password + 'uon_salt_2026')
-    const hashBuffer = await crypto.subtle.digest('SHA-256', data)
-    const hashArray = Array.from(new Uint8Array(hashBuffer))
-    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('')
-}
-
-// Hash للكلمة السرية المخزنة مسبقاً
-const STORED_HASHES = {
-    // كلمة مرور المشرف الرئيسي مخزنة كـ hash فقط
-    'a7d2e94f8b3c1052fe6d9a4781b3c5e2d9f7a1b4e8c2d6f0a3b7e9c1d5f2a4b6': { role: 'admin', label: 'المشرف الرئيسي' }
+// ===== PASSWORD CHECK =====
+async function checkPassword(password) {
+    try {
+        const { data } = await supabase.from('admin_passwords').select('*')
+        if (data) {
+            for (const row of data) {
+                if (row.password_plain === password) return { role: row.role, label: row.label }
+            }
+        }
+    } catch(e) {}
+    return null
 }
 
 // ===== DEFAULT DATA =====
@@ -882,23 +879,7 @@ window.login = async function() {
     const error = document.getElementById('loginError')
     if (!input) return
 
-    const hash = await hashPassword(input)
-
-    // Check against stored hashes
-    let matched = STORED_HASHES[hash] || null
-
-    // Also check Supabase for dynamically added passwords
-    if (!matched) {
-        try {
-            const { data } = await supabase.from('admin_passwords').select('*')
-            if (data) {
-                for (const row of data) {
-                    const rowHash = await hashPassword(row.password_plain)
-                    if (rowHash === hash) { matched = { role: row.role, label: row.label }; break }
-                }
-            }
-        } catch(e) {}
-    }
+    const matched = await checkPassword(input)
 
     if (matched) {
         currentAdmin = matched
