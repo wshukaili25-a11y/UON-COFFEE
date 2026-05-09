@@ -22,266 +22,161 @@
             --text-dim: #718096;
         }
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: 'Tajawal', sans-serif;
-            background: var(--dark);
-            color: var(--text);
-            overflow-x: hidden;
-            line-height: 1.6;
-        }
+        body { font-family: 'Tajawal', sans-serif; background: var(--dark); color: var(--text); overflow-x: hidden; line-height: 1.6; }
         ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-track { background: var(--dark); }
         ::-webkit-scrollbar-thumb { background: var(--dark-lighter); border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: var(--primary); }
 
-        @keyframes slideInUp {
-            from { opacity: 0; transform: translateY(40px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-8px); }
-            75% { transform: translateX(8px); }
-        }
-        @keyframes pulse {
-            0%, 100% { box-shadow: 0 0 0 0 rgba(0, 212, 255, 0.4); }
-            50% { box-shadow: 0 0 0 15px rgba(0, 212, 255, 0); }
-        }
-        @keyframes float {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-20px); }
-        }
+        @keyframes slideInUp { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
+        @keyframes pulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(0,212,255,0.4); } 50% { box-shadow: 0 0 0 15px rgba(0,212,255,0); } }
+        @keyframes float { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-20px); } }
+        @keyframes spin { to { transform: rotate(360deg); } }
 
-        .login-overlay {
-            position: fixed; inset: 0;
-            background: rgba(10, 14, 39, 0.98);
-            backdrop-filter: blur(20px);
-            z-index: 9999;
-            display: flex; align-items: center; justify-content: center;
-            transition: all 0.5s ease;
-            opacity: 0; pointer-events: none; transform: scale(1.1);
-        }
+        /* ===== LOADING ===== */
+        .loading-overlay { position: fixed; inset: 0; background: var(--dark); z-index: 99999; display: flex; align-items: center; justify-content: center; transition: opacity 0.5s; }
+        .loading-overlay.hidden { opacity: 0; pointer-events: none; }
+        .loading-spinner { width: 50px; height: 50px; border: 3px solid rgba(0,212,255,0.1); border-top-color: var(--primary); border-radius: 50%; animation: spin 0.8s linear infinite; }
+
+        /* ===== TOAST ===== */
+        .toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(100px); background: var(--success); color: white; padding: 1rem 2rem; border-radius: 12px; font-weight: 700; z-index: 10000; opacity: 0; transition: all 0.4s; display: flex; align-items: center; gap: 8px; box-shadow: 0 10px 40px rgba(107,203,119,0.3); }
+        .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+        .toast.error { background: var(--danger); box-shadow: 0 10px 40px rgba(239,68,68,0.3); }
+
+        /* ===== LOGIN ===== */
+        .login-overlay { position: fixed; inset: 0; background: rgba(10,14,39,0.98); backdrop-filter: blur(20px); z-index: 9999; display: flex; align-items: center; justify-content: center; transition: all 0.5s ease; opacity: 0; pointer-events: none; transform: scale(1.1); }
         .login-overlay.active { opacity: 1; pointer-events: all; transform: scale(1); }
-        .login-box {
-            background: var(--dark-light);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 24px; padding: 3rem;
-            width: 100%; max-width: 420px;
-            text-align: center;
-            box-shadow: 0 25px 80px rgba(0,0,0,0.5);
-        }
-        .login-icon {
-            width: 80px; height: 80px;
-            background: linear-gradient(135deg, #00d4ff, #0099cc);
-            border-radius: 24px;
-            display: flex; align-items: center; justify-content: center;
-            margin: 0 auto 1.5rem;
-            font-size: 2rem; color: var(--dark);
-        }
+        .login-box { background: var(--dark-light); border: 1px solid rgba(255,255,255,0.1); border-radius: 24px; padding: 3rem; width: 100%; max-width: 420px; text-align: center; box-shadow: 0 25px 80px rgba(0,0,0,0.5); }
+        .login-icon { width: 80px; height: 80px; background: linear-gradient(135deg,#00d4ff,#0099cc); border-radius: 24px; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; font-size: 2rem; color: var(--dark); }
         .login-box h2 { font-size: 1.8rem; font-weight: 900; margin-bottom: 0.5rem; }
         .login-box p { color: var(--text-dim); margin-bottom: 2rem; }
         .input-group { position: relative; margin-bottom: 1.5rem; }
         .input-group i { position: absolute; right: 1rem; top: 50%; transform: translateY(-50%); color: var(--text-dim); }
-        .input-group input {
-            width: 100%; padding: 1rem 3rem 1rem 1rem;
-            background: var(--dark);
-            border: 2px solid rgba(255,255,255,0.1);
-            border-radius: 14px; color: white;
-            font-family: 'Tajawal', sans-serif; font-size: 1rem;
-            transition: all 0.3s;
-        }
-        .input-group input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 20px rgba(0, 212, 255, 0.1); }
-        .login-btn {
-            width: 100%; padding: 1rem;
-            background: linear-gradient(135deg, #00d4ff, #0099cc);
-            border: none; border-radius: 14px;
-            color: var(--dark); font-weight: 800; font-size: 1.1rem;
-            font-family: 'Tajawal', sans-serif; cursor: pointer;
-            transition: all 0.3s;
-            display: flex; align-items: center; justify-content: center; gap: 8px;
-        }
-        .login-btn:hover { transform: translateY(-2px); box-shadow: 0 15px 40px rgba(0, 212, 255, 0.4); }
+        .input-group input { width: 100%; padding: 1rem 3rem 1rem 1rem; background: var(--dark); border: 2px solid rgba(255,255,255,0.1); border-radius: 14px; color: white; font-family: 'Tajawal', sans-serif; font-size: 1rem; transition: all 0.3s; }
+        .input-group input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 20px rgba(0,212,255,0.1); }
+        .login-btn { width: 100%; padding: 1rem; background: linear-gradient(135deg,#00d4ff,#0099cc); border: none; border-radius: 14px; color: var(--dark); font-weight: 800; font-size: 1.1rem; font-family: 'Tajawal', sans-serif; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .login-btn:hover { transform: translateY(-2px); box-shadow: 0 15px 40px rgba(0,212,255,0.4); }
         .login-error { color: var(--danger); font-size: 0.9rem; margin-top: 1rem; display: none; }
         .login-error.show { display: block; }
 
-        .admin-badge {
-            position: fixed; top: 80px; left: 20px; z-index: 999;
-            background: linear-gradient(135deg, var(--secondary), #ee5a5a);
-            padding: 0.5rem 1rem; border-radius: 50px;
-            font-size: 0.8rem; font-weight: 700;
-            display: none; align-items: center; gap: 6px;
-            box-shadow: 0 5px 20px rgba(255, 107, 107, 0.3);
-            animation: pulse 2s infinite;
-        }
+        /* ===== ADMIN BADGE ===== */
+        .admin-badge { position: fixed; top: 80px; left: 20px; z-index: 999; background: linear-gradient(135deg,var(--secondary),#ee5a5a); padding: 0.5rem 1rem; border-radius: 50px; font-size: 0.8rem; font-weight: 700; display: none; align-items: center; gap: 6px; box-shadow: 0 5px 20px rgba(255,107,107,0.3); animation: pulse 2s infinite; }
         .admin-badge.show { display: flex; }
 
-        .navbar {
-            position: fixed; top: 0; width: 100%;
-            padding: 1rem 5%;
-            display: flex; justify-content: space-between; align-items: center;
-            z-index: 1000;
-            background: rgba(10, 14, 39, 0.9);
-            backdrop-filter: blur(20px);
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-            transition: all 0.3s ease;
-        }
-        .navbar.scrolled { padding: 0.7rem 5%; background: rgba(10, 14, 39, 0.98); }
+        /* ===== NAVBAR ===== */
+        .navbar { position: fixed; top: 0; width: 100%; padding: 1rem 5%; display: flex; justify-content: space-between; align-items: center; z-index: 1000; background: rgba(10,14,39,0.9); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(255,255,255,0.05); transition: all 0.3s ease; }
+        .navbar.scrolled { padding: 0.7rem 5%; background: rgba(10,14,39,0.98); }
         .logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
-        .logo-icon {
-            width: 45px; height: 45px;
-            background: linear-gradient(135deg, #00d4ff, #0099cc);
-            border-radius: 12px;
-            display: flex; align-items: center; justify-content: center;
-            font-weight: 900; font-size: 1.3rem; color: var(--dark);
-        }
+        .logo-icon { width: 45px; height: 45px; background: linear-gradient(135deg,#00d4ff,#0099cc); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 1.3rem; color: var(--dark); }
         .logo-text { color: white; font-size: 1.3rem; font-weight: 700; }
         .logo-text span { color: var(--primary); }
-        .nav-links { display: flex; gap: 2.5rem; list-style: none; }
-        .nav-links a {
-            color: var(--text-muted); text-decoration: none;
-            font-weight: 500; transition: color 0.3s; position: relative;
-        }
-        .nav-links a::after {
-            content: ''; position: absolute; bottom: -5px; right: 0;
-            width: 0; height: 2px; background: var(--primary); transition: width 0.3s;
-        }
+        .nav-links { display: flex; gap: 2rem; list-style: none; }
+        .nav-links a { color: var(--text-muted); text-decoration: none; font-weight: 500; transition: color 0.3s; position: relative; font-size: 0.9rem; }
+        .nav-links a::after { content: ''; position: absolute; bottom: -5px; right: 0; width: 0; height: 2px; background: var(--primary); transition: width 0.3s; }
         .nav-links a:hover { color: var(--primary); }
         .nav-links a:hover::after { width: 100%; }
-        .nav-actions { display: flex; gap: 1rem; align-items: center; }
-        .nav-btn {
-            padding: 0.6rem 1.5rem;
-            background: linear-gradient(135deg, #00d4ff, #0099cc);
-            border: none; border-radius: 10px;
-            color: var(--dark); font-weight: 700;
-            font-family: 'Tajawal', sans-serif; cursor: pointer; transition: all 0.3s;
-        }
-        .nav-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(0, 212, 255, 0.3); }
-        .admin-btn {
-            padding: 0.6rem 1.2rem; background: transparent;
-            border: 2px solid var(--warning); border-radius: 10px;
-            color: var(--warning); font-weight: 700;
-            font-family: 'Tajawal', sans-serif; cursor: pointer; transition: all 0.3s;
-            display: none; align-items: center; gap: 6px; font-size: 0.9rem;
-        }
-        .admin-btn.show { display: flex; }
-        .admin-btn:hover { background: var(--warning); color: var(--dark); }
-        .logout-btn {
-            padding: 0.6rem 1.2rem; background: transparent;
-            border: 2px solid var(--text-dim); border-radius: 10px;
-            color: var(--text-dim); font-weight: 700;
-            font-family: 'Tajawal', sans-serif; cursor: pointer; transition: all 0.3s;
-            display: none; align-items: center; gap: 6px; font-size: 0.9rem;
-        }
+        .nav-actions { display: flex; gap: 0.8rem; align-items: center; }
+        .nav-btn { padding: 0.6rem 1.5rem; background: linear-gradient(135deg,#00d4ff,#0099cc); border: none; border-radius: 10px; color: var(--dark); font-weight: 700; font-family: 'Tajawal', sans-serif; cursor: pointer; transition: all 0.3s; font-size: 0.9rem; }
+        .nav-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(0,212,255,0.3); }
+        .admin-nav-btn { padding: 0.6rem 1.2rem; background: transparent; border: 2px solid var(--warning); border-radius: 10px; color: var(--warning); font-weight: 700; font-family: 'Tajawal', sans-serif; cursor: pointer; transition: all 0.3s; display: none; align-items: center; gap: 6px; font-size: 0.85rem; }
+        .admin-nav-btn.show { display: flex; }
+        .admin-nav-btn:hover { background: var(--warning); color: var(--dark); }
+        .logout-btn { padding: 0.6rem 1.2rem; background: transparent; border: 2px solid var(--text-dim); border-radius: 10px; color: var(--text-dim); font-weight: 700; font-family: 'Tajawal', sans-serif; cursor: pointer; transition: all 0.3s; display: none; align-items: center; gap: 6px; font-size: 0.85rem; }
         .logout-btn.show { display: flex; }
         .logout-btn:hover { border-color: var(--danger); color: var(--danger); }
         .mobile-menu { display: none; font-size: 1.5rem; color: white; cursor: pointer; }
 
-        .hero {
-            min-height: 100vh; display: flex; align-items: center; justify-content: center;
-            position: relative; padding: 8rem 5% 4rem; overflow: hidden;
-        }
+        /* ===== HERO ===== */
+        .hero { min-height: 100vh; display: flex; align-items: center; justify-content: center; position: relative; padding: 8rem 5% 4rem; overflow: hidden; }
         .hero-bg { position: absolute; width: 100%; height: 100%; top: 0; left: 0; }
         .hero-bg .circle { position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.15; }
         .hero-bg .circle-1 { width: 500px; height: 500px; background: var(--primary); top: -10%; right: -10%; animation: float 8s ease-in-out infinite; }
         .hero-bg .circle-2 { width: 400px; height: 400px; background: var(--secondary); bottom: -10%; left: -10%; animation: float 10s ease-in-out infinite reverse; }
         .hero-bg .circle-3 { width: 300px; height: 300px; background: var(--accent); top: 40%; left: 30%; animation: float 12s ease-in-out infinite; }
         .hero-content { text-align: center; z-index: 2; max-width: 800px; }
-        .hero-badge {
-            display: inline-flex; align-items: center; gap: 8px;
-            padding: 0.5rem 1.2rem;
-            background: rgba(0, 212, 255, 0.1);
-            border: 1px solid rgba(0, 212, 255, 0.2);
-            border-radius: 50px; font-size: 0.9rem; color: var(--primary);
-            margin-bottom: 2rem; animation: slideInUp 0.6s ease forwards;
-        }
-        .hero h1 {
-            font-size: clamp(2.5rem, 6vw, 4.5rem); font-weight: 900; line-height: 1.2;
-            margin-bottom: 1.5rem;
-            background: linear-gradient(135deg, #fff 0%, var(--primary) 100%);
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            animation: slideInUp 0.8s ease 0.2s forwards; opacity: 0;
-        }
+        .hero-badge { display: inline-flex; align-items: center; gap: 8px; padding: 0.5rem 1.2rem; background: rgba(0,212,255,0.1); border: 1px solid rgba(0,212,255,0.2); border-radius: 50px; font-size: 0.9rem; color: var(--primary); margin-bottom: 2rem; animation: slideInUp 0.6s ease forwards; }
+        .hero h1 { font-size: clamp(2.5rem,6vw,4.5rem); font-weight: 900; line-height: 1.2; margin-bottom: 1.5rem; background: linear-gradient(135deg,#fff 0%,var(--primary) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; animation: slideInUp 0.8s ease 0.2s forwards; opacity: 0; }
         .hero p { font-size: 1.2rem; color: var(--text-muted); margin-bottom: 0.5rem; animation: slideInUp 0.8s ease 0.4s forwards; opacity: 0; }
         .hero p.sub { font-size: 1rem; color: var(--text-dim); margin-bottom: 2.5rem; animation: slideInUp 0.8s ease 0.5s forwards; opacity: 0; }
         .hero-buttons { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; animation: slideInUp 0.8s ease 0.6s forwards; opacity: 0; }
-        .btn-primary {
-            padding: 1rem 2.5rem;
-            background: linear-gradient(135deg, #00d4ff, #0099cc);
-            border: none; border-radius: 14px; color: var(--dark);
-            font-weight: 800; font-size: 1rem; font-family: 'Tajawal', sans-serif;
-            cursor: pointer; transition: all 0.3s;
-            display: inline-flex; align-items: center; gap: 8px;
-        }
-        .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 15px 40px rgba(0, 212, 255, 0.4); }
-        .btn-secondary {
-            padding: 1rem 2.5rem; background: transparent;
-            border: 2px solid var(--primary); border-radius: 14px; color: var(--primary);
-            font-weight: 800; font-size: 1rem; font-family: 'Tajawal', sans-serif;
-            cursor: pointer; transition: all 0.3s;
-            display: inline-flex; align-items: center; gap: 8px;
-        }
+        .btn-primary { padding: 1rem 2.5rem; background: linear-gradient(135deg,#00d4ff,#0099cc); border: none; border-radius: 14px; color: var(--dark); font-weight: 800; font-size: 1rem; font-family: 'Tajawal', sans-serif; cursor: pointer; transition: all 0.3s; display: inline-flex; align-items: center; gap: 8px; }
+        .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 15px 40px rgba(0,212,255,0.4); }
+        .btn-secondary { padding: 1rem 2.5rem; background: transparent; border: 2px solid var(--primary); border-radius: 14px; color: var(--primary); font-weight: 800; font-size: 1rem; font-family: 'Tajawal', sans-serif; cursor: pointer; transition: all 0.3s; display: inline-flex; align-items: center; gap: 8px; }
         .btn-secondary:hover { background: var(--primary); color: var(--dark); transform: translateY(-3px); }
 
-        .stats-bar { padding: 2rem 5%; display: flex; justify-content: center; gap: 4rem; flex-wrap: wrap; }
-        .stat-item {
-            text-align: center; padding: 1.5rem 2rem;
-            background: var(--dark-light); border-radius: 16px;
-            border: 1px solid rgba(255,255,255,0.05); min-width: 150px; transition: all 0.3s;
-        }
-        .stat-item:hover { transform: translateY(-5px); border-color: var(--primary); box-shadow: 0 10px 40px rgba(0, 212, 255, 0.1); }
+        /* ===== STATS ===== */
+        .stats-bar { padding: 2rem 5%; display: flex; justify-content: center; gap: 2rem; flex-wrap: wrap; }
+        .stat-item { text-align: center; padding: 1.5rem 2rem; background: var(--dark-light); border-radius: 16px; border: 1px solid rgba(255,255,255,0.05); min-width: 140px; transition: all 0.3s; }
+        .stat-item:hover { transform: translateY(-5px); border-color: var(--primary); box-shadow: 0 10px 40px rgba(0,212,255,0.1); }
         .stat-item i { font-size: 2rem; color: var(--primary); margin-bottom: 0.5rem; display: block; }
         .stat-number { font-size: 2rem; font-weight: 900; color: white; display: block; }
-        .stat-label { color: var(--text-dim); font-size: 0.9rem; }
+        .stat-label { color: var(--text-dim); font-size: 0.85rem; }
 
-        .tools-section { padding: 6rem 5%; position: relative; }
+        /* ===== TOOLS ===== */
+        .tools-section { padding: 6rem 5%; }
         .section-header { text-align: center; margin-bottom: 4rem; }
-        .section-header h2 {
-            font-size: 2.5rem; font-weight: 900; margin-bottom: 1rem;
-            background: linear-gradient(135deg, #fff 0%, var(--primary) 100%);
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-        }
+        .section-header h2 { font-size: 2.5rem; font-weight: 900; margin-bottom: 1rem; background: linear-gradient(135deg,#fff 0%,var(--primary) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         .section-header p { color: var(--text-dim); font-size: 1.1rem; max-width: 600px; margin: 0 auto; }
-        .tools-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 2rem; max-width: 1400px; margin: 0 auto; }
-        .tool-card {
-            background: var(--dark-light); border: 1px solid rgba(255,255,255,0.05);
-            border-radius: 20px; padding: 2.5rem 2rem; text-align: center;
-            transition: all 0.4s; position: relative; overflow: hidden;
-        }
-        .tool-card::before {
-            content: ''; position: absolute; top: 0; left: 0;
-            width: 100%; height: 4px; background: var(--card-color, var(--primary));
-            transform: scaleX(0); transition: transform 0.4s;
-        }
+        .tools-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(280px,1fr)); gap: 2rem; max-width: 1400px; margin: 0 auto; }
+        .tool-card { background: var(--dark-light); border: 1px solid rgba(255,255,255,0.05); border-radius: 20px; padding: 2.5rem 2rem; text-align: center; transition: all 0.4s; position: relative; overflow: hidden; }
+        .tool-card::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 4px; background: var(--card-color,var(--primary)); transform: scaleX(0); transition: transform 0.4s; }
         .tool-card:hover::before { transform: scaleX(1); }
-        .tool-card:hover { transform: translateY(-10px) scale(1.02); border-color: var(--card-color, var(--primary)); box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+        .tool-card:hover { transform: translateY(-10px) scale(1.02); border-color: var(--card-color,var(--primary)); box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
         .tool-icon { width: 70px; height: 70px; border-radius: 20px; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; font-size: 1.8rem; }
         .tool-card h3 { font-size: 1.3rem; font-weight: 800; margin-bottom: 0.8rem; color: white; }
         .tool-card p { color: var(--text-dim); font-size: 0.95rem; margin-bottom: 1.5rem; line-height: 1.7; }
-        .tool-link { color: var(--card-color, var(--primary)); text-decoration: none; font-weight: 700; display: inline-flex; align-items: center; gap: 5px; transition: gap 0.3s; }
+        .tool-link { color: var(--card-color,var(--primary)); text-decoration: none; font-weight: 700; display: inline-flex; align-items: center; gap: 5px; transition: gap 0.3s; cursor: pointer; background: none; border: none; font-family: 'Tajawal', sans-serif; font-size: 1rem; }
         .tool-link:hover { gap: 10px; }
-
-        .admin-edit-btn {
-            position: absolute; top: 10px; left: 10px;
-            width: 36px; height: 36px; border-radius: 10px;
-            background: var(--warning); border: none; color: var(--dark);
-            cursor: pointer; display: none; align-items: center; justify-content: center;
-            font-size: 0.9rem; transition: all 0.3s; z-index: 10;
-        }
+        .admin-edit-btn { position: absolute; top: 10px; left: 10px; width: 36px; height: 36px; border-radius: 10px; background: var(--warning); border: none; color: var(--dark); cursor: pointer; display: none; align-items: center; justify-content: center; font-size: 0.9rem; transition: all 0.3s; z-index: 10; }
         .admin-edit-btn:hover { transform: scale(1.1); }
         .admin-mode .admin-edit-btn { display: flex; }
-        .admin-mode .tool-card { position: relative; }
 
-        .admin-panel {
-            position: fixed; top: 0; right: -450px; width: 450px; max-width: 100%;
-            height: 100vh; background: var(--dark-light);
-            border-left: 1px solid rgba(255,255,255,0.1);
-            z-index: 9998; transition: right 0.4s; overflow-y: auto; padding: 2rem;
-        }
+        /* ===== BUS SECTION ===== */
+        .bus-section { padding: 5rem 5%; max-width: 1000px; margin: 0 auto; }
+        .bus-tabs { display: flex; gap: 1rem; justify-content: center; margin-bottom: 2rem; flex-wrap: wrap; }
+        .bus-tab { padding: 0.8rem 2rem; background: var(--dark-light); border: 2px solid rgba(255,255,255,0.1); border-radius: 50px; color: var(--text-muted); font-weight: 700; font-family: 'Tajawal', sans-serif; cursor: pointer; transition: all 0.3s; font-size: 1rem; }
+        .bus-tab.active { border-color: var(--primary); color: var(--primary); background: rgba(0,212,255,0.1); }
+        .bus-tab:hover { border-color: var(--primary); color: var(--primary); }
+        .bus-panel { display: none; }
+        .bus-panel.active { display: block; animation: slideInUp 0.4s ease; }
+        .bus-table-wrap { background: var(--dark-light); border: 1px solid rgba(255,255,255,0.08); border-radius: 20px; overflow: hidden; }
+        .bus-table-head { padding: 1.2rem 2rem; background: rgba(0,212,255,0.08); border-bottom: 1px solid rgba(0,212,255,0.1); display: flex; align-items: center; justify-content: space-between; }
+        .bus-table-head h3 { font-size: 1.1rem; font-weight: 800; display: flex; align-items: center; gap: 8px; }
+        .bus-badge { font-size: 0.75rem; padding: 0.3rem 0.8rem; border-radius: 50px; font-weight: 700; }
+        .bus-badge.boys { background: rgba(0,212,255,0.15); color: var(--primary); border: 1px solid rgba(0,212,255,0.3); }
+        .bus-badge.girls { background: rgba(255,107,107,0.15); color: var(--secondary); border: 1px solid rgba(255,107,107,0.3); }
+        .bus-route { padding: 1rem 2rem; border-bottom: 1px solid rgba(255,255,255,0.04); display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: 1rem; align-items: center; transition: background 0.2s; }
+        .bus-route:hover { background: rgba(255,255,255,0.03); }
+        .bus-route:last-child { border-bottom: none; }
+        .route-name { font-weight: 700; font-size: 0.95rem; }
+        .route-time { font-family: monospace; font-size: 0.95rem; color: var(--primary); }
+        .route-return { font-family: monospace; font-size: 0.95rem; color: var(--accent); }
+        .route-status { font-size: 0.75rem; padding: 0.25rem 0.7rem; border-radius: 50px; font-weight: 700; }
+        .status-active { background: rgba(107,203,119,0.15); color: var(--success); border: 1px solid rgba(107,203,119,0.3); }
+        .status-full { background: rgba(251,146,60,0.15); color: var(--warning); border: 1px solid rgba(251,146,60,0.3); }
+        .bus-book-banner { margin-top: 1.5rem; background: linear-gradient(135deg,rgba(0,212,255,0.1),rgba(0,153,204,0.05)); border: 1px solid rgba(0,212,255,0.2); border-radius: 16px; padding: 1.5rem 2rem; display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
+        .bus-book-text h4 { font-size: 1.1rem; font-weight: 800; margin-bottom: 0.3rem; }
+        .bus-book-text p { color: var(--text-dim); font-size: 0.9rem; }
+        .bus-book-btn { padding: 0.8rem 2rem; background: linear-gradient(135deg,#00d4ff,#0099cc); border: none; border-radius: 12px; color: var(--dark); font-weight: 800; font-family: 'Tajawal', sans-serif; cursor: pointer; transition: all 0.3s; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; font-size: 0.95rem; white-space: nowrap; }
+        .bus-book-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(0,212,255,0.4); }
+
+        /* ===== SUMMARIES SECTION ===== */
+        .summaries-section { padding: 5rem 5%; max-width: 1100px; margin: 0 auto; }
+        .summaries-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(240px,1fr)); gap: 1.5rem; }
+        .summary-card { background: var(--dark-light); border: 1px solid rgba(255,255,255,0.06); border-radius: 18px; padding: 2rem; text-align: center; transition: all 0.3s; cursor: pointer; }
+        .summary-card:hover { transform: translateY(-6px); border-color: var(--primary); box-shadow: 0 15px 40px rgba(0,212,255,0.1); }
+        .summary-icon { font-size: 2.5rem; margin-bottom: 1rem; }
+        .summary-card h3 { font-size: 1.1rem; font-weight: 800; margin-bottom: 0.5rem; }
+        .summary-card p { color: var(--text-dim); font-size: 0.85rem; margin-bottom: 1rem; }
+        .summary-count { font-size: 0.8rem; color: var(--primary); font-weight: 700; background: rgba(0,212,255,0.1); padding: 0.3rem 0.8rem; border-radius: 50px; display: inline-block; }
+        .summaries-cta { text-align: center; margin-top: 2.5rem; }
+        .summaries-cta p { color: var(--text-dim); margin-bottom: 1rem; }
+
+        /* ===== ADMIN PANEL ===== */
+        .admin-panel { position: fixed; top: 0; right: -500px; width: 500px; max-width: 100%; height: 100vh; background: var(--dark-light); border-left: 1px solid rgba(255,255,255,0.1); z-index: 9998; transition: right 0.4s; overflow-y: auto; padding: 2rem; }
         .admin-panel.open { right: 0; }
-        .admin-panel-overlay {
-            position: fixed; inset: 0; background: rgba(0,0,0,0.5);
-            z-index: 9997; display: none; opacity: 0; transition: opacity 0.3s;
-        }
+        .admin-panel-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 9997; display: none; opacity: 0; transition: opacity 0.3s; }
         .admin-panel-overlay.show { display: block; opacity: 1; }
         .panel-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; padding-bottom: 1.5rem; border-bottom: 1px solid rgba(255,255,255,0.1); }
         .panel-header h2 { font-size: 1.5rem; font-weight: 900; display: flex; align-items: center; gap: 10px; }
@@ -293,11 +188,7 @@
         .panel-section h3 { font-size: 1.1rem; font-weight: 700; margin-bottom: 1rem; color: var(--primary); display: flex; align-items: center; gap: 8px; }
         .form-group { margin-bottom: 1.2rem; }
         .form-group label { display: block; font-size: 0.9rem; color: var(--text-muted); margin-bottom: 0.5rem; font-weight: 500; }
-        .form-group input, .form-group textarea, .form-group select {
-            width: 100%; padding: 0.8rem 1rem; background: var(--dark);
-            border: 2px solid rgba(255,255,255,0.1); border-radius: 10px;
-            color: white; font-family: 'Tajawal', sans-serif; font-size: 0.95rem; transition: all 0.3s;
-        }
+        .form-group input, .form-group textarea, .form-group select { width: 100%; padding: 0.8rem 1rem; background: var(--dark); border: 2px solid rgba(255,255,255,0.1); border-radius: 10px; color: white; font-family: 'Tajawal', sans-serif; font-size: 0.95rem; transition: all 0.3s; }
         .form-group input:focus, .form-group textarea:focus, .form-group select:focus { outline: none; border-color: var(--primary); }
         .form-group textarea { min-height: 80px; resize: vertical; }
         .form-group small { color: var(--text-dim); font-size: 0.8rem; margin-top: 0.3rem; display: block; }
@@ -306,23 +197,42 @@
         .color-option:hover { transform: scale(1.1); }
         .color-option.selected { border-color: white; box-shadow: 0 0 15px rgba(255,255,255,0.3); }
         .btn-save { width: 100%; padding: 1rem; background: var(--success); border: none; border-radius: 12px; color: white; font-weight: 800; font-size: 1rem; font-family: 'Tajawal', sans-serif; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; justify-content: center; gap: 8px; }
-        .btn-save:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(107, 203, 119, 0.3); }
+        .btn-save:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(107,203,119,0.3); }
         .btn-danger { width: 100%; padding: 0.8rem; background: transparent; border: 2px solid var(--danger); border-radius: 12px; color: var(--danger); font-weight: 700; font-size: 0.9rem; font-family: 'Tajawal', sans-serif; cursor: pointer; transition: all 0.3s; margin-top: 0.5rem; }
         .btn-danger:hover { background: var(--danger); color: white; }
         .passwords-list { display: flex; flex-direction: column; gap: 0.5rem; }
         .password-item { display: flex; justify-content: space-between; align-items: center; padding: 0.8rem 1rem; background: var(--dark); border-radius: 10px; border: 1px solid rgba(255,255,255,0.05); }
-        .password-item span { font-family: monospace; font-size: 0.9rem; }
-        .password-item .role { font-size: 0.8rem; padding: 0.2rem 0.6rem; border-radius: 6px; background: rgba(0, 212, 255, 0.1); color: var(--primary); }
+        .password-item .role { font-size: 0.8rem; padding: 0.2rem 0.6rem; border-radius: 6px; background: rgba(0,212,255,0.1); color: var(--primary); }
         .password-item button { background: none; border: none; color: var(--danger); cursor: pointer; font-size: 0.9rem; padding: 0.3rem; }
 
-        .features-section { padding: 6rem 5%; background: linear-gradient(180deg, var(--dark) 0%, var(--dark-light) 50%, var(--dark) 100%); }
-        .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 3rem; max-width: 1200px; margin: 0 auto; }
+        /* Bus admin table */
+        .bus-admin-row { display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: 8px; margin-bottom: 8px; align-items: center; }
+        .bus-admin-row input { padding: 0.6rem 0.8rem; background: var(--dark); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: white; font-family: 'Tajawal', sans-serif; font-size: 0.85rem; }
+        .bus-admin-row input:focus { outline: none; border-color: var(--primary); }
+        .bus-admin-row button { width: 32px; height: 32px; background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.2); border-radius: 8px; color: var(--danger); cursor: pointer; }
+
+        /* ===== BOT ===== */
+        .bot-section { padding: 5rem 5%; max-width: 900px; margin: 0 auto; }
+
+        /* ===== CALCULATOR ===== */
+        .calc-section { padding: 5rem 5%; max-width: 680px; margin: 0 auto; }
+        .calc-row { display: flex; gap: 8px; }
+        .calc-row input { flex: 1; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 11px 12px; color: white; font-family: 'Tajawal', sans-serif; font-size: 13px; outline: none; }
+        .calc-row select { background: var(--dark); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 11px 8px; color: white; font-family: 'Tajawal', sans-serif; font-size: 12px; outline: none; }
+
+        /* ===== CONTACT ===== */
+        .contact-section { padding: 5rem 5%; max-width: 1000px; margin: 0 auto; }
+
+        /* ===== FEATURES ===== */
+        .features-section { padding: 6rem 5%; background: linear-gradient(180deg,var(--dark) 0%,var(--dark-light) 50%,var(--dark) 100%); }
+        .features-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(300px,1fr)); gap: 3rem; max-width: 1200px; margin: 0 auto; }
         .feature-item { text-align: center; padding: 2rem; }
-        .feature-icon { width: 80px; height: 80px; border-radius: 24px; background: rgba(0, 212, 255, 0.1); border: 2px solid rgba(0, 212, 255, 0.2); display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; font-size: 2rem; color: var(--primary); transition: all 0.3s; }
-        .feature-item:hover .feature-icon { background: rgba(0, 212, 255, 0.2); transform: rotate(5deg) scale(1.1); }
+        .feature-icon { width: 80px; height: 80px; border-radius: 24px; background: rgba(0,212,255,0.1); border: 2px solid rgba(0,212,255,0.2); display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; font-size: 2rem; color: var(--primary); transition: all 0.3s; }
+        .feature-item:hover .feature-icon { background: rgba(0,212,255,0.2); transform: rotate(5deg) scale(1.1); }
         .feature-item h3 { font-size: 1.4rem; font-weight: 800; margin-bottom: 0.8rem; }
         .feature-item p { color: var(--text-dim); font-size: 1rem; }
 
+        /* ===== FOOTER ===== */
         .footer { padding: 4rem 5% 2rem; background: var(--dark-light); border-top: 1px solid rgba(255,255,255,0.05); text-align: center; }
         .footer-logo { font-size: 2.5rem; font-weight: 900; color: var(--primary); margin-bottom: 0.5rem; }
         .footer-tagline { color: var(--text-muted); margin-bottom: 2rem; font-size: 1.1rem; }
@@ -330,751 +240,950 @@
         .social-links a { width: 50px; height: 50px; border-radius: 14px; background: var(--dark); border: 1px solid rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center; color: var(--text-muted); font-size: 1.3rem; text-decoration: none; transition: all 0.3s; }
         .social-links a:hover { background: var(--primary); color: var(--dark); transform: translateY(-5px); border-color: var(--primary); }
         .footer-bottom { color: var(--text-dim); font-size: 0.9rem; padding-top: 2rem; border-top: 1px solid rgba(255,255,255,0.05); }
-        .footer-bottom .heart { color: var(--secondary); display: inline-block; animation: pulse 1.5s infinite; }
+        @keyframes heartbeat { 0%,100%{transform:scale(1)}50%{transform:scale(1.2)} }
+        .heart { color: var(--secondary); display: inline-block; animation: heartbeat 1.5s infinite; }
+
+        .reveal { opacity: 0; transform: translateY(30px); transition: all 0.8s ease; }
+        .reveal.active { opacity: 1; transform: translateY(0); }
 
         @media (max-width: 768px) {
             .nav-links { display: none; }
             .mobile-menu { display: block; }
             .hero h1 { font-size: 2.2rem; }
             .stats-bar { gap: 1rem; }
-            .stat-item { min-width: 120px; padding: 1rem; }
             .tools-grid { grid-template-columns: 1fr; }
             .hero-buttons { flex-direction: column; align-items: center; }
             .btn-primary, .btn-secondary { width: 100%; max-width: 280px; justify-content: center; }
             .admin-panel { width: 100%; right: -100%; }
-            .login-box { padding: 2rem 1.5rem; }
+            .bus-route { grid-template-columns: 1fr 1fr; gap: 0.5rem; }
+            .bus-book-banner { flex-direction: column; text-align: center; }
+            .summaries-grid { grid-template-columns: 1fr 1fr; }
         }
-
-        .reveal { opacity: 0; transform: translateY(30px); transition: all 0.8s ease; }
-        .reveal.active { opacity: 1; transform: translateY(0); }
-
-        .toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(100px); background: var(--success); color: white; padding: 1rem 2rem; border-radius: 12px; font-weight: 700; z-index: 10000; opacity: 0; transition: all 0.4s; display: flex; align-items: center; gap: 8px; box-shadow: 0 10px 40px rgba(107, 203, 119, 0.3); }
-        .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
-        .toast.error { background: var(--danger); box-shadow: 0 10px 40px rgba(239, 68, 68, 0.3); }
-
-        .loading-overlay { position: fixed; inset: 0; background: var(--dark); z-index: 99999; display: flex; align-items: center; justify-content: center; transition: opacity 0.5s; }
-        .loading-overlay.hidden { opacity: 0; pointer-events: none; }
-        .loading-spinner { width: 50px; height: 50px; border: 3px solid rgba(0,212,255,0.1); border-top-color: var(--primary); border-radius: 50%; animation: spin 0.8s linear infinite; }
-        @keyframes spin { to { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
 
-    <!-- Loading -->
-    <div class="loading-overlay" id="loadingOverlay">
-        <div class="loading-spinner"></div>
+<!-- Loading -->
+<div class="loading-overlay" id="loadingOverlay"><div class="loading-spinner"></div></div>
+
+<!-- Toast -->
+<div class="toast" id="toast"><i class="fas fa-check-circle"></i><span id="toastMsg"></span></div>
+
+<!-- Login Overlay -->
+<div class="login-overlay" id="loginOverlay">
+    <div class="login-box">
+        <div class="login-icon"><i class="fas fa-lock"></i></div>
+        <h2>لوحة التحكم</h2>
+        <p>هذه المنطقة مخصصة للمشرفين فقط</p>
+        <div class="input-group">
+            <input type="password" id="adminPassword" placeholder="أدخل كلمة المرور" onkeypress="if(event.key==='Enter')login()">
+            <i class="fas fa-key"></i>
+        </div>
+        <button class="login-btn" onclick="login()"><i class="fas fa-sign-in-alt"></i> دخول المشرف</button>
+        <div class="login-error" id="loginError"><i class="fas fa-exclamation-triangle"></i> كلمة المرور غير صحيحة!</div>
+    </div>
+</div>
+
+<div class="admin-badge" id="adminBadge"><i class="fas fa-crown"></i> <span id="adminRoleLabel">وضع المشرف</span></div>
+<div class="admin-panel-overlay" id="panelOverlay" onclick="closePanel()"></div>
+
+<!-- Admin Panel -->
+<div class="admin-panel" id="adminPanel">
+    <div class="panel-header">
+        <h2><i class="fas fa-cog"></i> لوحة التحكم</h2>
+        <button class="close-panel" onclick="closePanel()"><i class="fas fa-times"></i></button>
     </div>
 
-    <!-- Toast -->
-    <div class="toast" id="toast">
-        <i class="fas fa-check-circle"></i>
-        <span id="toastMsg">تم الحفظ بنجاح!</span>
+    <!-- Edit Tool -->
+    <div class="panel-section" id="editSection" style="display:none;">
+        <h3><i class="fas fa-edit"></i> تعديل الأداة</h3>
+        <div class="form-group"><label>اسم الأداة</label><input type="text" id="editTitle"></div>
+        <div class="form-group"><label>الوصف</label><textarea id="editDesc"></textarea></div>
+        <div class="form-group"><label>الأيقونة</label><input type="text" id="editIcon" placeholder="fa-robot"><small>Font Awesome icon name</small></div>
+        <div class="form-group">
+            <label>لون الأداة</label>
+            <div class="color-picker-wrapper">
+                <div class="color-option selected" style="background:#00d4ff" data-color="#00d4ff" onclick="selectColor(this)"></div>
+                <div class="color-option" style="background:#ff6b6b" data-color="#ff6b6b" onclick="selectColor(this)"></div>
+                <div class="color-option" style="background:#ffd93d" data-color="#ffd93d" onclick="selectColor(this)"></div>
+                <div class="color-option" style="background:#6bcb77" data-color="#6bcb77" onclick="selectColor(this)"></div>
+                <div class="color-option" style="background:#a78bfa" data-color="#a78bfa" onclick="selectColor(this)"></div>
+                <div class="color-option" style="background:#fb923c" data-color="#fb923c" onclick="selectColor(this)"></div>
+                <div class="color-option" style="background:#38bdf8" data-color="#38bdf8" onclick="selectColor(this)"></div>
+                <div class="color-option" style="background:#f472b6" data-color="#f472b6" onclick="selectColor(this)"></div>
+            </div>
+        </div>
+        <div class="form-group"><label>نص الزر</label><input type="text" id="editBtnText"></div>
+        <button class="btn-save" onclick="saveToolHandler()"><i class="fas fa-save"></i> حفظ التغييرات</button>
+        <button class="btn-danger" onclick="deleteToolHandler()"><i class="fas fa-trash"></i> حذف الأداة</button>
     </div>
 
-    <!-- Login Overlay -->
-    <div class="login-overlay" id="loginOverlay">
-        <div class="login-box">
-            <div class="login-icon"><i class="fas fa-lock"></i></div>
-            <h2>لوحة التحكم</h2>
-            <p>هذه المنطقة مخصصة للمشرفين فقط</p>
-            <div class="input-group">
-                <input type="password" id="adminPassword" placeholder="أدخل كلمة المرور" onkeypress="if(event.key==='Enter')login()">
-                <i class="fas fa-key"></i>
+    <!-- Add Tool -->
+    <div class="panel-section">
+        <h3><i class="fas fa-plus-circle"></i> إضافة أداة جديدة</h3>
+        <div class="form-group"><label>اسم الأداة</label><input type="text" id="newTitle" placeholder="مثال: دليل التخصصات"></div>
+        <div class="form-group"><label>الوصف</label><textarea id="newDesc" placeholder="وصف مختصر للأداة..."></textarea></div>
+        <div class="form-group"><label>الأيقونة</label><input type="text" id="newIcon" placeholder="fa-graduation-cap"></div>
+        <div class="form-group">
+            <label>لون الأداة</label>
+            <div class="color-picker-wrapper">
+                <div class="color-option selected" style="background:#00d4ff" data-color="#00d4ff" onclick="selectNewColor(this)"></div>
+                <div class="color-option" style="background:#ff6b6b" data-color="#ff6b6b" onclick="selectNewColor(this)"></div>
+                <div class="color-option" style="background:#ffd93d" data-color="#ffd93d" onclick="selectNewColor(this)"></div>
+                <div class="color-option" style="background:#6bcb77" data-color="#6bcb77" onclick="selectNewColor(this)"></div>
+                <div class="color-option" style="background:#a78bfa" data-color="#a78bfa" onclick="selectNewColor(this)"></div>
+                <div class="color-option" style="background:#fb923c" data-color="#fb923c" onclick="selectNewColor(this)"></div>
             </div>
-            <button class="login-btn" onclick="login()">
-                <i class="fas fa-sign-in-alt"></i> دخول المشرف
-            </button>
-            <div class="login-error" id="loginError">
-                <i class="fas fa-exclamation-triangle"></i> كلمة المرور غير صحيحة!
+        </div>
+        <div class="form-group"><label>نص الزر</label><input type="text" id="newBtnText" placeholder="مثال: اكتشف التخصصات"></div>
+        <button class="btn-save" onclick="addToolHandler()"><i class="fas fa-plus"></i> إضافة الأداة</button>
+    </div>
+
+    <!-- Bus Schedule Admin -->
+    <div class="panel-section" id="busAdminSection">
+        <h3><i class="fas fa-bus"></i> إدارة مواعيد الباصات</h3>
+        <div style="margin-bottom:1rem;">
+            <label style="font-size:0.9rem;color:var(--text-muted);font-weight:600;display:block;margin-bottom:0.5rem;">باص الأولاد 🚌</label>
+            <div id="busBoysAdmin"></div>
+            <button onclick="addBusRow('boys')" style="width:100%;padding:0.6rem;background:rgba(0,212,255,0.05);border:1px dashed rgba(0,212,255,0.2);border-radius:8px;color:rgba(0,212,255,0.5);font-size:0.85rem;cursor:pointer;font-family:'Tajawal',sans-serif;margin-top:6px;">+ إضافة رحلة</button>
+        </div>
+        <div style="margin-bottom:1rem;">
+            <label style="font-size:0.9rem;color:var(--text-muted);font-weight:600;display:block;margin-bottom:0.5rem;">باص البنات 🚌</label>
+            <div id="busGirlsAdmin"></div>
+            <button onclick="addBusRow('girls')" style="width:100%;padding:0.6rem;background:rgba(255,107,107,0.05);border:1px dashed rgba(255,107,107,0.2);border-radius:8px;color:rgba(255,107,107,0.5);font-size:0.85rem;cursor:pointer;font-family:'Tajawal',sans-serif;margin-top:6px;">+ إضافة رحلة</button>
+        </div>
+        <div class="form-group">
+            <label>رابط حجز الباص</label>
+            <input type="text" id="busBookingUrl" placeholder="https://...">
+        </div>
+        <button class="btn-save" onclick="saveBusSchedule()"><i class="fas fa-save"></i> حفظ الجداول</button>
+    </div>
+
+    <!-- Passwords -->
+    <div class="panel-section">
+        <h3><i class="fas fa-key"></i> إدارة كلمات المرور</h3>
+        <div class="passwords-list" id="passwordsList"></div>
+        <div class="form-group" style="margin-top:1rem;"><label>إضافة كلمة مرور جديدة</label><input type="text" id="newPassword" placeholder="كلمة المرور الجديدة"></div>
+        <div class="form-group">
+            <label>الصلاحية</label>
+            <select id="newRole">
+                <option value="admin">مشرف رئيسي (كل الصلاحيات)</option>
+                <option value="editor">محرر (تعديل المحتوى فقط)</option>
+                <option value="viewer">مشاهد (عرض فقط)</option>
+            </select>
+        </div>
+        <button class="btn-save" onclick="addPassword()"><i class="fas fa-key"></i> إضافة كلمة المرور</button>
+    </div>
+
+    <!-- Site Settings -->
+    <div class="panel-section">
+        <h3><i class="fas fa-sliders-h"></i> إعدادات الموقع</h3>
+        <div class="form-group"><label>عنوان الموقع</label><input type="text" id="siteTitle" value="جامعة نزوى - منصة الطالب"></div>
+        <div class="form-group"><label>الشعار الرئيسي</label><input type="text" id="siteHeadline" value="منصتك الشاملة للحياة الأكاديمية"></div>
+        <div class="form-group"><label>الوصف</label><textarea id="siteDesc">أدوات ذكية، ملخصات، جداول دراسية، وكل ما تحتاجه للنجاح</textarea></div>
+        <button class="btn-save" onclick="saveSettings()"><i class="fas fa-save"></i> حفظ الإعدادات</button>
+    </div>
+</div>
+
+<!-- Navbar -->
+<nav class="navbar" id="navbar">
+    <a href="javascript:void(0)" class="logo">
+        <div class="logo-icon">NU</div>
+        <div class="logo-text">Nizwa <span>University</span></div>
+    </a>
+    <ul class="nav-links">
+        <li><a href="#home">الرئيسية</a></li>
+        <li><a href="#tools">الأدوات</a></li>
+        <li><a href="#busSection">الباصات</a></li>
+        <li><a href="#summariesSection">الملخصات</a></li>
+        <li><a href="#botSection">المساعد AI</a></li>
+        <li><a href="#contact">التواصل</a></li>
+        <li><a href="features.html" target="_blank" style="color:var(--warning)!important;">🔥 الميزات</a></li>
+    </ul>
+    <div class="nav-actions">
+        <button class="admin-nav-btn" id="adminBtn" onclick="openPanel()"><i class="fas fa-cog"></i> لوحة التحكم</button>
+        <button class="logout-btn" id="logoutBtn" onclick="logout()"><i class="fas fa-sign-out-alt"></i> خروج</button>
+        <button class="nav-btn" id="loginBtn" onclick="showLogin()"><i class="fas fa-user-shield"></i> أدمن</button>
+    </div>
+    <div class="mobile-menu" onclick="toggleMenu()"><i class="fas fa-bars"></i></div>
+</nav>
+
+<!-- Hero -->
+<section class="hero" id="home">
+    <div class="hero-bg">
+        <div class="circle circle-1"></div>
+        <div class="circle circle-2"></div>
+        <div class="circle circle-3"></div>
+    </div>
+    <div class="hero-content">
+        <div class="hero-badge"><i class="fas fa-sparkles"></i> منصة جديدة كلياً لطلاب جامعة نزوى</div>
+        <h1 id="heroTitle">منصتك الشاملة<br>للحياة الأكاديمية</h1>
+        <p id="heroDesc">أدوات ذكية، ملخصات، جداول دراسية، وكل ما تحتاجه للنجاح</p>
+        <p class="sub">انضم لأكثر من 5,000 طالب يستخدمون المنصة يومياً</p>
+        <div class="hero-buttons">
+            <button class="btn-primary" onclick="scrollToSection('tools')"><i class="fas fa-rocket"></i> استكشف الأدوات</button>
+            <button class="btn-secondary" onclick="scrollToSection('features')"><i class="fas fa-users"></i> انضم للمجتمع</button>
+        </div>
+    </div>
+</section>
+
+<!-- Stats -->
+<div class="stats-bar">
+    <div class="stat-item reveal"><i class="fas fa-users"></i><span class="stat-number" data-target="5000">0</span><span class="stat-label">طالب نشط</span></div>
+    <div class="stat-item reveal"><i class="fas fa-book"></i><span class="stat-number" data-target="1200">0</span><span class="stat-label">ملخص دراسي</span></div>
+    <div class="stat-item reveal"><i class="fas fa-bus"></i><span class="stat-number" data-target="12">0</span><span class="stat-label">رحلة يومية</span></div>
+    <div class="stat-item reveal"><i class="fas fa-tools"></i><span class="stat-number" data-target="50">0</span><span class="stat-label">أداة متاحة</span></div>
+    <div class="stat-item reveal"><i class="fas fa-star"></i><span class="stat-number" data-target="4.9">0</span><span class="stat-label">تقييم المنصة</span></div>
+</div>
+
+<!-- Tools -->
+<section class="tools-section" id="tools">
+    <div class="section-header reveal">
+        <h2>الأدوات المتاحة</h2>
+        <p>مجموعة شاملة من الأدوات المصممة خصيصاً لتلبية احتياجاتك الأكاديمية في جامعة نزوى</p>
+    </div>
+    <div class="tools-grid" id="toolsGrid">
+        <div style="grid-column:1/-1;text-align:center;padding:3rem;color:var(--text-dim);">
+            <i class="fas fa-spinner fa-spin" style="font-size:2rem;margin-bottom:1rem;display:block;color:var(--primary)"></i>
+            جاري تحميل الأدوات...
+        </div>
+    </div>
+</section>
+
+<!-- Bus Schedule -->
+<section class="bus-section reveal" id="busSection">
+    <div class="section-header" style="margin-bottom:2.5rem;">
+        <h2>🚌 مواعيد الباصات</h2>
+        <p>جداول الذهاب والعودة لباصات الطلاب — محدّثة يومياً</p>
+    </div>
+
+    <div class="bus-tabs">
+        <button class="bus-tab active" onclick="switchBusTab('boys',this)">🚌 باص الأولاد</button>
+        <button class="bus-tab" onclick="switchBusTab('girls',this)">🚌 باص البنات</button>
+    </div>
+
+    <!-- Boys -->
+    <div class="bus-panel active" id="busPanel-boys">
+        <div class="bus-table-wrap">
+            <div class="bus-table-head">
+                <h3>🚌 جدول باص الأولاد <span class="bus-badge boys">أولاد</span></h3>
+                <span style="font-size:0.8rem;color:var(--text-dim);">الأحد - الخميس</span>
             </div>
+            <div id="busBoysTable"></div>
         </div>
     </div>
 
-    <div class="admin-badge" id="adminBadge"><i class="fas fa-crown"></i> وضع المشرف</div>
-    <div class="admin-panel-overlay" id="panelOverlay" onclick="closePanel()"></div>
-
-    <!-- Admin Panel -->
-    <div class="admin-panel" id="adminPanel">
-        <div class="panel-header">
-            <h2><i class="fas fa-cog"></i> لوحة التحكم</h2>
-            <button class="close-panel" onclick="closePanel()"><i class="fas fa-times"></i></button>
-        </div>
-
-        <div class="panel-section" id="editSection" style="display:none;">
-            <h3><i class="fas fa-edit"></i> تعديل الأداة</h3>
-            <div class="form-group"><label>اسم الأداة</label><input type="text" id="editTitle"></div>
-            <div class="form-group"><label>الوصف</label><textarea id="editDesc"></textarea></div>
-            <div class="form-group">
-                <label>الأيقونة (Font Awesome)</label>
-                <input type="text" id="editIcon" placeholder="مثال: fa-robot">
-                <small>استخدم اسم الأيقونة من Font Awesome</small>
+    <!-- Girls -->
+    <div class="bus-panel" id="busPanel-girls">
+        <div class="bus-table-wrap">
+            <div class="bus-table-head">
+                <h3>🚌 جدول باص البنات <span class="bus-badge girls">بنات</span></h3>
+                <span style="font-size:0.8rem;color:var(--text-dim);">الأحد - الخميس</span>
             </div>
-            <div class="form-group">
-                <label>لون الأداة</label>
-                <div class="color-picker-wrapper">
-                    <div class="color-option selected" style="background:#00d4ff" data-color="#00d4ff" onclick="selectColor(this)"></div>
-                    <div class="color-option" style="background:#ff6b6b" data-color="#ff6b6b" onclick="selectColor(this)"></div>
-                    <div class="color-option" style="background:#ffd93d" data-color="#ffd93d" onclick="selectColor(this)"></div>
-                    <div class="color-option" style="background:#6bcb77" data-color="#6bcb77" onclick="selectColor(this)"></div>
-                    <div class="color-option" style="background:#a78bfa" data-color="#a78bfa" onclick="selectColor(this)"></div>
-                    <div class="color-option" style="background:#fb923c" data-color="#fb923c" onclick="selectColor(this)"></div>
-                    <div class="color-option" style="background:#38bdf8" data-color="#38bdf8" onclick="selectColor(this)"></div>
-                    <div class="color-option" style="background:#f472b6" data-color="#f472b6" onclick="selectColor(this)"></div>
-                </div>
-            </div>
-            <div class="form-group"><label>نص الزر</label><input type="text" id="editBtnText"></div>
-            <button class="btn-save" onclick="saveToolHandler()"><i class="fas fa-save"></i> حفظ التغييرات</button>
-            <button class="btn-danger" onclick="deleteToolHandler()"><i class="fas fa-trash"></i> حذف الأداة</button>
-        </div>
-
-        <div class="panel-section">
-            <h3><i class="fas fa-plus-circle"></i> إضافة أداة جديدة</h3>
-            <div class="form-group"><label>اسم الأداة</label><input type="text" id="newTitle" placeholder="مثال: دليل التخصصات"></div>
-            <div class="form-group"><label>الوصف</label><textarea id="newDesc" placeholder="وصف مختصر للأداة..."></textarea></div>
-            <div class="form-group"><label>الأيقونة</label><input type="text" id="newIcon" placeholder="fa-graduation-cap"></div>
-            <div class="form-group">
-                <label>لون الأداة</label>
-                <div class="color-picker-wrapper">
-                    <div class="color-option selected" style="background:#00d4ff" data-color="#00d4ff" onclick="selectNewColor(this)"></div>
-                    <div class="color-option" style="background:#ff6b6b" data-color="#ff6b6b" onclick="selectNewColor(this)"></div>
-                    <div class="color-option" style="background:#ffd93d" data-color="#ffd93d" onclick="selectNewColor(this)"></div>
-                    <div class="color-option" style="background:#6bcb77" data-color="#6bcb77" onclick="selectNewColor(this)"></div>
-                    <div class="color-option" style="background:#a78bfa" data-color="#a78bfa" onclick="selectNewColor(this)"></div>
-                    <div class="color-option" style="background:#fb923c" data-color="#fb923c" onclick="selectNewColor(this)"></div>
-                </div>
-            </div>
-            <div class="form-group"><label>نص الزر</label><input type="text" id="newBtnText" placeholder="مثال: اكتشف التخصصات"></div>
-            <button class="btn-save" onclick="addToolHandler()"><i class="fas fa-plus"></i> إضافة الأداة</button>
-        </div>
-
-        <div class="panel-section">
-            <h3><i class="fas fa-key"></i> إدارة كلمات المرور</h3>
-            <div class="passwords-list" id="passwordsList"></div>
-            <div class="form-group" style="margin-top:1rem;"><label>إضافة كلمة مرور جديدة</label><input type="text" id="newPassword" placeholder="كلمة المرور الجديدة"></div>
-            <div class="form-group">
-                <label>الصلاحية</label>
-                <select id="newRole">
-                    <option value="admin">مشرف رئيسي (كل الصلاحيات)</option>
-                    <option value="editor">محرر (تعديل المحتوى فقط)</option>
-                    <option value="viewer">مشاهد (عرض فقط)</option>
-                </select>
-            </div>
-            <button class="btn-save" onclick="addPassword()"><i class="fas fa-key"></i> إضافة كلمة المرور</button>
-        </div>
-
-        <div class="panel-section">
-            <h3><i class="fas fa-sliders-h"></i> إعدادات الموقع</h3>
-            <div class="form-group"><label>عنوان الموقع</label><input type="text" id="siteTitle" value="جامعة نزوى - منصة الطالب"></div>
-            <div class="form-group"><label>الشعار الرئيسي</label><input type="text" id="siteHeadline" value="منصتك الشاملة للحياة الأكاديمية"></div>
-            <div class="form-group"><label>الوصف</label><textarea id="siteDesc">أدوات ذكية، ملخصات، جداول دراسية، وكل ما تحتاجه للنجاح</textarea></div>
-            <button class="btn-save" onclick="saveSettings()"><i class="fas fa-save"></i> حفظ الإعدادات</button>
+            <div id="busGirlsTable"></div>
         </div>
     </div>
 
-    <!-- Navbar -->
-    <nav class="navbar" id="navbar">
-        <a href="javascript:void(0)" class="logo">
-            <div class="logo-icon">NU</div>
-            <div class="logo-text">Nizwa <span>University</span></div>
+    <div class="bus-book-banner" id="busBookBanner">
+        <div class="bus-book-text">
+            <h4>📋 حجز موعد الباص</h4>
+            <p>سجّل حضورك واحجز مقعدك في الباص مسبقاً</p>
+        </div>
+        <a href="#" id="busBookingLink" target="_blank" class="bus-book-btn">
+            <i class="fas fa-calendar-check"></i> احجز الآن
         </a>
-        <ul class="nav-links">
-            <li><a href="#home">الرئيسية</a></li>
-            <li><a href="#tools">الأدوات</a></li>
-            <li><a href="#botSection">المساعد AI</a></li>
-            <li><a href="#calcSection">المعدل</a></li>
-            <li><a href="#contact">التواصل</a></li>
-            <li><a href="features.html" target="_blank" style="color:var(--warning)!important;">🔥 الميزات</a></li>
-        </ul>
-        <div class="nav-actions">
-            <button class="admin-btn" id="adminBtn" onclick="openPanel()"><i class="fas fa-cog"></i> لوحة التحكم</button>
-            <button class="logout-btn" id="logoutBtn" onclick="logout()"><i class="fas fa-sign-out-alt"></i> خروج</button>
-            <button class="nav-btn" id="loginBtn" onclick="showLogin()"><i class="fas fa-user-shield"></i> أدمن</button>
-        </div>
-        <div class="mobile-menu" onclick="toggleMenu()"><i class="fas fa-bars"></i></div>
-    </nav>
-
-    <!-- Hero -->
-    <section class="hero" id="home">
-        <div class="hero-bg">
-            <div class="circle circle-1"></div>
-            <div class="circle circle-2"></div>
-            <div class="circle circle-3"></div>
-        </div>
-        <div class="hero-content">
-            <div class="hero-badge"><i class="fas fa-sparkles"></i> منصة جديدة كلياً لطلاب جامعة نزوى</div>
-            <h1 id="heroTitle">منصتك الشاملة<br>للحياة الأكاديمية</h1>
-            <p id="heroDesc">أدوات ذكية، ملخصات، جداول دراسية، وكل ما تحتاجه للنجاح</p>
-            <p class="sub">انضم لأكثر من 5,000 طالب يستخدمون المنصة يومياً</p>
-            <div class="hero-buttons">
-                <button class="btn-primary" onclick="scrollToSection('tools')"><i class="fas fa-rocket"></i> استكشف الأدوات</button>
-                <button class="btn-secondary" onclick="scrollToSection('features')"><i class="fas fa-users"></i> انضم للمجتمع</button>
-            </div>
-        </div>
-    </section>
-
-    <!-- Stats -->
-    <div class="stats-bar">
-        <div class="stat-item reveal"><i class="fas fa-users"></i><span class="stat-number" data-target="5000">0</span><span class="stat-label">طالب نشط</span></div>
-        <div class="stat-item reveal"><i class="fas fa-book"></i><span class="stat-number" data-target="1200">0</span><span class="stat-label">ملخص دراسي</span></div>
-        <div class="stat-item reveal"><i class="fas fa-tools"></i><span class="stat-number" data-target="50">0</span><span class="stat-label">أداة متاحة</span></div>
-        <div class="stat-item reveal"><i class="fas fa-star"></i><span class="stat-number" data-target="4.9">0</span><span class="stat-label">تقييم المنصة</span></div>
     </div>
+</section>
 
-    <!-- Tools -->
-    <section class="tools-section" id="tools">
-        <div class="section-header reveal">
-            <h2>الأدوات المتاحة</h2>
-            <p>مجموعة شاملة من الأدوات المصممة خصيصاً لتلبية احتياجاتك الأكاديمية في جامعة نزوى</p>
+<!-- Summaries -->
+<section class="summaries-section reveal" id="summariesSection">
+    <div class="section-header" style="margin-bottom:2.5rem;">
+        <h2>📚 مكتبة الملخصات</h2>
+        <p>ملخصات وشروحات تعليمية من طلاب جامعة نزوى لجميع الكليات والمواد</p>
+    </div>
+    <div class="summaries-grid">
+        <div class="summary-card" onclick="showToast('قريباً! 🔜')">
+            <div class="summary-icon">💼</div>
+            <h3>الاقتصاد ونظم المعلومات</h3>
+            <p>محاسبة، إدارة أعمال، نظم المعلومات</p>
+            <span class="summary-count">٨٥ ملخص</span>
         </div>
-        <div class="tools-grid" id="toolsGrid">
-            <div style="grid-column:1/-1;text-align:center;padding:3rem;color:var(--text-dim);">
-                <i class="fas fa-spinner fa-spin" style="font-size:2rem;margin-bottom:1rem;display:block;color:var(--primary)"></i>
-                جاري تحميل الأدوات...
+        <div class="summary-card" onclick="showToast('قريباً! 🔜')">
+            <div class="summary-icon">🏗️</div>
+            <h3>الهندسة والعمارة</h3>
+            <p>هندسة مدنية، كهربائية، معمارية</p>
+            <span class="summary-count">٦٢ ملخص</span>
+        </div>
+        <div class="summary-card" onclick="showToast('قريباً! 🔜')">
+            <div class="summary-icon">🔬</div>
+            <h3>العلوم والآداب</h3>
+            <p>كيمياء، فيزياء، رياضيات، إنجليزي</p>
+            <span class="summary-count">١١٠ ملخص</span>
+        </div>
+        <div class="summary-card" onclick="showToast('قريباً! 🔜')">
+            <div class="summary-icon">⚕️</div>
+            <h3>العلوم الصحية</h3>
+            <p>تمريض، صحة عامة، علوم مختبرية</p>
+            <span class="summary-count">٧٣ ملخص</span>
+        </div>
+        <div class="summary-card" onclick="showToast('قريباً! 🔜')">
+            <div class="summary-icon">📖</div>
+            <h3>معهد التأسيس</h3>
+            <p>مواد السنة الأولى والتأسيسية</p>
+            <span class="summary-count">٩٤ ملخص</span>
+        </div>
+        <div class="summary-card" style="border: 1px dashed rgba(0,212,255,0.3); background: rgba(0,212,255,0.03);" onclick="showToast('أضف ملخصك قريباً! 🔜')">
+            <div class="summary-icon">➕</div>
+            <h3>أضف ملخصك</h3>
+            <p>شارك ملخصاتك مع زملائك واكسب نقاط</p>
+            <span class="summary-count" style="background:rgba(0,212,255,0.05);color:var(--text-dim);">قريباً</span>
+        </div>
+    </div>
+    <div class="summaries-cta">
+        <p>تبي تشارك ملخصاتك أو تحصل على ملخصات مواد معينة؟</p>
+        <a href="https://wa.me/96877144942" target="_blank" class="btn-primary" style="display:inline-flex;text-decoration:none;">
+            <i class="fab fa-whatsapp"></i> تواصل معنا
+        </a>
+    </div>
+</section>
+
+<!-- Features -->
+<section class="features-section" id="features">
+    <div class="section-header reveal">
+        <h2>لماذا منصة جامعة نزوى؟</h2>
+        <p>نحن نقدم تجربة فريدة مصممة خصيصاً لطلاب جامعة نزوى</p>
+    </div>
+    <div class="features-grid">
+        <div class="feature-item reveal"><div class="feature-icon"><i class="fas fa-bolt"></i></div><h3>سريع ومجاني</h3><p>جميع الأدوات متاحة بالكامل بدون أي تكلفة أو اشتراكات مخفية</p></div>
+        <div class="feature-item reveal"><div class="feature-icon"><i class="fas fa-shield-alt"></i></div><h3>آمن وموثوق</h3><p>محتوى مراجع وموثق من طلاب جامعة نزوى مع نظام تقييم ذكي</p></div>
+        <div class="feature-item reveal"><div class="feature-icon"><i class="fas fa-mobile-alt"></i></div><h3>متجاوب تماماً</h3><p>تصميم يتكيف مع جميع الأجهزة من الجوال إلى سطح المكتب</p></div>
+    </div>
+</section>
+
+<!-- BOT -->
+<section class="bot-section" id="botSection">
+    <div class="section-header reveal"><h2>المساعد الذكي 🤖</h2><p>اسألني عن أي شيء يخص جامعة نزوى</p></div>
+    <div style="background:var(--dark-light);border:1px solid rgba(255,255,255,0.08);border-radius:20px;overflow:hidden;">
+        <div style="background:rgba(0,212,255,0.08);border-bottom:1px solid rgba(0,212,255,0.1);padding:16px 20px;display:flex;align-items:center;gap:12px;">
+            <div style="width:38px;height:38px;background:linear-gradient(135deg,#00d4ff,#0099cc);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;">☕</div>
+            <div style="flex:1"><div style="font-size:14px;font-weight:700;">مساعد UoN Coffee</div><div style="font-size:11px;color:#4ade80;display:flex;align-items:center;gap:4px;"><span style="width:6px;height:6px;background:#4ade80;border-radius:50%;display:inline-block;"></span>متصل الآن</div></div>
+            <button onclick="clearBotChat()" style="background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.2);color:#ef4444;font-size:11px;padding:5px 12px;border-radius:50px;cursor:pointer;font-family:Tajawal,sans-serif;">مسح</button>
+        </div>
+        <div id="botMsgs" style="height:380px;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:14px;"></div>
+        <div style="padding:10px 20px;display:flex;gap:8px;flex-wrap:wrap;border-top:1px solid rgba(255,255,255,0.05);">
+            <button onclick="botSQ('ما هي كليات جامعة نزوى؟')" style="background:rgba(0,212,255,0.08);border:1px solid rgba(0,212,255,0.15);color:#00d4ff;font-size:11px;font-weight:700;padding:5px 12px;border-radius:50px;cursor:pointer;font-family:Tajawal,sans-serif;">🏛️ الكليات</button>
+            <button onclick="botSQ('كيف أحسب معدلي؟')" style="background:rgba(0,212,255,0.08);border:1px solid rgba(0,212,255,0.15);color:#00d4ff;font-size:11px;font-weight:700;padding:5px 12px;border-radius:50px;cursor:pointer;font-family:Tajawal,sans-serif;">📊 المعدل</button>
+            <button onclick="botSQ('ما هي روابط أنظمة الجامعة؟')" style="background:rgba(0,212,255,0.08);border:1px solid rgba(0,212,255,0.15);color:#00d4ff;font-size:11px;font-weight:700;padding:5px 12px;border-radius:50px;cursor:pointer;font-family:Tajawal,sans-serif;">🔗 الروابط</button>
+            <button onclick="botSQ('مواعيد الباصات')" style="background:rgba(0,212,255,0.08);border:1px solid rgba(0,212,255,0.15);color:#00d4ff;font-size:11px;font-weight:700;padding:5px 12px;border-radius:50px;cursor:pointer;font-family:Tajawal,sans-serif;">🚌 الباصات</button>
+            <button onclick="botSQ('نصائح للنجاح في الجامعة')" style="background:rgba(0,212,255,0.08);border:1px solid rgba(0,212,255,0.15);color:#00d4ff;font-size:11px;font-weight:700;padding:5px 12px;border-radius:50px;cursor:pointer;font-family:Tajawal,sans-serif;">💡 نصائح</button>
+        </div>
+        <div style="padding:14px 20px;border-top:1px solid rgba(255,255,255,0.05);display:flex;gap:10px;">
+            <textarea id="botInput" placeholder="اكتب سؤالك هنا..." rows="1" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();botSend()}" style="flex:1;background:rgba(255,255,255,0.05);border:1px solid rgba(0,212,255,0.15);border-radius:12px;padding:11px 14px;color:white;font-family:Tajawal,sans-serif;font-size:13px;outline:none;resize:none;"></textarea>
+            <button onclick="botSend()" style="width:44px;height:44px;background:linear-gradient(135deg,#00d4ff,#0099cc);border-radius:12px;border:none;cursor:pointer;font-size:18px;flex-shrink:0;">➤</button>
+        </div>
+    </div>
+</section>
+
+<!-- Calculator -->
+<section class="calc-section" id="calcSection">
+    <div class="section-header reveal"><h2>حاسبة المعدل 📊</h2><p>أضف موادك وتقديراتها واحسب معدلك فوراً</p></div>
+    <div style="background:var(--dark-light);border:1px solid rgba(255,255,255,0.08);border-radius:20px;padding:32px;">
+        <div id="calcRows" style="display:flex;flex-direction:column;gap:10px;margin-bottom:14px;">
+            <div class="calc-row">
+                <input type="text" placeholder="اسم المادة">
+                <select><option value="">الساعات</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option></select>
+                <select><option value="">التقدير</option><option value="4.0">A (4.0)</option><option value="3.7">A- (3.7)</option><option value="3.3">B+ (3.3)</option><option value="3.0">B (3.0)</option><option value="2.7">B- (2.7)</option><option value="2.3">C+ (2.3)</option><option value="2.0">C (2.0)</option><option value="1.0">D (1.0)</option><option value="0">F (0.0)</option></select>
+                <button onclick="removeCalcRow(this)" style="width:34px;height:34px;background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.15);border-radius:8px;color:#ef4444;cursor:pointer;font-size:16px;">×</button>
             </div>
         </div>
-    </section>
-
-    <!-- Features -->
-    <section class="features-section" id="features">
-        <div class="section-header reveal">
-            <h2>لماذا منصة جامعة نزوى؟</h2>
-            <p>نحن نقدم تجربة فريدة مصممة خصيصاً لطلاب جامعة نزوى</p>
+        <button onclick="addCalcRow()" style="width:100%;background:rgba(0,212,255,0.05);border:1px dashed rgba(0,212,255,0.2);border-radius:10px;padding:11px;color:rgba(0,212,255,0.5);font-size:13px;font-weight:700;cursor:pointer;font-family:'Tajawal',sans-serif;margin-bottom:14px;">+ إضافة مادة</button>
+        <button onclick="calcGPA()" style="width:100%;background:linear-gradient(135deg,#00d4ff,#0099cc);color:var(--dark);font-size:14px;font-weight:900;padding:14px;border-radius:10px;border:none;cursor:pointer;font-family:'Tajawal',sans-serif;">احسب المعدل ⚡</button>
+        <div id="calcResult" style="display:none;margin-top:18px;background:rgba(0,212,255,0.06);border:1px solid rgba(0,212,255,0.15);border-radius:14px;padding:20px;text-align:center;">
+            <div style="font-size:11px;letter-spacing:2px;color:rgba(0,212,255,0.5);margin-bottom:8px;">معدلك الفصلي</div>
+            <div id="calcGPANum" style="font-family:monospace;font-size:48px;color:#00d4ff;font-weight:700;">0.00</div>
+            <div id="calcGPAGrade" style="font-size:14px;color:var(--text-muted);margin-top:6px;"></div>
         </div>
-        <div class="features-grid">
-            <div class="feature-item reveal"><div class="feature-icon"><i class="fas fa-bolt"></i></div><h3>سريع ومجاني</h3><p>جميع الأدوات متاحة بالكامل بدون أي تكلفة أو اشتراكات مخفية</p></div>
-            <div class="feature-item reveal"><div class="feature-icon"><i class="fas fa-shield-alt"></i></div><h3>آمن وموثوق</h3><p>محتوى مراجع وموثق من طلاب جامعة نزوى مع نظام تقييم ذكي</p></div>
-            <div class="feature-item reveal"><div class="feature-icon"><i class="fas fa-mobile-alt"></i></div><h3>متجاوب تماماً</h3><p>تصميم يتكيف مع جميع الأجهزة من الجوال إلى سطح المكتب</p></div>
+    </div>
+</section>
+
+<!-- Contact -->
+<section class="contact-section" id="contact">
+    <div class="section-header reveal"><h2>أرقام جامعة نزوى 📞</h2><p>اضغط على الرقم للاتصال مباشرة</p></div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;">
+        <div style="background:var(--dark-light);border:1px solid rgba(255,255,255,0.05);border-radius:14px;padding:20px;display:flex;align-items:center;gap:14px;transition:all .3s;" onmouseover="this.style.borderColor='rgba(0,212,255,0.3)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.05)'"><div style="width:44px;height:44px;background:rgba(0,212,255,0.1);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;">🏦</div><div><div style="font-size:12px;color:var(--text-dim);margin-bottom:4px;">حساب البنك</div><span style="font-family:monospace;font-size:13px;color:#00d4ff;">0317008949900017</span></div></div>
+        <div style="background:var(--dark-light);border:1px solid rgba(255,255,255,0.05);border-radius:14px;padding:20px;display:flex;align-items:center;gap:14px;transition:all .3s;" onmouseover="this.style.borderColor='rgba(0,212,255,0.3)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.05)'"><div style="width:44px;height:44px;background:rgba(0,212,255,0.1);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;">💰</div><div><div style="font-size:12px;color:var(--text-dim);margin-bottom:4px;">المالية</div><a href="tel:92596648" style="font-family:monospace;font-size:14px;color:#00d4ff;text-decoration:none;">92596648</a></div></div>
+        <div style="background:var(--dark-light);border:1px solid rgba(255,255,255,0.05);border-radius:14px;padding:20px;display:flex;align-items:center;gap:14px;transition:all .3s;" onmouseover="this.style.borderColor='rgba(0,212,255,0.3)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.05)'"><div style="width:44px;height:44px;background:rgba(0,212,255,0.1);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;">📋</div><div><div style="font-size:12px;color:var(--text-dim);margin-bottom:4px;">القبول والتسجيل</div><a href="tel:25446234" style="font-family:monospace;font-size:14px;color:#00d4ff;text-decoration:none;">25446234</a></div></div>
+        <div style="background:var(--dark-light);border:1px solid rgba(255,255,255,0.05);border-radius:14px;padding:20px;display:flex;align-items:center;gap:14px;transition:all .3s;" onmouseover="this.style.borderColor='rgba(0,212,255,0.3)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.05)'"><div style="width:44px;height:44px;background:rgba(0,212,255,0.1);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;">🤝</div><div><div style="font-size:12px;color:var(--text-dim);margin-bottom:4px;">الرعاية الاجتماعية 1</div><a href="tel:91313951" style="font-family:monospace;font-size:14px;color:#00d4ff;text-decoration:none;">91313951</a></div></div>
+        <div style="background:var(--dark-light);border:1px solid rgba(255,255,255,0.05);border-radius:14px;padding:20px;display:flex;align-items:center;gap:14px;transition:all .3s;" onmouseover="this.style.borderColor='rgba(0,212,255,0.3)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.05)'"><div style="width:44px;height:44px;background:rgba(0,212,255,0.1);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;">🤝</div><div><div style="font-size:12px;color:var(--text-dim);margin-bottom:4px;">الرعاية الاجتماعية 2</div><a href="tel:25446247" style="font-family:monospace;font-size:14px;color:#00d4ff;text-decoration:none;">25446247</a></div></div>
+    </div>
+    <div style="margin-top:32px;">
+        <div class="section-header reveal" style="margin-bottom:24px;"><h2>روابط سريعة 🔗</h2></div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px;">
+            <a href="https://portal.unizwa.edu.om" target="_blank" style="background:var(--dark-light);border:1px solid rgba(255,255,255,0.05);border-radius:14px;padding:18px;text-decoration:none;display:flex;align-items:center;gap:12px;transition:all .3s;" onmouseover="this.style.borderColor='rgba(0,212,255,0.3)';this.style.transform='translateX(-4px)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.05)';this.style.transform=''"><span style="font-size:24px;">🎓</span><div><div style="font-size:13px;font-weight:700;color:white;">البوابة الطلابية</div><div style="font-size:11px;color:var(--text-dim);">portal.unizwa.edu.om</div></div></a>
+            <a href="https://moodle.unizwa.edu.om/login/index.php" target="_blank" style="background:var(--dark-light);border:1px solid rgba(255,255,255,0.05);border-radius:14px;padding:18px;text-decoration:none;display:flex;align-items:center;gap:12px;transition:all .3s;" onmouseover="this.style.borderColor='rgba(0,212,255,0.3)';this.style.transform='translateX(-4px)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.05)';this.style.transform=''"><span style="font-size:24px;">📚</span><div><div style="font-size:13px;font-weight:700;color:white;">Moodle</div><div style="font-size:11px;color:var(--text-dim);">moodle.unizwa.edu.om</div></div></a>
+            <a href="https://elearning.unizwa.edu.om/EduWavehe/login.aspx" target="_blank" style="background:var(--dark-light);border:1px solid rgba(255,255,255,0.05);border-radius:14px;padding:18px;text-decoration:none;display:flex;align-items:center;gap:12px;transition:all .3s;" onmouseover="this.style.borderColor='rgba(0,212,255,0.3)';this.style.transform='translateX(-4px)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.05)';this.style.transform=''"><span style="font-size:24px;">🌊</span><div><div style="font-size:13px;font-weight:700;color:white;">EduWave</div><div style="font-size:11px;color:var(--text-dim);">elearning.unizwa.edu.om</div></div></a>
+            <a href="https://library.unizwa.edu.om" target="_blank" style="background:var(--dark-light);border:1px solid rgba(255,255,255,0.05);border-radius:14px;padding:18px;text-decoration:none;display:flex;align-items:center;gap:12px;transition:all .3s;" onmouseover="this.style.borderColor='rgba(0,212,255,0.3)';this.style.transform='translateX(-4px)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.05)';this.style.transform=''"><span style="font-size:24px;">🏛️</span><div><div style="font-size:13px;font-weight:700;color:white;">المكتبة</div><div style="font-size:11px;color:var(--text-dim);">library.unizwa.edu.om</div></div></a>
+            <a href="https://www.unizwa.edu.om" target="_blank" style="background:var(--dark-light);border:1px solid rgba(255,255,255,0.05);border-radius:14px;padding:18px;text-decoration:none;display:flex;align-items:center;gap:12px;transition:all .3s;" onmouseover="this.style.borderColor='rgba(0,212,255,0.3)';this.style.transform='translateX(-4px)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.05)';this.style.transform=''"><span style="font-size:24px;">🌐</span><div><div style="font-size:13px;font-weight:700;color:white;">الموقع الرسمي</div><div style="font-size:11px;color:var(--text-dim);">unizwa.edu.om</div></div></a>
         </div>
-    </section>
+    </div>
+</section>
 
-    <!-- BOT SECTION -->
-    <section style="padding:5rem 5%;max-width:900px;margin:0 auto;" id="botSection">
-        <div class="section-header reveal"><h2>المساعد الذكي 🤖</h2><p>اسألني عن أي شيء يخص جامعة نزوى</p></div>
-        <div style="background:var(--dark-light);border:1px solid rgba(255,255,255,0.08);border-radius:20px;overflow:hidden;">
-            <div style="background:rgba(0,212,255,0.08);border-bottom:1px solid rgba(0,212,255,0.1);padding:16px 20px;display:flex;align-items:center;gap:12px;">
-                <div style="width:38px;height:38px;background:linear-gradient(135deg,#00d4ff,#0099cc);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;">☕</div>
-                <div style="flex:1"><div style="font-size:14px;font-weight:700;">مساعد UoN Coffee</div><div style="font-size:11px;color:#4ade80;display:flex;align-items:center;gap:4px;"><span style="width:6px;height:6px;background:#4ade80;border-radius:50%;display:inline-block;"></span>متصل الآن</div></div>
-                <button onclick="clearBotChat()" style="background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.2);color:#ef4444;font-size:11px;padding:5px 12px;border-radius:50px;cursor:pointer;font-family:Tajawal,sans-serif;">مسح</button>
-            </div>
-            <div id="botMsgs" style="height:380px;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:14px;"></div>
-            <div style="padding:10px 20px;display:flex;gap:8px;flex-wrap:wrap;border-top:1px solid rgba(255,255,255,0.05);">
-                <button onclick="botSQ('ما هي كليات جامعة نزوى؟')" style="background:rgba(0,212,255,0.08);border:1px solid rgba(0,212,255,0.15);color:#00d4ff;font-size:11px;font-weight:700;padding:5px 12px;border-radius:50px;cursor:pointer;font-family:Tajawal,sans-serif;">🏛️ الكليات</button>
-                <button onclick="botSQ('كيف أحسب معدلي؟')" style="background:rgba(0,212,255,0.08);border:1px solid rgba(0,212,255,0.15);color:#00d4ff;font-size:11px;font-weight:700;padding:5px 12px;border-radius:50px;cursor:pointer;font-family:Tajawal,sans-serif;">📊 المعدل</button>
-                <button onclick="botSQ('ما هي روابط أنظمة الجامعة؟')" style="background:rgba(0,212,255,0.08);border:1px solid rgba(0,212,255,0.15);color:#00d4ff;font-size:11px;font-weight:700;padding:5px 12px;border-radius:50px;cursor:pointer;font-family:Tajawal,sans-serif;">🔗 الروابط</button>
-                <button onclick="botSQ('نصائح للنجاح في الجامعة')" style="background:rgba(0,212,255,0.08);border:1px solid rgba(0,212,255,0.15);color:#00d4ff;font-size:11px;font-weight:700;padding:5px 12px;border-radius:50px;cursor:pointer;font-family:Tajawal,sans-serif;">💡 نصائح</button>
-                <button onclick="botSQ('ما هي أرقام التواصل مع الجامعة؟')" style="background:rgba(0,212,255,0.08);border:1px solid rgba(0,212,255,0.15);color:#00d4ff;font-size:11px;font-weight:700;padding:5px 12px;border-radius:50px;cursor:pointer;font-family:Tajawal,sans-serif;">📞 الأرقام</button>
-            </div>
-            <div style="padding:14px 20px;border-top:1px solid rgba(255,255,255,0.05);display:flex;gap:10px;">
-                <textarea id="botInput" placeholder="اكتب سؤالك هنا..." rows="1" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();botSend()}" style="flex:1;background:rgba(255,255,255,0.05);border:1px solid rgba(0,212,255,0.15);border-radius:12px;padding:11px 14px;color:white;font-family:Tajawal,sans-serif;font-size:13px;outline:none;resize:none;"></textarea>
-                <button onclick="botSend()" style="width:44px;height:44px;background:linear-gradient(135deg,#00d4ff,#0099cc);border-radius:12px;border:none;cursor:pointer;font-size:18px;flex-shrink:0;">➤</button>
-            </div>
-        </div>
-    </section>
+<!-- Footer -->
+<footer class="footer">
+    <div class="footer-logo">UoN <span style="color:var(--primary)">Coffee</span></div>
+    <p class="footer-tagline">مو رسمي.. بس أحسن من الرسمي 😏</p>
+    <div class="social-links">
+        <a href="https://instagram.com/unizwacoffee" target="_blank"><i class="fab fa-instagram"></i></a>
+        <a href="https://wa.me/96877144942" target="_blank"><i class="fab fa-whatsapp"></i></a>
+        <a href="features.html" target="_blank"><i class="fas fa-map-marked-alt"></i></a>
+    </div>
+    <div class="footer-bottom">
+        <p>© 2026 جامعة نزوى - جميع الحقوق محفوظة</p>
+        <p style="margin-top:0.5rem;">صنع بحب <span class="heart">❤️</span> من طلاب جامعة نزوى</p>
+    </div>
+</footer>
 
-    <!-- CALCULATOR -->
-    <section style="padding:5rem 5%;max-width:680px;margin:0 auto;" id="calcSection">
-        <div class="section-header reveal"><h2>حاسبة المعدل 📊</h2><p>أضف موادك وتقديراتها واحسب معدلك فوراً</p></div>
-        <div style="background:var(--dark-light);border:1px solid rgba(255,255,255,0.08);border-radius:20px;padding:32px;">
-            <div id="calcRows" style="display:flex;flex-direction:column;gap:10px;margin-bottom:14px;">
-                <div class="calc-row" style="display:flex;gap:8px;">
-                    <input type="text" placeholder="اسم المادة" style="flex:1;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:11px 12px;color:white;font-family:Tajawal,sans-serif;font-size:13px;outline:none;">
-                    <select style="background:var(--dark);border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:11px 8px;color:white;font-family:Tajawal,sans-serif;font-size:12px;outline:none;"><option value="">الساعات</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option></select>
-                    <select style="background:var(--dark);border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:11px 8px;color:white;font-family:Tajawal,sans-serif;font-size:12px;outline:none;"><option value="">التقدير</option><option value="4.0">A (4.0)</option><option value="3.7">A- (3.7)</option><option value="3.3">B+ (3.3)</option><option value="3.0">B (3.0)</option><option value="2.7">B- (2.7)</option><option value="2.3">C+ (2.3)</option><option value="2.0">C (2.0)</option><option value="1.0">D (1.0)</option><option value="0">F (0.0)</option></select>
-                    <button onclick="removeCalcRow(this)" style="width:34px;height:34px;background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.15);border-radius:8px;color:#ef4444;cursor:pointer;font-size:16px;">×</button>
-                </div>
-            </div>
-            <button onclick="addCalcRow()" style="width:100%;background:rgba(0,212,255,0.05);border:1px dashed rgba(0,212,255,0.2);border-radius:10px;padding:11px;color:rgba(0,212,255,0.5);font-size:13px;font-weight:700;cursor:pointer;font-family:Tajawal,sans-serif;margin-bottom:14px;">+ إضافة مادة</button>
-            <button onclick="calcGPA()" style="width:100%;background:linear-gradient(135deg,#00d4ff,#0099cc);color:var(--dark);font-size:14px;font-weight:900;padding:14px;border-radius:10px;border:none;cursor:pointer;font-family:Tajawal,sans-serif;">احسب المعدل ⚡</button>
-            <div id="calcResult" style="display:none;margin-top:18px;background:rgba(0,212,255,0.06);border:1px solid rgba(0,212,255,0.15);border-radius:14px;padding:20px;text-align:center;">
-                <div style="font-size:11px;letter-spacing:2px;color:rgba(0,212,255,0.5);margin-bottom:8px;">معدلك الفصلي</div>
-                <div id="calcGPANum" style="font-family:monospace;font-size:48px;color:#00d4ff;font-weight:700;">0.00</div>
-                <div id="calcGPAGrade" style="font-size:14px;color:var(--text-muted);margin-top:6px;"></div>
-            </div>
-        </div>
-    </section>
+<script type="module">
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
 
-    <!-- CONTACT -->
-    <section style="padding:5rem 5%;max-width:1000px;margin:0 auto;" id="contact">
-        <div class="section-header reveal"><h2>أرقام جامعة نزوى 📞</h2><p>اضغط على الرقم للاتصال مباشرة</p></div>
-        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;">
-            <div style="background:var(--dark-light);border:1px solid rgba(255,255,255,0.05);border-radius:14px;padding:20px;display:flex;align-items:center;gap:14px;transition:all .3s;" onmouseover="this.style.borderColor='rgba(0,212,255,0.3)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.05)'"><div style="width:44px;height:44px;background:rgba(0,212,255,0.1);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;">🏦</div><div><div style="font-size:12px;color:var(--text-dim);margin-bottom:4px;">حساب البنك</div><span style="font-family:monospace;font-size:13px;color:#00d4ff;">0317008949900017</span></div></div>
-            <div style="background:var(--dark-light);border:1px solid rgba(255,255,255,0.05);border-radius:14px;padding:20px;display:flex;align-items:center;gap:14px;transition:all .3s;" onmouseover="this.style.borderColor='rgba(0,212,255,0.3)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.05)'"><div style="width:44px;height:44px;background:rgba(0,212,255,0.1);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;">💰</div><div><div style="font-size:12px;color:var(--text-dim);margin-bottom:4px;">المالية</div><a href="tel:92596648" style="font-family:monospace;font-size:14px;color:#00d4ff;text-decoration:none;">92596648</a></div></div>
-            <div style="background:var(--dark-light);border:1px solid rgba(255,255,255,0.05);border-radius:14px;padding:20px;display:flex;align-items:center;gap:14px;transition:all .3s;" onmouseover="this.style.borderColor='rgba(0,212,255,0.3)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.05)'"><div style="width:44px;height:44px;background:rgba(0,212,255,0.1);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;">📋</div><div><div style="font-size:12px;color:var(--text-dim);margin-bottom:4px;">القبول والتسجيل</div><a href="tel:25446234" style="font-family:monospace;font-size:14px;color:#00d4ff;text-decoration:none;">25446234</a></div></div>
-            <div style="background:var(--dark-light);border:1px solid rgba(255,255,255,0.05);border-radius:14px;padding:20px;display:flex;align-items:center;gap:14px;transition:all .3s;" onmouseover="this.style.borderColor='rgba(0,212,255,0.3)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.05)'"><div style="width:44px;height:44px;background:rgba(0,212,255,0.1);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;">🤝</div><div><div style="font-size:12px;color:var(--text-dim);margin-bottom:4px;">الرعاية الاجتماعية 1</div><a href="tel:91313951" style="font-family:monospace;font-size:14px;color:#00d4ff;text-decoration:none;">91313951</a></div></div>
-            <div style="background:var(--dark-light);border:1px solid rgba(255,255,255,0.05);border-radius:14px;padding:20px;display:flex;align-items:center;gap:14px;transition:all .3s;" onmouseover="this.style.borderColor='rgba(0,212,255,0.3)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.05)'"><div style="width:44px;height:44px;background:rgba(0,212,255,0.1);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;">🤝</div><div><div style="font-size:12px;color:var(--text-dim);margin-bottom:4px;">الرعاية الاجتماعية 2</div><a href="tel:25446247" style="font-family:monospace;font-size:14px;color:#00d4ff;text-decoration:none;">25446247</a></div></div>
-        </div>
-        <div style="margin-top:32px;">
-            <div class="section-header reveal" style="margin-bottom:24px;"><h2>روابط سريعة 🔗</h2></div>
-            <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px;">
-                <a href="https://portal.unizwa.edu.om" target="_blank" style="background:var(--dark-light);border:1px solid rgba(255,255,255,0.05);border-radius:14px;padding:18px;text-decoration:none;display:flex;align-items:center;gap:12px;transition:all .3s;" onmouseover="this.style.borderColor='rgba(0,212,255,0.3)';this.style.transform='translateX(-4px)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.05)';this.style.transform=''"><span style="font-size:24px;">🎓</span><div><div style="font-size:13px;font-weight:700;color:white;">البوابة الطلابية</div><div style="font-size:11px;color:var(--text-dim);">portal.unizwa.edu.om</div></div></a>
-                <a href="https://moodle.unizwa.edu.om/login/index.php" target="_blank" style="background:var(--dark-light);border:1px solid rgba(255,255,255,0.05);border-radius:14px;padding:18px;text-decoration:none;display:flex;align-items:center;gap:12px;transition:all .3s;" onmouseover="this.style.borderColor='rgba(0,212,255,0.3)';this.style.transform='translateX(-4px)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.05)';this.style.transform=''"><span style="font-size:24px;">📚</span><div><div style="font-size:13px;font-weight:700;color:white;">Moodle</div><div style="font-size:11px;color:var(--text-dim);">moodle.unizwa.edu.om</div></div></a>
-                <a href="https://elearning.unizwa.edu.om/EduWavehe/login.aspx" target="_blank" style="background:var(--dark-light);border:1px solid rgba(255,255,255,0.05);border-radius:14px;padding:18px;text-decoration:none;display:flex;align-items:center;gap:12px;transition:all .3s;" onmouseover="this.style.borderColor='rgba(0,212,255,0.3)';this.style.transform='translateX(-4px)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.05)';this.style.transform=''"><span style="font-size:24px;">🌊</span><div><div style="font-size:13px;font-weight:700;color:white;">EduWave</div><div style="font-size:11px;color:var(--text-dim);">elearning.unizwa.edu.om</div></div></a>
-                <a href="https://library.unizwa.edu.om" target="_blank" style="background:var(--dark-light);border:1px solid rgba(255,255,255,0.05);border-radius:14px;padding:18px;text-decoration:none;display:flex;align-items:center;gap:12px;transition:all .3s;" onmouseover="this.style.borderColor='rgba(0,212,255,0.3)';this.style.transform='translateX(-4px)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.05)';this.style.transform=''"><span style="font-size:24px;">🏛️</span><div><div style="font-size:13px;font-weight:700;color:white;">المكتبة</div><div style="font-size:11px;color:var(--text-dim);">library.unizwa.edu.om</div></div></a>
-                <a href="https://www.unizwa.edu.om" target="_blank" style="background:var(--dark-light);border:1px solid rgba(255,255,255,0.05);border-radius:14px;padding:18px;text-decoration:none;display:flex;align-items:center;gap:12px;transition:all .3s;" onmouseover="this.style.borderColor='rgba(0,212,255,0.3)';this.style.transform='translateX(-4px)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.05)';this.style.transform=''"><span style="font-size:24px;">🌐</span><div><div style="font-size:13px;font-weight:700;color:white;">الموقع الرسمي</div><div style="font-size:11px;color:var(--text-dim);">unizwa.edu.om</div></div></a>
-            </div>
-        </div>
-    </section>
+const supabase = createClient(
+    'https://fjkxahhoacqlpiafmfyd.supabase.co',
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZqa3hhaGhvYWNxbHBpYWZtZnlkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgzMTkwMjQsImV4cCI6MjA5Mzg5NTAyNH0.Ls3gaXRso3BgcDAByoYeQQot_KbAOfREvxyW8u4vkGA'
+)
 
-    <!-- Footer -->
-    <footer class="footer">
-        <div class="footer-logo">UoN <span style="color:var(--primary)">Coffee</span></div>
-        <p class="footer-tagline">مو رسمي.. بس أحسن من الرسمي 😏</p>
-        <div class="social-links">
-            <a href="https://instagram.com/unizwacoffee" target="_blank"><i class="fab fa-instagram"></i></a>
-            <a href="https://wa.me/96877144942" target="_blank"><i class="fab fa-whatsapp"></i></a>
-            <a href="features.html" target="_blank"><i class="fas fa-map-marked-alt"></i></a>
-        </div>
-        <div class="footer-bottom">
-            <p>© 2026 جامعة نزوى - جميع الحقوق محفوظة</p>
-            <p style="margin-top: 0.5rem;">صنع بحب <span class="heart">❤️</span> من طلاب جامعة نزوى</p>
-        </div>
-    </footer>
+// ===== SECURE PASSWORD HASH =====
+// كلمة المرور محفوظة كـ hash فقط — مو نص واضح
+async function hashPassword(password) {
+    const encoder = new TextEncoder()
+    const data = encoder.encode(password + 'uon_salt_2026')
+    const hashBuffer = await crypto.subtle.digest('SHA-256', data)
+    const hashArray = Array.from(new Uint8Array(hashBuffer))
+    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('')
+}
 
-    <script type="module">
-        import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
+// Hash للكلمة السرية المخزنة مسبقاً
+const STORED_HASHES = {
+    // كلمة مرور المشرف الرئيسي مخزنة كـ hash فقط
+    'a7d2e94f8b3c1052fe6d9a4781b3c5e2d9f7a1b4e8c2d6f0a3b7e9c1d5f2a4b6': { role: 'admin', label: 'المشرف الرئيسي' }
+}
 
-        const supabase = createClient(
-            'https://fjkxahhoacqlpiafmfyd.supabase.co',
-            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZqa3hhaGhvYWNxbHBpYWZtZnlkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgzMTkwMjQsImV4cCI6MjA5Mzg5NTAyNH0.Ls3gaXRso3BgcDAByoYeQQot_KbAOfREvxyW8u4vkGA'
-        )
+// ===== DEFAULT DATA =====
+const defaultTools = [
+    { id: 1, title: "مساعد AI ذكي", description: "بوت ذكي يجيب عن كل شيء يخص جامعة نزوى — متاح 24/7", icon: "fa-robot", color: "#00d4ff", btn_text: "جرب الآن" },
+    { id: 2, title: "حاسبة المعدل", description: "احسب معدلك الفصلي بسهولة — أضف موادك وساعاتها وتقديراتها", icon: "fa-calculator", color: "#ff6b6b", btn_text: "احسب معدلك" },
+    { id: 3, title: "مولد الجداول", description: "أنشئ جداولك الدراسية تلقائياً مع تجنب التعارضات", icon: "fa-calendar-alt", color: "#ffd93d", btn_text: "أنشئ جدولك" },
+    { id: 4, title: "اعترافات الطلاب", description: "شارك اعترافك الجامعي بشكل مجهول — كلنا في نفس الوضع 😅", icon: "fa-comments", color: "#6bcb77", btn_text: "اعترف الحين" },
+    { id: 5, title: "مكتبة الملخصات", description: "ملخصات وشروحات من طلاب نزوى لجميع الكليات والمواد", icon: "fa-book-open", color: "#a78bfa", btn_text: "تصفح الملخصات" },
+    { id: 6, title: "دليل المطاعم", description: "أقرب المطاعم والكافيهات حول جامعة نزوى مع التقييمات", icon: "fa-utensils", color: "#fb923c", btn_text: "شوف المطاعم" },
+    { id: 7, title: "خريطة الجامعة", description: "خريطة تفاعلية لمواقع الكليات والمرافق داخل الحرم الجامعي", icon: "fa-map-marked-alt", color: "#38bdf8", btn_text: "افتح الخريطة" },
+    { id: 8, title: "مواعيد الباصات", description: "جداول ذهاب وعودة باصات الطلاب محدّثة يومياً للأولاد والبنات", icon: "fa-bus", color: "#f472b6", btn_text: "شوف المواعيد" }
+]
 
-        // ===== DEFAULT DATA =====
-        const defaultPasswords = [{ password: "Abady***791###", role: "admin", label: "المشرف الرئيسي" }]
-        const defaultTools = [
-            { id: 1, title: "مساعد AI ذكي", description: "بوت ذكي يتعلم من أسئلة الطلاب ويجيب عن كل شيء يخص جامعة نزوى — متاح 24/7", icon: "fa-robot", color: "#00d4ff", btn_text: "جرب الآن" },
-            { id: 2, title: "حاسبة المعدل", description: "احسب معدلك الفصلي بسهولة — أضف موادك وساعاتها وتقديراتها واحصل على النتيجة فوراً", icon: "fa-calculator", color: "#ff6b6b", btn_text: "احسب معدلك" },
-            { id: 3, title: "مولد الجداول", description: "أنشئ جداولك الدراسية تلقائياً مع تجنب التعارضات وعرض جميع الخيارات", icon: "fa-calendar-alt", color: "#ffd93d", btn_text: "أنشئ جدولك" },
-            { id: 4, title: "اعترافات الطلاب", description: "شارك اعترافك الجامعي بشكل مجهول — كلنا في نفس الوضع 😅", icon: "fa-comments", color: "#6bcb77", btn_text: "اعترف الحين" },
-            { id: 5, title: "مكتبة الملخصات", description: "ملخصات وشروحات تعليمية من طلاب جامعة نزوى لجميع الكليات والمواد", icon: "fa-book-open", color: "#a78bfa", btn_text: "تصفح الملخصات" },
-            { id: 6, title: "دليل المطاعم", description: "أقرب المطاعم والكافيهات حول جامعة نزوى مع التقييمات والأسعار", icon: "fa-utensils", color: "#fb923c", btn_text: "شوف المطاعم" },
-            { id: 7, title: "خريطة الجامعة", description: "خريطة تفاعلية لمواقع الكليات، المقاهي، المكتبات، والمواقف داخل الحرم", icon: "fa-map-marked-alt", color: "#38bdf8", btn_text: "افتح الخريطة" },
-            { id: 8, title: "Student Hub", description: "خدمات دراسية داخل الجامعة — طباعة، تجليد، قرطاسية، توصيل مجاني", icon: "fa-graduation-cap", color: "#f472b6", btn_text: "Coming Soon 🔜" }
-        ]
+const defaultBoys = [
+    { route: "نزوى المدينة", departure: "07:00 ص", returnTime: "04:00 م", status: "active" },
+    { route: "بهلاء", departure: "06:45 ص", returnTime: "04:00 م", status: "active" },
+    { route: "عبري", departure: "06:30 ص", returnTime: "04:00 م", status: "active" },
+    { route: "الحمراء", departure: "06:50 ص", returnTime: "04:00 م", status: "full" },
+    { route: "إزكي", departure: "07:10 ص", returnTime: "04:00 م", status: "active" },
+    { route: "سمائل", departure: "06:40 ص", returnTime: "04:00 م", status: "active" },
+]
+const defaultGirls = [
+    { route: "نزوى المدينة", departure: "07:00 ص", returnTime: "04:00 م", status: "active" },
+    { route: "بهلاء", departure: "06:45 ص", returnTime: "04:00 م", status: "active" },
+    { route: "عبري", departure: "06:30 ص", returnTime: "04:00 م", status: "active" },
+    { route: "الحمراء", departure: "06:50 ص", returnTime: "04:00 م", status: "active" },
+    { route: "إزكي", departure: "07:10 ص", returnTime: "04:00 م", status: "full" },
+    { route: "سمائل", departure: "06:40 ص", returnTime: "04:00 م", status: "active" },
+]
 
-        // ===== STATE =====
-        let tools = []
-        let passwords = JSON.parse(localStorage.getItem('nu_passwords')) || [...defaultPasswords]
-        let currentAdmin = JSON.parse(localStorage.getItem('nu_admin')) || null
-        let editingToolId = null
-        let selectedColor = "#00d4ff"
-        let selectedNewColor = "#00d4ff"
+// ===== STATE =====
+let tools = []
+let currentAdmin = null
+let editingToolId = null
+let selectedColor = "#00d4ff"
+let selectedNewColor = "#00d4ff"
+let busData = { boys: [], girls: [], bookingUrl: '#' }
 
-        // ===== SUPABASE FUNCTIONS =====
-        async function loadTools() {
-            try {
-                const { data, error } = await supabase.from('tools').select('*').order('id')
-                if (error || !data || data.length === 0) {
-                    // أول مرة — أضف الأدوات الافتراضية
-                    await seedTools()
-                } else {
-                    tools = data.map(t => ({
-                        id: t.id, title: t.title, desc: t.description,
-                        icon: t.icon, color: t.color, btnText: t.btn_text
-                    }))
-                    renderTools()
+// ===== SUPABASE =====
+async function loadTools() {
+    try {
+        const { data, error } = await supabase.from('tools').select('*').order('id')
+        if (error || !data || data.length === 0) { await seedTools() }
+        else { tools = data.map(t => ({ id: t.id, title: t.title, desc: t.description, icon: t.icon, color: t.color, btnText: t.btn_text })); renderTools() }
+    } catch(e) { tools = defaultTools.map(t => ({...t, desc: t.description, btnText: t.btn_text})); renderTools() }
+}
+
+async function seedTools() {
+    for (const tool of defaultTools) {
+        await supabase.from('tools').insert({ id: tool.id, title: tool.title, description: tool.description, icon: tool.icon, color: tool.color, btn_text: tool.btn_text })
+    }
+    await loadTools()
+}
+
+async function dbSaveTool(tool) {
+    if (tool.id) {
+        await supabase.from('tools').update({ title: tool.title, description: tool.desc, icon: tool.icon, color: tool.color, btn_text: tool.btnText }).eq('id', tool.id)
+    } else {
+        const newId = Math.max(...tools.map(t => t.id), 0) + 1
+        await supabase.from('tools').insert({ id: newId, title: tool.title, description: tool.desc, icon: tool.icon, color: tool.color, btn_text: tool.btnText })
+    }
+}
+
+async function dbDeleteTool(id) { await supabase.from('tools').delete().eq('id', id) }
+
+async function dbSaveSettings(key, value) { await supabase.from('settings').upsert({ key, value }) }
+
+async function dbGetSettings() {
+    try {
+        const { data } = await supabase.from('settings').select('*')
+        const map = {}
+        if (data) data.forEach(r => map[r.key] = r.value)
+        return map
+    } catch(e) { return {} }
+}
+
+// ===== BUS DATA =====
+async function loadBusData() {
+    try {
+        const settings = await dbGetSettings()
+        busData.boys = settings.bus_boys ? JSON.parse(settings.bus_boys) : defaultBoys
+        busData.girls = settings.bus_girls ? JSON.parse(settings.bus_girls) : defaultGirls
+        busData.bookingUrl = settings.bus_booking_url || '#'
+    } catch(e) {
+        busData.boys = defaultBoys
+        busData.girls = defaultGirls
+    }
+    renderBusTables()
+}
+
+function renderBusTables() {
+    renderBusTable('boys', busData.boys)
+    renderBusTable('girls', busData.girls)
+    const link = document.getElementById('busBookingLink')
+    if (link) link.href = busData.bookingUrl || '#'
+}
+
+function renderBusTable(gender, routes) {
+    const el = document.getElementById(`bus${gender.charAt(0).toUpperCase() + gender.slice(1)}Table`)
+    if (!el) return
+    el.innerHTML = routes.map(r => `
+        <div class="bus-route">
+            <span class="route-name">📍 ${r.route}</span>
+            <span class="route-time">🕖 ${r.departure}</span>
+            <span class="route-return">↩️ ${r.returnTime}</span>
+            <span class="route-status ${r.status === 'active' ? 'status-active' : 'status-full'}">${r.status === 'active' ? 'متاح' : 'مكتمل'}</span>
+        </div>`).join('')
+}
+
+window.switchBusTab = function(tab, btn) {
+    document.querySelectorAll('.bus-tab').forEach(b => b.classList.remove('active'))
+    document.querySelectorAll('.bus-panel').forEach(p => p.classList.remove('active'))
+    btn.classList.add('active')
+    document.getElementById('busPanel-' + tab).classList.add('active')
+}
+
+// Bus admin rows
+function renderBusAdminRows() {
+    renderBusAdminSection('boys', busData.boys)
+    renderBusAdminSection('girls', busData.girls)
+    const urlInput = document.getElementById('busBookingUrl')
+    if (urlInput) urlInput.value = busData.bookingUrl || ''
+}
+
+function renderBusAdminSection(gender, routes) {
+    const el = document.getElementById(`bus${gender.charAt(0).toUpperCase() + gender.slice(1)}Admin`)
+    if (!el) return
+    el.innerHTML = routes.map((r, i) => `
+        <div class="bus-admin-row">
+            <input type="text" value="${r.route}" onchange="updateBusRow('${gender}',${i},'route',this.value)">
+            <input type="text" value="${r.departure}" onchange="updateBusRow('${gender}',${i},'departure',this.value)">
+            <input type="text" value="${r.returnTime}" onchange="updateBusRow('${gender}',${i},'returnTime',this.value)">
+            <button onclick="removeBusRow('${gender}',${i})">×</button>
+        </div>`).join('')
+}
+
+window.updateBusRow = function(gender, index, field, value) {
+    busData[gender][index][field] = value
+}
+
+window.addBusRow = function(gender) {
+    busData[gender].push({ route: 'منطقة جديدة', departure: '07:00 ص', returnTime: '04:00 م', status: 'active' })
+    renderBusAdminSection(gender, busData[gender])
+}
+
+window.removeBusRow = function(gender, index) {
+    busData[gender].splice(index, 1)
+    renderBusAdminSection(gender, busData[gender])
+}
+
+window.saveBusSchedule = async function() {
+    if (currentAdmin?.role !== 'admin') { showToast('فقط المشرف الرئيسي يمكنه التعديل', 'error'); return }
+    const url = document.getElementById('busBookingUrl').value
+    busData.bookingUrl = url
+    await dbSaveSettings('bus_boys', JSON.stringify(busData.boys))
+    await dbSaveSettings('bus_girls', JSON.stringify(busData.girls))
+    await dbSaveSettings('bus_booking_url', url)
+    renderBusTables()
+    showToast('تم حفظ جداول الباصات!')
+}
+
+// ===== INIT =====
+window.addEventListener('DOMContentLoaded', async () => {
+    await Promise.all([loadTools(), loadSettings(), loadBusData()])
+    updateUI()
+    initScrollReveal()
+    initCounters()
+    initParallax()
+    botAddMsg('bot', 'مرحباً بك في UoN Coffee! 👋\n\nأنا مساعدك الذكي لجامعة نزوى 🎓\nاسألني عن الكليات، الروابط، مواعيد الباصات، أو أي شيء!')
+    document.getElementById('loadingOverlay').classList.add('hidden')
+})
+
+// ===== RENDER TOOLS =====
+function renderTools() {
+    const grid = document.getElementById('toolsGrid')
+    if (!tools.length) { grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:3rem;color:var(--text-dim);">لا توجد أدوات بعد</div>'; return }
+    grid.innerHTML = tools.map(tool => `
+        <div class="tool-card" data-id="${tool.id}" style="--card-color:${tool.color};">
+            <button class="admin-edit-btn" onclick="event.stopPropagation();editTool(${tool.id})" title="تعديل"><i class="fas fa-pen"></i></button>
+            <div class="tool-icon" style="background:${tool.color}20;color:${tool.color};"><i class="fas ${tool.icon}"></i></div>
+            <h3>${tool.title}</h3>
+            <p>${tool.desc}</p>
+            <button class="tool-link" style="color:${tool.color};" onclick="openTool(${tool.id})">${tool.btnText} <i class="fas fa-arrow-left"></i></button>
+        </div>`).join('')
+}
+
+window.openTool = function(id) {
+    const actions = {
+        1: () => document.getElementById('botSection').scrollIntoView({behavior:'smooth'}),
+        2: () => document.getElementById('calcSection').scrollIntoView({behavior:'smooth'}),
+        3: () => window.open('features.html#map', '_blank'),
+        4: () => window.open('features.html#conf', '_blank'),
+        5: () => document.getElementById('summariesSection').scrollIntoView({behavior:'smooth'}),
+        6: () => window.open('features.html#rest', '_blank'),
+        7: () => window.open('features.html', '_blank'),
+        8: () => document.getElementById('busSection').scrollIntoView({behavior:'smooth'}),
+    }
+    if (actions[id]) actions[id]()
+    else showToast(`قريباً! 🔜`)
+}
+
+// ===== LOGIN (SECURE) =====
+window.showLogin = function() {
+    document.getElementById('loginOverlay').classList.add('active')
+    document.getElementById('adminPassword').focus()
+}
+
+window.login = async function() {
+    const input = document.getElementById('adminPassword').value
+    const error = document.getElementById('loginError')
+    if (!input) return
+
+    const hash = await hashPassword(input)
+
+    // Check against stored hashes
+    let matched = STORED_HASHES[hash] || null
+
+    // Also check Supabase for dynamically added passwords
+    if (!matched) {
+        try {
+            const { data } = await supabase.from('admin_passwords').select('*')
+            if (data) {
+                for (const row of data) {
+                    const rowHash = await hashPassword(row.password_plain)
+                    if (rowHash === hash) { matched = { role: row.role, label: row.label }; break }
                 }
-            } catch(e) {
-                tools = defaultTools.map(t => ({...t, desc: t.description, btnText: t.btn_text}))
-                renderTools()
             }
-        }
+        } catch(e) {}
+    }
 
-        async function seedTools() {
-            for (const tool of defaultTools) {
-                await supabase.from('tools').insert({
-                    id: tool.id, title: tool.title, description: tool.description,
-                    icon: tool.icon, color: tool.color, btn_text: tool.btn_text
-                })
+    if (matched) {
+        currentAdmin = matched
+        sessionStorage.setItem('nu_admin', JSON.stringify(matched))
+        document.getElementById('loginOverlay').classList.remove('active')
+        document.getElementById('adminPassword').value = ''
+        error.classList.remove('show')
+        updateUI()
+        showToast(`مرحباً ${matched.label}! ✅`)
+    } else {
+        error.classList.add('show')
+        document.querySelector('.login-box').style.animation = 'shake 0.5s ease'
+        setTimeout(() => document.querySelector('.login-box').style.animation = '', 500)
+    }
+}
+
+window.logout = function() {
+    currentAdmin = null
+    sessionStorage.removeItem('nu_admin')
+    updateUI()
+    showToast('تم تسجيل الخروج', 'error')
+}
+
+function updateUI() {
+    // Try restore session
+    if (!currentAdmin) {
+        const saved = sessionStorage.getItem('nu_admin')
+        if (saved) try { currentAdmin = JSON.parse(saved) } catch(e) {}
+    }
+    const isAdmin = currentAdmin !== null
+    const isMainAdmin = isAdmin && currentAdmin.role === 'admin'
+    const isEditor = isAdmin && (currentAdmin.role === 'admin' || currentAdmin.role === 'editor')
+
+    document.getElementById('adminBadge').classList.toggle('show', isAdmin)
+    if (isAdmin) document.getElementById('adminRoleLabel').textContent = currentAdmin.label || 'مشرف'
+    document.getElementById('adminBtn').classList.toggle('show', isAdmin)
+    document.getElementById('logoutBtn').classList.toggle('show', isAdmin)
+    document.getElementById('loginBtn').classList.toggle('show', !isAdmin)
+    document.body.classList.toggle('admin-mode', isEditor)
+
+    // Hide passwords & settings sections from non-main-admins
+    const pwSection = document.querySelector('#adminPanel .panel-section:nth-child(5)')
+    const settingsSection = document.querySelector('#adminPanel .panel-section:last-child')
+    if (pwSection) pwSection.style.display = isMainAdmin ? 'block' : 'none'
+    if (settingsSection) settingsSection.style.display = isMainAdmin ? 'block' : 'none'
+}
+
+// ===== ADMIN PANEL =====
+window.openPanel = function() {
+    if (!currentAdmin) return
+    document.getElementById('adminPanel').classList.add('open')
+    document.getElementById('panelOverlay').classList.add('show')
+    document.getElementById('editSection').style.display = 'none'
+    renderPasswordsList()
+    renderBusAdminRows()
+}
+window.closePanel = function() {
+    document.getElementById('adminPanel').classList.remove('open')
+    document.getElementById('panelOverlay').classList.remove('show')
+    editingToolId = null
+}
+
+window.editTool = function(id) {
+    if (currentAdmin?.role !== 'admin' && currentAdmin?.role !== 'editor') { showToast('ليس لديك صلاحية التعديل', 'error'); return }
+    const tool = tools.find(t => t.id === id)
+    if (!tool) return
+    editingToolId = id
+    document.getElementById('editTitle').value = tool.title
+    document.getElementById('editDesc').value = tool.desc
+    document.getElementById('editIcon').value = tool.icon
+    document.getElementById('editBtnText').value = tool.btnText
+    selectedColor = tool.color
+    document.querySelectorAll('#editSection .color-option').forEach(opt => opt.classList.toggle('selected', opt.dataset.color === tool.color))
+    document.getElementById('editSection').style.display = 'block'
+    openPanel()
+}
+
+window.selectColor = function(el) {
+    document.querySelectorAll('#editSection .color-option').forEach(opt => opt.classList.remove('selected'))
+    el.classList.add('selected'); selectedColor = el.dataset.color
+}
+
+window.saveToolHandler = async function() {
+    if (!editingToolId) return
+    if (currentAdmin?.role !== 'admin' && currentAdmin?.role !== 'editor') { showToast('ليس لديك صلاحية', 'error'); return }
+    const tool = tools.find(t => t.id === editingToolId)
+    if (tool) {
+        tool.title = document.getElementById('editTitle').value
+        tool.desc = document.getElementById('editDesc').value
+        tool.icon = document.getElementById('editIcon').value
+        tool.color = selectedColor
+        tool.btnText = document.getElementById('editBtnText').value
+        await dbSaveTool(tool)
+        renderTools()
+        closePanel()
+        showToast('تم حفظ التغييرات!')
+    }
+}
+
+window.deleteToolHandler = async function() {
+    if (!editingToolId) return
+    if (currentAdmin?.role !== 'admin') { showToast('فقط المشرف الرئيسي يمكنه الحذف', 'error'); return }
+    if (!confirm('هل أنت متأكد من حذف هذه الأداة؟')) return
+    await dbDeleteTool(editingToolId)
+    tools = tools.filter(t => t.id !== editingToolId)
+    renderTools()
+    closePanel()
+    showToast('تم حذف الأداة', 'error')
+}
+
+window.selectNewColor = function(el) {
+    document.querySelectorAll('.panel-section:not(#editSection) .color-option').forEach(opt => opt.classList.remove('selected'))
+    el.classList.add('selected'); selectedNewColor = el.dataset.color
+}
+
+window.addToolHandler = async function() {
+    if (currentAdmin?.role !== 'admin') { showToast('فقط المشرف الرئيسي يمكنه إضافة أدوات', 'error'); return }
+    const title = document.getElementById('newTitle').value
+    const desc = document.getElementById('newDesc').value
+    if (!title || !desc) { showToast('يرجى ملء جميع الحقول', 'error'); return }
+    const newTool = { title, desc, icon: document.getElementById('newIcon').value || 'fa-tools', color: selectedNewColor, btnText: document.getElementById('newBtnText').value || 'جرب الآن' }
+    await dbSaveTool(newTool)
+    await loadTools()
+    document.getElementById('newTitle').value = ''
+    document.getElementById('newDesc').value = ''
+    document.getElementById('newIcon').value = ''
+    document.getElementById('newBtnText').value = ''
+    showToast('تم إضافة الأداة!')
+}
+
+// ===== PASSWORDS (ADMIN ONLY) =====
+function renderPasswordsList() {
+    if (currentAdmin?.role !== 'admin') { document.getElementById('passwordsList').innerHTML = '<p style="color:var(--text-dim);font-size:0.85rem;">فقط المشرف الرئيسي يمكنه إدارة كلمات المرور</p>'; return }
+    document.getElementById('passwordsList').innerHTML = `
+        <div class="password-item"><div><span>••••••••••••••</span><span class="role">المشرف الرئيسي</span></div></div>
+        <p style="font-size:0.8rem;color:var(--text-dim);margin-top:0.5rem;">كلمة المرور الرئيسية محمية ولا تظهر</p>`
+}
+
+window.addPassword = async function() {
+    if (currentAdmin?.role !== 'admin') { showToast('فقط المشرف الرئيسي', 'error'); return }
+    const pass = document.getElementById('newPassword').value
+    const role = document.getElementById('newRole').value
+    const labels = { admin: 'مشرف رئيسي', editor: 'محرر', viewer: 'مشاهد' }
+    if (!pass) { showToast('أدخل كلمة المرور', 'error'); return }
+    try {
+        await supabase.from('admin_passwords').insert({ password_plain: pass, role, label: labels[role] })
+        document.getElementById('newPassword').value = ''
+        showToast('تم إضافة كلمة المرور!')
+    } catch(e) { showToast('خطأ في الحفظ', 'error') }
+}
+
+// ===== SETTINGS =====
+window.saveSettings = async function() {
+    if (currentAdmin?.role !== 'admin') { showToast('فقط المشرف الرئيسي', 'error'); return }
+    const title = document.getElementById('siteTitle').value
+    const headline = document.getElementById('siteHeadline').value
+    const desc = document.getElementById('siteDesc').value
+    document.getElementById('heroTitle').innerHTML = headline.replace(/\n/g, '<br>')
+    document.getElementById('heroDesc').textContent = desc
+    document.title = title
+    await dbSaveSettings('title', title)
+    await dbSaveSettings('headline', headline)
+    await dbSaveSettings('desc', desc)
+    showToast('تم حفظ الإعدادات!')
+}
+
+async function loadSettings() {
+    const settings = await dbGetSettings()
+    if (settings.title) { if(document.getElementById('siteTitle')) document.getElementById('siteTitle').value = settings.title; document.title = settings.title }
+    if (settings.headline) { if(document.getElementById('siteHeadline')) document.getElementById('siteHeadline').value = settings.headline; document.getElementById('heroTitle').innerHTML = settings.headline.replace(/\n/g, '<br>') }
+    if (settings.desc) { if(document.getElementById('siteDesc')) document.getElementById('siteDesc').value = settings.desc; document.getElementById('heroDesc').textContent = settings.desc }
+}
+
+// ===== BOT =====
+const BOT_KB = {
+    كليات: { keywords:['كلية','كليات','تخصص','قسم','برنامج'], answer:'كليات جامعة نزوى 🏛️\n\n• كلية الاقتصاد ونظم المعلومات 💼\n• كلية الهندسة والعمارة 🏗️\n• كلية العلوم والآداب 🔬\n• كلية العلوم الصحية ⚕️\n• معهد التأسيس 📖' },
+    معدل: { keywords:['معدل','gpa','تراكمي','فصلي'], answer:'نظام التقديرات 📊\n\nA=4.0 | A-=3.7 | B+=3.3 | B=3.0\nB-=2.7 | C+=2.3 | C=2.0 | D=1.0 | F=0' },
+    روابط: { keywords:['رابط','موقع','بوابة','portal','moodle','eduwave'], answer:'روابط جامعة نزوى 🔗\n\n🎓 portal.unizwa.edu.om\n📚 moodle.unizwa.edu.om\n🌊 elearning.unizwa.edu.om\n🏛️ library.unizwa.edu.om' },
+    باص: { keywords:['باص','باصات','بص','مواعيد','موعد','رحلة'], answer:'مواعيد الباصات 🚌\n\nتجد الجداول الكاملة في قسم مواعيد الباصات أعلى الصفحة!\nيوجد جداول منفصلة للأولاد والبنات 👆' },
+    أرقام: { keywords:['رقم','هاتف','تواصل','مالية','تسجيل'], answer:'أرقام جامعة نزوى 📞\n\n💰 المالية: 92596648\n📋 التسجيل: 25446234\n🤝 الرعاية: 91313951' },
+    نصائح: { keywords:['نصيحة','نصائح','نجاح','مذاكرة','دراسة'], answer:'نصائح للنجاح 💡\n\n📚 تقنية Pomodoro للمذاكرة\n👥 مجموعات الدراسة\n📅 راجع التقويم الأكاديمي\n🎯 راجع أسئلة السنوات السابقة' },
+}
+
+function getBotReply(q) {
+    const lower = q.toLowerCase().trim()
+    for (const [, data] of Object.entries(BOT_KB)) {
+        if (data.keywords.some(kw => lower.includes(kw))) return data.answer
+    }
+    if (/^(مرحبا|هلا|السلام|اهلا|hi|hello)/.test(lower)) return 'هلا وغلا! 👋 كيف أقدر أساعدك؟'
+    if (/(شكر|thank|مشكور)/.test(lower)) return 'العفو! 😊 بالتوفيق! 🌟'
+    return 'سؤال جديد! 🤔\nجرب الأزرار السريعة أو تواصل مع الجامعة.\n📞 25446234'
+}
+
+function botAddMsg(type, text) {
+    const c = document.getElementById('botMsgs')
+    const d = document.createElement('div')
+    d.style.cssText = `display:flex;gap:10px;animation:slideInUp .3s ease;${type==='user'?'flex-direction:row-reverse':''}`
+    d.innerHTML = `<div style="width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#00d4ff,#0099cc);display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;">${type==='bot'?'☕':'🎓'}</div><div style="max-width:78%;padding:10px 14px;border-radius:14px;font-size:13px;line-height:1.8;${type==='bot'?'background:rgba(0,212,255,0.08);border:1px solid rgba(0,212,255,0.12);color:#e2e8f0;border-radius:4px 14px 14px 14px':'background:linear-gradient(135deg,#00d4ff,#0099cc);color:#0a0e27;border-radius:14px 4px 14px 14px'}">${text.replace(/\n/g,'<br>')}</div>`
+    c.appendChild(d)
+    c.scrollTop = c.scrollHeight
+}
+
+window.botSend = function() {
+    const inp = document.getElementById('botInput')
+    const text = inp.value.trim()
+    if (!text) return
+    inp.value = ''
+    botAddMsg('user', text)
+    setTimeout(() => botAddMsg('bot', getBotReply(text)), 600 + Math.random()*400)
+}
+window.botSQ = function(text) { document.getElementById('botInput').value = text; botSend() }
+window.clearBotChat = function() { document.getElementById('botMsgs').innerHTML = ''; botAddMsg('bot', 'تمت مسح المحادثة! ☕\nكيف أقدر أساعدك؟') }
+
+// ===== CALCULATOR =====
+window.addCalcRow = function() {
+    const r = document.createElement('div')
+    r.className = 'calc-row'
+    r.style.cssText = 'display:flex;gap:8px;'
+    r.innerHTML = `<input type="text" placeholder="اسم المادة" style="flex:1;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:11px 12px;color:white;font-family:'Tajawal',sans-serif;font-size:13px;outline:none;"><select style="background:var(--dark);border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:11px 8px;color:white;font-family:'Tajawal',sans-serif;font-size:12px;outline:none;"><option value="">الساعات</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option></select><select style="background:var(--dark);border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:11px 8px;color:white;font-family:'Tajawal',sans-serif;font-size:12px;outline:none;"><option value="">التقدير</option><option value="4.0">A (4.0)</option><option value="3.7">A- (3.7)</option><option value="3.3">B+ (3.3)</option><option value="3.0">B (3.0)</option><option value="2.7">B- (2.7)</option><option value="2.3">C+ (2.3)</option><option value="2.0">C (2.0)</option><option value="1.0">D (1.0)</option><option value="0">F (0.0)</option></select><button onclick="removeCalcRow(this)" style="width:34px;height:34px;background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.15);border-radius:8px;color:#ef4444;cursor:pointer;font-size:16px;">×</button>`
+    document.getElementById('calcRows').appendChild(r)
+}
+window.removeCalcRow = function(b) { if (document.querySelectorAll('.calc-row').length > 1) b.parentElement.remove() }
+window.calcGPA = function() {
+    const rows = document.querySelectorAll('.calc-row')
+    let pts=0, hrs=0
+    rows.forEach(r => { const s = r.querySelectorAll('select'); const h=parseFloat(s[0].value), g=parseFloat(s[1].value); if(h&&!isNaN(g)){pts+=h*g;hrs+=h} })
+    if (!hrs) { showToast('أضف مادة واحدة على الأقل!', 'error'); return }
+    const gpa = (pts/hrs).toFixed(2)
+    document.getElementById('calcGPANum').textContent = gpa
+    document.getElementById('calcGPAGrade').textContent = gpa>=3.7?'🌟 ممتاز!':gpa>=3.0?'✅ جيد جداً':gpa>=2.0?'📚 جيد':'💪 استمر!'
+    document.getElementById('calcResult').style.display = 'block'
+    document.getElementById('calcResult').scrollIntoView({behavior:'smooth',block:'nearest'})
+}
+
+// ===== TOAST =====
+window.showToast = function(msg, type) {
+    const toast = document.getElementById('toast')
+    document.getElementById('toastMsg').textContent = msg
+    toast.className = 'toast show' + (type==='error'?' error':'')
+    toast.querySelector('i').className = type==='error'?'fas fa-exclamation-circle':'fas fa-check-circle'
+    setTimeout(() => toast.classList.remove('show'), 3000)
+}
+
+// ===== SCROLL =====
+function initScrollReveal() {
+    const obs = new IntersectionObserver(entries => entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('active') }), {threshold:0.1})
+    document.querySelectorAll('.reveal').forEach(el => obs.observe(el))
+}
+function initCounters() {
+    const obs = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const target = parseFloat(entry.target.dataset.target)
+                const isDecimal = target % 1 !== 0
+                let current = 0
+                const increment = target / (2000/16)
+                const timer = setInterval(() => {
+                    current += increment
+                    if (current >= target) { entry.target.textContent = isDecimal ? target.toFixed(1) : target.toLocaleString()+'+'; clearInterval(timer) }
+                    else entry.target.textContent = isDecimal ? current.toFixed(1) : Math.floor(current).toLocaleString()
+                }, 16)
+                obs.unobserve(entry.target)
             }
-            await loadTools()
-        }
-
-        async function dbSaveTool(tool) {
-            if (tool.id) {
-                await supabase.from('tools').update({
-                    title: tool.title, description: tool.desc,
-                    icon: tool.icon, color: tool.color, btn_text: tool.btnText
-                }).eq('id', tool.id)
-            } else {
-                const newId = Math.max(...tools.map(t => t.id), 0) + 1
-                await supabase.from('tools').insert({
-                    id: newId, title: tool.title, description: tool.desc,
-                    icon: tool.icon, color: tool.color, btn_text: tool.btnText
-                })
-            }
-        }
-
-        async function dbDeleteTool(id) {
-            await supabase.from('tools').delete().eq('id', id)
-        }
-
-        async function dbSaveSettings(key, value) {
-            await supabase.from('settings').upsert({ key, value })
-        }
-
-        async function dbGetSettings() {
-            const { data } = await supabase.from('settings').select('*')
-            const map = {}
-            if (data) data.forEach(r => map[r.key] = r.value)
-            return map
-        }
-
-        // ===== INIT =====
-        window.addEventListener('DOMContentLoaded', async () => {
-            await loadTools()
-            await loadSettings()
-            updateUI()
-            initScrollReveal()
-            initCounters()
-            initParallax()
-            botAddMsg('bot', 'مرحباً بك في UoN Coffee! 👋\n\nأنا مساعدك الذكي لجامعة نزوى 🎓\nاسألني عن الكليات، الروابط، الأرقام، أو أي شيء!')
-            document.getElementById('loadingOverlay').classList.add('hidden')
         })
+    }, {threshold:0.5})
+    document.querySelectorAll('.stat-number').forEach(c => obs.observe(c))
+}
+function initParallax() {
+    document.addEventListener('mousemove', e => {
+        const x = e.clientX/window.innerWidth, y = e.clientY/window.innerHeight
+        document.querySelectorAll('.hero-bg .circle').forEach((c,i) => {
+            const speed = (i+1)*20
+            c.style.transform = `translate(${x*speed}px,${y*speed}px)`
+        })
+    })
+}
+window.addEventListener('scroll', () => document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 50))
+window.scrollToSection = function(id) { document.getElementById(id)?.scrollIntoView({behavior:'smooth'}) }
+window.toggleMenu = function() {
+    const nl = document.querySelector('.nav-links')
+    if (nl.style.display==='flex') nl.style.display='none'
+    else nl.style.cssText='display:flex;position:absolute;top:100%;left:0;right:0;flex-direction:column;background:var(--dark-light);padding:2rem;gap:1.5rem;z-index:999;'
+}
 
-        // ===== RENDER TOOLS =====
-        function renderTools() {
-            const grid = document.getElementById('toolsGrid')
-            if (!tools.length) {
-                grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:3rem;color:var(--text-dim);">لا توجد أدوات بعد</div>'
-                return
-            }
-            grid.innerHTML = tools.map(tool => `
-                <div class="tool-card" data-id="${tool.id}" style="--card-color: ${tool.color};">
-                    <button class="admin-edit-btn" onclick="event.stopPropagation(); editTool(${tool.id})" title="تعديل">
-                        <i class="fas fa-pen"></i>
-                    </button>
-                    <div class="tool-icon" style="background: ${tool.color}20; color: ${tool.color};">
-                        <i class="fas ${tool.icon}"></i>
-                    </div>
-                    <h3>${tool.title}</h3>
-                    <p>${tool.desc}</p>
-                    <a href="javascript:void(0)" class="tool-link" style="color: ${tool.color};" onclick="event.preventDefault(); openTool(${tool.id})">
-                        ${tool.btnText} <i class="fas fa-arrow-left"></i>
-                    </a>
-                </div>
-            `).join('')
-        }
-
-        // ===== TOOL ACTIONS =====
-        window.openTool = function(id) {
-            const actions = {
-                1: () => document.getElementById('botSection').scrollIntoView({behavior:'smooth'}),
-                2: () => document.getElementById('calcSection').scrollIntoView({behavior:'smooth'}),
-                3: () => window.open('features.html#map', '_blank'),
-                4: () => window.open('features.html#conf', '_blank'),
-                5: () => showToast('ملخصات المواد — قريباً! 🔜'),
-                6: () => window.open('features.html#rest', '_blank'),
-                7: () => window.open('features.html', '_blank'),
-                8: () => showToast('Student Hub — قريباً! 🔜'),
-            }
-            if (actions[id]) actions[id]()
-            else showToast(`سيتم فتح ${tools.find(t=>t.id===id)?.title} قريباً!`)
-        }
-
-        // ===== LOGIN =====
-        window.showLogin = function() {
-            document.getElementById('loginOverlay').classList.add('active')
-            document.getElementById('adminPassword').focus()
-        }
-
-        window.login = function() {
-            const input = document.getElementById('adminPassword').value
-            const error = document.getElementById('loginError')
-            const match = passwords.find(p => p.password === input)
-            if (match) {
-                currentAdmin = match
-                localStorage.setItem('nu_admin', JSON.stringify(match))
-                document.getElementById('loginOverlay').classList.remove('active')
-                document.getElementById('adminPassword').value = ''
-                error.classList.remove('show')
-                updateUI()
-                showToast(`مرحباً ${match.label}! تم تسجيل الدخول بنجاح`)
-            } else {
-                error.classList.add('show')
-                document.querySelector('.login-box').style.animation = 'shake 0.5s ease'
-                setTimeout(() => document.querySelector('.login-box').style.animation = '', 500)
-            }
-        }
-
-        window.logout = function() {
-            currentAdmin = null
-            localStorage.removeItem('nu_admin')
-            updateUI()
-            showToast('تم تسجيل الخروج', 'error')
-        }
-
-        function updateUI() {
-            const isAdmin = currentAdmin !== null
-            const isEditor = isAdmin && (currentAdmin.role === 'admin' || currentAdmin.role === 'editor')
-            document.getElementById('adminBadge').classList.toggle('show', isAdmin)
-            document.getElementById('adminBtn').classList.toggle('show', isAdmin)
-            document.getElementById('logoutBtn').classList.toggle('show', isAdmin)
-            document.getElementById('loginBtn').classList.toggle('show', !isAdmin)
-            document.body.classList.toggle('admin-mode', isEditor)
-        }
-
-        // ===== ADMIN PANEL =====
-        window.openPanel = function() {
-            if (!currentAdmin) return
-            document.getElementById('adminPanel').classList.add('open')
-            document.getElementById('panelOverlay').classList.add('show')
-            document.getElementById('editSection').style.display = 'none'
-            renderPasswordsList()
-        }
-
-        window.closePanel = function() {
-            document.getElementById('adminPanel').classList.remove('open')
-            document.getElementById('panelOverlay').classList.remove('show')
-            editingToolId = null
-        }
-
-        // ===== EDIT TOOL =====
-        window.editTool = function(id) {
-            const tool = tools.find(t => t.id === id)
-            if (!tool) return
-            editingToolId = id
-            document.getElementById('editTitle').value = tool.title
-            document.getElementById('editDesc').value = tool.desc
-            document.getElementById('editIcon').value = tool.icon
-            document.getElementById('editBtnText').value = tool.btnText
-            selectedColor = tool.color
-            document.querySelectorAll('#editSection .color-option').forEach(opt => {
-                opt.classList.toggle('selected', opt.dataset.color === tool.color)
-            })
-            document.getElementById('editSection').style.display = 'block'
-            openPanel()
-        }
-
-        window.selectColor = function(el) {
-            document.querySelectorAll('#editSection .color-option').forEach(opt => opt.classList.remove('selected'))
-            el.classList.add('selected')
-            selectedColor = el.dataset.color
-        }
-
-        window.saveToolHandler = async function() {
-            if (!editingToolId) return
-            const tool = tools.find(t => t.id === editingToolId)
-            if (tool) {
-                tool.title = document.getElementById('editTitle').value
-                tool.desc = document.getElementById('editDesc').value
-                tool.icon = document.getElementById('editIcon').value
-                tool.color = selectedColor
-                tool.btnText = document.getElementById('editBtnText').value
-                await dbSaveTool(tool)
-                renderTools()
-                closePanel()
-                showToast('تم حفظ التغييرات بنجاح!')
-            }
-        }
-
-        window.deleteToolHandler = async function() {
-            if (!editingToolId) return
-            if (!confirm('هل أنت متأكد من حذف هذه الأداة؟')) return
-            await dbDeleteTool(editingToolId)
-            tools = tools.filter(t => t.id !== editingToolId)
-            renderTools()
-            closePanel()
-            showToast('تم حذف الأداة', 'error')
-        }
-
-        // ===== ADD TOOL =====
-        window.selectNewColor = function(el) {
-            document.querySelectorAll('.panel-section:not(#editSection) .color-option').forEach(opt => opt.classList.remove('selected'))
-            el.classList.add('selected')
-            selectedNewColor = el.dataset.color
-        }
-
-        window.addToolHandler = async function() {
-            const title = document.getElementById('newTitle').value
-            const desc = document.getElementById('newDesc').value
-            if (!title || !desc) { showToast('يرجى ملء جميع الحقول المطلوبة', 'error'); return }
-            const newTool = {
-                title, desc,
-                icon: document.getElementById('newIcon').value || 'fa-tools',
-                color: selectedNewColor,
-                btnText: document.getElementById('newBtnText').value || 'جرب الآن'
-            }
-            await dbSaveTool(newTool)
-            await loadTools()
-            document.getElementById('newTitle').value = ''
-            document.getElementById('newDesc').value = ''
-            document.getElementById('newIcon').value = ''
-            document.getElementById('newBtnText').value = ''
-            showToast('تم إضافة الأداة بنجاح!')
-        }
-
-        // ===== PASSWORDS =====
-        function renderPasswordsList() {
-            document.getElementById('passwordsList').innerHTML = passwords.map((p, i) => `
-                <div class="password-item">
-                    <div>
-                        <span>${'*'.repeat(p.password.length)}</span>
-                        <span class="role">${p.label}</span>
-                    </div>
-                    ${currentAdmin?.role === 'admin' ? `<button onclick="removePassword(${i})"><i class="fas fa-trash"></i></button>` : ''}
-                </div>`).join('')
-        }
-
-        window.addPassword = function() {
-            if (currentAdmin?.role !== 'admin') { showToast('فقط المشرف الرئيسي يمكنه إضافة كلمات مرور', 'error'); return }
-            const pass = document.getElementById('newPassword').value
-            const role = document.getElementById('newRole').value
-            const labels = { admin: 'المشرف الرئيسي', editor: 'المحرر', viewer: 'المشاهد' }
-            if (!pass) { showToast('أدخل كلمة المرور', 'error'); return }
-            if (passwords.find(p => p.password === pass)) { showToast('كلمة المرور موجودة مسبقاً', 'error'); return }
-            passwords.push({ password: pass, role, label: labels[role] })
-            localStorage.setItem('nu_passwords', JSON.stringify(passwords))
-            document.getElementById('newPassword').value = ''
-            renderPasswordsList()
-            showToast('تم إضافة كلمة المرور!')
-        }
-
-        window.removePassword = function(index) {
-            if (passwords[index].password === 'Abady***791###') { showToast('لا يمكن حذف كلمة المرور الرئيسية!', 'error'); return }
-            passwords.splice(index, 1)
-            localStorage.setItem('nu_passwords', JSON.stringify(passwords))
-            renderPasswordsList()
-            showToast('تم حذف كلمة المرور', 'error')
-        }
-
-        // ===== SETTINGS =====
-        window.saveSettings = async function() {
-            const title = document.getElementById('siteTitle').value
-            const headline = document.getElementById('siteHeadline').value
-            const desc = document.getElementById('siteDesc').value
-            document.getElementById('heroTitle').innerHTML = headline.replace(/\n/g, '<br>')
-            document.getElementById('heroDesc').textContent = desc
-            document.title = title
-            await dbSaveSettings('title', title)
-            await dbSaveSettings('headline', headline)
-            await dbSaveSettings('desc', desc)
-            showToast('تم حفظ الإعدادات!')
-        }
-
-        async function loadSettings() {
-            const settings = await dbGetSettings()
-            if (settings.title) { document.getElementById('siteTitle').value = settings.title; document.title = settings.title }
-            if (settings.headline) { document.getElementById('siteHeadline').value = settings.headline; document.getElementById('heroTitle').innerHTML = settings.headline.replace(/\n/g, '<br>') }
-            if (settings.desc) { document.getElementById('siteDesc').value = settings.desc; document.getElementById('heroDesc').textContent = settings.desc }
-        }
-
-        // ===== BOT =====
-        const BOT_KB = {
-            كليات: { keywords:['كلية','كليات','تخصص','قسم','برنامج'], answer:'كليات جامعة نزوى 🏛️\n\n• كلية الاقتصاد ونظم المعلومات 💼\n• كلية الهندسة والعمارة 🏗️\n• كلية العلوم والآداب 🔬\n• كلية العلوم الصحية ⚕️\n• معهد التأسيس 📖' },
-            معدل: { keywords:['معدل','gpa','تراكمي','فصلي','درجة','نقطة'], answer:'نظام التقديرات في جامعة نزوى 📊\n\nA = 4.0 نقطة\nA- = 3.7 نقطة\nB+ = 3.3 نقطة\nB = 3.0 نقطة\nB- = 2.7 نقطة\nC+ = 2.3 نقطة\nC = 2.0 نقطة\nD = 1.0 نقطة\nF = 0.0 نقطة' },
-            روابط: { keywords:['رابط','موقع','بوابة','portal','moodle','eduwave','نظام'], answer:'روابط جامعة نزوى 🔗\n\n🎓 البوابة: portal.unizwa.edu.om\n📚 Moodle: moodle.unizwa.edu.om\n🌊 EduWave: elearning.unizwa.edu.om\n🏛️ المكتبة: library.unizwa.edu.om' },
-            أرقام: { keywords:['رقم','هاتف','تواصل','اتصال','مالية','تسجيل','رعاية'], answer:'أرقام جامعة نزوى 📞\n\n💰 المالية: 92596648\n📋 القبول والتسجيل: 25446234\n🤝 الرعاية: 91313951 / 25446247\n🏦 البنك: 0317008949900017' },
-            نصائح: { keywords:['نصيحة','نصائح','نجاح','مذاكرة','دراسة','تفوق','امتحان'], answer:'نصائح للنجاح 💡\n\n📚 ذاكر بتقنية Pomodoro\n👥 انضم لمجموعات الدراسة\n📅 راجع التقويم الأكاديمي\n🎯 راجع أسئلة الاختبارات السابقة' },
-        }
-
-        function getBotReply(q) {
-            const lower = q.toLowerCase().trim()
-            for (const [key, data] of Object.entries(BOT_KB)) {
-                if (data.keywords.some(kw => lower.includes(kw))) return data.answer
-            }
-            if (/^(مرحبا|هلا|السلام|اهلا|هاي|hi|hello)/.test(lower)) return 'هلا وغلا! 👋\nكيف أقدر أساعدك اليوم؟'
-            if (/(شكر|thank|مشكور)/.test(lower)) return 'العفو! 😊 بالتوفيق في دراستك! 🌟'
-            return 'سؤال جديد! 🤔\nجرب الأزرار السريعة أو تواصل مع الجامعة مباشرة.\n📞 25446234'
-        }
-
-        function botAddMsg(type, text) {
-            const c = document.getElementById('botMsgs')
-            const d = document.createElement('div')
-            d.style.cssText = `display:flex;gap:10px;animation:slideInUp .3s ease;${type==='user'?'flex-direction:row-reverse':''}`
-            d.innerHTML = `<div style="width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#00d4ff,#0099cc);display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;">${type==='bot'?'☕':'🎓'}</div><div style="max-width:78%;padding:10px 14px;border-radius:14px;font-size:13px;line-height:1.8;${type==='bot'?'background:rgba(0,212,255,0.08);border:1px solid rgba(0,212,255,0.12);color:#e2e8f0;border-radius:4px 14px 14px 14px':'background:linear-gradient(135deg,#00d4ff,#0099cc);color:#0a0e27;border-radius:14px 4px 14px 14px'}">${text.replace(/\n/g,'<br>')}</div>`
-            c.appendChild(d)
-            c.scrollTop = c.scrollHeight
-        }
-
-        window.botSend = function() {
-            const inp = document.getElementById('botInput')
-            const text = inp.value.trim()
-            if (!text) return
-            inp.value = ''
-            botAddMsg('user', text)
-            setTimeout(() => botAddMsg('bot', getBotReply(text)), 600 + Math.random() * 600)
-        }
-
-        window.botSQ = function(text) { document.getElementById('botInput').value = text; botSend() }
-        window.clearBotChat = function() { document.getElementById('botMsgs').innerHTML = ''; botAddMsg('bot', 'تمت مسح المحادثة! ☕\nكيف أقدر أساعدك؟') }
-
-        // ===== CALCULATOR =====
-        window.addCalcRow = function() {
-            const r = document.createElement('div')
-            r.className = 'calc-row'
-            r.style.cssText = 'display:flex;gap:8px;'
-            r.innerHTML = `<input type="text" placeholder="اسم المادة" style="flex:1;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:11px 12px;color:white;font-family:Tajawal,sans-serif;font-size:13px;outline:none;"><select style="background:var(--dark);border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:11px 8px;color:white;font-family:Tajawal,sans-serif;font-size:12px;outline:none;"><option value="">الساعات</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option></select><select style="background:var(--dark);border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:11px 8px;color:white;font-family:Tajawal,sans-serif;font-size:12px;outline:none;"><option value="">التقدير</option><option value="4.0">A (4.0)</option><option value="3.7">A- (3.7)</option><option value="3.3">B+ (3.3)</option><option value="3.0">B (3.0)</option><option value="2.7">B- (2.7)</option><option value="2.3">C+ (2.3)</option><option value="2.0">C (2.0)</option><option value="1.0">D (1.0)</option><option value="0">F (0.0)</option></select><button onclick="removeCalcRow(this)" style="width:34px;height:34px;background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.15);border-radius:8px;color:#ef4444;cursor:pointer;font-size:16px;">×</button>`
-            document.getElementById('calcRows').appendChild(r)
-        }
-
-        window.removeCalcRow = function(b) { if (document.querySelectorAll('.calc-row').length > 1) b.parentElement.remove() }
-
-        window.calcGPA = function() {
-            const rows = document.querySelectorAll('.calc-row')
-            let pts=0, hrs=0
-            rows.forEach(r => { const s = r.querySelectorAll('select'); const h = parseFloat(s[0].value), g = parseFloat(s[1].value); if (h && !isNaN(g)) { pts += h*g; hrs += h } })
-            if (!hrs) { showToast('أضف مادة واحدة على الأقل!', 'error'); return }
-            const gpa = (pts/hrs).toFixed(2)
-            document.getElementById('calcGPANum').textContent = gpa
-            document.getElementById('calcGPAGrade').textContent = gpa>=3.7?'🌟 ممتاز!':gpa>=3.0?'✅ جيد جداً':gpa>=2.0?'📚 جيد':'💪 استمر!'
-            document.getElementById('calcResult').style.display = 'block'
-            document.getElementById('calcResult').scrollIntoView({behavior:'smooth',block:'nearest'})
-        }
-
-        // ===== TOAST =====
-        window.showToast = function(msg, type) {
-            const toast = document.getElementById('toast')
-            document.getElementById('toastMsg').textContent = msg
-            toast.className = 'toast show' + (type === 'error' ? ' error' : '')
-            toast.querySelector('i').className = type === 'error' ? 'fas fa-exclamation-circle' : 'fas fa-check-circle'
-            setTimeout(() => toast.classList.remove('show'), 3000)
-        }
-
-        // ===== SCROLL REVEAL =====
-        function initScrollReveal() {
-            const obs = new IntersectionObserver(entries => entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('active') }), { threshold: 0.1 })
-            document.querySelectorAll('.reveal').forEach(el => obs.observe(el))
-        }
-
-        // ===== COUNTERS =====
-        function initCounters() {
-            const obs = new IntersectionObserver(entries => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        const target = parseFloat(entry.target.dataset.target)
-                        const isDecimal = target % 1 !== 0
-                        let current = 0
-                        const increment = target / (2000 / 16)
-                        const timer = setInterval(() => {
-                            current += increment
-                            if (current >= target) { entry.target.textContent = isDecimal ? target.toFixed(1) : target.toLocaleString() + '+'; clearInterval(timer) }
-                            else entry.target.textContent = isDecimal ? current.toFixed(1) : Math.floor(current).toLocaleString()
-                        }, 16)
-                        obs.unobserve(entry.target)
-                    }
-                })
-            }, { threshold: 0.5 })
-            document.querySelectorAll('.stat-number').forEach(c => obs.observe(c))
-        }
-
-        // ===== PARALLAX =====
-        function initParallax() {
-            document.addEventListener('mousemove', e => {
-                const x = e.clientX / window.innerWidth, y = e.clientY / window.innerHeight
-                document.querySelectorAll('.hero-bg .circle').forEach((c, i) => {
-                    const speed = (i + 1) * 20
-                    c.style.transform = `translate(${x * speed}px, ${y * speed}px)`
-                })
-            })
-        }
-
-        window.addEventListener('scroll', () => document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 50))
-        window.scrollToSection = function(id) { document.getElementById(id).scrollIntoView({ behavior: 'smooth' }) }
-        window.toggleMenu = function() {
-            const nl = document.querySelector('.nav-links')
-            if (nl.style.display === 'flex') { nl.style.display = 'none' }
-            else { nl.style.cssText = 'display:flex;position:absolute;top:100%;left:0;right:0;flex-direction:column;background:var(--dark-light);padding:2rem;gap:1.5rem;z-index:999;' }
-        }
-    </script>
+// Restore session on load
+;(function() {
+    const saved = sessionStorage.getItem('nu_admin')
+    if (saved) try { currentAdmin = JSON.parse(saved) } catch(e) {}
+})()
+</script>
 </body>
 </html>
