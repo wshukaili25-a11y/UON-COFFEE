@@ -378,6 +378,12 @@
             <label for="newIsEnabled" style="margin:0;cursor:pointer;"><b>الأداة مفعّلة</b> <span style="font-size:0.8rem;color:var(--text-dim);font-weight:400;">— أزل العلامة لتظهر "قريباً"</span></label>
         </div>
         <button class="btn-save" onclick="addToolHandler()"><i class="fas fa-plus"></i> إضافة الأداة</button>
+        <div style="margin-top:1rem;padding-top:1rem;border-top:1px solid rgba(255,255,255,0.06);">
+            <button onclick="resetToolsToDefault()" style="width:100%;padding:0.8rem;background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2);border-radius:12px;color:var(--danger);font-weight:700;font-family:'Tajawal',sans-serif;cursor:pointer;font-size:0.9rem;">
+                <i class="fas fa-redo"></i> إعادة ضبط الأدوات للافتراضي
+            </button>
+            <p style="font-size:0.75rem;color:var(--text-dim);text-align:center;margin-top:0.5rem;">يحذف الأدوات الإضافية ويعيد الأصلية بروابطها الصحيحة</p>
+        </div>
     </div>
 
     <!-- Bus Schedule Admin -->
@@ -630,14 +636,14 @@ async function checkPassword(password) {
 
 // ===== DEFAULT DATA =====
 const defaultTools = [
-    { id: 1, title: "مساعد AI ذكي", description: "بوت ذكي يجيب عن كل شيء يخص جامعة نزوى — متاح 24/7", icon: "fa-robot", color: "#00d4ff", btn_text: "جرب الآن" },
-    { id: 2, title: "حاسبة المعدل", description: "احسب معدلك الفصلي بسهولة — أضف موادك وساعاتها وتقديراتها", icon: "fa-calculator", color: "#ff6b6b", btn_text: "احسب معدلك" },
-    { id: 3, title: "مولد الجداول", description: "أنشئ جداولك الدراسية تلقائياً مع تجنب التعارضات", icon: "fa-calendar-alt", color: "#ffd93d", btn_text: "أنشئ جدولك" },
-    { id: 4, title: "اعترافات الطلاب", description: "شارك اعترافك الجامعي بشكل مجهول — كلنا في نفس الوضع 😅", icon: "fa-comments", color: "#6bcb77", btn_text: "اعترف الحين" },
-    { id: 5, title: "مكتبة الملخصات", description: "ملخصات وشروحات من طلاب نزوى لجميع الكليات والمواد", icon: "fa-book-open", color: "#a78bfa", btn_text: "تصفح الملخصات" },
-    { id: 6, title: "دليل المطاعم", description: "أقرب المطاعم والكافيهات حول جامعة نزوى مع التقييمات", icon: "fa-utensils", color: "#fb923c", btn_text: "شوف المطاعم" },
-    { id: 7, title: "خريطة الجامعة", description: "خريطة تفاعلية لمواقع الكليات والمرافق داخل الحرم الجامعي", icon: "fa-map-marked-alt", color: "#38bdf8", btn_text: "افتح الخريطة" },
-    { id: 8, title: "مواعيد الباصات", description: "جداول ذهاب وعودة باصات الطلاب محدّثة يومياً للأولاد والبنات", icon: "fa-bus", color: "#f472b6", btn_text: "شوف المواعيد" }
+    { id: 1, title: "مساعد AI ذكي", description: "بوت ذكي يجيب عن كل شيء يخص جامعة نزوى — متاح 24/7", icon: "fa-robot", color: "#00d4ff", btn_text: "جرب الآن", link_url: "", is_enabled: true },
+    { id: 2, title: "حاسبة المعدل", description: "احسب معدلك الفصلي بسهولة — أضف موادك وساعاتها وتقديراتها", icon: "fa-calculator", color: "#ff6b6b", btn_text: "احسب معدلك", link_url: "", is_enabled: true },
+    { id: 3, title: "مولد الجداول", description: "أنشئ جداولك الدراسية تلقائياً مع تجنب التعارضات", icon: "fa-calendar-alt", color: "#ffd93d", btn_text: "أنشئ جدولك", link_url: "features.html", is_enabled: true },
+    { id: 4, title: "اعترافات الطلاب", description: "شارك اعترافك الجامعي بشكل مجهول — كلنا في نفس الوضع 😅", icon: "fa-comments", color: "#6bcb77", btn_text: "اعترف الحين", link_url: "features.html#conf", is_enabled: true },
+    { id: 5, title: "مكتبة الملخصات", description: "ملخصات وشروحات من طلاب نزوى لجميع الكليات والمواد", icon: "fa-book-open", color: "#a78bfa", btn_text: "تصفح الملخصات", link_url: "summaries.html", is_enabled: true },
+    { id: 6, title: "دليل المطاعم", description: "أقرب المطاعم والكافيهات حول جامعة نزوى مع التقييمات", icon: "fa-utensils", color: "#fb923c", btn_text: "شوف المطاعم", link_url: "features.html#rest", is_enabled: true },
+    { id: 7, title: "خريطة الجامعة", description: "خريطة تفاعلية لمواقع الكليات والمرافق داخل الحرم الجامعي", icon: "fa-map-marked-alt", color: "#38bdf8", btn_text: "افتح الخريطة", link_url: "tools.html", is_enabled: true },
+    { id: 8, title: "مواعيد الباصات", description: "جداول ذهاب وعودة باصات الطلاب محدّثة يومياً للأولاد والبنات", icon: "fa-bus", color: "#f472b6", btn_text: "شوف المواعيد", link_url: "bus.html", is_enabled: true }
 ]
 
 const defaultBoys = [
@@ -670,15 +676,50 @@ async function loadTools() {
     try {
         const { data, error } = await supabase.from('tools').select('*').order('id')
         if (error || !data || data.length === 0) { await seedTools() }
-        else { tools = data.map(t => ({ id: t.id, title: t.title, desc: t.description, icon: t.icon, color: t.color, btnText: t.btn_text, linkUrl: t.link_url || '', isEnabled: t.is_enabled !== false })); renderTools() }
-    } catch(e) { tools = defaultTools.map(t => ({...t, desc: t.description, btnText: t.btn_text})); renderTools() }
+        else {
+            tools = data.map(t => ({
+                id: t.id,
+                title: t.title,
+                desc: t.description,
+                icon: t.icon,
+                color: t.color,
+                btnText: t.btn_text,
+                linkUrl: t.link_url || '',
+                isEnabled: t.is_enabled === null ? true : t.is_enabled !== false
+            }))
+            renderTools()
+        }
+    } catch(e) {
+        tools = defaultTools.map(t => ({ id: t.id, title: t.title, desc: t.description, icon: t.icon, color: t.color, btnText: t.btn_text, linkUrl: t.link_url || '', isEnabled: true }))
+        renderTools()
+    }
 }
 
 async function seedTools() {
     for (const tool of defaultTools) {
-        await supabase.from('tools').insert({ id: tool.id, title: tool.title, description: tool.description, icon: tool.icon, color: tool.color, btn_text: tool.btn_text })
+        await supabase.from('tools').upsert({
+            id: tool.id, title: tool.title, description: tool.description,
+            icon: tool.icon, color: tool.color, btn_text: tool.btn_text,
+            link_url: tool.link_url, is_enabled: tool.is_enabled
+        })
+    }
+    // Delete any tools not in defaultTools (e.g. Student Hub)
+    const defaultIds = defaultTools.map(t => t.id)
+    const { data: allTools } = await supabase.from('tools').select('id')
+    if (allTools) {
+        for (const t of allTools) {
+            if (!defaultIds.includes(t.id)) await supabase.from('tools').delete().eq('id', t.id)
+        }
     }
     await loadTools()
+}
+
+// Admin: reset all tools to default (removes Student Hub etc.)
+window.resetToolsToDefault = async function() {
+    if (currentAdmin?.role !== 'admin') return
+    if (!confirm('هذا سيعيد ضبط جميع الأدوات للإعدادات الافتراضية. متأكد؟')) return
+    await seedTools()
+    showToast('تم إعادة ضبط الأدوات!')
 }
 
 async function dbSaveTool(tool) {
@@ -824,30 +865,30 @@ function renderTools() {
 
 window.openTool = function(id) {
     const tool = tools.find(t => t.id === id)
-    // Check if tool is enabled
+    // Check if tool is disabled
     if (tool && tool.isEnabled === false) {
         showToast('هذه الأداة غير متاحة حالياً 🔜', 'error')
         return
     }
-    // If tool has a custom URL stored
+    // Use stored linkUrl first
     if (tool && tool.linkUrl && tool.linkUrl.trim()) {
         if (tool.linkUrl.startsWith('http')) window.open(tool.linkUrl, '_blank')
         else window.location.href = tool.linkUrl
         return
     }
-    // Built-in default actions
-    const actions = {
-        1: () => document.getElementById('botSection').scrollIntoView({behavior:'smooth'}),
-        2: () => document.getElementById('calcSection').scrollIntoView({behavior:'smooth'}),
-        3: () => window.location.href = 'features.html',
-        4: () => window.location.href = 'features.html#conf',
-        5: () => window.location.href = 'summaries.html',
-        6: () => window.location.href = 'features.html#rest',
-        7: () => window.location.href = 'tools.html',
-        8: () => window.location.href = 'bus.html',
+    // Fallback to defaultTools link_url
+    const def = defaultTools.find(t => t.id === id)
+    if (def && def.link_url) {
+        window.location.href = def.link_url
+        return
     }
-    if (actions[id]) actions[id]()
-    else showToast(`قريباً! 🔜`)
+    // Built-in scroll actions for tools without a page
+    const scrollActions = {
+        1: () => document.getElementById('botSection')?.scrollIntoView({behavior:'smooth'}),
+        2: () => document.getElementById('calcSection')?.scrollIntoView({behavior:'smooth'}),
+    }
+    if (scrollActions[id]) { scrollActions[id](); return }
+    showToast('قريباً! 🔜')
 }
 
 // ===== LOGIN (SECURE) =====
