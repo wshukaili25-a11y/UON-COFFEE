@@ -38,7 +38,8 @@
 
     /* ===== LOADING ===== */
     .loading-overlay { position: fixed; inset: 0; background: var(--dark); z-index: 99999; display: flex; align-items: center; justify-content: center; transition: opacity 0.5s; }
-    .loading-overlay.hidden { opacity: 0; pointer-events: none; }
+    .loading-overlay { position: fixed; inset: 0; background: var(--dark); z-index: 9999; display: flex; align-items: center; justify-content: center; transition: opacity 0.5s; }
+    .loading-overlay.hidden { opacity: 0; pointer-events: none; visibility: hidden; }
     .loading-spinner { width: 50px; height: 50px; border: 3px solid rgba(0,212,255,0.1); border-top-color: var(--primary); border-radius: 50%; animation: spin 0.8s linear infinite; }
 
     /* ===== TOAST ===== */
@@ -483,8 +484,8 @@
 
 <nav class="navbar" id="navbar">
     <a href="javascript:void(0)" class="logo">
-        <div class="logo-icon">NU</div>
-        <div class="logo-text">Nizwa <span>University</span></div>
+        <div class="logo-icon">UoN</div>
+        <div class="logo-text">University of Nizwa <span>Ai</span></div>
     </a>
     <ul class="nav-links">
         <li><a href="#home">الرئيسية</a></li>
@@ -681,7 +682,8 @@ const defaultTools = [
     { id: 6, title: "دليل المطاعم", description: "أقرب المطاعم والكافيهات حول جامعة نزوى مع التقييمات", icon: "fa-utensils", color: "#fb923c", btn_text: "شوف المطاعم", link_url: "features.html#rest", is_enabled: true },
     { id: 7, title: "خريطة الجامعة", description: "خريطة تفاعلية لمواقع الكليات والمرافق داخل الحرم الجامعي", icon: "fa-map-marked-alt", color: "#38bdf8", btn_text: "افتح الخريطة", link_url: "tools.html", is_enabled: true },
     { id: 8, title: "مواعيد الباصات", description: "جداول ذهاب وعودة باصات الطلاب محدّثة يومياً للأولاد والبنات", icon: "fa-bus", color: "#f472b6", btn_text: "شوف المواعيد", link_url: "bus.html", is_enabled: true },
-    { id: 9, title: "مجموعات الواتساب", description: "انضم لمجموعات موادك وكليتك — تواصل مع زملائك وشارك المعلومات", icon: "fab fa-whatsapp", color: "#25D366", btn_text: "انضم الحين", link_url: "whatsapp.html", is_enabled: true }
+    { id: 9, title: "مجموعات الواتساب", description: "انضم لمجموعات موادك وكليتك — تواصل مع زملائك وشارك المعلومات", icon: "fab fa-whatsapp", color: "#25D366", btn_text: "انضم الحين", link_url: "whatsapp.html", is_enabled: true },
+    { id: 10, title: "مشاريع الطلاب", description: "اكتشف مشاريع زملائك الإبداعية، صوّت لأفضلها، وشارك مشروعك 🚀", icon: "fa-rocket", color: "#a78bfa", btn_text: "اكتشف المشاريع", link_url: "projects.html", is_enabled: true }
 ]
 
 const defaultBoys = [
