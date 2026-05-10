@@ -336,10 +336,10 @@
         <button class="close-panel" onclick="closePanel()"><i class="fas fa-times"></i></button>
     </div>
     <div class="panel-tabs" id="panelTabs">
-        <button class="panel-tab active" onclick="switchTab('tools')">🛠 الأدوات</button>
-        <button class="panel-tab" onclick="switchTab('bus')">🚌 الباصات</button>
-        <button class="panel-tab admin-only-tab" onclick="switchTab('passwords')">🔑 كلمات المرور</button>
-        <button class="panel-tab admin-only-tab" onclick="switchTab('settings')">⚙️ الإعدادات</button>
+        <button class="panel-tab active" onclick="switchTab('tools',this)">🛠 الأدوات</button>
+        <button class="panel-tab" onclick="switchTab('bus',this)">🚌 الباصات</button>
+        <button class="panel-tab admin-only-tab" onclick="switchTab('passwords',this)">🔑 كلمات المرور</button>
+        <button class="panel-tab admin-only-tab" onclick="switchTab('settings',this)">⚙️ الإعدادات</button>
     </div>
     <div class="panel-body">
 
@@ -680,7 +680,8 @@ const defaultTools = [
     { id: 5, title: "مكتبة الملخصات", description: "ملخصات وشروحات من طلاب نزوى لجميع الكليات والمواد", icon: "fa-book-open", color: "#a78bfa", btn_text: "تصفح الملخصات", link_url: "summaries.html", is_enabled: true },
     { id: 6, title: "دليل المطاعم", description: "أقرب المطاعم والكافيهات حول جامعة نزوى مع التقييمات", icon: "fa-utensils", color: "#fb923c", btn_text: "شوف المطاعم", link_url: "features.html#rest", is_enabled: true },
     { id: 7, title: "خريطة الجامعة", description: "خريطة تفاعلية لمواقع الكليات والمرافق داخل الحرم الجامعي", icon: "fa-map-marked-alt", color: "#38bdf8", btn_text: "افتح الخريطة", link_url: "tools.html", is_enabled: true },
-    { id: 8, title: "مواعيد الباصات", description: "جداول ذهاب وعودة باصات الطلاب محدّثة يومياً للأولاد والبنات", icon: "fa-bus", color: "#f472b6", btn_text: "شوف المواعيد", link_url: "bus.html", is_enabled: true }
+    { id: 8, title: "مواعيد الباصات", description: "جداول ذهاب وعودة باصات الطلاب محدّثة يومياً للأولاد والبنات", icon: "fa-bus", color: "#f472b6", btn_text: "شوف المواعيد", link_url: "bus.html", is_enabled: true },
+    { id: 9, title: "مجموعات الواتساب", description: "انضم لمجموعات موادك وكليتك — تواصل مع زملائك وشارك المعلومات", icon: "fab fa-whatsapp", color: "#25D366", btn_text: "انضم الحين", link_url: "whatsapp.html", is_enabled: true }
 ]
 
 const defaultBoys = [
@@ -892,7 +893,7 @@ function renderTools() {
         <div class="tool-card" data-id="${tool.id}" style="--card-color:${tool.color};${disabled ? 'opacity:0.5;filter:grayscale(0.6);' : ''}">
             <button class="admin-edit-btn" onclick="event.stopPropagation();editTool(${tool.id})" title="تعديل"><i class="fas fa-pen"></i></button>
             ${disabled ? `<div style="position:absolute;top:10px;right:10px;background:rgba(251,146,60,0.15);border:1px solid rgba(251,146,60,0.4);color:var(--warning);font-size:0.7rem;font-weight:700;padding:0.2rem 0.6rem;border-radius:50px;">🔜 قريباً</div>` : ''}
-            <div class="tool-icon" style="background:${tool.color}20;color:${tool.color};"><i class="fas ${tool.icon}"></i></div>
+            <div class="tool-icon" style="background:${tool.color}20;color:${tool.color};"><i class="${tool.icon.startsWith('fa-') ? 'fas ' + tool.icon : tool.icon}"></i></div>
             <h3>${tool.title}</h3>
             <p>${tool.desc}</p>
             <button class="tool-link" style="color:${tool.color};${disabled ? 'opacity:0.5;cursor:not-allowed;' : ''}" onclick="openTool(${tool.id})">${tool.btnText} <i class="fas fa-arrow-left"></i></button>
@@ -906,7 +907,7 @@ function renderToolsToggleList() {
     if (!list) return
     list.innerHTML = tools.map(tool => `
         <div class="tool-toggle-row">
-            <div class="tool-toggle-icon" style="background:${tool.color}20;color:${tool.color};"><i class="fas ${tool.icon}"></i></div>
+            <div class="tool-toggle-icon" style="background:${tool.color}20;color:${tool.color};"><i class="${tool.icon.startsWith('fa-') ? 'fas ' + tool.icon : tool.icon}"></i></div>
             <span class="tool-toggle-name">${tool.title}</span>
             <label class="tool-toggle-switch" title="${tool.isEnabled !== false ? 'مفعّل — اضغط لإيقاف' : 'موقوف — اضغط لتفعيل'}">
                 <input type="checkbox" ${tool.isEnabled !== false ? 'checked' : ''} onchange="quickToggleTool(${tool.id}, this.checked)">
@@ -1001,11 +1002,11 @@ function updateUI() {
     })
 }
 
-window.switchTab = function(tab) {
+window.switchTab = function(tab, el) {
     document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'))
     document.querySelectorAll('.panel-tab').forEach(t => t.classList.remove('active'))
     document.getElementById('tab-' + tab)?.classList.add('active')
-    event.currentTarget.classList.add('active')
+    if (el) el.classList.add('active')
     if (tab === 'bus') renderBusAdminRows()
     if (tab === 'passwords') renderPasswordsList()
 }
@@ -1023,7 +1024,7 @@ function switchTabDirect(tab) {
     document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'))
     document.querySelectorAll('.panel-tab').forEach(t => t.classList.remove('active'))
     document.getElementById('tab-' + tab)?.classList.add('active')
-    document.querySelector(`.panel-tab[onclick="switchTab('${tab}')"]`)?.classList.add('active')
+    document.querySelector(`.panel-tab[onclick="switchTab('${tab}',this)"]`)?.classList.add('active')
 }
 window.closePanel = function() {
     document.getElementById('adminPanel').classList.remove('open')
