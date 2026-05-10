@@ -248,13 +248,6 @@ body { font-family: 'Tajawal', sans-serif; background: var(--dark); color: var(-
     .mb-icon { font-size: 16px; }
     .admin-panel { width: 100%; right: -100%; }
 }
-.maintenance-overlay { position:fixed; inset:0; background:var(--dark); z-index:99998; display:none; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:2rem; }
-.maintenance-overlay.active { display:flex; }
-.maint-icon { font-size:5rem; margin-bottom:1.5rem; animation:float 3s ease-in-out infinite; }
-.maint-title { font-size:clamp(2rem,5vw,3.5rem); font-weight:900; background:linear-gradient(135deg,#fb923c,#f97316); -webkit-background-clip:text; -webkit-text-fill-color:transparent; margin-bottom:1rem; }
-.maint-desc { color:var(--text-muted); font-size:1.1rem; max-width:500px; line-height:1.8; margin-bottom:2rem; }
-.maint-badge { display:inline-flex; align-items:center; gap:8px; padding:0.6rem 1.5rem; background:rgba(251,146,60,0.1); border:1px solid rgba(251,146,60,0.3); border-radius:50px; color:#fb923c; font-weight:700; font-size:0.9rem; }
-.maint-back { margin-top:1.5rem; padding:0.8rem 2rem; background:linear-gradient(135deg,#00d4ff,#0099cc); border:none; border-radius:12px; color:#0a0e27; font-weight:800; font-family:'Tajawal',sans-serif; cursor:pointer; font-size:1rem; text-decoration:none; display:inline-flex; align-items:center; gap:8px; }
 </style>
 </head>
 <body>
@@ -264,15 +257,6 @@ body { font-family: 'Tajawal', sans-serif; background: var(--dark); color: var(-
 
 <!-- Loading -->
 <div class="loading-overlay" id="loadingOverlay"><div class="loading-spinner"></div></div>
-
-<!-- Maintenance -->
-<div class="maintenance-overlay" id="maintenanceOverlay">
-    <div class="maint-icon">🔧</div>
-    <div class="maint-title">الموقع تحت الصيانة</div>
-    <p class="maint-desc" id="maintenanceMsg">نعمل على تحسين المنصة لتقديم تجربة أفضل لك 🚀<br>سنعود قريباً بجديد مميز!</p>
-    <div class="maint-badge"><i class="fas fa-tools"></i> جاري التحديث...</div>
-    <a href="index.html" class="maint-back"><i class="fas fa-arrow-right"></i> العودة للرئيسية</a>
-</div>
 
 <!-- Toast -->
 <div class="toast" id="toast"><i class="fas fa-check-circle"></i><span id="toastMsg"></span></div>
@@ -541,24 +525,11 @@ window.addEventListener('DOMContentLoaded', async () => {
 
     setTimeout(() => document.getElementById('loadingOverlay').classList.add('hidden'), 4000)
     try { await Promise.all([loadConfessions(), loadRestaurants()]) } catch(e) { console.log(e) }
-    await checkMaintenance()
     document.getElementById('loadingOverlay').classList.add('hidden')
     initScrollReveal()
     handleUrlHash()
     window.addEventListener('scroll', () => document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 50))
 })
-
-async function checkMaintenance() {
-    try {
-        const { data } = await supabase.from('settings').select('value').eq('key', 'maintenance_mode').single()
-        if (data?.value === 'true' && !currentAdmin) {
-            const { data: msgData } = await supabase.from('settings').select('value').eq('key', 'maintenance_message').single()
-            const msg = msgData?.value || 'نعمل على تحسين المنصة لتقديم تجربة أفضل لك 🚀\nسنعود قريباً بجديد مميز!'
-            document.getElementById('maintenanceMsg').innerHTML = msg.replace(/\n/g, '<br>')
-            document.getElementById('maintenanceOverlay').classList.add('active')
-        }
-    } catch(e) {}
-}
 
 // ===== CONFESSIONS (SUPABASE) =====
 async function loadConfessions() {
@@ -598,17 +569,34 @@ window.submitConf = async function() {
     const text = document.getElementById('confText').value.trim()
     if (!text || text.length < 10) { showToast('الاعتراف قصير جداً! 😅', 'error'); return }
     const anon = document.getElementById('anonCheck').checked
+    const btn = document.querySelector('.cf-send')
+    btn.disabled = true
+    btn.textContent = '⏳ جاري النشر...'
     try {
-        const { data, error } = await supabase.from('confessions').insert({
-            text, category: selectedCat, is_anon: anon, likes: 0
-        }).select()
-        if (error) throw error
-        document.getElementById('confText').value = ''
-        confessions.unshift({ id: data[0].id, text, cat: selectedCat, anon, likes: 0, time: 'الآن' })
+        const insertData = { text, category: selectedCat, is_anon: anon, likes: 0 }
+        const { data, error } = await supabase.from('confessions').insert(insertData).select()
+        if (error) {
+            console.error('Confession error:', error)
+            // Try without select in case of RLS on returning
+            const { error: e2 } = await supabase.from('confessions').insert(insertData)
+            if (e2) throw e2
+            // Success without return data
+            document.getElementById('confText').value = ''
+            confessions.unshift({ id: Date.now(), text, cat: selectedCat, anon, likes: 0, time: 'الآن' })
+        } else {
+            document.getElementById('confText').value = ''
+            confessions.unshift({ id: data[0].id, text, cat: selectedCat, anon, likes: 0, time: 'الآن' })
+        }
         document.getElementById('confCount').textContent = confessions.length
         renderConfs()
         showToast('تم نشر اعترافك! 🚀')
-    } catch(e) { showToast('خطأ في النشر، جرب مرة ثانية', 'error') }
+    } catch(e) {
+        console.error('Final confession error:', e)
+        showToast('خطأ في النشر: ' + (e.message || 'تحقق من إعدادات قاعدة البيانات'), 'error')
+    } finally {
+        btn.disabled = false
+        btn.textContent = 'نشر 🚀'
+    }
 }
 
 window.filterConf = function(cat, btn) {
