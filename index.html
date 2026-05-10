@@ -243,8 +243,17 @@
         @keyframes heartbeat { 0%,100%{transform:scale(1)}50%{transform:scale(1.2)} }
         .heart { color: var(--secondary); display: inline-block; animation: heartbeat 1.5s infinite; }
 
-        .reveal { opacity: 0; transform: translateY(30px); transition: all 0.8s ease; }
-        .reveal.active { opacity: 1; transform: translateY(0); }
+        /* ===== MAINTENANCE MODE ===== */
+        .maintenance-overlay { position: fixed; inset: 0; background: var(--dark); z-index: 99998; display: none; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 2rem; }
+        .maintenance-overlay.active { display: flex; }
+        .maintenance-icon { font-size: 5rem; margin-bottom: 1.5rem; animation: float 3s ease-in-out infinite; }
+        .maintenance-title { font-size: clamp(2rem,5vw,3.5rem); font-weight: 900; background: linear-gradient(135deg,var(--warning),#f97316); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 1rem; }
+        .maintenance-desc { color: var(--text-muted); font-size: 1.1rem; max-width: 500px; line-height: 1.8; margin-bottom: 2rem; }
+        .maintenance-badge { display: inline-flex; align-items: center; gap: 8px; padding: 0.6rem 1.5rem; background: rgba(251,146,60,0.1); border: 1px solid rgba(251,146,60,0.3); border-radius: 50px; color: var(--warning); font-weight: 700; font-size: 0.9rem; }
+        .maintenance-admin-exit { position: fixed; bottom: 24px; right: 24px; padding: 0.7rem 1.5rem; background: var(--danger); border: none; border-radius: 12px; color: white; font-weight: 700; font-family: 'Tajawal', sans-serif; cursor: pointer; font-size: 0.85rem; opacity: 0.7; transition: opacity 0.3s; z-index: 99999; display: none; }
+        .maintenance-admin-exit:hover { opacity: 1; }
+
+        @keyframes float { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-20px); } }
 
         @media (max-width: 768px) {
             .nav-links { display: none; }
@@ -265,6 +274,15 @@
 
 <!-- Loading -->
 <div class="loading-overlay" id="loadingOverlay"><div class="loading-spinner"></div></div>
+
+<!-- Maintenance Mode Overlay -->
+<div class="maintenance-overlay" id="maintenanceOverlay">
+    <div class="maintenance-icon">🔧</div>
+    <div class="maintenance-title">الموقع تحت الصيانة</div>
+    <p class="maintenance-desc" id="maintenanceMsg">نعمل على تحسين المنصة لتقديم تجربة أفضل لك 🚀<br>سنعود قريباً بجديد مميز!</p>
+    <div class="maintenance-badge"><i class="fas fa-tools"></i> جاري التحديث...</div>
+</div>
+<button class="maintenance-admin-exit" id="maintenanceAdminExit" onclick="exitMaintenance()"><i class="fas fa-sign-out-alt"></i> خروج من وضع الصيانة (أدمن)</button>
 
 <!-- Toast -->
 <div class="toast" id="toast"><i class="fas fa-check-circle"></i><span id="toastMsg"></span></div>
@@ -298,8 +316,16 @@
     <div class="panel-section" id="editSection" style="display:none;">
         <h3><i class="fas fa-edit"></i> تعديل الأداة</h3>
         <div class="form-group"><label>اسم الأداة</label><input type="text" id="editTitle"></div>
-        <div class="form-group"><label>الوصف</label><textarea id="editDesc"></textarea></div>
+        <div class="form-group">
+            <label>الوصف <span style="font-size:0.75rem;color:var(--text-dim);">(يدعم HTML: &lt;b&gt;, &lt;a href=""&gt;, &lt;br&gt;, أرقام، جداول...)</span></label>
+            <textarea id="editDesc" style="min-height:100px;font-family:monospace;font-size:0.85rem;"></textarea>
+            <small>مثال: أداة تدعم <b>3 ميزات</b> — <a href="#">رابط</a></small>
+        </div>
         <div class="form-group"><label>الأيقونة</label><input type="text" id="editIcon" placeholder="fa-robot"><small>Font Awesome icon name</small></div>
+        <div class="form-group">
+            <label>رابط الأداة <span style="font-size:0.75rem;color:var(--text-dim);">(اتركه فارغاً للرابط الافتراضي)</span></label>
+            <input type="text" id="editLinkUrl" placeholder="https://... أو summaries.html أو #botSection">
+        </div>
         <div class="form-group">
             <label>لون الأداة</label>
             <div class="color-picker-wrapper">
@@ -314,6 +340,10 @@
             </div>
         </div>
         <div class="form-group"><label>نص الزر</label><input type="text" id="editBtnText"></div>
+        <div class="form-group" style="display:flex;align-items:center;gap:12px;background:rgba(251,146,60,0.06);border:1px solid rgba(251,146,60,0.2);border-radius:10px;padding:0.8rem 1rem;">
+            <input type="checkbox" id="editIsEnabled" style="width:18px;height:18px;accent-color:var(--success);cursor:pointer;">
+            <label for="editIsEnabled" style="margin:0;cursor:pointer;"><b>الأداة مفعّلة</b> <span style="font-size:0.8rem;color:var(--text-dim);font-weight:400;">— أزل العلامة لتظهر "قريباً" وتوقف الوصول إليها</span></label>
+        </div>
         <button class="btn-save" onclick="saveToolHandler()"><i class="fas fa-save"></i> حفظ التغييرات</button>
         <button class="btn-danger" onclick="deleteToolHandler()"><i class="fas fa-trash"></i> حذف الأداة</button>
     </div>
@@ -322,8 +352,15 @@
     <div class="panel-section">
         <h3><i class="fas fa-plus-circle"></i> إضافة أداة جديدة</h3>
         <div class="form-group"><label>اسم الأداة</label><input type="text" id="newTitle" placeholder="مثال: دليل التخصصات"></div>
-        <div class="form-group"><label>الوصف</label><textarea id="newDesc" placeholder="وصف مختصر للأداة..."></textarea></div>
+        <div class="form-group">
+            <label>الوصف <span style="font-size:0.75rem;color:var(--text-dim);">(يدعم HTML: &lt;b&gt;, &lt;a href=""&gt;, &lt;br&gt;, جداول...)</span></label>
+            <textarea id="newDesc" placeholder="وصف مختصر للأداة...&#10;مثال: يدعم <b>5 ميزات</b> ومنها <a href='#'>رابط مباشر</a>" style="min-height:90px;font-family:monospace;font-size:0.85rem;"></textarea>
+        </div>
         <div class="form-group"><label>الأيقونة</label><input type="text" id="newIcon" placeholder="fa-graduation-cap"></div>
+        <div class="form-group">
+            <label>رابط الأداة <span style="font-size:0.75rem;color:var(--text-dim);">(اتركه فارغاً للرابط الافتراضي)</span></label>
+            <input type="text" id="newLinkUrl" placeholder="https://... أو summaries.html">
+        </div>
         <div class="form-group">
             <label>لون الأداة</label>
             <div class="color-picker-wrapper">
@@ -336,6 +373,10 @@
             </div>
         </div>
         <div class="form-group"><label>نص الزر</label><input type="text" id="newBtnText" placeholder="مثال: اكتشف التخصصات"></div>
+        <div class="form-group" style="display:flex;align-items:center;gap:12px;background:rgba(107,203,119,0.06);border:1px solid rgba(107,203,119,0.2);border-radius:10px;padding:0.8rem 1rem;">
+            <input type="checkbox" id="newIsEnabled" checked style="width:18px;height:18px;accent-color:var(--success);cursor:pointer;">
+            <label for="newIsEnabled" style="margin:0;cursor:pointer;"><b>الأداة مفعّلة</b> <span style="font-size:0.8rem;color:var(--text-dim);font-weight:400;">— أزل العلامة لتظهر "قريباً"</span></label>
+        </div>
         <button class="btn-save" onclick="addToolHandler()"><i class="fas fa-plus"></i> إضافة الأداة</button>
     </div>
 
@@ -382,6 +423,23 @@
         <div class="form-group"><label>الشعار الرئيسي</label><input type="text" id="siteHeadline" value="منصتك الشاملة للحياة الأكاديمية"></div>
         <div class="form-group"><label>الوصف</label><textarea id="siteDesc">أدوات ذكية، ملخصات، جداول دراسية، وكل ما تحتاجه للنجاح</textarea></div>
         <button class="btn-save" onclick="saveSettings()"><i class="fas fa-save"></i> حفظ الإعدادات</button>
+
+        <!-- Maintenance Mode -->
+        <div style="margin-top:1.5rem;padding-top:1.5rem;border-top:1px solid rgba(255,255,255,0.06);">
+            <h3 style="color:var(--warning);margin-bottom:1rem;"><i class="fas fa-hard-hat"></i> وضع الصيانة</h3>
+            <div style="background:rgba(251,146,60,0.06);border:1px solid rgba(251,146,60,0.2);border-radius:12px;padding:1rem;margin-bottom:1rem;">
+                <div style="display:flex;align-items:center;gap:12px;margin-bottom:0.8rem;">
+                    <input type="checkbox" id="maintenanceToggle" style="width:18px;height:18px;accent-color:var(--warning);cursor:pointer;" onchange="toggleMaintenance(this.checked)">
+                    <label for="maintenanceToggle" style="margin:0;cursor:pointer;font-weight:700;color:var(--warning);">🔧 تفعيل وضع الصيانة</label>
+                </div>
+                <p style="font-size:0.8rem;color:var(--text-dim);margin-right:30px;">عند التفعيل، سيرى الزوار شاشة الصيانة. أنت كأدمن تقدر تتصفح الموقع بشكل طبيعي.</p>
+            </div>
+            <div class="form-group">
+                <label>رسالة الصيانة <span style="font-size:0.75rem;color:var(--text-dim);">(تظهر للزوار)</span></label>
+                <textarea id="maintenanceMessage" style="min-height:70px;" placeholder="نعمل على تحسين المنصة...&#10;سنعود قريباً!"></textarea>
+            </div>
+            <button class="btn-save" style="background:linear-gradient(135deg,var(--warning),#f97316);" onclick="saveMaintenance()"><i class="fas fa-save"></i> حفظ رسالة الصيانة</button>
+        </div>
     </div>
 </div>
 
@@ -612,7 +670,7 @@ async function loadTools() {
     try {
         const { data, error } = await supabase.from('tools').select('*').order('id')
         if (error || !data || data.length === 0) { await seedTools() }
-        else { tools = data.map(t => ({ id: t.id, title: t.title, desc: t.description, icon: t.icon, color: t.color, btnText: t.btn_text })); renderTools() }
+        else { tools = data.map(t => ({ id: t.id, title: t.title, desc: t.description, icon: t.icon, color: t.color, btnText: t.btn_text, linkUrl: t.link_url || '', isEnabled: t.is_enabled !== false })); renderTools() }
     } catch(e) { tools = defaultTools.map(t => ({...t, desc: t.description, btnText: t.btn_text})); renderTools() }
 }
 
@@ -625,10 +683,10 @@ async function seedTools() {
 
 async function dbSaveTool(tool) {
     if (tool.id) {
-        await supabase.from('tools').update({ title: tool.title, description: tool.desc, icon: tool.icon, color: tool.color, btn_text: tool.btnText }).eq('id', tool.id)
+        await supabase.from('tools').update({ title: tool.title, description: tool.desc, icon: tool.icon, color: tool.color, btn_text: tool.btnText, link_url: tool.linkUrl || '', is_enabled: tool.isEnabled !== false }).eq('id', tool.id)
     } else {
         const newId = Math.max(...tools.map(t => t.id), 0) + 1
-        await supabase.from('tools').insert({ id: newId, title: tool.title, description: tool.desc, icon: tool.icon, color: tool.color, btn_text: tool.btnText })
+        await supabase.from('tools').insert({ id: newId, title: tool.title, description: tool.desc, icon: tool.icon, color: tool.color, btn_text: tool.btnText, link_url: tool.linkUrl || '', is_enabled: tool.isEnabled !== false })
     }
 }
 
@@ -736,6 +794,7 @@ window.addEventListener('DOMContentLoaded', async () => {
     setTimeout(() => document.getElementById('loadingOverlay').classList.add('hidden'), 4000)
     try {
         await Promise.all([loadTools(), loadSettings(), loadBusData()])
+        await checkMaintenance()
     } catch(e) { console.log('init error', e) }
     updateUI()
     initScrollReveal()
@@ -749,17 +808,34 @@ window.addEventListener('DOMContentLoaded', async () => {
 function renderTools() {
     const grid = document.getElementById('toolsGrid')
     if (!tools.length) { grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:3rem;color:var(--text-dim);">لا توجد أدوات بعد</div>'; return }
-    grid.innerHTML = tools.map(tool => `
-        <div class="tool-card" data-id="${tool.id}" style="--card-color:${tool.color};">
+    grid.innerHTML = tools.map(tool => {
+        const disabled = tool.isEnabled === false
+        return `
+        <div class="tool-card" data-id="${tool.id}" style="--card-color:${tool.color};${disabled ? 'opacity:0.5;filter:grayscale(0.6);' : ''}">
             <button class="admin-edit-btn" onclick="event.stopPropagation();editTool(${tool.id})" title="تعديل"><i class="fas fa-pen"></i></button>
+            ${disabled ? `<div style="position:absolute;top:10px;right:10px;background:rgba(251,146,60,0.15);border:1px solid rgba(251,146,60,0.4);color:var(--warning);font-size:0.7rem;font-weight:700;padding:0.2rem 0.6rem;border-radius:50px;">🔜 قريباً</div>` : ''}
             <div class="tool-icon" style="background:${tool.color}20;color:${tool.color};"><i class="fas ${tool.icon}"></i></div>
             <h3>${tool.title}</h3>
             <p>${tool.desc}</p>
-            <button class="tool-link" style="color:${tool.color};" onclick="openTool(${tool.id})">${tool.btnText} <i class="fas fa-arrow-left"></i></button>
-        </div>`).join('')
+            <button class="tool-link" style="color:${tool.color};${disabled ? 'opacity:0.5;cursor:not-allowed;' : ''}" onclick="openTool(${tool.id})">${tool.btnText} <i class="fas fa-arrow-left"></i></button>
+        </div>`
+    }).join('')
 }
 
 window.openTool = function(id) {
+    const tool = tools.find(t => t.id === id)
+    // Check if tool is enabled
+    if (tool && tool.isEnabled === false) {
+        showToast('هذه الأداة غير متاحة حالياً 🔜', 'error')
+        return
+    }
+    // If tool has a custom URL stored
+    if (tool && tool.linkUrl && tool.linkUrl.trim()) {
+        if (tool.linkUrl.startsWith('http')) window.open(tool.linkUrl, '_blank')
+        else window.location.href = tool.linkUrl
+        return
+    }
+    // Built-in default actions
     const actions = {
         1: () => document.getElementById('botSection').scrollIntoView({behavior:'smooth'}),
         2: () => document.getElementById('calcSection').scrollIntoView({behavior:'smooth'}),
@@ -857,6 +933,8 @@ window.editTool = function(id) {
     document.getElementById('editDesc').value = tool.desc
     document.getElementById('editIcon').value = tool.icon
     document.getElementById('editBtnText').value = tool.btnText
+    document.getElementById('editLinkUrl').value = tool.linkUrl || ''
+    document.getElementById('editIsEnabled').checked = tool.isEnabled !== false
     selectedColor = tool.color
     document.querySelectorAll('#editSection .color-option').forEach(opt => opt.classList.toggle('selected', opt.dataset.color === tool.color))
     document.getElementById('editSection').style.display = 'block'
@@ -878,6 +956,8 @@ window.saveToolHandler = async function() {
         tool.icon = document.getElementById('editIcon').value
         tool.color = selectedColor
         tool.btnText = document.getElementById('editBtnText').value
+        tool.linkUrl = document.getElementById('editLinkUrl').value
+        tool.isEnabled = document.getElementById('editIsEnabled').checked
         await dbSaveTool(tool)
         renderTools()
         closePanel()
@@ -906,13 +986,15 @@ window.addToolHandler = async function() {
     const title = document.getElementById('newTitle').value
     const desc = document.getElementById('newDesc').value
     if (!title || !desc) { showToast('يرجى ملء جميع الحقول', 'error'); return }
-    const newTool = { title, desc, icon: document.getElementById('newIcon').value || 'fa-tools', color: selectedNewColor, btnText: document.getElementById('newBtnText').value || 'جرب الآن' }
+    const newTool = { title, desc, icon: document.getElementById('newIcon').value || 'fa-tools', color: selectedNewColor, btnText: document.getElementById('newBtnText').value || 'جرب الآن', linkUrl: document.getElementById('newLinkUrl').value || '', isEnabled: document.getElementById('newIsEnabled').checked }
     await dbSaveTool(newTool)
     await loadTools()
     document.getElementById('newTitle').value = ''
     document.getElementById('newDesc').value = ''
     document.getElementById('newIcon').value = ''
     document.getElementById('newBtnText').value = ''
+    document.getElementById('newLinkUrl').value = ''
+    document.getElementById('newIsEnabled').checked = true
     showToast('تم إضافة الأداة!')
 }
 
@@ -937,6 +1019,65 @@ window.addPassword = async function() {
     } catch(e) { showToast('خطأ في الحفظ', 'error') }
 }
 
+// ===== MAINTENANCE MODE =====
+async function checkMaintenance() {
+    try {
+        const { data } = await supabase.from('settings').select('value').eq('key', 'maintenance_mode').single()
+        const isOn = data?.value === 'true'
+        if (isOn) {
+            const { data: msgData } = await supabase.from('settings').select('value').eq('key', 'maintenance_message').single()
+            const msg = msgData?.value || 'نعمل على تحسين المنصة لتقديم تجربة أفضل لك 🚀\nسنعود قريباً بجديد مميز!'
+            document.getElementById('maintenanceMsg').innerHTML = msg.replace(/\n/g, '<br>')
+            // Only show maintenance if NOT admin
+            if (!currentAdmin) {
+                document.getElementById('maintenanceOverlay').classList.add('active')
+            } else {
+                // Admin can see site but with exit button
+                document.getElementById('maintenanceAdminExit').style.display = 'block'
+            }
+        }
+        // Sync toggle in panel
+        const toggle = document.getElementById('maintenanceToggle')
+        if (toggle) toggle.checked = isOn
+        // Load message into textarea
+        const msgInput = document.getElementById('maintenanceMessage')
+        if (msgInput) {
+            const { data: msgData } = await supabase.from('settings').select('value').eq('key', 'maintenance_message').single()
+            if (msgData?.value) msgInput.value = msgData.value
+        }
+    } catch(e) {}
+}
+
+window.toggleMaintenance = async function(checked) {
+    if (currentAdmin?.role !== 'admin') { showToast('فقط المشرف الرئيسي', 'error'); document.getElementById('maintenanceToggle').checked = !checked; return }
+    await dbSaveSettings('maintenance_mode', checked ? 'true' : 'false')
+    if (checked) {
+        document.getElementById('maintenanceAdminExit').style.display = 'block'
+        showToast('⚠️ وضع الصيانة مفعّل — الزوار سيرون شاشة الصيانة', 'error')
+    } else {
+        document.getElementById('maintenanceAdminExit').style.display = 'none'
+        document.getElementById('maintenanceOverlay').classList.remove('active')
+        showToast('✅ وضع الصيانة أُوقف — الموقع متاح للجميع')
+    }
+}
+
+window.saveMaintenance = async function() {
+    if (currentAdmin?.role !== 'admin') { showToast('فقط المشرف الرئيسي', 'error'); return }
+    const msg = document.getElementById('maintenanceMessage').value || 'نعمل على تحسين المنصة...'
+    await dbSaveSettings('maintenance_message', msg)
+    document.getElementById('maintenanceMsg').innerHTML = msg.replace(/\n/g, '<br>')
+    showToast('تم حفظ رسالة الصيانة!')
+}
+
+window.exitMaintenance = async function() {
+    // Admin exits maintenance mode
+    await dbSaveSettings('maintenance_mode', 'false')
+    document.getElementById('maintenanceOverlay').classList.remove('active')
+    document.getElementById('maintenanceAdminExit').style.display = 'none'
+    document.getElementById('maintenanceToggle').checked = false
+    showToast('✅ تم إيقاف وضع الصيانة')
+}
+
 // ===== SETTINGS =====
 window.saveSettings = async function() {
     if (currentAdmin?.role !== 'admin') { showToast('فقط المشرف الرئيسي', 'error'); return }
@@ -957,6 +1098,11 @@ async function loadSettings() {
     if (settings.title) { if(document.getElementById('siteTitle')) document.getElementById('siteTitle').value = settings.title; document.title = settings.title }
     if (settings.headline) { if(document.getElementById('siteHeadline')) document.getElementById('siteHeadline').value = settings.headline; document.getElementById('heroTitle').innerHTML = settings.headline.replace(/\n/g, '<br>') }
     if (settings.desc) { if(document.getElementById('siteDesc')) document.getElementById('siteDesc').value = settings.desc; document.getElementById('heroDesc').textContent = settings.desc }
+    // Maintenance
+    const toggle = document.getElementById('maintenanceToggle')
+    if (toggle) toggle.checked = settings.maintenance_mode === 'true'
+    const msgInput = document.getElementById('maintenanceMessage')
+    if (msgInput && settings.maintenance_message) msgInput.value = settings.maintenance_message
 }
 
 // ===== BOT =====
