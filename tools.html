@@ -303,9 +303,12 @@ main { padding:90px 5% 60px; max-width:1100px; margin:0 auto; position:relative;
                 <div class="emoji-opt" data-emoji="💬" onclick="selToolEmoji(this)">💬</div>
             </div>
         </div>
-        <div class="mcheck-row">
+        <div class="mcheck-row" style="background:rgba(251,146,60,.08);border:1px solid rgba(251,146,60,.2);border-radius:10px;padding:.7rem 1rem;margin-bottom:12px;">
             <input type="checkbox" id="toolComingSoon">
-            <label for="toolComingSoon">Coming Soon (لم يُفعَّل بعد)</label>
+            <label for="toolComingSoon" style="color:var(--warning);font-weight:700;">
+                🔜 Coming Soon — الأداة غير مفعّلة بعد<br>
+                <span style="font-size:.75rem;color:var(--text-dim);font-weight:400;">أزل العلامة لتفعيلها وإضافة رابط</span>
+            </label>
         </div>
         <div class="mbtns">
             <button class="mbtn-cancel" onclick="closeToolModal()">إلغاء</button>
