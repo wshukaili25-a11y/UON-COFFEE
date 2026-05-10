@@ -134,12 +134,26 @@ main { padding:90px 5% 60px; max-width:900px; margin:0 auto; position:relative; 
     .book-banner { flex-direction:column; text-align:center; }
     .admin-panel { width:100%; right:-100%; }
 }
+.maintenance-overlay { position:fixed; inset:0; background:var(--dark); z-index:99998; display:none; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:2rem; }
+.maintenance-overlay.active { display:flex; }
+.maint-icon { font-size:5rem; margin-bottom:1.5rem; animation:float 3s ease-in-out infinite; }
+.maint-title { font-size:clamp(2rem,5vw,3.5rem); font-weight:900; background:linear-gradient(135deg,#fb923c,#f97316); -webkit-background-clip:text; -webkit-text-fill-color:transparent; margin-bottom:1rem; }
+.maint-desc { color:var(--text-muted); font-size:1.1rem; max-width:500px; line-height:1.8; margin-bottom:2rem; }
+.maint-badge { display:inline-flex; align-items:center; gap:8px; padding:0.6rem 1.5rem; background:rgba(251,146,60,0.1); border:1px solid rgba(251,146,60,0.3); border-radius:50px; color:#fb923c; font-weight:700; font-size:0.9rem; }
+.maint-back { margin-top:1.5rem; padding:0.8rem 2rem; background:linear-gradient(135deg,#00d4ff,#0099cc); border:none; border-radius:12px; color:#0a0e27; font-weight:800; font-family:'Tajawal',sans-serif; cursor:pointer; font-size:1rem; text-decoration:none; display:inline-flex; align-items:center; gap:8px; }
 </style>
 </head>
 <body>
 
 <div class="page-bg"><div class="c c1"></div><div class="c c2"></div></div>
 <div class="loading-overlay" id="loadingOverlay"><div class="spinner"></div></div>
+<div class="maintenance-overlay" id="maintenanceOverlay">
+    <div class="maint-icon">🔧</div>
+    <div class="maint-title">الموقع تحت الصيانة</div>
+    <p class="maint-desc" id="maintenanceMsg">نعمل على تحسين المنصة لتقديم تجربة أفضل لك 🚀<br>سنعود قريباً بجديد مميز!</p>
+    <div class="maint-badge"><i class="fas fa-tools"></i> جاري التحديث...</div>
+    <a href="index.html" class="maint-back"><i class="fas fa-arrow-right"></i> العودة للرئيسية</a>
+</div>
 <div class="toast" id="toast"><i class="fas fa-check-circle"></i><span id="toastMsg"></span></div>
 <div class="admin-badge" id="adminBadge"><i class="fas fa-crown"></i><span id="adminLabel">مشرف</span></div>
 <div class="admin-overlay" id="adminOverlay" onclick="closeAP()"></div>
@@ -290,9 +304,22 @@ window.addEventListener('DOMContentLoaded', async () => {
     if (saved) try { currentAdmin = JSON.parse(saved); updateAdminUI() } catch(e) {}
     setTimeout(() => document.getElementById('loadingOverlay').classList.add('hidden'), 4000)
     await loadBusData()
+    await checkMaintenance()
     document.getElementById('loadingOverlay').classList.add('hidden')
     initReveal()
 })
+
+async function checkMaintenance() {
+    try {
+        const { data } = await supabase.from('settings').select('value').eq('key', 'maintenance_mode').single()
+        if (data?.value === 'true' && !currentAdmin) {
+            const { data: msgData } = await supabase.from('settings').select('value').eq('key', 'maintenance_message').single()
+            const msg = msgData?.value || 'نعمل على تحسين المنصة لتقديم تجربة أفضل لك 🚀\nسنعود قريباً بجديد مميز!'
+            document.getElementById('maintenanceMsg').innerHTML = msg.replace(/\n/g, '<br>')
+            document.getElementById('maintenanceOverlay').classList.add('active')
+        }
+    } catch(e) {}
+}
 
 async function loadBusData() {
     try {
