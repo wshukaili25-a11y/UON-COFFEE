@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UoN Coffee — مكتبة الملخصات</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<style>
+:root {
+    --primary: #00d4ff; --secondary: #ff6b6b; --accent: #ffd93d;
+    --success: #6bcb77; --warning: #fb923c; --danger: #ef4444;
+    --dark: #0a0e27; --dark-light: #1a1f3d; --dark-lighter: #2d3561;
+    --text: #e2e8f0; --text-muted: #a0aec0; --text-dim: #718096;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Tajawal',sans-serif; background:var(--dark); color:var(--text); overflow-x:hidden; }
+::-webkit-scrollbar { width:6px; } ::-webkit-scrollbar-track { background:var(--dark); } ::-webkit-scrollbar-thumb { background:var(--dark-lighter); border-radius:3px; }
+@keyframes spin { to{transform:rotate(360deg)} }
+@keyframes slideInUp { from{opacity:0;transform:translateY(30px)} to{opacity:1;transform:translateY(0)} }
+@keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-12px)} }
+
+.loading-overlay { position:fixed; inset:0; background:var(--dark); z-index:99999; display:flex; align-items:center; justify-content:center; transition:opacity .5s; }
+.loading-overlay.hidden { opacity:0; pointer-events:none; }
+.spinner { width:44px; height:44px; border:3px solid rgba(0,212,255,.1); border-top-color:var(--primary); border-radius:50%; animation:spin .8s linear infinite; }
+.toast { position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(80px); background:var(--success); color:#fff; padding:.8rem 1.8rem; border-radius:12px; font-weight:700; z-index:10000; opacity:0; transition:all .4s; display:flex; align-items:center; gap:8px; }
+.toast.show { transform:translateX(-50%) translateY(0); opacity:1; }
+.toast.error { background:var(--danger); }
+
+/* NAVBAR */
+.navbar { position:fixed; top:0; width:100%; padding:.9rem 5%; display:flex; justify-content:space-between; align-items:center; z-index:1000; background:rgba(10,14,39,.93); backdrop-filter:blur(20px); border-bottom:1px solid rgba(255,255,255,.05); }
+.logo { display:flex; align-items:center; gap:10px; text-decoration:none; }
+.logo-icon { width:40px; height:40px; background:linear-gradient(135deg,#00d4ff,#0099cc); border-radius:10px; display:flex; align-items:center; justify-content:center; font-weight:900; font-size:1.1rem; color:var(--dark); }
+.logo-text { color:#fff; font-size:1.1rem; font-weight:700; }
+.logo-text span { color:var(--primary); }
+.nav-right { display:flex; gap:.7rem; align-items:center; }
+.nav-home { padding:.5rem 1.2rem; background:linear-gradient(135deg,#00d4ff,#0099cc); border:none; border-radius:10px; color:var(--dark); font-weight:700; font-family:'Tajawal',sans-serif; cursor:pointer; font-size:.85rem; text-decoration:none; display:inline-flex; align-items:center; gap:6px; transition:all .3s; }
+.nav-home:hover { transform:translateY(-2px); box-shadow:0 8px 24px rgba(0,212,255,.3); }
+.admin-nav-btn { padding:.5rem 1.1rem; background:transparent; border:1.5px solid var(--warning); border-radius:10px; color:var(--warning); font-weight:700; font-family:'Tajawal',sans-serif; cursor:pointer; font-size:.82rem; display:none; align-items:center; gap:6px; transition:all .3s; }
+.admin-nav-btn.show { display:flex; }
+.admin-nav-btn:hover { background:var(--warning); color:var(--dark); }
+.logout-btn { padding:.5rem 1rem; background:transparent; border:1.5px solid var(--text-dim); border-radius:10px; color:var(--text-dim); font-weight:700; font-family:'Tajawal',sans-serif; cursor:pointer; font-size:.82rem; display:none; align-items:center; gap:6px; transition:all .3s; }
+.logout-btn.show { display:flex; }
+.logout-btn:hover { border-color:var(--danger); color:var(--danger); }
+.admin-badge { position:fixed; top:70px; left:16px; z-index:999; background:linear-gradient(135deg,var(--secondary),#ee5a5a); padding:.4rem .9rem; border-radius:50px; font-size:.75rem; font-weight:700; display:none; align-items:center; gap:5px; }
+.admin-badge.show { display:flex; }
+
+.page-bg { position:fixed; inset:0; pointer-events:none; z-index:0; overflow:hidden; }
+.page-bg .c { position:absolute; border-radius:50%; filter:blur(90px); opacity:.07; }
+.page-bg .c1 { width:500px; height:500px; background:var(--primary); top:-15%; right:-10%; animation:float 10s ease-in-out infinite; }
+.page-bg .c2 { width:350px; height:350px; background:var(--accent); bottom:-10%; left:-8%; animation:float 13s ease-in-out infinite reverse; }
+
+main { padding:90px 5% 60px; max-width:1100px; margin:0 auto; position:relative; z-index:1; }
+
+.page-hero { text-align:center; padding:2rem 0 2.5rem; }
+.hero-badge { display:inline-flex; align-items:center; gap:6px; padding:.4rem 1rem; background:rgba(0,212,255,.1); border:1px solid rgba(0,212,255,.2); border-radius:50px; font-size:.8rem; color:var(--primary); margin-bottom:1rem; }
+.page-hero h1 { font-size:clamp(1.8rem,4vw,2.8rem); font-weight:900; background:linear-gradient(135deg,#fff 0%,var(--primary) 100%); -webkit-background-clip:text; -webkit-text-fill-color:transparent; margin-bottom:.6rem; }
+.page-hero p { color:var(--text-dim); font-size:.95rem; }
+
+/* FILTERS */
+.filters { display:flex; gap:.6rem; flex-wrap:wrap; justify-content:center; margin-bottom:2rem; }
+.filter-btn { padding:.55rem 1.2rem; background:var(--dark-light); border:1px solid rgba(255,255,255,.07); border-radius:50px; color:var(--text-muted); font-size:.82rem; font-weight:700; cursor:pointer; font-family:'Tajawal',sans-serif; transition:all .3s; }
+.filter-btn.active, .filter-btn:hover { background:rgba(0,212,255,.1); border-color:rgba(0,212,255,.3); color:var(--primary); }
+
+/* COLLEGE GRID */
+.colleges-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:1.5rem; margin-bottom:3rem; }
+.college-card { background:var(--dark-light); border:1px solid rgba(255,255,255,.06); border-radius:20px; overflow:hidden; transition:all .3s; position:relative; }
+.college-card:hover { border-color:rgba(0,212,255,.2); transform:translateY(-4px); box-shadow:0 15px 40px rgba(0,0,0,.3); }
+.cc-header { padding:1.3rem 1.5rem; display:flex; align-items:center; gap:12px; border-bottom:1px solid rgba(255,255,255,.05); }
+.cc-icon { width:46px; height:46px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:1.4rem; flex-shrink:0; }
+.cc-name { font-size:1rem; font-weight:800; color:var(--text); }
+.cc-count { font-size:.75rem; color:var(--text-dim); margin-top:2px; }
+.cc-body { padding:1rem 1.5rem; }
+.subject-item { display:flex; align-items:center; justify-content:space-between; padding:.6rem 0; border-bottom:1px solid rgba(255,255,255,.04); cursor:pointer; transition:all .2s; }
+.subject-item:last-child { border-bottom:none; }
+.subject-item:hover { padding-right:.5rem; }
+.subject-name { font-size:.88rem; font-weight:600; color:var(--text); display:flex; align-items:center; gap:8px; }
+.subject-meta { display:flex; align-items:center; gap:8px; }
+.subject-count { font-size:.72rem; background:rgba(0,212,255,.08); border:1px solid rgba(0,212,255,.15); color:var(--primary); padding:.2rem .6rem; border-radius:50px; }
+.subject-arrow { color:var(--text-dim); font-size:.75rem; }
+.cc-footer { padding:1rem 1.5rem; background:rgba(255,255,255,.02); border-top:1px solid rgba(255,255,255,.04); display:flex; gap:.6rem; }
+.cc-btn { flex:1; padding:.6rem; border-radius:10px; font-size:.82rem; font-weight:700; cursor:pointer; font-family:'Tajawal',sans-serif; transition:all .3s; border:none; text-align:center; }
+.cc-btn-primary { background:linear-gradient(135deg,#00d4ff,#0099cc); color:var(--dark); }
+.cc-btn-primary:hover { transform:translateY(-1px); box-shadow:0 6px 18px rgba(0,212,255,.3); }
+.cc-btn-secondary { background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.1)!important; color:var(--text-muted); }
+.cc-btn-secondary:hover { background:rgba(255,255,255,.1); color:var(--text); }
+
+/* UPLOAD SECTION */
+.upload-section { background:var(--dark-light); border:1px solid rgba(255,255,255,.06); border-radius:22px; padding:2rem; margin-bottom:3rem; }
+.upload-title { font-size:1.1rem; font-weight:800; margin-bottom:1.5rem; display:flex; align-items:center; gap:8px; }
+.upload-grid { display:grid; grid-template-columns:1fr 1fr; gap:1rem; }
+.upload-inp { width:100%; padding:.85rem 1rem; background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.1); border-radius:12px; color:var(--text); font-family:'Tajawal',sans-serif; font-size:.9rem; outline:none; transition:border-color .3s; }
+.upload-inp:focus { border-color:var(--primary); }
+.upload-inp::placeholder { color:var(--text-dim); }
+.upload-full { grid-column:1/-1; }
+.upload-select { width:100%; padding:.85rem 1rem; background:var(--dark); border:1px solid rgba(255,255,255,.1); border-radius:12px; color:var(--text); font-family:'Tajawal',sans-serif; font-size:.9rem; outline:none; }
+.upload-btn { width:100%; padding:.9rem; background:linear-gradient(135deg,#00d4ff,#0099cc); border:none; border-radius:12px; color:var(--dark); font-weight:800; font-size:.95rem; cursor:pointer; font-family:'Tajawal',sans-serif; transition:all .3s; margin-top:.5rem; display:flex; align-items:center; justify-content:center; gap:8px; }
+.upload-btn:hover { transform:translateY(-2px); box-shadow:0 10px 30px rgba(0,212,255,.35); }
+
+/* PENDING (admin) */
+.pending-section { display:none; background:var(--dark-light); border:1px solid rgba(251,146,60,.2); border-radius:22px; padding:2rem; margin-bottom:2rem; }
+.admin-mode .pending-section { display:block; }
+.pending-title { font-size:1rem; font-weight:800; color:var(--warning); margin-bottom:1.2rem; display:flex; align-items:center; gap:8px; }
+.pending-card { background:rgba(255,255,255,.03); border:1px solid rgba(255,255,255,.07); border-radius:14px; padding:1rem 1.2rem; margin-bottom:.8rem; display:flex; align-items:center; justify-content:space-between; gap:1rem; flex-wrap:wrap; }
+.pending-info .pending-name { font-size:.9rem; font-weight:700; }
+.pending-info .pending-meta { font-size:.78rem; color:var(--text-dim); margin-top:3px; }
+.pending-info .pending-link { font-size:.78rem; color:var(--primary); word-break:break-all; }
+.pending-btns { display:flex; gap:6px; flex-shrink:0; }
+.p-approve { padding:.4rem .9rem; background:rgba(107,203,119,.12); border:1px solid rgba(107,203,119,.25); color:var(--success); font-size:.78rem; font-weight:700; border-radius:8px; cursor:pointer; font-family:'Tajawal',sans-serif; }
+.p-reject { padding:.4rem .9rem; background:rgba(239,68,68,.08); border:1px solid rgba(239,68,68,.2); color:var(--danger); font-size:.78rem; font-weight:700; border-radius:8px; cursor:pointer; font-family:'Tajawal',sans-serif; }
+
+/* ADMIN PANEL */
+.admin-panel { position:fixed; top:0; right:-430px; width:410px; max-width:100%; height:100vh; background:var(--dark-light); border-left:1px solid rgba(255,255,255,.08); z-index:1500; transition:right .4s; overflow-y:auto; padding:1.8rem; }
+.admin-panel.open { right:0; }
+.admin-overlay { position:fixed; inset:0; background:rgba(0,0,0,.5); z-index:1499; display:none; }
+.admin-overlay.show { display:block; }
+.ap-head { display:flex; justify-content:space-between; align-items:center; margin-bottom:1.8rem; padding-bottom:1.2rem; border-bottom:1px solid rgba(255,255,255,.08); }
+.ap-head h2 { font-size:1.2rem; font-weight:900; display:flex; align-items:center; gap:8px; }
+.ap-head h2 i { color:var(--warning); }
+.close-ap { width:36px; height:36px; border-radius:10px; background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.08); color:var(--text-muted); cursor:pointer; display:flex; align-items:center; justify-content:center; }
+.close-ap:hover { background:var(--danger); color:#fff; }
+.ap-section { margin-bottom:1.5rem; padding-bottom:1.5rem; border-bottom:1px solid rgba(255,255,255,.05); }
+.ap-section:last-child { border-bottom:none; }
+.ap-section h3 { font-size:.9rem; font-weight:700; color:var(--primary); margin-bottom:.8rem; display:flex; align-items:center; gap:6px; }
+.ap-login-badge { font-size:.8rem; color:var(--success); margin-bottom:1rem; display:flex; align-items:center; gap:6px; }
+.ap-login-badge::before { content:''; width:6px; height:6px; background:var(--success); border-radius:50%; }
+.minp { width:100%; padding:.8rem 1rem; background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.1); border-radius:10px; color:var(--text); font-family:'Tajawal',sans-serif; font-size:.88rem; outline:none; margin-bottom:8px; }
+.minp:focus { border-color:var(--primary); }
+.minp::placeholder { color:var(--text-dim); }
+.ap-stat { background:rgba(0,212,255,.05); border:1px solid rgba(0,212,255,.1); border-radius:10px; padding:.8rem 1rem; display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; }
+.ap-stat-label { font-size:.82rem; color:var(--text-muted); }
+.ap-stat-val { font-family:monospace; font-size:1.3rem; color:var(--primary); font-weight:700; }
+.ap-action { width:100%; background:rgba(0,212,255,.06); border:1px solid rgba(0,212,255,.15); color:var(--primary); font-size:.85rem; font-weight:700; padding:.8rem 1rem; border-radius:10px; cursor:pointer; font-family:'Tajawal',sans-serif; transition:all .3s; text-align:right; display:flex; align-items:center; gap:8px; margin-bottom:6px; }
+.ap-action:hover { background:rgba(0,212,255,.12); }
+.ap-action.danger { color:var(--danger); border-color:rgba(239,68,68,.2); background:rgba(239,68,68,.05); }
+.ap-action.danger:hover { background:rgba(239,68,68,.12); }
+
+.admin-fab { position:fixed; bottom:22px; left:22px; z-index:999; width:44px; height:44px; background:rgba(0,212,255,.1); border:1px solid rgba(0,212,255,.2); border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:1rem; transition:all .3s; backdrop-filter:blur(8px); }
+.admin-fab:hover { background:rgba(0,212,255,.2); transform:scale(1.1); }
+
+.reveal { opacity:0; transform:translateY(20px); transition:opacity .6s ease,transform .6s ease; }
+.reveal.active { opacity:1; transform:translateY(0); }
+.empty-state { text-align:center; padding:2rem; color:var(--text-dim); font-size:.9rem; }
+
+@media(max-width:600px) {
+    .colleges-grid { grid-template-columns:1fr; }
+    .upload-grid { grid-template-columns:1fr; }
+    .admin-panel { width:100%; right:-100%; }
+    .filters { gap:.4rem; }
+}
+</style>
+</head>
+<body>
+
+<div class="page-bg"><div class="c c1"></div><div class="c c2"></div></div>
+<div class="loading-overlay" id="loadingOverlay"><div class="spinner"></div></div>
+<div class="toast" id="toast"><i class="fas fa-check-circle"></i><span id="toastMsg"></span></div>
+<div class="admin-badge" id="adminBadge"><i class="fas fa-crown"></i><span id="adminLabel">مشرف</span></div>
+<div class="admin-overlay" id="adminOverlay" onclick="closeAP()"></div>
+
+<!-- Admin Panel -->
+<div class="admin-panel" id="adminPanel">
+    <div class="ap-head">
+        <h2><i class="fas fa-cog"></i> إدارة الملخصات</h2>
+        <button class="close-ap" onclick="closeAP()"><i class="fas fa-times"></i></button>
+    </div>
+
+    <div class="ap-section" id="apLoginSection">
+        <h3><i class="fas fa-lock"></i> تسجيل الدخول</h3>
+        <input type="password" class="minp" id="apPass" placeholder="كلمة المرور..." onkeydown="if(event.key==='Enter')apLogin()">
+        <button onclick="apLogin()" style="width:100%;background:linear-gradient(135deg,#00d4ff,#0099cc);color:var(--dark);border:none;border-radius:10px;padding:11px;font-size:.9rem;font-weight:800;cursor:pointer;font-family:'Tajawal',sans-serif;margin-top:4px;">دخول ⚡</button>
+    </div>
+
+    <div id="apControls" style="display:none;">
+        <div class="ap-section">
+            <div class="ap-login-badge" id="apBadgeText">مرحباً!</div>
+            <div class="ap-stat"><span class="ap-stat-label">الملخصات المعلقة</span><span class="ap-stat-val" id="statPending">0</span></div>
+            <div class="ap-stat"><span class="ap-stat-label">إجمالي الملخصات</span><span class="ap-stat-val" id="statTotal">0</span></div>
+        </div>
+        <div class="ap-section">
+            <h3><i class="fas fa-tasks"></i> الطلبات المعلقة</h3>
+            <button class="ap-action" onclick="closeAP();document.getElementById('pendingSection').scrollIntoView({behavior:'smooth'})">
+                <i class="fas fa-eye"></i> عرض الطلبات المعلقة
+            </button>
+        </div>
+        <div class="ap-section">
+            <button class="ap-action danger" onclick="apLogout()"><i class="fas fa-sign-out-alt"></i> تسجيل خروج</button>
+        </div>
+    </div>
+</div>
+
+<!-- Navbar -->
+<nav class="navbar">
+    <a href="index.html" class="logo">
+        <div class="logo-icon">NU</div>
+        <div class="logo-text">Nizwa <span>University</span></div>
+    </a>
+    <div class="nav-right">
+        <button class="admin-nav-btn" id="adminNavBtn" onclick="openAP()"><i class="fas fa-cog"></i> لوحة التحكم</button>
+        <button class="logout-btn" id="logoutNavBtn" onclick="apLogout()"><i class="fas fa-sign-out-alt"></i> خروج</button>
+        <a href="index.html" class="nav-home"><i class="fas fa-arrow-right"></i> الرئيسية</a>
+    </div>
+</nav>
+
+<div class="admin-fab" onclick="openAP()"><i class="fas fa-cog"></i></div>
+
+<main>
+    <div class="page-hero reveal">
+        <div class="hero-badge"><i class="fas fa-book-open"></i> من طلاب نزوى</div>
+        <h1>مكتبة الملخصات 📚</h1>
+        <p>ملخصات وشروحات لجميع الكليات والمواد — شاركها مع زملائك</p>
+    </div>
+
+    <!-- Filters -->
+    <div class="filters reveal">
+        <button class="filter-btn active" onclick="filterCollege('all',this)">الكل</button>
+        <button class="filter-btn" onclick="filterCollege('اقتصاد',this)">💼 الاقتصاد</button>
+        <button class="filter-btn" onclick="filterCollege('هندسة',this)">🏗️ الهندسة</button>
+        <button class="filter-btn" onclick="filterCollege('علوم',this)">🔬 العلوم والآداب</button>
+        <button class="filter-btn" onclick="filterCollege('صحية',this)">⚕️ الصحية</button>
+        <button class="filter-btn" onclick="filterCollege('تأسيس',this)">📖 التأسيس</button>
+    </div>
+
+    <!-- Pending section (admin only) -->
+    <div class="pending-section" id="pendingSection">
+        <div class="pending-title"><i class="fas fa-clock"></i> طلبات ملخصات معلقة</div>
+        <div id="pendingList"><div class="empty-state">لا توجد طلبات معلقة ✅</div></div>
+    </div>
+
+    <!-- Colleges Grid -->
+    <div class="colleges-grid" id="collegesGrid"></div>
+
+    <!-- Upload Section -->
+    <div class="upload-section reveal">
+        <div class="upload-title">📤 أضف ملخصك</div>
+        <p style="color:var(--text-dim);font-size:.85rem;margin-bottom:1.2rem;">شارك ملخصاتك مع زملائك — سيراجعها الأدمن قبل النشر</p>
+        <div class="upload-grid">
+            <div>
+                <input type="text" class="upload-inp" id="upName" placeholder="اسمك (اختياري)">
+            </div>
+            <div>
+                <select class="upload-select" id="upCollege">
+                    <option value="">اختر الكلية</option>
+                    <option value="اقتصاد">💼 الاقتصاد ونظم المعلومات</option>
+                    <option value="هندسة">🏗️ الهندسة والعمارة</option>
+                    <option value="علوم">🔬 العلوم والآداب</option>
+                    <option value="صحية">⚕️ العلوم الصحية</option>
+                    <option value="تأسيس">📖 معهد التأسيس</option>
+                </select>
+            </div>
+            <div>
+                <input type="text" class="upload-inp" id="upSubject" placeholder="اسم المادة/الرمز (مثال: MATH101)">
+            </div>
+            <div>
+                <input type="text" class="upload-inp" id="upTags" placeholder="الوسوم (مثال: اختبار، محاضرات)">
+            </div>
+            <div class="upload-full">
+                <input type="url" class="upload-inp" id="upLink" placeholder="رابط التخزين السحابي (Google Drive, OneDrive...)">
+            </div>
+            <div class="upload-full">
+                <textarea class="upload-inp" id="upDesc" placeholder="وصف اختياري..." rows="2" style="resize:none;"></textarea>
+            </div>
+        </div>
+        <button class="upload-btn" onclick="submitSummary()">
+            <i class="fas fa-paper-plane"></i> إرسال للمراجعة
+        </button>
+    </div>
+</main>
+
+<script type="module">
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
+const supabase = createClient(
+    'https://fjkxahhoacqlpiafmfyd.supabase.co',
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZqa3hhaGhvYWNxbHBpYWZtZnlkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgzMTkwMjQsImV4cCI6MjA5Mzg5NTAyNH0.Ls3gaXRso3BgcDAByoYeQQot_KbAOfREvxyW8u4vkGA'
+)
+
+const FALLBACK_PASS = 'UoN@Coffee#2026!'
+async function checkPassword(pass) {
+    if (pass === FALLBACK_PASS) return { role:'admin', label:'المشرف الرئيسي' }
+    try {
+        const { data } = await supabase.from('admin_passwords').select('*')
+        if (data) for (const r of data) if (r.password_plain === pass) return { role:r.role, label:r.label }
+    } catch(e) {}
+    return null
+}
+
+// Default colleges data
+const defaultColleges = [
+    {
+        id:'eco', name:'الاقتصاد ونظم المعلومات', emoji:'💼', color:'#6bcb77', tag:'اقتصاد',
+        subjects:[
+            { name:'ACCT101 - مبادئ المحاسبة', count:12 },
+            { name:'MGMT201 - إدارة الأعمال', count:8 },
+            { name:'MIS301 - نظم المعلومات', count:6 },
+            { name:'ECON101 - مبادئ الاقتصاد', count:9 },
+        ]
+    },
+    {
+        id:'eng', name:'الهندسة والعمارة', emoji:'🏗️', color:'#fb923c', tag:'هندسة',
+        subjects:[
+            { name:'MATH101 - رياضيات هندسية', count:15 },
+            { name:'PHYS201 - فيزياء', count:7 },
+            { name:'CIVL301 - هندسة مدنية', count:5 },
+            { name:'ARCH201 - عمارة', count:4 },
+        ]
+    },
+    {
+        id:'sci', name:'العلوم والآداب', emoji:'🔬', color:'#a78bfa', tag:'علوم',
+        subjects:[
+            { name:'CHEM101 - كيمياء عامة', count:18 },
+            { name:'BIOL101 - أحياء', count:11 },
+            { name:'MATH101 - رياضيات', count:20 },
+            { name:'ENGL101 - لغة إنجليزية', count:14 },
+        ]
+    },
+    {
+        id:'health', name:'العلوم الصحية', emoji:'⚕️', color:'#ff6b6b', tag:'صحية',
+        subjects:[
+            { name:'NURS101 - أساسيات التمريض', count:9 },
+            { name:'ANAT201 - تشريح', count:7 },
+            { name:'PHARM301 - صيدلة', count:5 },
+            { name:'PUBH101 - صحة عامة', count:8 },
+        ]
+    },
+    {
+        id:'found', name:'معهد التأسيس', emoji:'📖', color:'#38bdf8', tag:'تأسيس',
+        subjects:[
+            { name:'ENGL001 - إنجليزي تأسيسي', count:22 },
+            { name:'MATH001 - رياضيات تأسيسية', count:19 },
+            { name:'COMP001 - حاسوب تأسيسي', count:10 },
+            { name:'ARAB001 - عربي تأسيسي', count:8 },
+        ]
+    },
+]
+
+let summaries = []
+let pending = []
+let currentAdmin = null
+let currentFilter = 'all'
+
+window.addEventListener('DOMContentLoaded', async () => {
+    const saved = sessionStorage.getItem('uon_sum_admin')
+    if (saved) try { currentAdmin = JSON.parse(saved); updateAdminUI() } catch(e) {}
+    setTimeout(() => document.getElementById('loadingOverlay').classList.add('hidden'), 4000)
+    try { await loadSummaries() } catch(e) {}
+    document.getElementById('loadingOverlay').classList.add('hidden')
+    renderColleges()
+    initReveal()
+})
+
+async function loadSummaries() {
+    try {
+        const { data } = await supabase.from('summaries').select('*').order('created_at', { ascending: false })
+        if (data) {
+            summaries = data.filter(s => s.approved)
+            pending = data.filter(s => !s.approved)
+        }
+    } catch(e) {}
+    updateStats()
+    renderPending()
+}
+
+function renderColleges() {
+    const grid = document.getElementById('collegesGrid')
+    const filtered = currentFilter === 'all' ? defaultColleges : defaultColleges.filter(c => c.tag === currentFilter)
+    grid.innerHTML = filtered.map(col => `
+        <div class="college-card reveal" style="--col-color:${col.color}">
+            <div class="cc-header">
+                <div class="cc-icon" style="background:${col.color}20;color:${col.color}">${col.emoji}</div>
+                <div>
+                    <div class="cc-name">${col.name}</div>
+                    <div class="cc-count">${col.subjects.reduce((a,s)=>a+s.count,0)} ملخص</div>
+                </div>
+            </div>
+            <div class="cc-body">
+                ${col.subjects.map(s => `
+                    <div class="subject-item" onclick="openSubject('${s.name}')">
+                        <span class="subject-name"><i class="fas fa-file-alt" style="color:${col.color};font-size:.75rem"></i>${s.name}</span>
+                        <div class="subject-meta">
+                            <span class="subject-count">${s.count}</span>
+                            <i class="fas fa-chevron-left subject-arrow"></i>
+                        </div>
+                    </div>`).join('')}
+            </div>
+            <div class="cc-footer">
+                <button class="cc-btn cc-btn-primary" onclick="openCollege('${col.id}')">عرض الكل</button>
+                <button class="cc-btn cc-btn-secondary" onclick="document.getElementById('upCollege').value='${col.tag}';document.getElementById('upLink').focus()">+ أضف ملخص</button>
+            </div>
+        </div>`).join('')
+    setTimeout(() => document.querySelectorAll('.college-card.reveal').forEach(el => el.classList.add('active')), 50)
+}
+
+window.filterCollege = function(tag, btn) {
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'))
+    btn.classList.add('active')
+    currentFilter = tag
+    renderColleges()
+}
+
+window.openSubject = function(name) {
+    showToast(`جاري تحميل ملخصات: ${name} 📚`)
+}
+
+window.openCollege = function(id) {
+    showToast('سيتم فتح ملخصات الكلية قريباً 🔜')
+}
+
+// Submit summary
+window.submitSummary = async function() {
+    const college = document.getElementById('upCollege').value
+    const subject = document.getElementById('upSubject').value.trim()
+    const link = document.getElementById('upLink').value.trim()
+    if (!college || !subject || !link) { showToast('يرجى ملء الكلية والمادة والرابط', 'error'); return }
+    if (!link.startsWith('http')) { showToast('الرابط غير صحيح', 'error'); return }
+    try {
+        await supabase.from('summaries').insert({
+            submitter_name: document.getElementById('upName').value.trim() || 'مجهول',
+            college, subject,
+            tags: document.getElementById('upTags').value.trim(),
+            link,
+            description: document.getElementById('upDesc').value.trim(),
+            approved: false
+        })
+        ;['upName','upSubject','upLink','upTags','upDesc'].forEach(id => document.getElementById(id).value = '')
+        document.getElementById('upCollege').value = ''
+        showToast('تم إرسال الملخص للمراجعة! ✅')
+        await loadSummaries()
+    } catch(e) { showToast('خطأ في الإرسال، جرب مرة ثانية', 'error') }
+}
+
+// Pending (admin)
+function renderPending() {
+    const list = document.getElementById('pendingList')
+    if (!pending.length) { list.innerHTML = '<div class="empty-state">لا توجد طلبات معلقة ✅</div>'; return }
+    list.innerHTML = pending.map(p => `
+        <div class="pending-card" id="pend-${p.id}">
+            <div class="pending-info">
+                <div class="pending-name">📚 ${p.subject} — ${p.college}</div>
+                <div class="pending-meta">بواسطة: ${p.submitter_name || 'مجهول'} ${p.tags ? '· ' + p.tags : ''}</div>
+                <div class="pending-link"><a href="${p.link}" target="_blank" style="color:var(--primary)">🔗 ${p.link.substring(0,50)}...</a></div>
+            </div>
+            <div class="pending-btns">
+                <button class="p-approve" onclick="approveSummary('${p.id}')">✅ قبول</button>
+                <button class="p-reject" onclick="rejectSummary('${p.id}')">❌ رفض</button>
+            </div>
+        </div>`).join('')
+}
+
+window.approveSummary = async function(id) {
+    try {
+        await supabase.from('summaries').update({ approved: true }).eq('id', id)
+        pending = pending.filter(p => p.id != id)
+        renderPending()
+        updateStats()
+        showToast('تم قبول الملخص! ✅')
+    } catch(e) { showToast('خطأ', 'error') }
+}
+
+window.rejectSummary = async function(id) {
+    if (!confirm('هل تريد رفض وحذف هذا الملخص؟')) return
+    try {
+        await supabase.from('summaries').delete().eq('id', id)
+        pending = pending.filter(p => p.id != id)
+        renderPending()
+        updateStats()
+        showToast('تم رفض الملخص', 'error')
+    } catch(e) { showToast('خطأ', 'error') }
+}
+
+function updateStats() {
+    document.getElementById('statPending').textContent = pending.length
+    document.getElementById('statTotal').textContent = summaries.length + pending.length
+}
+
+// Admin
+window.openAP = () => { document.getElementById('adminPanel').classList.add('open'); document.getElementById('adminOverlay').classList.add('show') }
+window.closeAP = () => { document.getElementById('adminPanel').classList.remove('open'); document.getElementById('adminOverlay').classList.remove('show') }
+
+window.apLogin = async function() {
+    const pass = document.getElementById('apPass').value
+    if (!pass) return
+    const matched = await checkPassword(pass)
+    if (matched) {
+        currentAdmin = matched
+        sessionStorage.setItem('uon_sum_admin', JSON.stringify(matched))
+        document.getElementById('apPass').value = ''
+        updateAdminUI()
+        showToast(`مرحباً ${matched.label}! ✅`)
+    } else {
+        document.getElementById('apPass').style.borderColor = 'var(--danger)'
+        setTimeout(() => document.getElementById('apPass').style.borderColor = '', 1000)
+        showToast('كلمة المرور غير صحيحة', 'error')
+    }
+}
+
+window.apLogout = function() {
+    currentAdmin = null
+    sessionStorage.removeItem('uon_sum_admin')
+    updateAdminUI()
+    closeAP()
+    showToast('تم تسجيل الخروج', 'error')
+}
+
+function updateAdminUI() {
+    const isAdmin = !!currentAdmin
+    document.getElementById('apLoginSection').style.display = isAdmin ? 'none' : 'block'
+    document.getElementById('apControls').style.display = isAdmin ? 'block' : 'none'
+    document.getElementById('adminBadge').classList.toggle('show', isAdmin)
+    document.getElementById('adminNavBtn').classList.toggle('show', isAdmin)
+    document.getElementById('logoutNavBtn').classList.toggle('show', isAdmin)
+    if (isAdmin) {
+        document.getElementById('apBadgeText').textContent = `مرحباً ${currentAdmin.label}! 👋`
+        document.getElementById('adminLabel').textContent = currentAdmin.label
+    }
+    document.body.classList.toggle('admin-mode', isAdmin)
+    updateStats()
+    renderPending()
+}
+
+window.showToast = function(msg, type) {
+    const t = document.getElementById('toast')
+    document.getElementById('toastMsg').textContent = msg
+    t.className = 'toast show'+(type==='error'?' error':'')
+    t.querySelector('i').className = type==='error'?'fas fa-exclamation-circle':'fas fa-check-circle'
+    setTimeout(() => t.classList.remove('show'), 3000)
+}
+
+function initReveal() {
+    const obs = new IntersectionObserver(es => es.forEach(e => { if(e.isIntersecting) e.target.classList.add('active') }), {threshold:.1})
+    document.querySelectorAll('.reveal').forEach(el => obs.observe(el))
+}
+</script>
+</body>
+</html>
