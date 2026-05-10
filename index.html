@@ -394,8 +394,8 @@
     <ul class="nav-links">
         <li><a href="#home">الرئيسية</a></li>
         <li><a href="#tools">الأدوات</a></li>
-        <li><a href="#busSection">الباصات</a></li>
-        <li><a href="#summariesSection">الملخصات</a></li>
+        
+        
         <li><a href="#botSection">المساعد AI</a></li>
         <li><a href="#contact">التواصل</a></li>
         <li><a href="features.html" target="_blank" style="color:var(--warning)!important;">🔥 الميزات</a></li>
@@ -431,10 +431,7 @@
 <div class="stats-bar">
     <div class="stat-item reveal"><i class="fas fa-users"></i><span class="stat-number" data-target="5000">0</span><span class="stat-label">طالب نشط</span></div>
     <div class="stat-item reveal"><i class="fas fa-book"></i><span class="stat-number" data-target="1200">0</span><span class="stat-label">ملخص دراسي</span></div>
-    <div class="stat-item reveal"><i class="fas fa-bus"></i><span class="stat-number" data-target="12">0</span><span class="stat-label">رحلة يومية</span></div>
-    <div class="stat-item reveal"><i class="fas fa-tools"></i><span class="stat-number" data-target="50">0</span><span class="stat-label">أداة متاحة</span></div>
-    <div class="stat-item reveal"><i class="fas fa-star"></i><span class="stat-number" data-target="4.9">0</span><span class="stat-label">تقييم المنصة</span></div>
-</div>
+    </div>
 
 <!-- Tools -->
 <section class="tools-section" id="tools">
@@ -450,102 +447,9 @@
     </div>
 </section>
 
-<!-- Bus Schedule -->
-<section class="bus-section reveal" id="busSection">
-    <div class="section-header" style="margin-bottom:2.5rem;">
-        <h2>🚌 مواعيد الباصات</h2>
-        <p>جداول الذهاب والعودة لباصات الطلاب — محدّثة يومياً</p>
-    </div>
 
-    <div class="bus-tabs">
-        <button class="bus-tab active" onclick="switchBusTab('boys',this)">🚌 باص الأولاد</button>
-        <button class="bus-tab" onclick="switchBusTab('girls',this)">🚌 باص البنات</button>
-    </div>
 
-    <!-- Boys -->
-    <div class="bus-panel active" id="busPanel-boys">
-        <div class="bus-table-wrap">
-            <div class="bus-table-head">
-                <h3>🚌 جدول باص الأولاد <span class="bus-badge boys">أولاد</span></h3>
-                <span style="font-size:0.8rem;color:var(--text-dim);">الأحد - الخميس</span>
-            </div>
-            <div id="busBoysTable"></div>
-        </div>
-    </div>
 
-    <!-- Girls -->
-    <div class="bus-panel" id="busPanel-girls">
-        <div class="bus-table-wrap">
-            <div class="bus-table-head">
-                <h3>🚌 جدول باص البنات <span class="bus-badge girls">بنات</span></h3>
-                <span style="font-size:0.8rem;color:var(--text-dim);">الأحد - الخميس</span>
-            </div>
-            <div id="busGirlsTable"></div>
-        </div>
-    </div>
-
-    <div class="bus-book-banner" id="busBookBanner">
-        <div class="bus-book-text">
-            <h4>📋 حجز موعد الباص</h4>
-            <p>سجّل حضورك واحجز مقعدك في الباص مسبقاً</p>
-        </div>
-        <a href="#" id="busBookingLink" target="_blank" class="bus-book-btn">
-            <i class="fas fa-calendar-check"></i> احجز الآن
-        </a>
-    </div>
-</section>
-
-<!-- Summaries -->
-<section class="summaries-section reveal" id="summariesSection">
-    <div class="section-header" style="margin-bottom:2.5rem;">
-        <h2>📚 مكتبة الملخصات</h2>
-        <p>ملخصات وشروحات تعليمية من طلاب جامعة نزوى لجميع الكليات والمواد</p>
-    </div>
-    <div class="summaries-grid">
-        <div class="summary-card" onclick="showToast('قريباً! 🔜')">
-            <div class="summary-icon">💼</div>
-            <h3>الاقتصاد ونظم المعلومات</h3>
-            <p>محاسبة، إدارة أعمال، نظم المعلومات</p>
-            <span class="summary-count">٨٥ ملخص</span>
-        </div>
-        <div class="summary-card" onclick="showToast('قريباً! 🔜')">
-            <div class="summary-icon">🏗️</div>
-            <h3>الهندسة والعمارة</h3>
-            <p>هندسة مدنية، كهربائية، معمارية</p>
-            <span class="summary-count">٦٢ ملخص</span>
-        </div>
-        <div class="summary-card" onclick="showToast('قريباً! 🔜')">
-            <div class="summary-icon">🔬</div>
-            <h3>العلوم والآداب</h3>
-            <p>كيمياء، فيزياء، رياضيات، إنجليزي</p>
-            <span class="summary-count">١١٠ ملخص</span>
-        </div>
-        <div class="summary-card" onclick="showToast('قريباً! 🔜')">
-            <div class="summary-icon">⚕️</div>
-            <h3>العلوم الصحية</h3>
-            <p>تمريض، صحة عامة، علوم مختبرية</p>
-            <span class="summary-count">٧٣ ملخص</span>
-        </div>
-        <div class="summary-card" onclick="showToast('قريباً! 🔜')">
-            <div class="summary-icon">📖</div>
-            <h3>معهد التأسيس</h3>
-            <p>مواد السنة الأولى والتأسيسية</p>
-            <span class="summary-count">٩٤ ملخص</span>
-        </div>
-        <div class="summary-card" style="border: 1px dashed rgba(0,212,255,0.3); background: rgba(0,212,255,0.03);" onclick="showToast('أضف ملخصك قريباً! 🔜')">
-            <div class="summary-icon">➕</div>
-            <h3>أضف ملخصك</h3>
-            <p>شارك ملخصاتك مع زملائك واكسب نقاط</p>
-            <span class="summary-count" style="background:rgba(0,212,255,0.05);color:var(--text-dim);">قريباً</span>
-        </div>
-    </div>
-    <div class="summaries-cta">
-        <p>تبي تشارك ملخصاتك أو تحصل على ملخصات مواد معينة؟</p>
-        <a href="https://wa.me/96877144942" target="_blank" class="btn-primary" style="display:inline-flex;text-decoration:none;">
-            <i class="fab fa-whatsapp"></i> تواصل معنا
-        </a>
-    </div>
-</section>
 
 <!-- Features -->
 <section class="features-section" id="features">
