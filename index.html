@@ -243,7 +243,16 @@
         @keyframes heartbeat { 0%,100%{transform:scale(1)}50%{transform:scale(1.2)} }
         .heart { color: var(--secondary); display: inline-block; animation: heartbeat 1.5s infinite; }
 
-        /* ===== MAINTENANCE MODE ===== */
+        .tool-toggle-row { display:flex; align-items:center; gap:10px; padding:0.7rem 0.9rem; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.06); border-radius:10px; margin-bottom:6px; transition:all 0.2s; }
+        .tool-toggle-row:hover { background:rgba(255,255,255,0.05); }
+        .tool-toggle-icon { width:32px; height:32px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:0.85rem; flex-shrink:0; }
+        .tool-toggle-name { flex:1; font-weight:700; font-size:0.9rem; }
+        .tool-toggle-switch { position:relative; width:44px; height:24px; flex-shrink:0; }
+        .tool-toggle-switch input { opacity:0; width:0; height:0; }
+        .tool-toggle-slider { position:absolute; inset:0; background:rgba(239,68,68,0.3); border-radius:50px; cursor:pointer; transition:0.3s; border:1px solid rgba(239,68,68,0.4); }
+        .tool-toggle-slider:before { content:''; position:absolute; width:18px; height:18px; left:2px; top:2px; background:white; border-radius:50%; transition:0.3s; }
+        .tool-toggle-switch input:checked + .tool-toggle-slider { background:rgba(107,203,119,0.3); border-color:rgba(107,203,119,0.5); }
+        .tool-toggle-switch input:checked + .tool-toggle-slider:before { transform:translateX(20px); }
         .maintenance-overlay { position: fixed; inset: 0; background: var(--dark); z-index: 99998; display: none; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 2rem; }
         .maintenance-overlay.active { display: flex; }
         .maintenance-icon { font-size: 5rem; margin-bottom: 1.5rem; animation: float 3s ease-in-out infinite; }
@@ -349,14 +358,14 @@
     </div>
 
     <!-- Add Tool -->
-    <div class="panel-section">
+    <div class="panel-section" id="addToolSection">
         <h3><i class="fas fa-plus-circle"></i> إضافة أداة جديدة</h3>
         <div class="form-group"><label>اسم الأداة</label><input type="text" id="newTitle" placeholder="مثال: دليل التخصصات"></div>
         <div class="form-group">
-            <label>الوصف <span style="font-size:0.75rem;color:var(--text-dim);">(يدعم HTML: &lt;b&gt;, &lt;a href=""&gt;, &lt;br&gt;, جداول...)</span></label>
-            <textarea id="newDesc" placeholder="وصف مختصر للأداة...&#10;مثال: يدعم <b>5 ميزات</b> ومنها <a href='#'>رابط مباشر</a>" style="min-height:90px;font-family:monospace;font-size:0.85rem;"></textarea>
+            <label>الوصف <span style="font-size:0.75rem;color:var(--text-dim);">(يدعم HTML: &lt;b&gt;, &lt;a href=""&gt;, &lt;br&gt;...)</span></label>
+            <textarea id="newDesc" placeholder="وصف مختصر للأداة..." style="min-height:80px;font-family:monospace;font-size:0.85rem;"></textarea>
         </div>
-        <div class="form-group"><label>الأيقونة</label><input type="text" id="newIcon" placeholder="fa-graduation-cap"></div>
+        <div class="form-group"><label>الأيقونة <small style="color:var(--text-dim);">Font Awesome</small></label><input type="text" id="newIcon" placeholder="fa-graduation-cap"></div>
         <div class="form-group">
             <label>رابط الأداة <span style="font-size:0.75rem;color:var(--text-dim);">(اتركه فارغاً للرابط الافتراضي)</span></label>
             <input type="text" id="newLinkUrl" placeholder="https://... أو summaries.html">
@@ -378,11 +387,17 @@
             <label for="newIsEnabled" style="margin:0;cursor:pointer;"><b>الأداة مفعّلة</b> <span style="font-size:0.8rem;color:var(--text-dim);font-weight:400;">— أزل العلامة لتظهر "قريباً"</span></label>
         </div>
         <button class="btn-save" onclick="addToolHandler()"><i class="fas fa-plus"></i> إضافة الأداة</button>
+    </div>
+
+    <!-- Tools Toggle Quick Panel -->
+    <div class="panel-section" id="toolsToggleSection">
+        <h3><i class="fas fa-toggle-on"></i> تفعيل / إيقاف الأدوات</h3>
+        <p style="font-size:0.82rem;color:var(--text-dim);margin-bottom:1rem;">كل أداة يمكن فتحها أو إغلاقها بشكل مستقل</p>
+        <div id="toolsToggleList"></div>
         <div style="margin-top:1rem;padding-top:1rem;border-top:1px solid rgba(255,255,255,0.06);">
             <button onclick="resetToolsToDefault()" style="width:100%;padding:0.8rem;background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2);border-radius:12px;color:var(--danger);font-weight:700;font-family:'Tajawal',sans-serif;cursor:pointer;font-size:0.9rem;">
                 <i class="fas fa-redo"></i> إعادة ضبط الأدوات للافتراضي
             </button>
-            <p style="font-size:0.75rem;color:var(--text-dim);text-align:center;margin-top:0.5rem;">يحذف الأدوات الإضافية ويعيد الأصلية بروابطها الصحيحة</p>
         </div>
     </div>
 
@@ -861,6 +876,21 @@ function renderTools() {
             <button class="tool-link" style="color:${tool.color};${disabled ? 'opacity:0.5;cursor:not-allowed;' : ''}" onclick="openTool(${tool.id})">${tool.btnText} <i class="fas fa-arrow-left"></i></button>
         </div>`
     }).join('')
+    renderToolsToggleList()
+}
+
+function renderToolsToggleList() {
+    const list = document.getElementById('toolsToggleList')
+    if (!list) return
+    list.innerHTML = tools.map(tool => `
+        <div class="tool-toggle-row">
+            <div class="tool-toggle-icon" style="background:${tool.color}20;color:${tool.color};"><i class="fas ${tool.icon}"></i></div>
+            <span class="tool-toggle-name">${tool.title}</span>
+            <label class="tool-toggle-switch" title="${tool.isEnabled !== false ? 'مفعّل — اضغط لإيقاف' : 'موقوف — اضغط لتفعيل'}">
+                <input type="checkbox" ${tool.isEnabled !== false ? 'checked' : ''} onchange="quickToggleTool(${tool.id}, this.checked)">
+                <span class="tool-toggle-slider"></span>
+            </label>
+        </div>`).join('')
 }
 
 window.openTool = function(id) {
@@ -963,6 +993,18 @@ window.closePanel = function() {
     document.getElementById('adminPanel').classList.remove('open')
     document.getElementById('panelOverlay').classList.remove('show')
     editingToolId = null
+}
+
+window.quickToggleTool = async function(id, enabled) {
+    if (currentAdmin?.role !== 'admin' && currentAdmin?.role !== 'editor') {
+        showToast('ليس لديك صلاحية', 'error'); return
+    }
+    const tool = tools.find(t => t.id === id)
+    if (!tool) return
+    tool.isEnabled = enabled
+    await supabase.from('tools').update({ is_enabled: enabled }).eq('id', id)
+    renderTools()
+    showToast(enabled ? `✅ "${tool.title}" مفعّلة` : `🔜 "${tool.title}" موقوفة`)
 }
 
 window.editTool = function(id) {
