@@ -264,8 +264,6 @@
 </style>
 ```
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
 </head>
 <body>
 
@@ -475,12 +473,7 @@
         <h2>الأدوات المتاحة</h2>
         <p>مجموعة شاملة من الأدوات المصممة خصيصاً لتلبية احتياجاتك الأكاديمية في جامعة نزوى</p>
     </div>
-    <div class="tools-grid" id="toolsGrid">
-        <div style="grid-column:1/-1;text-align:center;padding:3rem;color:var(--text-dim);">
-            <i class="fas fa-spinner fa-spin" style="font-size:2rem;margin-bottom:1rem;display:block;color:var(--primary)"></i>
-            جاري تحميل الأدوات...
-        </div>
-    </div>
+    <div class="tools-grid" id="toolsGrid"></div>
 </section>
 
 <!-- Features -->
@@ -583,6 +576,8 @@
         <p style="margin-top:0.5rem;">صنع بحب <span class="heart">❤️</span> من طلاب جامعة نزوى</p>
     </div>
 </footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" crossorigin="anonymous"></script>
 
 <script>
 const supabase = (window.supabase || window.supabaseJs).createClient(
