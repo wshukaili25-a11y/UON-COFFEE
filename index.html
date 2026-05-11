@@ -38,8 +38,7 @@
 
     /* ===== LOADING ===== */
     .loading-overlay { position: fixed; inset: 0; background: var(--dark); z-index: 99999; display: flex; align-items: center; justify-content: center; transition: opacity 0.5s; }
-    .loading-overlay { position: fixed; inset: 0; background: var(--dark); z-index: 9999; display: flex; align-items: center; justify-content: center; transition: opacity 0.5s; }
-    .loading-overlay.hidden { opacity: 0; pointer-events: none; visibility: hidden; }
+    .loading-overlay.hidden { display: none !important; }
     .loading-spinner { width: 50px; height: 50px; border: 3px solid rgba(0,212,255,0.1); border-top-color: var(--primary); border-radius: 50%; animation: spin 0.8s linear infinite; }
 
     /* ===== TOAST ===== */
@@ -296,11 +295,10 @@
 
 <div class="loading-overlay" id="loadingOverlay"><div class="loading-spinner"></div></div>
 <script>
-// Force hide loading after 4s no matter what
+// Hide after 1s max - don't block the page
 setTimeout(() => {
-    const ol = document.getElementById('loadingOverlay')
-    if (ol) ol.classList.add('hidden')
-}, 4000)
+    document.getElementById('loadingOverlay').classList.add('hidden')
+}, 1000)
 </script>
 
 <!-- Maintenance Mode Overlay -->
@@ -728,7 +726,7 @@ const defaultGirls = [
 ]
 
 // ===== STATE =====
-let tools = []
+let tools = defaultTools.map(t => ({ id: t.id, title: t.title, desc: t.description, icon: t.icon, color: t.color, btnText: t.btn_text, linkUrl: t.link_url || '', isEnabled: true }))
 let currentAdmin = null
 let editingToolId = null
 let selectedColor = "#00d4ff"
@@ -901,17 +899,21 @@ window.saveBusSchedule = async function() {
 
 // ===== INIT =====
 window.addEventListener('DOMContentLoaded', () => {
-    // Hide loading immediately - don't wait for Supabase
+    // Hide loading immediately
     document.getElementById('loadingOverlay').classList.add('hidden')
-    
-    // Init UI immediately with defaults
+
+    // Render tools immediately from defaults
+    renderTools()
+    renderBusTables()
+
+    // Init UI
     updateUI()
     initScrollReveal()
     initCounters()
     initParallax()
     botAddMsg('bot', 'مرحباً بك في UoN Coffee! 👋\n\nأنا مساعدك الذكي لجامعة نزوى 🎓\nاسألني عن الكليات، الروابط، مواعيد الباصات، أو أي شيء!')
 
-    // Load data from Supabase in background (non-blocking)
+    // Load from Supabase in background
     loadTools()
     loadSettings().catch(() => {})
     loadBusData().catch(() => {})
