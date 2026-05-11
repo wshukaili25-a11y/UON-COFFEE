@@ -737,10 +737,13 @@ let busData = { boys: [], girls: [], bookingUrl: '#' }
 
 // ===== SUPABASE =====
 async function loadTools() {
+    // Show default tools immediately so UI never stays empty
+    tools = defaultTools.map(t => ({ id: t.id, title: t.title, desc: t.description, icon: t.icon, color: t.color, btnText: t.btn_text, linkUrl: t.link_url || '', isEnabled: true }))
+    renderTools()
+    // Then try to load from Supabase and update
     try {
         const { data, error } = await supabase.from('tools').select('*').order('id')
-        if (error || !data || data.length === 0) { await seedTools() }
-        else {
+        if (!error && data && data.length > 0) {
             tools = data.map(t => ({
                 id: t.id,
                 title: t.title,
@@ -752,10 +755,13 @@ async function loadTools() {
                 isEnabled: t.is_enabled === null ? true : t.is_enabled !== false
             }))
             renderTools()
+        } else {
+            // Seed DB in background without blocking UI
+            seedTools().catch(() => {})
         }
     } catch(e) {
-        tools = defaultTools.map(t => ({ id: t.id, title: t.title, desc: t.description, icon: t.icon, color: t.color, btnText: t.btn_text, linkUrl: t.link_url || '', isEnabled: true }))
-        renderTools()
+        // UI already showing defaults, just log
+        console.log('Using default tools (offline)')
     }
 }
 
@@ -894,19 +900,22 @@ window.saveBusSchedule = async function() {
 }
 
 // ===== INIT =====
-window.addEventListener('DOMContentLoaded', async () => {
-    // إخفاء الـ loading بعد 4 ثواني على أي حال
-    setTimeout(() => document.getElementById('loadingOverlay').classList.add('hidden'), 4000)
-    try {
-        await Promise.all([loadTools(), loadSettings(), loadBusData()])
-        await checkMaintenance()
-    } catch(e) { console.log('init error', e) }
+window.addEventListener('DOMContentLoaded', () => {
+    // Hide loading immediately - don't wait for Supabase
+    document.getElementById('loadingOverlay').classList.add('hidden')
+    
+    // Init UI immediately with defaults
     updateUI()
     initScrollReveal()
     initCounters()
     initParallax()
     botAddMsg('bot', 'مرحباً بك في UoN Coffee! 👋\n\nأنا مساعدك الذكي لجامعة نزوى 🎓\nاسألني عن الكليات، الروابط، مواعيد الباصات، أو أي شيء!')
-    document.getElementById('loadingOverlay').classList.add('hidden')
+
+    // Load data from Supabase in background (non-blocking)
+    loadTools()
+    loadSettings().catch(() => {})
+    loadBusData().catch(() => {})
+    checkMaintenance().catch(() => {})
 })
 
 // ===== RENDER TOOLS =====
