@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>جامعة نزوى - منصة الطالب</title>
+    <title>University of Nizwa Ai - منصة الطالب</title>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
@@ -38,7 +38,7 @@
 
     /* ===== LOADING ===== */
     .loading-overlay { position: fixed; inset: 0; background: var(--dark); z-index: 99999; display: flex; align-items: center; justify-content: center; transition: opacity 0.5s; }
-    .loading-overlay.hidden { display: none !important; }
+    .loading-overlay.hidden { opacity: 0; pointer-events: none; }
     .loading-spinner { width: 50px; height: 50px; border: 3px solid rgba(0,212,255,0.1); border-top-color: var(--primary); border-radius: 50%; animation: spin 0.8s linear infinite; }
 
     /* ===== TOAST ===== */
@@ -176,43 +176,37 @@
     .summaries-cta p { color: var(--text-dim); margin-bottom: 1rem; }
 
     /* ===== ADMIN PANEL ===== */
-    .admin-panel { position: fixed; top: 0; right: -500px; width: 500px; max-width: 100%; height: 100vh; background: var(--dark-light); border-left: 1px solid rgba(255,255,255,0.1); z-index: 9998; transition: right 0.4s; overflow: hidden; display: flex; flex-direction: column; }
+    .admin-panel { position: fixed; top: 0; right: -500px; width: 500px; max-width: 100%; height: 100vh; background: var(--dark-light); border-left: 1px solid rgba(255,255,255,0.1); z-index: 9998; transition: right 0.4s; overflow-y: auto; padding: 2rem; }
     .admin-panel.open { right: 0; }
     .admin-panel-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 9997; display: none; opacity: 0; transition: opacity 0.3s; }
     .admin-panel-overlay.show { display: block; opacity: 1; }
-    .panel-header { display: flex; justify-content: space-between; align-items: center; padding: 1rem 1.5rem; border-bottom: 1px solid rgba(255,255,255,0.1); flex-shrink: 0; background: var(--dark); }
-    .panel-header h2 { font-size: 1.2rem; font-weight: 900; display: flex; align-items: center; gap: 10px; }
+    .panel-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; padding-bottom: 1.5rem; border-bottom: 1px solid rgba(255,255,255,0.1); }
+    .panel-header h2 { font-size: 1.5rem; font-weight: 900; display: flex; align-items: center; gap: 10px; }
     .panel-header h2 i { color: var(--warning); }
-    .close-panel { width: 36px; height: 36px; border-radius: 10px; background: var(--dark-light); border: 1px solid rgba(255,255,255,0.1); color: var(--text-muted); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.3s; }
+    .close-panel { width: 40px; height: 40px; border-radius: 12px; background: var(--dark); border: 1px solid rgba(255,255,255,0.1); color: var(--text-muted); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.3s; }
     .close-panel:hover { background: var(--secondary); color: white; }
-    .panel-tabs { display: flex; gap: 4px; padding: 0.7rem 1rem; background: var(--dark); border-bottom: 1px solid rgba(255,255,255,0.08); flex-shrink: 0; overflow-x: auto; scrollbar-width: none; }
-    .panel-tabs::-webkit-scrollbar { display: none; }
-    .panel-tab { padding: 0.45rem 0.85rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: transparent; color: var(--text-muted); font-family: 'Tajawal', sans-serif; font-size: 0.78rem; font-weight: 700; cursor: pointer; white-space: nowrap; transition: all 0.2s; }
-    .panel-tab.active { background: var(--primary); border-color: var(--primary); color: var(--dark); }
-    .panel-tab:hover:not(.active) { border-color: var(--primary); color: var(--primary); }
-    .panel-body { flex: 1; overflow-y: auto; padding: 1.5rem; }
-    .tab-pane { display: none; }
-    .tab-pane.active { display: block; animation: slideInUp 0.2s ease; }
-    .panel-section { margin-bottom: 1.5rem; }
-    .panel-section h3 { font-size: 1rem; font-weight: 700; margin-bottom: 1rem; color: var(--primary); display: flex; align-items: center; gap: 8px; }
-    .form-group { margin-bottom: 1rem; }
-    .form-group label { display: block; font-size: 0.88rem; color: var(--text-muted); margin-bottom: 0.4rem; font-weight: 500; }
-    .form-group input, .form-group textarea, .form-group select { width: 100%; padding: 0.75rem 1rem; background: var(--dark); border: 2px solid rgba(255,255,255,0.1); border-radius: 10px; color: white; font-family: 'Tajawal', sans-serif; font-size: 0.92rem; transition: all 0.3s; }
+    .panel-section { margin-bottom: 2rem; padding-bottom: 2rem; border-bottom: 1px solid rgba(255,255,255,0.05); }
+    .panel-section:last-child { border-bottom: none; }
+    .panel-section h3 { font-size: 1.1rem; font-weight: 700; margin-bottom: 1rem; color: var(--primary); display: flex; align-items: center; gap: 8px; }
+    .form-group { margin-bottom: 1.2rem; }
+    .form-group label { display: block; font-size: 0.9rem; color: var(--text-muted); margin-bottom: 0.5rem; font-weight: 500; }
+    .form-group input, .form-group textarea, .form-group select { width: 100%; padding: 0.8rem 1rem; background: var(--dark); border: 2px solid rgba(255,255,255,0.1); border-radius: 10px; color: white; font-family: 'Tajawal', sans-serif; font-size: 0.95rem; transition: all 0.3s; }
     .form-group input:focus, .form-group textarea:focus, .form-group select:focus { outline: none; border-color: var(--primary); }
     .form-group textarea { min-height: 80px; resize: vertical; }
     .form-group small { color: var(--text-dim); font-size: 0.8rem; margin-top: 0.3rem; display: block; }
     .color-picker-wrapper { display: flex; gap: 10px; flex-wrap: wrap; }
-    .color-option { width: 36px; height: 36px; border-radius: 10px; cursor: pointer; border: 3px solid transparent; transition: all 0.3s; }
+    .color-option { width: 40px; height: 40px; border-radius: 10px; cursor: pointer; border: 3px solid transparent; transition: all 0.3s; }
     .color-option:hover { transform: scale(1.1); }
     .color-option.selected { border-color: white; box-shadow: 0 0 15px rgba(255,255,255,0.3); }
-    .btn-save { width: 100%; padding: 0.9rem; background: var(--success); border: none; border-radius: 12px; color: white; font-weight: 800; font-size: 0.95rem; font-family: 'Tajawal', sans-serif; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 0.5rem; }
+    .btn-save { width: 100%; padding: 1rem; background: var(--success); border: none; border-radius: 12px; color: white; font-weight: 800; font-size: 1rem; font-family: 'Tajawal', sans-serif; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; justify-content: center; gap: 8px; }
     .btn-save:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(107,203,119,0.3); }
-    .btn-danger { width: 100%; padding: 0.75rem; background: transparent; border: 2px solid var(--danger); border-radius: 12px; color: var(--danger); font-weight: 700; font-size: 0.9rem; font-family: 'Tajawal', sans-serif; cursor: pointer; transition: all 0.3s; }
+    .btn-danger { width: 100%; padding: 0.8rem; background: transparent; border: 2px solid var(--danger); border-radius: 12px; color: var(--danger); font-weight: 700; font-size: 0.9rem; font-family: 'Tajawal', sans-serif; cursor: pointer; transition: all 0.3s; margin-top: 0.5rem; }
     .btn-danger:hover { background: var(--danger); color: white; }
     .passwords-list { display: flex; flex-direction: column; gap: 0.5rem; }
     .password-item { display: flex; justify-content: space-between; align-items: center; padding: 0.8rem 1rem; background: var(--dark); border-radius: 10px; border: 1px solid rgba(255,255,255,0.05); }
     .password-item .role { font-size: 0.8rem; padding: 0.2rem 0.6rem; border-radius: 6px; background: rgba(0,212,255,0.1); color: var(--primary); }
     .password-item button { background: none; border: none; color: var(--danger); cursor: pointer; font-size: 0.9rem; padding: 0.3rem; }
+
     /* Bus admin table */
     .bus-admin-row { display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: 8px; margin-bottom: 8px; align-items: center; }
     .bus-admin-row input { padding: 0.6rem 0.8rem; background: var(--dark); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: white; font-family: 'Tajawal', sans-serif; font-size: 0.85rem; }
@@ -251,26 +245,8 @@
     @keyframes heartbeat { 0%,100%{transform:scale(1)}50%{transform:scale(1.2)} }
     .heart { color: var(--secondary); display: inline-block; animation: heartbeat 1.5s infinite; }
 
-    .tool-toggle-row { display:flex; align-items:center; gap:10px; padding:0.7rem 0.9rem; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.06); border-radius:10px; margin-bottom:6px; transition:all 0.2s; }
-    .tool-toggle-row:hover { background:rgba(255,255,255,0.05); }
-    .tool-toggle-icon { width:32px; height:32px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:0.85rem; flex-shrink:0; }
-    .tool-toggle-name { flex:1; font-weight:700; font-size:0.9rem; }
-    .tool-toggle-switch { position:relative; width:44px; height:24px; flex-shrink:0; }
-    .tool-toggle-switch input { opacity:0; width:0; height:0; }
-    .tool-toggle-slider { position:absolute; inset:0; background:rgba(239,68,68,0.3); border-radius:50px; cursor:pointer; transition:0.3s; border:1px solid rgba(239,68,68,0.4); }
-    .tool-toggle-slider:before { content:''; position:absolute; width:18px; height:18px; left:2px; top:2px; background:white; border-radius:50%; transition:0.3s; }
-    .tool-toggle-switch input:checked + .tool-toggle-slider { background:rgba(107,203,119,0.3); border-color:rgba(107,203,119,0.5); }
-    .tool-toggle-switch input:checked + .tool-toggle-slider:before { transform:translateX(20px); }
-    .maintenance-overlay { position: fixed; inset: 0; background: var(--dark); z-index: 99998; display: none; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 2rem; }
-    .maintenance-overlay.active { display: flex; }
-    .maintenance-icon { font-size: 5rem; margin-bottom: 1.5rem; animation: float 3s ease-in-out infinite; }
-    .maintenance-title { font-size: clamp(2rem,5vw,3.5rem); font-weight: 900; background: linear-gradient(135deg,var(--warning),#f97316); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 1rem; }
-    .maintenance-desc { color: var(--text-muted); font-size: 1.1rem; max-width: 500px; line-height: 1.8; margin-bottom: 2rem; }
-    .maintenance-badge { display: inline-flex; align-items: center; gap: 8px; padding: 0.6rem 1.5rem; background: rgba(251,146,60,0.1); border: 1px solid rgba(251,146,60,0.3); border-radius: 50px; color: var(--warning); font-weight: 700; font-size: 0.9rem; }
-    .maintenance-admin-exit { position: fixed; bottom: 24px; right: 24px; padding: 0.7rem 1.5rem; background: var(--danger); border: none; border-radius: 12px; color: white; font-weight: 700; font-family: 'Tajawal', sans-serif; cursor: pointer; font-size: 0.85rem; opacity: 0.7; transition: opacity 0.3s; z-index: 99999; display: none; }
-    .maintenance-admin-exit:hover { opacity: 1; }
-
-    @keyframes float { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-20px); } }
+    .reveal { opacity: 0; transform: translateY(30px); transition: all 0.8s ease; }
+    .reveal.active { opacity: 1; transform: translateY(0); }
 
     @media (max-width: 768px) {
         .nav-links { display: none; }
@@ -294,22 +270,6 @@
 <!-- Loading -->
 
 <div class="loading-overlay" id="loadingOverlay"><div class="loading-spinner"></div></div>
-<script>
-// Hide after 1s max - don't block the page
-setTimeout(() => {
-    document.getElementById('loadingOverlay').classList.add('hidden')
-}, 1000)
-</script>
-
-<!-- Maintenance Mode Overlay -->
-
-<div class="maintenance-overlay" id="maintenanceOverlay">
-    <div class="maintenance-icon">🔧</div>
-    <div class="maintenance-title">الموقع تحت الصيانة</div>
-    <p class="maintenance-desc" id="maintenanceMsg">نعمل على تحسين المنصة لتقديم تجربة أفضل لك 🚀<br>سنعود قريباً بجديد مميز!</p>
-    <div class="maintenance-badge"><i class="fas fa-tools"></i> جاري التحديث...</div>
-</div>
-<button class="maintenance-admin-exit" id="maintenanceAdminExit" onclick="exitMaintenance()"><i class="fas fa-sign-out-alt"></i> خروج من وضع الصيانة (أدمن)</button>
 
 <!-- Toast -->
 
@@ -341,145 +301,112 @@ setTimeout(() => {
         <h2><i class="fas fa-cog"></i> لوحة التحكم</h2>
         <button class="close-panel" onclick="closePanel()"><i class="fas fa-times"></i></button>
     </div>
-    <div class="panel-tabs" id="panelTabs">
-        <button class="panel-tab active" onclick="switchTab('tools',this)">🛠 الأدوات</button>
-        <button class="panel-tab" onclick="switchTab('bus',this)">🚌 الباصات</button>
-        <button class="panel-tab admin-only-tab" onclick="switchTab('passwords',this)">🔑 كلمات المرور</button>
-        <button class="panel-tab admin-only-tab" onclick="switchTab('settings',this)">⚙️ الإعدادات</button>
-    </div>
-    <div class="panel-body">
 
 ```
-    <!-- TAB: TOOLS -->
-    <div class="tab-pane active" id="tab-tools">
-
-        <!-- Edit Tool (hidden by default) -->
-        <div class="panel-section" id="editSection" style="display:none;background:rgba(251,146,60,0.05);border:1px solid rgba(251,146,60,0.15);border-radius:14px;padding:1rem;margin-bottom:1.5rem;">
-            <h3><i class="fas fa-edit"></i> تعديل الأداة</h3>
-            <div class="form-group"><label>اسم الأداة</label><input type="text" id="editTitle"></div>
-            <div class="form-group">
-                <label>الوصف <span style="font-size:0.72rem;color:var(--text-dim);">(يدعم HTML)</span></label>
-                <textarea id="editDesc" style="min-height:80px;font-family:monospace;font-size:0.82rem;"></textarea>
-            </div>
-            <div class="form-group"><label>الأيقونة <small>Font Awesome</small></label><input type="text" id="editIcon" placeholder="fa-robot"></div>
-            <div class="form-group"><label>رابط الأداة <span style="font-size:0.72rem;color:var(--text-dim);">(فارغ = افتراضي)</span></label><input type="text" id="editLinkUrl" placeholder="https://... أو page.html"></div>
-            <div class="form-group"><label>لون الأداة</label>
-                <div class="color-picker-wrapper">
-                    <div class="color-option selected" style="background:#00d4ff" data-color="#00d4ff" onclick="selectColor(this)"></div>
-                    <div class="color-option" style="background:#ff6b6b" data-color="#ff6b6b" onclick="selectColor(this)"></div>
-                    <div class="color-option" style="background:#ffd93d" data-color="#ffd93d" onclick="selectColor(this)"></div>
-                    <div class="color-option" style="background:#6bcb77" data-color="#6bcb77" onclick="selectColor(this)"></div>
-                    <div class="color-option" style="background:#a78bfa" data-color="#a78bfa" onclick="selectColor(this)"></div>
-                    <div class="color-option" style="background:#fb923c" data-color="#fb923c" onclick="selectColor(this)"></div>
-                    <div class="color-option" style="background:#38bdf8" data-color="#38bdf8" onclick="selectColor(this)"></div>
-                    <div class="color-option" style="background:#f472b6" data-color="#f472b6" onclick="selectColor(this)"></div>
-                </div>
-            </div>
-            <div class="form-group"><label>نص الزر</label><input type="text" id="editBtnText"></div>
-            <div class="form-group" style="display:flex;align-items:center;gap:12px;background:rgba(251,146,60,0.06);border:1px solid rgba(251,146,60,0.2);border-radius:10px;padding:0.8rem 1rem;">
-                <input type="checkbox" id="editIsEnabled" style="width:18px;height:18px;accent-color:var(--success);cursor:pointer;">
-                <label for="editIsEnabled" style="margin:0;cursor:pointer;font-size:0.88rem;"><b>الأداة مفعّلة</b></label>
-            </div>
-            <button class="btn-save" onclick="saveToolHandler()"><i class="fas fa-save"></i> حفظ</button>
-            <button class="btn-danger" onclick="deleteToolHandler()"><i class="fas fa-trash"></i> حذف الأداة</button>
-            <button onclick="document.getElementById('editSection').style.display='none'" style="width:100%;padding:0.6rem;background:transparent;border:1px solid rgba(255,255,255,0.1);border-radius:10px;color:var(--text-dim);font-family:'Tajawal',sans-serif;cursor:pointer;margin-top:0.5rem;font-size:0.85rem;">إلغاء</button>
-        </div>
-
-        <!-- Toggle Tools -->
-        <div class="panel-section">
-            <h3><i class="fas fa-toggle-on"></i> تفعيل / إيقاف الأدوات</h3>
-            <div id="toolsToggleList"></div>
-        </div>
-
-        <!-- Add Tool -->
-        <div class="panel-section" style="border-top:1px solid rgba(255,255,255,0.06);padding-top:1.5rem;">
-            <h3><i class="fas fa-plus-circle"></i> إضافة أداة جديدة</h3>
-            <div class="form-group"><label>اسم الأداة</label><input type="text" id="newTitle" placeholder="مثال: دليل التخصصات"></div>
-            <div class="form-group"><label>الوصف</label><textarea id="newDesc" placeholder="وصف مختصر..." style="font-family:monospace;font-size:0.85rem;"></textarea></div>
-            <div class="form-group"><label>الأيقونة</label><input type="text" id="newIcon" placeholder="fa-graduation-cap"></div>
-            <div class="form-group"><label>رابط الأداة <span style="font-size:0.72rem;color:var(--text-dim);">(فارغ = افتراضي)</span></label><input type="text" id="newLinkUrl" placeholder="https://... أو page.html"></div>
-            <div class="form-group"><label>لون الأداة</label>
-                <div class="color-picker-wrapper">
-                    <div class="color-option selected" style="background:#00d4ff" data-color="#00d4ff" onclick="selectNewColor(this)"></div>
-                    <div class="color-option" style="background:#ff6b6b" data-color="#ff6b6b" onclick="selectNewColor(this)"></div>
-                    <div class="color-option" style="background:#ffd93d" data-color="#ffd93d" onclick="selectNewColor(this)"></div>
-                    <div class="color-option" style="background:#6bcb77" data-color="#6bcb77" onclick="selectNewColor(this)"></div>
-                    <div class="color-option" style="background:#a78bfa" data-color="#a78bfa" onclick="selectNewColor(this)"></div>
-                    <div class="color-option" style="background:#fb923c" data-color="#fb923c" onclick="selectNewColor(this)"></div>
-                </div>
-            </div>
-            <div class="form-group"><label>نص الزر</label><input type="text" id="newBtnText" placeholder="مثال: اكتشف التخصصات"></div>
-            <div class="form-group" style="display:flex;align-items:center;gap:12px;background:rgba(107,203,119,0.06);border:1px solid rgba(107,203,119,0.2);border-radius:10px;padding:0.8rem 1rem;">
-                <input type="checkbox" id="newIsEnabled" checked style="width:18px;height:18px;accent-color:var(--success);cursor:pointer;">
-                <label for="newIsEnabled" style="margin:0;cursor:pointer;font-size:0.88rem;"><b>الأداة مفعّلة</b></label>
-            </div>
-            <button class="btn-save" onclick="addToolHandler()"><i class="fas fa-plus"></i> إضافة الأداة</button>
-            <button onclick="resetToolsToDefault()" style="width:100%;padding:0.7rem;background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2);border-radius:10px;color:var(--danger);font-weight:700;font-family:'Tajawal',sans-serif;cursor:pointer;font-size:0.85rem;margin-top:0.5rem;">
-                <i class="fas fa-redo"></i> إعادة ضبط الأدوات للافتراضي
-            </button>
+<!-- Edit Tool -->
+<div class="panel-section" id="editSection" style="display:none;">
+    <h3><i class="fas fa-edit"></i> تعديل الأداة</h3>
+    <div class="form-group"><label>اسم الأداة</label><input type="text" id="editTitle"></div>
+    <div class="form-group"><label>الوصف</label><textarea id="editDesc"></textarea></div>
+    <div class="form-group"><label>الأيقونة</label><input type="text" id="editIcon" placeholder="fa-robot"><small>Font Awesome icon name</small></div>
+    <div class="form-group">
+        <label>لون الأداة</label>
+        <div class="color-picker-wrapper">
+            <div class="color-option selected" style="background:#00d4ff" data-color="#00d4ff" onclick="selectColor(this)"></div>
+            <div class="color-option" style="background:#ff6b6b" data-color="#ff6b6b" onclick="selectColor(this)"></div>
+            <div class="color-option" style="background:#ffd93d" data-color="#ffd93d" onclick="selectColor(this)"></div>
+            <div class="color-option" style="background:#6bcb77" data-color="#6bcb77" onclick="selectColor(this)"></div>
+            <div class="color-option" style="background:#a78bfa" data-color="#a78bfa" onclick="selectColor(this)"></div>
+            <div class="color-option" style="background:#fb923c" data-color="#fb923c" onclick="selectColor(this)"></div>
+            <div class="color-option" style="background:#38bdf8" data-color="#38bdf8" onclick="selectColor(this)"></div>
+            <div class="color-option" style="background:#f472b6" data-color="#f472b6" onclick="selectColor(this)"></div>
         </div>
     </div>
+    <div class="form-group"><label>نص الزر</label><input type="text" id="editBtnText"></div>
+    <button class="btn-save" onclick="saveToolHandler()"><i class="fas fa-save"></i> حفظ التغييرات</button>
+    <button class="btn-danger" onclick="deleteToolHandler()"><i class="fas fa-trash"></i> حذف الأداة</button>
+</div>
 
-    <!-- TAB: BUS -->
-    <div class="tab-pane" id="tab-bus">
-        <div class="panel-section">
-            <h3><i class="fas fa-bus"></i> إدارة مواعيد الباصات</h3>
-            <div style="margin-bottom:1rem;">
-                <label style="font-size:0.9rem;color:var(--text-muted);font-weight:600;display:block;margin-bottom:0.5rem;">باص الأولاد 🚌</label>
-                <div id="busBoysAdmin"></div>
-                <button onclick="addBusRow('boys')" style="width:100%;padding:0.6rem;background:rgba(0,212,255,0.05);border:1px dashed rgba(0,212,255,0.2);border-radius:8px;color:rgba(0,212,255,0.5);font-size:0.85rem;cursor:pointer;font-family:'Tajawal',sans-serif;margin-top:6px;">+ إضافة رحلة</button>
-            </div>
-            <div style="margin-bottom:1rem;">
-                <label style="font-size:0.9rem;color:var(--text-muted);font-weight:600;display:block;margin-bottom:0.5rem;">باص البنات 🚌</label>
-                <div id="busGirlsAdmin"></div>
-                <button onclick="addBusRow('girls')" style="width:100%;padding:0.6rem;background:rgba(255,107,107,0.05);border:1px dashed rgba(255,107,107,0.2);border-radius:8px;color:rgba(255,107,107,0.5);font-size:0.85rem;cursor:pointer;font-family:'Tajawal',sans-serif;margin-top:6px;">+ إضافة رحلة</button>
-            </div>
-            <div class="form-group"><label>رابط حجز الباص</label><input type="text" id="busBookingUrl" placeholder="https://..."></div>
-            <button class="btn-save" onclick="saveBusSchedule()"><i class="fas fa-save"></i> حفظ الجداول</button>
+<!-- Add Tool -->
+<div class="panel-section">
+    <h3><i class="fas fa-plus-circle"></i> إضافة أداة جديدة</h3>
+    <div class="form-group"><label>اسم الأداة</label><input type="text" id="newTitle" placeholder="مثال: دليل التخصصات"></div>
+    <div class="form-group"><label>الوصف</label><textarea id="newDesc" placeholder="وصف مختصر للأداة..."></textarea></div>
+    <div class="form-group"><label>الأيقونة</label><input type="text" id="newIcon" placeholder="fa-graduation-cap"></div>
+    <div class="form-group">
+        <label>لون الأداة</label>
+        <div class="color-picker-wrapper">
+            <div class="color-option selected" style="background:#00d4ff" data-color="#00d4ff" onclick="selectNewColor(this)"></div>
+            <div class="color-option" style="background:#ff6b6b" data-color="#ff6b6b" onclick="selectNewColor(this)"></div>
+            <div class="color-option" style="background:#ffd93d" data-color="#ffd93d" onclick="selectNewColor(this)"></div>
+            <div class="color-option" style="background:#6bcb77" data-color="#6bcb77" onclick="selectNewColor(this)"></div>
+            <div class="color-option" style="background:#a78bfa" data-color="#a78bfa" onclick="selectNewColor(this)"></div>
+            <div class="color-option" style="background:#fb923c" data-color="#fb923c" onclick="selectNewColor(this)"></div>
         </div>
     </div>
+    <div class="form-group"><label>نص الزر</label><input type="text" id="newBtnText" placeholder="مثال: اكتشف التخصصات"></div>
+    <button class="btn-save" onclick="addToolHandler()"><i class="fas fa-plus"></i> إضافة الأداة</button>
+</div>
 
-    <!-- TAB: PASSWORDS -->
-    <div class="tab-pane" id="tab-passwords">
-        <div class="panel-section">
-            <h3><i class="fas fa-key"></i> إدارة كلمات المرور</h3>
-            <div class="passwords-list" id="passwordsList"></div>
-            <div class="form-group" style="margin-top:1rem;"><label>كلمة مرور جديدة</label><input type="text" id="newPassword" placeholder="كلمة المرور الجديدة"></div>
-            <div class="form-group">
-                <label>الصلاحية</label>
-                <select id="newRole">
-                    <option value="admin">مشرف رئيسي (كل الصلاحيات)</option>
-                    <option value="editor">محرر (تعديل المحتوى فقط)</option>
-                    <option value="viewer">مشاهد (عرض فقط)</option>
-                </select>
-            </div>
-            <button class="btn-save" onclick="addPassword()"><i class="fas fa-key"></i> إضافة</button>
-        </div>
+<!-- Bus Schedule Admin -->
+<div class="panel-section" id="busAdminSection">
+    <h3><i class="fas fa-bus"></i> إدارة مواعيد الباصات</h3>
+    <div style="margin-bottom:1rem;">
+        <label style="font-size:0.9rem;color:var(--text-muted);font-weight:600;display:block;margin-bottom:0.5rem;">باص الأولاد 🚌</label>
+        <div id="busBoysAdmin"></div>
+        <button onclick="addBusRow('boys')" style="width:100%;padding:0.6rem;background:rgba(0,212,255,0.05);border:1px dashed rgba(0,212,255,0.2);border-radius:8px;color:rgba(0,212,255,0.5);font-size:0.85rem;cursor:pointer;font-family:'Tajawal',sans-serif;margin-top:6px;">+ إضافة رحلة</button>
     </div>
-
-    <!-- TAB: SETTINGS -->
-    <div class="tab-pane" id="tab-settings">
-        <div class="panel-section">
-            <h3><i class="fas fa-sliders-h"></i> إعدادات الموقع</h3>
-            <div class="form-group"><label>عنوان الموقع</label><input type="text" id="siteTitle" value="جامعة نزوى - منصة الطالب"></div>
-            <div class="form-group"><label>الشعار الرئيسي</label><input type="text" id="siteHeadline" value="منصتك الشاملة للحياة الأكاديمية"></div>
-            <div class="form-group"><label>الوصف</label><textarea id="siteDesc">أدوات ذكية، ملخصات، جداول دراسية، وكل ما تحتاجه للنجاح</textarea></div>
-            <button class="btn-save" onclick="saveSettings()"><i class="fas fa-save"></i> حفظ الإعدادات</button>
-        </div>
-        <div class="panel-section" style="border-top:1px solid rgba(255,255,255,0.06);padding-top:1.5rem;">
-            <h3 style="color:var(--warning);"><i class="fas fa-hard-hat"></i> وضع الصيانة</h3>
-            <div style="background:rgba(251,146,60,0.06);border:1px solid rgba(251,146,60,0.2);border-radius:12px;padding:1rem;margin-bottom:1rem;">
-                <div style="display:flex;align-items:center;gap:12px;margin-bottom:0.5rem;">
-                    <input type="checkbox" id="maintenanceToggle" style="width:18px;height:18px;accent-color:var(--warning);cursor:pointer;" onchange="toggleMaintenance(this.checked)">
-                    <label for="maintenanceToggle" style="margin:0;cursor:pointer;font-weight:700;color:var(--warning);">🔧 تفعيل وضع الصيانة</label>
-                </div>
-                <p style="font-size:0.78rem;color:var(--text-dim);margin-right:30px;">الزوار سيرون شاشة الصيانة. أنت كأدمن تتصفح عادي.</p>
-            </div>
-            <div class="form-group"><label>رسالة الصيانة</label><textarea id="maintenanceMessage" style="min-height:70px;" placeholder="نعمل على تحسين المنصة..."></textarea></div>
-            <button class="btn-save" style="background:linear-gradient(135deg,var(--warning),#f97316);" onclick="saveMaintenance()"><i class="fas fa-save"></i> حفظ الرسالة</button>
-        </div>
+    <div style="margin-bottom:1rem;">
+        <label style="font-size:0.9rem;color:var(--text-muted);font-weight:600;display:block;margin-bottom:0.5rem;">باص البنات 🚌</label>
+        <div id="busGirlsAdmin"></div>
+        <button onclick="addBusRow('girls')" style="width:100%;padding:0.6rem;background:rgba(255,107,107,0.05);border:1px dashed rgba(255,107,107,0.2);border-radius:8px;color:rgba(255,107,107,0.5);font-size:0.85rem;cursor:pointer;font-family:'Tajawal',sans-serif;margin-top:6px;">+ إضافة رحلة</button>
     </div>
+    <div class="form-group">
+        <label>رابط حجز الباص</label>
+        <input type="text" id="busBookingUrl" placeholder="https://...">
+    </div>
+    <button class="btn-save" onclick="saveBusSchedule()"><i class="fas fa-save"></i> حفظ الجداول</button>
+</div>
 
+<!-- Passwords -->
+<div class="panel-section">
+    <h3><i class="fas fa-key"></i> إدارة كلمات المرور</h3>
+    <div class="passwords-list" id="passwordsList"></div>
+    <div class="form-group" style="margin-top:1rem;"><label>إضافة كلمة مرور جديدة</label><input type="text" id="newPassword" placeholder="كلمة المرور الجديدة"></div>
+    <div class="form-group">
+        <label>الصلاحية</label>
+        <select id="newRole">
+            <option value="admin">مشرف رئيسي (كل الصلاحيات)</option>
+            <option value="editor">محرر (تعديل المحتوى فقط)</option>
+            <option value="viewer">مشاهد (عرض فقط)</option>
+        </select>
+    </div>
+    <button class="btn-save" onclick="addPassword()"><i class="fas fa-key"></i> إضافة كلمة المرور</button>
+</div>
+
+<!-- Tools Toggle -->
+<div class="panel-section">
+    <h3><i class="fas fa-toggle-on"></i> تفعيل / إيقاف الأدوات</h3>
+    <div id="toolsToggleList"></div>
+    <button onclick="resetToolsToDefault()" style="width:100%;margin-top:0.8rem;padding:0.75rem;background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2);border-radius:10px;color:#ef4444;font-weight:700;font-family:'Tajawal',sans-serif;cursor:pointer;font-size:0.85rem;"><i class="fas fa-redo"></i> إعادة ضبط الأدوات للافتراضي</button>
+</div>
+
+<!-- Site Settings -->
+<div class="panel-section">
+    <h3><i class="fas fa-sliders-h"></i> إعدادات الموقع</h3>
+    <div class="form-group"><label>عنوان الموقع</label><input type="text" id="siteTitle" value="University of Nizwa Ai - منصة الطالب"></div>
+    <div class="form-group"><label>الشعار الرئيسي</label><input type="text" id="siteHeadline" value="منصتك الشاملة للحياة الأكاديمية"></div>
+    <div class="form-group"><label>الوصف</label><textarea id="siteDesc">أدوات ذكية، ملخصات، جداول دراسية، وكل ما تحتاجه للنجاح</textarea></div>
+    <button class="btn-save" onclick="saveSettings()"><i class="fas fa-save"></i> حفظ الإعدادات</button>
+    <div style="margin-top:1.5rem;padding-top:1.5rem;border-top:1px solid rgba(255,255,255,0.06);">
+        <h3 style="color:#fb923c;margin-bottom:1rem;"><i class="fas fa-hard-hat"></i> وضع الصيانة</h3>
+        <div style="display:flex;align-items:center;gap:10px;background:rgba(251,146,60,0.06);border:1px solid rgba(251,146,60,0.2);border-radius:10px;padding:0.8rem;margin-bottom:0.8rem;">
+            <input type="checkbox" id="maintenanceToggle" style="width:18px;height:18px;accent-color:#fb923c;cursor:pointer;" onchange="toggleMaintenance(this.checked)">
+            <label for="maintenanceToggle" style="margin:0;cursor:pointer;font-weight:700;color:#fb923c;">🔧 تفعيل وضع الصيانة</label>
+        </div>
+        <div class="form-group"><label>رسالة الصيانة</label><textarea id="maintenanceMessage" style="min-height:60px;" placeholder="نعمل على تحسين المنصة..."></textarea></div>
+        <button class="btn-save" style="background:linear-gradient(135deg,#fb923c,#f97316);" onclick="saveMaintenance()"><i class="fas fa-save"></i> حفظ الرسالة</button>
+    </div>
 </div>
 ```
 
@@ -655,29 +582,12 @@ setTimeout(() => {
 </footer>
 
 <script type="module">
-// ===== SUPABASE INIT =====
-let supabase
-try {
-    const { createClient } = await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm')
-    supabase = createClient(
-        'https://fjkxahhoacqlpiafmfyd.supabase.co',
-        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZqa3hhaGhvYWNxbHBpYWZtZnlkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgzMTkwMjQsImV4cCI6MjA5Mzg5NTAyNH0.Ls3gaXRso3BgcDAByoYeQQot_KbAOfREvxyW8u4vkGA'
-    )
-} catch(e) {
-    console.warn('Supabase load failed, using offline mode')
-    // Fake supabase that returns empty data so UI still renders
-    supabase = {
-        from: () => ({
-            select: () => ({ order: () => ({ data: [], error: null }), eq: () => ({ single: () => ({ data: null }), data: [], error: null }) }),
-            insert: () => ({ select: () => ({ data: [], error: null }) }),
-            update: () => ({ eq: () => ({}) }),
-            delete: () => ({ eq: () => ({}) }),
-            upsert: () => ({})
-        })
-    }
-    // Force hide loading overlay
-    document.getElementById('loadingOverlay')?.classList.add('hidden')
-}
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
+
+const supabase = createClient(
+    'https://fjkxahhoacqlpiafmfyd.supabase.co',
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZqa3hhaGhvYWNxbHBpYWZtZnlkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgzMTkwMjQsImV4cCI6MjA5Mzg5NTAyNH0.Ls3gaXRso3BgcDAByoYeQQot_KbAOfREvxyW8u4vkGA'
+)
 
 // ===== PASSWORD CHECK =====
 const FALLBACK_PASS = 'UoN@Coffee#2026!'
@@ -704,8 +614,8 @@ const defaultTools = [
     { id: 6, title: "دليل المطاعم", description: "أقرب المطاعم والكافيهات حول جامعة نزوى مع التقييمات", icon: "fa-utensils", color: "#fb923c", btn_text: "شوف المطاعم", link_url: "features.html#rest", is_enabled: true },
     { id: 7, title: "خريطة الجامعة", description: "خريطة تفاعلية لمواقع الكليات والمرافق داخل الحرم الجامعي", icon: "fa-map-marked-alt", color: "#38bdf8", btn_text: "افتح الخريطة", link_url: "tools.html", is_enabled: true },
     { id: 8, title: "مواعيد الباصات", description: "جداول ذهاب وعودة باصات الطلاب محدّثة يومياً للأولاد والبنات", icon: "fa-bus", color: "#f472b6", btn_text: "شوف المواعيد", link_url: "bus.html", is_enabled: true },
-    { id: 9, title: "مجموعات الواتساب", description: "انضم لمجموعات موادك وكليتك — تواصل مع زملائك وشارك المعلومات", icon: "fab fa-whatsapp", color: "#25D366", btn_text: "انضم الحين", link_url: "whatsapp.html", is_enabled: true },
-    { id: 10, title: "مشاريع الطلاب", description: "اكتشف مشاريع زملائك الإبداعية، صوّت لأفضلها، وشارك مشروعك 🚀", icon: "fa-rocket", color: "#a78bfa", btn_text: "اكتشف المشاريع", link_url: "projects.html", is_enabled: true }
+    { id: 9, title: "مجموعات الواتساب", description: "انضم لمجموعات موادك وكليتك — تواصل مع زملائك", icon: "fa-whatsapp", color: "#25D366", btn_text: "انضم الحين", link_url: "whatsapp.html", is_enabled: true },
+    { id: 10, title: "مشاريع الطلاب", description: "اكتشف مشاريع زملائك الإبداعية وصوّت لأفضلها 🚀", icon: "fa-rocket", color: "#a78bfa", btn_text: "اكتشف المشاريع", link_url: "projects.html", is_enabled: true }
 ]
 
 const defaultBoys = [
@@ -726,7 +636,7 @@ const defaultGirls = [
 ]
 
 // ===== STATE =====
-let tools = defaultTools.map(t => ({ id: t.id, title: t.title, desc: t.description, icon: t.icon, color: t.color, btnText: t.btn_text, linkUrl: t.link_url || '', isEnabled: true }))
+let tools = defaultTools.map(t => ({ id: t.id, title: t.title, desc: t.description, icon: t.icon, color: t.color, btnText: t.btn_text, linkUrl: t.link_url||"", isEnabled: t.is_enabled !== false }))
 let currentAdmin = null
 let editingToolId = null
 let selectedColor = "#00d4ff"
@@ -735,67 +645,32 @@ let busData = { boys: [], girls: [], bookingUrl: '#' }
 
 // ===== SUPABASE =====
 async function loadTools() {
-    // Show default tools immediately so UI never stays empty
-    tools = defaultTools.map(t => ({ id: t.id, title: t.title, desc: t.description, icon: t.icon, color: t.color, btnText: t.btn_text, linkUrl: t.link_url || '', isEnabled: true }))
-    renderTools()
-    // Then try to load from Supabase and update
     try {
         const { data, error } = await supabase.from('tools').select('*').order('id')
         if (!error && data && data.length > 0) {
-            tools = data.map(t => ({
-                id: t.id,
-                title: t.title,
-                desc: t.description,
-                icon: t.icon,
-                color: t.color,
-                btnText: t.btn_text,
-                linkUrl: t.link_url || '',
-                isEnabled: t.is_enabled === null ? true : t.is_enabled !== false
-            }))
+            tools = data.map(t => ({ id: t.id, title: t.title, desc: t.description, icon: t.icon, color: t.color, btnText: t.btn_text, linkUrl: t.link_url||"", isEnabled: t.is_enabled === null ? true : t.is_enabled !== false }))
             renderTools()
-        } else {
-            // Seed DB in background without blocking UI
-            seedTools().catch(() => {})
-        }
-    } catch(e) {
-        // UI already showing defaults, just log
-        console.log('Using default tools (offline)')
-    }
+        } else { seedTools().catch(()=>{}) }
+    } catch(e) { console.log('loadTools offline') }
 }
 
 async function seedTools() {
     for (const tool of defaultTools) {
-        await supabase.from('tools').upsert({
-            id: tool.id, title: tool.title, description: tool.description,
-            icon: tool.icon, color: tool.color, btn_text: tool.btn_text,
-            link_url: tool.link_url, is_enabled: tool.is_enabled
-        })
+        await supabase.from('tools').upsert({ id: tool.id, title: tool.title, description: tool.description, icon: tool.icon, color: tool.color, btn_text: tool.btn_text, link_url: tool.link_url||"", is_enabled: true })
     }
-    // Delete any tools not in defaultTools (e.g. Student Hub)
-    const defaultIds = defaultTools.map(t => t.id)
-    const { data: allTools } = await supabase.from('tools').select('id')
-    if (allTools) {
-        for (const t of allTools) {
-            if (!defaultIds.includes(t.id)) await supabase.from('tools').delete().eq('id', t.id)
-        }
+    const { data } = await supabase.from('tools').select('*').order('id')
+    if (data && data.length > 0) {
+        tools = data.map(t => ({ id: t.id, title: t.title, desc: t.description, icon: t.icon, color: t.color, btnText: t.btn_text, linkUrl: t.link_url||"", isEnabled: true }))
+        renderTools()
     }
-    await loadTools()
-}
-
-// Admin: reset all tools to default (removes Student Hub etc.)
-window.resetToolsToDefault = async function() {
-    if (currentAdmin?.role !== 'admin') return
-    if (!confirm('هذا سيعيد ضبط جميع الأدوات للإعدادات الافتراضية. متأكد؟')) return
-    await seedTools()
-    showToast('تم إعادة ضبط الأدوات!')
 }
 
 async function dbSaveTool(tool) {
     if (tool.id) {
-        await supabase.from('tools').update({ title: tool.title, description: tool.desc, icon: tool.icon, color: tool.color, btn_text: tool.btnText, link_url: tool.linkUrl || '', is_enabled: tool.isEnabled !== false }).eq('id', tool.id)
+        await supabase.from('tools').update({ title: tool.title, description: tool.desc, icon: tool.icon, color: tool.color, btn_text: tool.btnText, link_url: tool.linkUrl||"", is_enabled: tool.isEnabled !== false }).eq('id', tool.id)
     } else {
         const newId = Math.max(...tools.map(t => t.id), 0) + 1
-        await supabase.from('tools').insert({ id: newId, title: tool.title, description: tool.desc, icon: tool.icon, color: tool.color, btn_text: tool.btnText, link_url: tool.linkUrl || '', is_enabled: tool.isEnabled !== false })
+        await supabase.from('tools').insert({ id: newId, title: tool.title, description: tool.desc, icon: tool.icon, color: tool.color, btn_text: tool.btnText, link_url: tool.linkUrl||"", is_enabled: tool.isEnabled !== false })
     }
 }
 
@@ -898,86 +773,47 @@ window.saveBusSchedule = async function() {
 }
 
 // ===== INIT =====
-window.addEventListener('DOMContentLoaded', () => {
-    // Hide loading immediately
-    document.getElementById('loadingOverlay').classList.add('hidden')
-
-    // Render tools immediately from defaults
+window.addEventListener('DOMContentLoaded', async () => {
     renderTools()
     renderBusTables()
-
-    // Init UI
     updateUI()
     initScrollReveal()
     initCounters()
     initParallax()
     botAddMsg('bot', 'مرحباً بك في UoN Coffee! 👋\n\nأنا مساعدك الذكي لجامعة نزوى 🎓\nاسألني عن الكليات، الروابط، مواعيد الباصات، أو أي شيء!')
-
-    // Load from Supabase in background
+    document.getElementById('loadingOverlay').classList.add('hidden')
     loadTools()
-    loadSettings().catch(() => {})
-    loadBusData().catch(() => {})
-    checkMaintenance().catch(() => {})
+    loadSettings().catch(()=>{})
+    loadBusData().catch(()=>{})
 })
 
 // ===== RENDER TOOLS =====
 function renderTools() {
     const grid = document.getElementById('toolsGrid')
+    if (!grid) return
     if (!tools.length) { grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:3rem;color:var(--text-dim);">لا توجد أدوات بعد</div>'; return }
     grid.innerHTML = tools.map(tool => {
         const disabled = tool.isEnabled === false
-        return `
-        <div class="tool-card" data-id="${tool.id}" style="--card-color:${tool.color};${disabled ? 'opacity:0.5;filter:grayscale(0.6);' : ''}">
+        const iconClass = tool.icon === 'fa-whatsapp' ? 'fab fa-whatsapp' : 'fas ' + tool.icon
+        return `<div class="tool-card" data-id="${tool.id}" style="--card-color:${tool.color};${disabled?'opacity:0.5;filter:grayscale(0.6);':''}">
             <button class="admin-edit-btn" onclick="event.stopPropagation();editTool(${tool.id})" title="تعديل"><i class="fas fa-pen"></i></button>
-            ${disabled ? `<div style="position:absolute;top:10px;right:10px;background:rgba(251,146,60,0.15);border:1px solid rgba(251,146,60,0.4);color:var(--warning);font-size:0.7rem;font-weight:700;padding:0.2rem 0.6rem;border-radius:50px;">🔜 قريباً</div>` : ''}
-            <div class="tool-icon" style="background:${tool.color}20;color:${tool.color};"><i class="${tool.icon.startsWith('fa-') ? 'fas ' + tool.icon : tool.icon}"></i></div>
+            ${disabled ? '<div style="position:absolute;top:10px;right:10px;background:rgba(251,146,60,0.15);border:1px solid rgba(251,146,60,0.4);color:#fb923c;font-size:0.7rem;font-weight:700;padding:0.2rem 0.6rem;border-radius:50px;z-index:2;">🔜 قريباً</div>' : ''}
+            <div class="tool-icon" style="background:${tool.color}20;color:${tool.color};"><i class="${iconClass}"></i></div>
             <h3>${tool.title}</h3>
             <p>${tool.desc}</p>
-            <button class="tool-link" style="color:${tool.color};${disabled ? 'opacity:0.5;cursor:not-allowed;' : ''}" onclick="openTool(${tool.id})">${tool.btnText} <i class="fas fa-arrow-left"></i></button>
+            <button class="tool-link" style="color:${tool.color};${disabled?'opacity:0.5;cursor:not-allowed;':''}" onclick="openTool(${tool.id})">${tool.btnText} <i class="fas fa-arrow-left"></i></button>
         </div>`
     }).join('')
-    renderToolsToggleList()
-}
-
-function renderToolsToggleList() {
-    const list = document.getElementById('toolsToggleList')
-    if (!list) return
-    list.innerHTML = tools.map(tool => `
-        <div class="tool-toggle-row">
-            <div class="tool-toggle-icon" style="background:${tool.color}20;color:${tool.color};"><i class="${tool.icon.startsWith('fa-') ? 'fas ' + tool.icon : tool.icon}"></i></div>
-            <span class="tool-toggle-name">${tool.title}</span>
-            <label class="tool-toggle-switch" title="${tool.isEnabled !== false ? 'مفعّل — اضغط لإيقاف' : 'موقوف — اضغط لتفعيل'}">
-                <input type="checkbox" ${tool.isEnabled !== false ? 'checked' : ''} onchange="quickToggleTool(${tool.id}, this.checked)">
-                <span class="tool-toggle-slider"></span>
-            </label>
-        </div>`).join('')
 }
 
 window.openTool = function(id) {
     const tool = tools.find(t => t.id === id)
-    // Check if tool is disabled
-    if (tool && tool.isEnabled === false) {
-        showToast('هذه الأداة غير متاحة حالياً 🔜', 'error')
-        return
-    }
-    // Use stored linkUrl first
-    if (tool && tool.linkUrl && tool.linkUrl.trim()) {
-        if (tool.linkUrl.startsWith('http')) window.open(tool.linkUrl, '_blank')
-        else window.location.href = tool.linkUrl
-        return
-    }
-    // Fallback to defaultTools link_url
+    if (tool && tool.isEnabled === false) { showToast('هذه الأداة غير متاحة حالياً 🔜', 'error'); return }
+    if (tool && tool.linkUrl) { window.location.href = tool.linkUrl; return }
     const def = defaultTools.find(t => t.id === id)
-    if (def && def.link_url) {
-        window.location.href = def.link_url
-        return
-    }
-    // Built-in scroll actions for tools without a page
-    const scrollActions = {
-        1: () => document.getElementById('botSection')?.scrollIntoView({behavior:'smooth'}),
-        2: () => document.getElementById('calcSection')?.scrollIntoView({behavior:'smooth'}),
-    }
-    if (scrollActions[id]) { scrollActions[id](); return }
+    if (def && def.link_url) { window.location.href = def.link_url; return }
+    const scrolls = { 1: 'botSection', 2: 'calcSection' }
+    if (scrolls[id]) { document.getElementById(scrolls[id])?.scrollIntoView({behavior:'smooth'}); return }
     showToast('قريباً! 🔜')
 }
 
@@ -1033,19 +869,11 @@ function updateUI() {
     document.getElementById('loginBtn').classList.toggle('show', !isAdmin)
     document.body.classList.toggle('admin-mode', isEditor)
 
-    // Hide admin-only tabs from non-main-admins
-    document.querySelectorAll('.admin-only-tab').forEach(t => {
-        t.style.display = isMainAdmin ? 'block' : 'none'
-    })
-}
-
-window.switchTab = function(tab, el) {
-    document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'))
-    document.querySelectorAll('.panel-tab').forEach(t => t.classList.remove('active'))
-    document.getElementById('tab-' + tab)?.classList.add('active')
-    if (el) el.classList.add('active')
-    if (tab === 'bus') renderBusAdminRows()
-    if (tab === 'passwords') renderPasswordsList()
+    // Hide passwords & settings sections from non-main-admins
+    const pwSection = document.querySelector('#adminPanel .panel-section:nth-child(5)')
+    const settingsSection = document.querySelector('#adminPanel .panel-section:last-child')
+    if (pwSection) pwSection.style.display = isMainAdmin ? 'block' : 'none'
+    if (settingsSection) settingsSection.style.display = isMainAdmin ? 'block' : 'none'
 }
 
 // ===== ADMIN PANEL =====
@@ -1054,31 +882,14 @@ window.openPanel = function() {
     document.getElementById('adminPanel').classList.add('open')
     document.getElementById('panelOverlay').classList.add('show')
     document.getElementById('editSection').style.display = 'none'
-    // Default to tools tab
-    switchTabDirect('tools')
-}
-function switchTabDirect(tab) {
-    document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'))
-    document.querySelectorAll('.panel-tab').forEach(t => t.classList.remove('active'))
-    document.getElementById('tab-' + tab)?.classList.add('active')
-    document.querySelector(`.panel-tab[onclick="switchTab('${tab}',this)"]`)?.classList.add('active')
+    renderPasswordsList()
+    renderBusAdminRows()
+    renderToolsToggleList()
 }
 window.closePanel = function() {
     document.getElementById('adminPanel').classList.remove('open')
     document.getElementById('panelOverlay').classList.remove('show')
     editingToolId = null
-}
-
-window.quickToggleTool = async function(id, enabled) {
-    if (currentAdmin?.role !== 'admin' && currentAdmin?.role !== 'editor') {
-        showToast('ليس لديك صلاحية', 'error'); return
-    }
-    const tool = tools.find(t => t.id === id)
-    if (!tool) return
-    tool.isEnabled = enabled
-    await supabase.from('tools').update({ is_enabled: enabled }).eq('id', id)
-    renderTools()
-    showToast(enabled ? `✅ "${tool.title}" مفعّلة` : `🔜 "${tool.title}" موقوفة`)
 }
 
 window.editTool = function(id) {
@@ -1090,8 +901,8 @@ window.editTool = function(id) {
     document.getElementById('editDesc').value = tool.desc
     document.getElementById('editIcon').value = tool.icon
     document.getElementById('editBtnText').value = tool.btnText
-    document.getElementById('editLinkUrl').value = tool.linkUrl || ''
-    document.getElementById('editIsEnabled').checked = tool.isEnabled !== false
+    if (document.getElementById('editLinkUrl')) document.getElementById('editLinkUrl').value = tool.linkUrl||''
+    if (document.getElementById('editIsEnabled')) document.getElementById('editIsEnabled').checked = tool.isEnabled !== false
     selectedColor = tool.color
     document.querySelectorAll('#editSection .color-option').forEach(opt => opt.classList.toggle('selected', opt.dataset.color === tool.color))
     document.getElementById('editSection').style.display = 'block'
@@ -1113,8 +924,8 @@ window.saveToolHandler = async function() {
         tool.icon = document.getElementById('editIcon').value
         tool.color = selectedColor
         tool.btnText = document.getElementById('editBtnText').value
-        tool.linkUrl = document.getElementById('editLinkUrl').value
-        tool.isEnabled = document.getElementById('editIsEnabled').checked
+        tool.linkUrl = document.getElementById('editLinkUrl')?.value || ''
+        tool.isEnabled = document.getElementById('editIsEnabled')?.checked !== false
         await dbSaveTool(tool)
         renderTools()
         closePanel()
@@ -1143,15 +954,13 @@ window.addToolHandler = async function() {
     const title = document.getElementById('newTitle').value
     const desc = document.getElementById('newDesc').value
     if (!title || !desc) { showToast('يرجى ملء جميع الحقول', 'error'); return }
-    const newTool = { title, desc, icon: document.getElementById('newIcon').value || 'fa-tools', color: selectedNewColor, btnText: document.getElementById('newBtnText').value || 'جرب الآن', linkUrl: document.getElementById('newLinkUrl').value || '', isEnabled: document.getElementById('newIsEnabled').checked }
+    const newTool = { title, desc, icon: document.getElementById('newIcon').value || 'fa-tools', color: selectedNewColor, btnText: document.getElementById('newBtnText').value || 'جرب الآن' }
     await dbSaveTool(newTool)
     await loadTools()
     document.getElementById('newTitle').value = ''
     document.getElementById('newDesc').value = ''
     document.getElementById('newIcon').value = ''
     document.getElementById('newBtnText').value = ''
-    document.getElementById('newLinkUrl').value = ''
-    document.getElementById('newIsEnabled').checked = true
     showToast('تم إضافة الأداة!')
 }
 
@@ -1176,65 +985,6 @@ window.addPassword = async function() {
     } catch(e) { showToast('خطأ في الحفظ', 'error') }
 }
 
-// ===== MAINTENANCE MODE =====
-async function checkMaintenance() {
-    try {
-        const { data } = await supabase.from('settings').select('value').eq('key', 'maintenance_mode').single()
-        const isOn = data?.value === 'true'
-        if (isOn) {
-            const { data: msgData } = await supabase.from('settings').select('value').eq('key', 'maintenance_message').single()
-            const msg = msgData?.value || 'نعمل على تحسين المنصة لتقديم تجربة أفضل لك 🚀\nسنعود قريباً بجديد مميز!'
-            document.getElementById('maintenanceMsg').innerHTML = msg.replace(/\n/g, '<br>')
-            // Only show maintenance if NOT admin
-            if (!currentAdmin) {
-                document.getElementById('maintenanceOverlay').classList.add('active')
-            } else {
-                // Admin can see site but with exit button
-                document.getElementById('maintenanceAdminExit').style.display = 'block'
-            }
-        }
-        // Sync toggle in panel
-        const toggle = document.getElementById('maintenanceToggle')
-        if (toggle) toggle.checked = isOn
-        // Load message into textarea
-        const msgInput = document.getElementById('maintenanceMessage')
-        if (msgInput) {
-            const { data: msgData } = await supabase.from('settings').select('value').eq('key', 'maintenance_message').single()
-            if (msgData?.value) msgInput.value = msgData.value
-        }
-    } catch(e) {}
-}
-
-window.toggleMaintenance = async function(checked) {
-    if (currentAdmin?.role !== 'admin') { showToast('فقط المشرف الرئيسي', 'error'); document.getElementById('maintenanceToggle').checked = !checked; return }
-    await dbSaveSettings('maintenance_mode', checked ? 'true' : 'false')
-    if (checked) {
-        document.getElementById('maintenanceAdminExit').style.display = 'block'
-        showToast('⚠️ وضع الصيانة مفعّل — الزوار سيرون شاشة الصيانة', 'error')
-    } else {
-        document.getElementById('maintenanceAdminExit').style.display = 'none'
-        document.getElementById('maintenanceOverlay').classList.remove('active')
-        showToast('✅ وضع الصيانة أُوقف — الموقع متاح للجميع')
-    }
-}
-
-window.saveMaintenance = async function() {
-    if (currentAdmin?.role !== 'admin') { showToast('فقط المشرف الرئيسي', 'error'); return }
-    const msg = document.getElementById('maintenanceMessage').value || 'نعمل على تحسين المنصة...'
-    await dbSaveSettings('maintenance_message', msg)
-    document.getElementById('maintenanceMsg').innerHTML = msg.replace(/\n/g, '<br>')
-    showToast('تم حفظ رسالة الصيانة!')
-}
-
-window.exitMaintenance = async function() {
-    // Admin exits maintenance mode
-    await dbSaveSettings('maintenance_mode', 'false')
-    document.getElementById('maintenanceOverlay').classList.remove('active')
-    document.getElementById('maintenanceAdminExit').style.display = 'none'
-    document.getElementById('maintenanceToggle').checked = false
-    showToast('✅ تم إيقاف وضع الصيانة')
-}
-
 // ===== SETTINGS =====
 window.saveSettings = async function() {
     if (currentAdmin?.role !== 'admin') { showToast('فقط المشرف الرئيسي', 'error'); return }
@@ -1255,11 +1005,6 @@ async function loadSettings() {
     if (settings.title) { if(document.getElementById('siteTitle')) document.getElementById('siteTitle').value = settings.title; document.title = settings.title }
     if (settings.headline) { if(document.getElementById('siteHeadline')) document.getElementById('siteHeadline').value = settings.headline; document.getElementById('heroTitle').innerHTML = settings.headline.replace(/\n/g, '<br>') }
     if (settings.desc) { if(document.getElementById('siteDesc')) document.getElementById('siteDesc').value = settings.desc; document.getElementById('heroDesc').textContent = settings.desc }
-    // Maintenance
-    const toggle = document.getElementById('maintenanceToggle')
-    if (toggle) toggle.checked = settings.maintenance_mode === 'true'
-    const msgInput = document.getElementById('maintenanceMessage')
-    if (msgInput && settings.maintenance_message) msgInput.value = settings.maintenance_message
 }
 
 // ===== BOT =====
@@ -1372,7 +1117,89 @@ window.toggleMenu = function() {
     if (nl.style.display==='flex') nl.style.display='none'
     else nl.style.cssText='display:flex;position:absolute;top:100%;left:0;right:0;flex-direction:column;background:var(--dark-light);padding:2rem;gap:1.5rem;z-index:999;'
 }
+
+
+// ===== NEW FEATURES =====
+window.quickToggleTool = async function(id, enabled) {
+    const tool = tools.find(t => t.id === id)
+    if (!tool) return
+    tool.isEnabled = enabled
+    renderTools()
+    try { await supabase.from('tools').update({ is_enabled: enabled }).eq('id', id) } catch(e) {}
+    showToast(enabled ? '✅ الأداة مفعّلة' : '🔜 الأداة موقوفة')
+}
+
+window.resetToolsToDefault = async function() {
+    if (currentAdmin?.role !== 'admin') return
+    if (!confirm('إعادة ضبط جميع الأدوات للافتراضي؟')) return
+    tools = defaultTools.map(t => ({ id: t.id, title: t.title, desc: t.description, icon: t.icon, color: t.color, btnText: t.btn_text, linkUrl: t.link_url||'', isEnabled: true }))
+    renderTools()
+    await seedTools()
+    showToast('تم إعادة الضبط!')
+}
+
+function renderToolsToggleList() {
+    const list = document.getElementById('toolsToggleList')
+    if (!list) return
+    list.innerHTML = tools.map(tool => {
+        const iconClass = tool.icon === 'fa-whatsapp' ? 'fab fa-whatsapp' : 'fas ' + tool.icon
+        const on = tool.isEnabled !== false
+        return `<div style="display:flex;align-items:center;gap:10px;padding:0.65rem 0.9rem;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:10px;margin-bottom:6px;">
+            <div style="width:30px;height:30px;border-radius:8px;background:${tool.color}15;color:${tool.color};display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:0.85rem;"><i class="${iconClass}"></i></div>
+            <span style="flex:1;font-weight:700;font-size:0.85rem;">${tool.title}</span>
+            <label style="position:relative;display:inline-block;width:40px;height:20px;flex-shrink:0;cursor:pointer;">
+                <input type="checkbox" ${on?'checked':''} onchange="quickToggleTool(${tool.id},this.checked)" style="opacity:0;width:0;height:0;position:absolute;">
+                <span style="position:absolute;inset:0;background:${on?'rgba(107,203,119,0.35)':'rgba(239,68,68,0.2)'};border-radius:20px;border:1px solid ${on?'rgba(107,203,119,0.5)':'rgba(239,68,68,0.3)'};transition:all 0.3s;"></span>
+                <span style="position:absolute;width:14px;height:14px;background:white;border-radius:50%;top:2px;left:${on?'22px':'2px'};transition:left 0.3s;"></span>
+            </label>
+        </div>`
+    }).join('')
+}
+
+window.toggleMaintenance = async function(checked) {
+    try { await supabase.from('settings').upsert({ key:'maintenance_mode', value:checked?'true':'false' }) } catch(e) {}
+    showToast(checked ? '⚠️ وضع الصيانة مفعّل' : '✅ وضع الصيانة مُوقف')
+}
+
+window.saveMaintenance = async function() {
+    const msg = document.getElementById('maintenanceMessage')?.value || ''
+    try { await supabase.from('settings').upsert({ key:'maintenance_message', value:msg }) } catch(e) {}
+    showToast('تم حفظ رسالة الصيانة!')
+}
+
+// Restore session on load
+;(function() {
+    const saved = sessionStorage.getItem('nu_admin')
+    if (saved) try { currentAdmin = JSON.parse(saved) } catch(e) {}
+})()
 </script>
 
+<!-- Maintenance Overlay -->
+
+<div id="maintenanceOverlay" style="display:none;position:fixed;inset:0;background:#0a0e27;z-index:99998;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:2rem;">
+    <div style="font-size:4rem;margin-bottom:1rem;">🔧</div>
+    <div style="font-size:clamp(2rem,5vw,3rem);font-weight:900;color:#fb923c;margin-bottom:1rem;">الموقع تحت الصيانة</div>
+    <p id="maintenanceMsg" style="color:#a0aec0;max-width:500px;line-height:1.8;margin-bottom:2rem;">نعمل على تحسين المنصة 🚀</p>
+    <div style="display:inline-flex;align-items:center;gap:8px;padding:0.6rem 1.5rem;background:rgba(251,146,60,0.1);border:1px solid rgba(251,146,60,0.3);border-radius:50px;color:#fb923c;font-weight:700;"><i class="fas fa-tools"></i> جاري التحديث...</div>
+</div>
+<script>
+// Check maintenance on load
+(async function() {
+    try {
+        const saved = sessionStorage.getItem('nu_admin')
+        if (saved) return
+        // Wait for supabase to be available
+        await new Promise(r => setTimeout(r, 500))
+        if (typeof supabase === 'undefined') return
+        const {data} = await supabase.from('settings').select('value').eq('key','maintenance_mode').single()
+        if (data?.value === 'true') {
+            const {data:m} = await supabase.from('settings').select('value').eq('key','maintenance_message').single()
+            const el = document.getElementById('maintenanceOverlay')
+            const p = document.getElementById('maintenanceMsg')
+            if (el) { if(p && m?.value) p.innerHTML = m.value.replace(/\n/g,'<br>'); el.style.display='flex' }
+        }
+    } catch(e){}
+})()
+</script>
 </body>
 </html>
