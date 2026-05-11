@@ -270,7 +270,6 @@
 <!-- Loading -->
 
 <div class="loading-overlay" id="loadingOverlay"><div class="loading-spinner"></div></div>
-<script>setTimeout(function(){var o=document.getElementById("loadingOverlay");if(o)o.classList.add("hidden");},500);</script>
 
 <!-- Toast -->
 
@@ -385,29 +384,13 @@
     <button class="btn-save" onclick="addPassword()"><i class="fas fa-key"></i> إضافة كلمة المرور</button>
 </div>
 
-<!-- Tools Toggle -->
-<div class="panel-section">
-    <h3><i class="fas fa-toggle-on"></i> تفعيل / إيقاف الأدوات</h3>
-    <div id="toolsToggleList"></div>
-    <button onclick="resetToolsToDefault()" style="width:100%;margin-top:0.8rem;padding:0.75rem;background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2);border-radius:10px;color:#ef4444;font-weight:700;font-family:'Tajawal',sans-serif;cursor:pointer;font-size:0.85rem;"><i class="fas fa-redo"></i> إعادة ضبط الأدوات للافتراضي</button>
-</div>
-
 <!-- Site Settings -->
 <div class="panel-section">
     <h3><i class="fas fa-sliders-h"></i> إعدادات الموقع</h3>
-    <div class="form-group"><label>عنوان الموقع</label><input type="text" id="siteTitle" value="University of Nizwa Ai - منصة الطالب"></div>
+    <div class="form-group"><label>عنوان الموقع</label><input type="text" id="siteTitle" value="جامعة نزوى - منصة الطالب"></div>
     <div class="form-group"><label>الشعار الرئيسي</label><input type="text" id="siteHeadline" value="منصتك الشاملة للحياة الأكاديمية"></div>
     <div class="form-group"><label>الوصف</label><textarea id="siteDesc">أدوات ذكية، ملخصات، جداول دراسية، وكل ما تحتاجه للنجاح</textarea></div>
     <button class="btn-save" onclick="saveSettings()"><i class="fas fa-save"></i> حفظ الإعدادات</button>
-    <div style="margin-top:1.5rem;padding-top:1.5rem;border-top:1px solid rgba(255,255,255,0.06);">
-        <h3 style="color:#fb923c;margin-bottom:1rem;"><i class="fas fa-hard-hat"></i> وضع الصيانة</h3>
-        <div style="display:flex;align-items:center;gap:10px;background:rgba(251,146,60,0.06);border:1px solid rgba(251,146,60,0.2);border-radius:10px;padding:0.8rem;margin-bottom:0.8rem;">
-            <input type="checkbox" id="maintenanceToggle" style="width:18px;height:18px;accent-color:#fb923c;cursor:pointer;" onchange="toggleMaintenance(this.checked)">
-            <label for="maintenanceToggle" style="margin:0;cursor:pointer;font-weight:700;color:#fb923c;">🔧 تفعيل وضع الصيانة</label>
-        </div>
-        <div class="form-group"><label>رسالة الصيانة</label><textarea id="maintenanceMessage" style="min-height:60px;" placeholder="نعمل على تحسين المنصة..."></textarea></div>
-        <button class="btn-save" style="background:linear-gradient(135deg,#fb923c,#f97316);" onclick="saveMaintenance()"><i class="fas fa-save"></i> حفظ الرسالة</button>
-    </div>
 </div>
 ```
 
@@ -577,14 +560,13 @@
     </div>
 </footer>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" crossorigin="anonymous"></script>
+<script type="module">
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
 
-<script>
-const supabase = (window.supabase || window.supabaseJs).createClient(
+const supabase = createClient(
     'https://fjkxahhoacqlpiafmfyd.supabase.co',
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZqa3hhaGhvYWNxbHBpYWZtZnlkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgzMTkwMjQsImV4cCI6MjA5Mzg5NTAyNH0.Ls3gaXRso3BgcDAByoYeQQot_KbAOfREvxyW8u4vkGA'
 )
-
 
 // ===== PASSWORD CHECK =====
 const FALLBACK_PASS = 'UoN@Coffee#2026!'
@@ -603,16 +585,16 @@ async function checkPassword(password) {
 
 // ===== DEFAULT DATA =====
 const defaultTools = [
-    { id: 1, title: "مساعد AI ذكي", description: "بوت ذكي يجيب عن كل شيء يخص جامعة نزوى — متاح 24/7", icon: "fa-robot", color: "#00d4ff", btn_text: "جرب الآن", link_url: "", is_enabled: true },
-    { id: 2, title: "حاسبة المعدل", description: "احسب معدلك الفصلي بسهولة — أضف موادك وساعاتها وتقديراتها", icon: "fa-calculator", color: "#ff6b6b", btn_text: "احسب معدلك", link_url: "", is_enabled: true },
-    { id: 3, title: "مولد الجداول", description: "أنشئ جداولك الدراسية تلقائياً مع تجنب التعارضات", icon: "fa-calendar-alt", color: "#ffd93d", btn_text: "أنشئ جدولك", link_url: "features.html", is_enabled: true },
-    { id: 4, title: "اعترافات الطلاب", description: "شارك اعترافك الجامعي بشكل مجهول — كلنا في نفس الوضع 😅", icon: "fa-comments", color: "#6bcb77", btn_text: "اعترف الحين", link_url: "features.html#conf", is_enabled: true },
-    { id: 5, title: "مكتبة الملخصات", description: "ملخصات وشروحات من طلاب نزوى لجميع الكليات والمواد", icon: "fa-book-open", color: "#a78bfa", btn_text: "تصفح الملخصات", link_url: "summaries.html", is_enabled: true },
-    { id: 6, title: "دليل المطاعم", description: "أقرب المطاعم والكافيهات حول جامعة نزوى مع التقييمات", icon: "fa-utensils", color: "#fb923c", btn_text: "شوف المطاعم", link_url: "features.html#rest", is_enabled: true },
-    { id: 7, title: "خريطة الجامعة", description: "خريطة تفاعلية لمواقع الكليات والمرافق داخل الحرم الجامعي", icon: "fa-map-marked-alt", color: "#38bdf8", btn_text: "افتح الخريطة", link_url: "tools.html", is_enabled: true },
-    { id: 8, title: "مواعيد الباصات", description: "جداول ذهاب وعودة باصات الطلاب محدّثة يومياً للأولاد والبنات", icon: "fa-bus", color: "#f472b6", btn_text: "شوف المواعيد", link_url: "bus.html", is_enabled: true },
-    { id: 9, title: "مجموعات الواتساب", description: "انضم لمجموعات موادك وكليتك — تواصل مع زملائك", icon: "fa-whatsapp", color: "#25D366", btn_text: "انضم الحين", link_url: "whatsapp.html", is_enabled: true },
-    { id: 10, title: "مشاريع الطلاب", description: "اكتشف مشاريع زملائك الإبداعية وصوّت لأفضلها 🚀", icon: "fa-rocket", color: "#a78bfa", btn_text: "اكتشف المشاريع", link_url: "projects.html", is_enabled: true }
+    { id: 1, title: "مساعد AI ذكي", description: "بوت ذكي يجيب عن كل شيء يخص جامعة نزوى — متاح 24/7", icon: "fa-robot", color: "#00d4ff", btn_text: "جرب الآن" },
+    { id: 2, title: "حاسبة المعدل", description: "احسب معدلك الفصلي بسهولة — أضف موادك وساعاتها وتقديراتها", icon: "fa-calculator", color: "#ff6b6b", btn_text: "احسب معدلك" },
+    { id: 3, title: "مولد الجداول", description: "أنشئ جداولك الدراسية تلقائياً مع تجنب التعارضات", icon: "fa-calendar-alt", color: "#ffd93d", btn_text: "أنشئ جدولك" },
+    { id: 4, title: "اعترافات الطلاب", description: "شارك اعترافك الجامعي بشكل مجهول — كلنا في نفس الوضع 😅", icon: "fa-comments", color: "#6bcb77", btn_text: "اعترف الحين" },
+    { id: 5, title: "مكتبة الملخصات", description: "ملخصات وشروحات من طلاب نزوى لجميع الكليات والمواد", icon: "fa-book-open", color: "#a78bfa", btn_text: "تصفح الملخصات" },
+    { id: 6, title: "دليل المطاعم", description: "أقرب المطاعم والكافيهات حول جامعة نزوى مع التقييمات", icon: "fa-utensils", color: "#fb923c", btn_text: "شوف المطاعم" },
+    { id: 7, title: "خريطة الجامعة", description: "خريطة تفاعلية لمواقع الكليات والمرافق داخل الحرم الجامعي", icon: "fa-map-marked-alt", color: "#38bdf8", btn_text: "افتح الخريطة" },
+    { id: 8, title: "مواعيد الباصات", description: "جداول ذهاب وعودة باصات الطلاب محدّثة يومياً للأولاد والبنات", icon: "fa-bus", color: "#f472b6", btn_text: "شوف المواعيد", link_url: "bus.html" },
+    { id: 9, title: "مجموعات الواتساب", description: "انضم لمجموعات موادك وكليتك — تواصل مع زملائك", icon: "fa-whatsapp", color: "#25D366", btn_text: "انضم الحين", link_url: "whatsapp.html" },
+    { id: 10, title: "مشاريع الطلاب", description: "اكتشف مشاريع زملائك الإبداعية وصوّت لأفضلها 🚀", icon: "fa-rocket", color: "#a78bfa", btn_text: "اكتشف المشاريع", link_url: "projects.html" }
 ]
 
 const defaultBoys = [
@@ -633,7 +615,7 @@ const defaultGirls = [
 ]
 
 // ===== STATE =====
-let tools = defaultTools.map(t => ({ id: t.id, title: t.title, desc: t.description, icon: t.icon, color: t.color, btnText: t.btn_text, linkUrl: t.link_url||"", isEnabled: t.is_enabled !== false }))
+let tools = defaultTools.map(t => ({ id: t.id, title: t.title, desc: t.description, icon: t.icon, color: t.color, btnText: t.btn_text, linkUrl: t.link_url||"", isEnabled: true }))
 let currentAdmin = null
 let editingToolId = null
 let selectedColor = "#00d4ff"
@@ -645,29 +627,25 @@ async function loadTools() {
     try {
         const { data, error } = await supabase.from('tools').select('*').order('id')
         if (!error && data && data.length > 0) {
-            tools = data.map(t => ({ id: t.id, title: t.title, desc: t.description, icon: t.icon, color: t.color, btnText: t.btn_text, linkUrl: t.link_url||"", isEnabled: t.is_enabled === null ? true : t.is_enabled !== false }))
+            tools = data.map(t => ({ id: t.id, title: t.title, desc: t.description, icon: t.icon, color: t.color, btnText: t.btn_text, linkUrl: t.link_url||'', isEnabled: t.is_enabled !== false }))
             renderTools()
-        } else { seedTools().catch(()=>{}) }
-    } catch(e) { console.log('loadTools offline') }
+        } else { seedTools().catch(function(){}) }
+    } catch(e) {}
 }
 
 async function seedTools() {
     for (const tool of defaultTools) {
-        await supabase.from('tools').upsert({ id: tool.id, title: tool.title, description: tool.description, icon: tool.icon, color: tool.color, btn_text: tool.btn_text, link_url: tool.link_url||"", is_enabled: true })
+        await supabase.from('tools').insert({ id: tool.id, title: tool.title, description: tool.description, icon: tool.icon, color: tool.color, btn_text: tool.btn_text })
     }
-    const { data } = await supabase.from('tools').select('*').order('id')
-    if (data && data.length > 0) {
-        tools = data.map(t => ({ id: t.id, title: t.title, desc: t.description, icon: t.icon, color: t.color, btnText: t.btn_text, linkUrl: t.link_url||"", isEnabled: true }))
-        renderTools()
-    }
+    await loadTools()
 }
 
 async function dbSaveTool(tool) {
     if (tool.id) {
-        await supabase.from('tools').update({ title: tool.title, description: tool.desc, icon: tool.icon, color: tool.color, btn_text: tool.btnText, link_url: tool.linkUrl||"", is_enabled: tool.isEnabled !== false }).eq('id', tool.id)
+        await supabase.from('tools').update({ title: tool.title, description: tool.desc, icon: tool.icon, color: tool.color, btn_text: tool.btnText }).eq('id', tool.id)
     } else {
         const newId = Math.max(...tools.map(t => t.id), 0) + 1
-        await supabase.from('tools').insert({ id: newId, title: tool.title, description: tool.desc, icon: tool.icon, color: tool.color, btn_text: tool.btnText, link_url: tool.linkUrl||"", is_enabled: tool.isEnabled !== false })
+        await supabase.from('tools').insert({ id: newId, title: tool.title, description: tool.desc, icon: tool.icon, color: tool.color, btn_text: tool.btnText })
     }
 }
 
@@ -770,7 +748,7 @@ window.saveBusSchedule = async function() {
 }
 
 // ===== INIT =====
-window.addEventListener('DOMContentLoaded', async () => {
+window.addEventListener('DOMContentLoaded', function() {
     renderTools()
     renderBusTables()
     updateUI()
@@ -779,27 +757,23 @@ window.addEventListener('DOMContentLoaded', async () => {
     initParallax()
     botAddMsg('bot', 'مرحباً بك في UoN Coffee! 👋\n\nأنا مساعدك الذكي لجامعة نزوى 🎓\nاسألني عن الكليات، الروابط، مواعيد الباصات، أو أي شيء!')
     document.getElementById('loadingOverlay').classList.add('hidden')
-    loadTools()
-    loadSettings().catch(()=>{})
-    loadBusData().catch(()=>{})
+    setTimeout(function() { loadTools(); loadSettings(); loadBusData(); }, 100)
 })
 
 // ===== RENDER TOOLS =====
 function renderTools() {
     const grid = document.getElementById('toolsGrid')
     if (!grid) return
-    if (!tools.length) { grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:3rem;color:var(--text-dim);">لا توجد أدوات بعد</div>'; return }
     grid.innerHTML = tools.map(tool => {
         const disabled = tool.isEnabled === false
-        const iconClass = tool.icon === 'fa-whatsapp' ? 'fab fa-whatsapp' : 'fas ' + tool.icon
-        return `<div class="tool-card" data-id="${tool.id}" style="--card-color:${tool.color};${disabled?'opacity:0.5;filter:grayscale(0.6);':''}">
-            <button class="admin-edit-btn" onclick="event.stopPropagation();editTool(${tool.id})" title="تعديل"><i class="fas fa-pen"></i></button>
-            ${disabled ? '<div style="position:absolute;top:10px;right:10px;background:rgba(251,146,60,0.15);border:1px solid rgba(251,146,60,0.4);color:#fb923c;font-size:0.7rem;font-weight:700;padding:0.2rem 0.6rem;border-radius:50px;z-index:2;">🔜 قريباً</div>' : ''}
-            <div class="tool-icon" style="background:${tool.color}20;color:${tool.color};"><i class="${iconClass}"></i></div>
-            <h3>${tool.title}</h3>
-            <p>${tool.desc}</p>
-            <button class="tool-link" style="color:${tool.color};${disabled?'opacity:0.5;cursor:not-allowed;':''}" onclick="openTool(${tool.id})">${tool.btnText} <i class="fas fa-arrow-left"></i></button>
-        </div>`
+        const ic = tool.icon === 'fa-whatsapp' ? 'fab fa-whatsapp' : 'fas ' + tool.icon
+        return '<div class="tool-card" data-id="' + tool.id + '" style="--card-color:' + tool.color + ';' + (disabled ? 'opacity:0.5;filter:grayscale(0.5)' : '') + '">' +
+            '<button class="admin-edit-btn" onclick="event.stopPropagation();editTool(' + tool.id + ')" title="تعديل"><i class="fas fa-pen"></i></button>' +
+            (disabled ? '<div style="position:absolute;top:8px;right:8px;background:rgba(251,146,60,0.15);border:1px solid rgba(251,146,60,0.4);color:#fb923c;font-size:0.7rem;font-weight:700;padding:0.2rem 0.6rem;border-radius:50px;z-index:2;">🔜 قريباً</div>' : '') +
+            '<div class="tool-icon" style="background:' + tool.color + '20;color:' + tool.color + ';"><i class="' + ic + '"></i></div>' +
+            '<h3>' + tool.title + '</h3><p>' + tool.desc + '</p>' +
+            '<button class="tool-link" style="color:' + tool.color + ';' + (disabled ? 'opacity:0.5;cursor:not-allowed' : '') + '" onclick="openTool(' + tool.id + ')">' + tool.btnText + ' <i class="fas fa-arrow-left"></i></button>' +
+            '</div>'
     }).join('')
 }
 
@@ -807,10 +781,8 @@ window.openTool = function(id) {
     const tool = tools.find(t => t.id === id)
     if (tool && tool.isEnabled === false) { showToast('هذه الأداة غير متاحة حالياً 🔜', 'error'); return }
     if (tool && tool.linkUrl) { window.location.href = tool.linkUrl; return }
-    const def = defaultTools.find(t => t.id === id)
-    if (def && def.link_url) { window.location.href = def.link_url; return }
-    const scrolls = { 1: 'botSection', 2: 'calcSection' }
-    if (scrolls[id]) { document.getElementById(scrolls[id])?.scrollIntoView({behavior:'smooth'}); return }
+    if (id === 1) { document.getElementById('botSection').scrollIntoView({behavior:'smooth'}); return }
+    if (id === 2) { document.getElementById('calcSection').scrollIntoView({behavior:'smooth'}); return }
     showToast('قريباً! 🔜')
 }
 
@@ -881,7 +853,6 @@ window.openPanel = function() {
     document.getElementById('editSection').style.display = 'none'
     renderPasswordsList()
     renderBusAdminRows()
-    renderToolsToggleList()
 }
 window.closePanel = function() {
     document.getElementById('adminPanel').classList.remove('open')
@@ -898,8 +869,6 @@ window.editTool = function(id) {
     document.getElementById('editDesc').value = tool.desc
     document.getElementById('editIcon').value = tool.icon
     document.getElementById('editBtnText').value = tool.btnText
-    if (document.getElementById('editLinkUrl')) document.getElementById('editLinkUrl').value = tool.linkUrl||''
-    if (document.getElementById('editIsEnabled')) document.getElementById('editIsEnabled').checked = tool.isEnabled !== false
     selectedColor = tool.color
     document.querySelectorAll('#editSection .color-option').forEach(opt => opt.classList.toggle('selected', opt.dataset.color === tool.color))
     document.getElementById('editSection').style.display = 'block'
@@ -921,8 +890,6 @@ window.saveToolHandler = async function() {
         tool.icon = document.getElementById('editIcon').value
         tool.color = selectedColor
         tool.btnText = document.getElementById('editBtnText').value
-        tool.linkUrl = document.getElementById('editLinkUrl')?.value || ''
-        tool.isEnabled = document.getElementById('editIsEnabled')?.checked !== false
         await dbSaveTool(tool)
         renderTools()
         closePanel()
@@ -1115,53 +1082,21 @@ window.toggleMenu = function() {
     else nl.style.cssText='display:flex;position:absolute;top:100%;left:0;right:0;flex-direction:column;background:var(--dark-light);padding:2rem;gap:1.5rem;z-index:999;'
 }
 
-
-// ===== NEW FEATURES =====
-window.quickToggleTool = async function(id, enabled) {
-    const tool = tools.find(t => t.id === id)
-    if (!tool) return
+window.quickToggleTool = function(id, enabled) {
+    var tool = tools.find(function(t){return t.id===id})
+    if(!tool) return
     tool.isEnabled = enabled
     renderTools()
-    try { await supabase.from('tools').update({ is_enabled: enabled }).eq('id', id) } catch(e) {}
+    supabase.from('tools').update({is_enabled:enabled}).eq('id',id).then(function(){})
     showToast(enabled ? '✅ الأداة مفعّلة' : '🔜 الأداة موقوفة')
 }
 
 window.resetToolsToDefault = async function() {
-    if (currentAdmin?.role !== 'admin') return
-    if (!confirm('إعادة ضبط جميع الأدوات للافتراضي؟')) return
+    if (!confirm('إعادة ضبط الأدوات للافتراضي؟')) return
     tools = defaultTools.map(t => ({ id: t.id, title: t.title, desc: t.description, icon: t.icon, color: t.color, btnText: t.btn_text, linkUrl: t.link_url||'', isEnabled: true }))
     renderTools()
     await seedTools()
     showToast('تم إعادة الضبط!')
-}
-
-function renderToolsToggleList() {
-    const list = document.getElementById('toolsToggleList')
-    if (!list) return
-    list.innerHTML = tools.map(tool => {
-        const iconClass = tool.icon === 'fa-whatsapp' ? 'fab fa-whatsapp' : 'fas ' + tool.icon
-        const on = tool.isEnabled !== false
-        return `<div style="display:flex;align-items:center;gap:10px;padding:0.65rem 0.9rem;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:10px;margin-bottom:6px;">
-            <div style="width:30px;height:30px;border-radius:8px;background:${tool.color}15;color:${tool.color};display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:0.85rem;"><i class="${iconClass}"></i></div>
-            <span style="flex:1;font-weight:700;font-size:0.85rem;">${tool.title}</span>
-            <label style="position:relative;display:inline-block;width:40px;height:20px;flex-shrink:0;cursor:pointer;">
-                <input type="checkbox" ${on?'checked':''} onchange="quickToggleTool(${tool.id},this.checked)" style="opacity:0;width:0;height:0;position:absolute;">
-                <span style="position:absolute;inset:0;background:${on?'rgba(107,203,119,0.35)':'rgba(239,68,68,0.2)'};border-radius:20px;border:1px solid ${on?'rgba(107,203,119,0.5)':'rgba(239,68,68,0.3)'};transition:all 0.3s;"></span>
-                <span style="position:absolute;width:14px;height:14px;background:white;border-radius:50%;top:2px;left:${on?'22px':'2px'};transition:left 0.3s;"></span>
-            </label>
-        </div>`
-    }).join('')
-}
-
-window.toggleMaintenance = async function(checked) {
-    try { await supabase.from('settings').upsert({ key:'maintenance_mode', value:checked?'true':'false' }) } catch(e) {}
-    showToast(checked ? '⚠️ وضع الصيانة مفعّل' : '✅ وضع الصيانة مُوقف')
-}
-
-window.saveMaintenance = async function() {
-    const msg = document.getElementById('maintenanceMessage')?.value || ''
-    try { await supabase.from('settings').upsert({ key:'maintenance_message', value:msg }) } catch(e) {}
-    showToast('تم حفظ رسالة الصيانة!')
 }
 
 // Restore session on load
@@ -1171,32 +1106,5 @@ window.saveMaintenance = async function() {
 })()
 </script>
 
-<!-- Maintenance Overlay -->
-
-<div id="maintenanceOverlay" style="display:none;position:fixed;inset:0;background:#0a0e27;z-index:99998;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:2rem;">
-    <div style="font-size:4rem;margin-bottom:1rem;">🔧</div>
-    <div style="font-size:clamp(2rem,5vw,3rem);font-weight:900;color:#fb923c;margin-bottom:1rem;">الموقع تحت الصيانة</div>
-    <p id="maintenanceMsg" style="color:#a0aec0;max-width:500px;line-height:1.8;margin-bottom:2rem;">نعمل على تحسين المنصة 🚀</p>
-    <div style="display:inline-flex;align-items:center;gap:8px;padding:0.6rem 1.5rem;background:rgba(251,146,60,0.1);border:1px solid rgba(251,146,60,0.3);border-radius:50px;color:#fb923c;font-weight:700;"><i class="fas fa-tools"></i> جاري التحديث...</div>
-</div>
-<script>
-// Check maintenance on load
-(async function() {
-    try {
-        const saved = sessionStorage.getItem('nu_admin')
-        if (saved) return
-        // Wait for supabase to be available
-        await new Promise(r => setTimeout(r, 500))
-        if (typeof supabase === 'undefined') return
-        const {data} = await supabase.from('settings').select('value').eq('key','maintenance_mode').single()
-        if (data?.value === 'true') {
-            const {data:m} = await supabase.from('settings').select('value').eq('key','maintenance_message').single()
-            const el = document.getElementById('maintenanceOverlay')
-            const p = document.getElementById('maintenanceMsg')
-            if (el) { if(p && m?.value) p.innerHTML = m.value.replace(/\n/g,'<br>'); el.style.display='flex' }
-        }
-    } catch(e){}
-})()
-</script>
 </body>
 </html>
