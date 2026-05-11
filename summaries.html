@@ -22,7 +22,7 @@ body { font-family:'Tajawal',sans-serif; background:var(--dark); color:var(--tex
 @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-12px)} }
 
 .loading-overlay { position:fixed; inset:0; background:var(–dark); z-index:99999; display:flex; align-items:center; justify-content:center; transition:opacity .5s; }
-.loading-overlay.hidden { opacity:0; pointer-events:none; }
+.loading-overlay.hidden { display: none !important; }
 .spinner { width:44px; height:44px; border:3px solid rgba(0,212,255,.1); border-top-color:var(–primary); border-radius:50%; animation:spin .8s linear infinite; }
 .toast { position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(80px); background:var(–success); color:#fff; padding:.8rem 1.8rem; border-radius:12px; font-weight:700; z-index:10000; opacity:0; transition:all .4s; display:flex; align-items:center; gap:8px; }
 .toast.show { transform:translateX(-50%) translateY(0); opacity:1; }
@@ -349,6 +349,21 @@ let currentAdmin = null
 let currentFilter = 'all'
 
 window.addEventListener('DOMContentLoaded', async () => {
+    setTimeout(()=>document.getElementById('loadingOverlay')?.classList.add('hidden'),1000);
+    // Check maintenance (uses existing supabase instance)
+    try {
+        const _adm = sessionStorage.getItem('uon_bus_admin')||sessionStorage.getItem('uon_feat_admin')||sessionStorage.getItem('uon_sum_admin')||sessionStorage.getItem('nu_admin')
+        if (!_adm) {
+            supabase.from('settings').select('value').eq('key','maintenance_mode').single().then(r=>{
+                if(r.data?.value==='true'){
+                    supabase.from('settings').select('value').eq('key','maintenance_message').single().then(r2=>{
+                        const el=document.getElementById('maintOverlay')
+                        if(el){if(r2.data?.value)document.getElementById('maintMsg').innerHTML=r2.data.value.replace(/\n/g,'<br>');el.style.display='flex'}
+                    })
+                }
+            })
+        }
+    } catch(e){}
     const saved = sessionStorage.getItem('uon_sum_admin')
     if (saved) try { currentAdmin = JSON.parse(saved); updateAdminUI() } catch(e) {}
     setTimeout(() => document.getElementById('loadingOverlay').classList.add('hidden'), 4000)
@@ -541,31 +556,11 @@ function initReveal() {
 }
 </script>
 
-<div id="maintOverlay" style="display:none;position:fixed;inset:0;background:#0a0e27;z-index:99998;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:2rem;font-family:'Tajawal',sans-serif;">
+<div id="maintOverlay" style="display:none;position:fixed;inset:0;background:#0a0e27;z-index:99998;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:2rem;font-family:'Tajawal',sans-serif;color:#e2e8f0;">
     <div style="font-size:4rem;margin-bottom:1rem;">🔧</div>
     <div style="font-size:2.5rem;font-weight:900;color:#fb923c;margin-bottom:1rem;">الموقع تحت الصيانة</div>
     <p id="maintMsg" style="color:#a0aec0;max-width:500px;line-height:1.8;margin-bottom:2rem;">نعمل على تحسين المنصة 🚀</p>
-    <a href="index.html" style="padding:0.8rem 2rem;background:#00d4ff;border-radius:12px;color:#0a0e27;font-weight:800;text-decoration:none;display:inline-block;">العودة للرئيسية</a>
+    <a href="index.html" style="padding:0.8rem 2rem;background:#00d4ff;border-radius:12px;color:#0a0e27;font-weight:800;text-decoration:none;">العودة للرئيسية</a>
 </div>
-<script>
-(async function() {
-    try {
-        if (sessionStorage.getItem('nu_admin')) return
-        await new Promise(r => setTimeout(r, 800))
-        // Find supabase instance from page
-        const allScripts = document.querySelectorAll('script[type="module"]')
-        // Use dynamic import
-        const {createClient} = await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm')
-        const sb = createClient('https://fjkxahhoacqlpiafmfyd.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZqa3hhaGhvYWNxbHBpYWZtZnlkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgzMTkwMjQsImV4cCI6MjA5Mzg5NTAyNH0.Ls3gaXRso3BgcDAByoYeQQot_KbAOfREvxyW8u4vkGA')
-        const {data} = await sb.from('settings').select('value').eq('key','maintenance_mode').single()
-        if (data?.value === 'true') {
-            const {data:m} = await sb.from('settings').select('value').eq('key','maintenance_message').single()
-            const el = document.getElementById('maintOverlay')
-            const p = document.getElementById('maintMsg')
-            if (el) { if(p && m?.value) p.innerHTML = m.value.replace(/\n/g,'<br>'); el.style.display='flex' }
-        }
-    } catch(e){}
-})()
-</script>
 </body>
 </html>
