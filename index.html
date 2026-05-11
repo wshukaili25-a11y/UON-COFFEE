@@ -295,6 +295,13 @@
 <!-- Loading -->
 
 <div class="loading-overlay" id="loadingOverlay"><div class="loading-spinner"></div></div>
+<script>
+// Force hide loading after 4s no matter what
+setTimeout(() => {
+    const ol = document.getElementById('loadingOverlay')
+    if (ol) ol.classList.add('hidden')
+}, 4000)
+</script>
 
 <!-- Maintenance Mode Overlay -->
 
@@ -650,12 +657,29 @@
 </footer>
 
 <script type="module">
-import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
-
-const supabase = createClient(
-    'https://fjkxahhoacqlpiafmfyd.supabase.co',
-    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZqa3hhaGhvYWNxbHBpYWZtZnlkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgzMTkwMjQsImV4cCI6MjA5Mzg5NTAyNH0.Ls3gaXRso3BgcDAByoYeQQot_KbAOfREvxyW8u4vkGA'
-)
+// ===== SUPABASE INIT =====
+let supabase
+try {
+    const { createClient } = await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm')
+    supabase = createClient(
+        'https://fjkxahhoacqlpiafmfyd.supabase.co',
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZqa3hhaGhvYWNxbHBpYWZtZnlkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgzMTkwMjQsImV4cCI6MjA5Mzg5NTAyNH0.Ls3gaXRso3BgcDAByoYeQQot_KbAOfREvxyW8u4vkGA'
+    )
+} catch(e) {
+    console.warn('Supabase load failed, using offline mode')
+    // Fake supabase that returns empty data so UI still renders
+    supabase = {
+        from: () => ({
+            select: () => ({ order: () => ({ data: [], error: null }), eq: () => ({ single: () => ({ data: null }), data: [], error: null }) }),
+            insert: () => ({ select: () => ({ data: [], error: null }) }),
+            update: () => ({ eq: () => ({}) }),
+            delete: () => ({ eq: () => ({}) }),
+            upsert: () => ({})
+        })
+    }
+    // Force hide loading overlay
+    document.getElementById('loadingOverlay')?.classList.add('hidden')
+}
 
 // ===== PASSWORD CHECK =====
 const FALLBACK_PASS = 'UoN@Coffee#2026!'
@@ -1337,12 +1361,6 @@ window.toggleMenu = function() {
     if (nl.style.display==='flex') nl.style.display='none'
     else nl.style.cssText='display:flex;position:absolute;top:100%;left:0;right:0;flex-direction:column;background:var(--dark-light);padding:2rem;gap:1.5rem;z-index:999;'
 }
-
-// Restore session on load
-;(function() {
-    const saved = sessionStorage.getItem('nu_admin')
-    if (saved) try { currentAdmin = JSON.parse(saved) } catch(e) {}
-})()
 </script>
 
 </body>
