@@ -264,6 +264,8 @@
 </style>
 ```
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 </head>
 <body>
 
@@ -582,13 +584,12 @@
     </div>
 </footer>
 
-<script type="module">
-import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
-
-const supabase = createClient(
+<script>
+const supabase = (window.supabase || window.supabaseJs).createClient(
     'https://fjkxahhoacqlpiafmfyd.supabase.co',
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZqa3hhaGhvYWNxbHBpYWZtZnlkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgzMTkwMjQsImV4cCI6MjA5Mzg5NTAyNH0.Ls3gaXRso3BgcDAByoYeQQot_KbAOfREvxyW8u4vkGA'
 )
+
 
 // ===== PASSWORD CHECK =====
 const FALLBACK_PASS = 'UoN@Coffee#2026!'
