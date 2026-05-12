@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
@@ -375,6 +375,13 @@
         <button class="btn-save" onclick="addPassword()"><i class="fas fa-key"></i> إضافة كلمة المرور</button>
     </div>
 
+    <!-- Tools Toggle -->
+    <div class="panel-section">
+        <h3><i class="fas fa-toggle-on"></i> تفعيل / إيقاف الأدوات</h3>
+        <div id="toolsToggleList"></div>
+        <button onclick="resetToolsToDefault()" style="width:100%;margin-top:0.8rem;padding:0.75rem;background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2);border-radius:10px;color:#ef4444;font-weight:700;font-family:'Tajawal',sans-serif;cursor:pointer;font-size:0.85rem;"><i class="fas fa-redo"></i> إعادة ضبط الأدوات للافتراضي</button>
+    </div>
+
     <!-- Site Settings -->
     <div class="panel-section">
         <h3><i class="fas fa-sliders-h"></i> إعدادات الموقع</h3>
@@ -382,6 +389,15 @@
         <div class="form-group"><label>الشعار الرئيسي</label><input type="text" id="siteHeadline" value="منصتك الشاملة للحياة الأكاديمية"></div>
         <div class="form-group"><label>الوصف</label><textarea id="siteDesc">أدوات ذكية، ملخصات، جداول دراسية، وكل ما تحتاجه للنجاح</textarea></div>
         <button class="btn-save" onclick="saveSettings()"><i class="fas fa-save"></i> حفظ الإعدادات</button>
+        <div style="margin-top:1.5rem;padding-top:1.5rem;border-top:1px solid rgba(255,255,255,0.06);">
+            <h3 style="color:#fb923c;margin-bottom:1rem;font-size:1rem;"><i class="fas fa-hard-hat"></i> وضع الصيانة</h3>
+            <div style="display:flex;align-items:center;gap:10px;background:rgba(251,146,60,0.06);border:1px solid rgba(251,146,60,0.2);border-radius:10px;padding:0.8rem;margin-bottom:0.8rem;">
+                <input type="checkbox" id="maintenanceToggle" style="width:18px;height:18px;accent-color:#fb923c;cursor:pointer;" onchange="toggleMaintenance(this.checked)">
+                <label for="maintenanceToggle" style="margin:0;cursor:pointer;font-weight:700;color:#fb923c;">🔧 تفعيل وضع الصيانة</label>
+            </div>
+            <div class="form-group"><label>رسالة الصيانة</label><textarea id="maintenanceMessage" style="min-height:60px;" placeholder="نعمل على تحسين المنصة..."></textarea></div>
+            <button class="btn-save" style="background:linear-gradient(135deg,#fb923c,#f97316);" onclick="saveMaintenance()"><i class="fas fa-save"></i> حفظ الرسالة</button>
+        </div>
     </div>
 </div>
 
@@ -547,13 +563,78 @@
     </div>
 </footer>
 
-<script type="module">
-import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
-
-const supabase = createClient(
-    'https://fjkxahhoacqlpiafmfyd.supabase.co',
-    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZqa3hhaGhvYWNxbHBpYWZtZnlkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgzMTkwMjQsImV4cCI6MjA5Mzg5NTAyNH0.Ls3gaXRso3BgcDAByoYeQQot_KbAOfREvxyW8u4vkGA'
-)
+<script>
+// Minimal Supabase Client - No CDN Required
+(function() {
+    function createClient(url, key) {
+        const headers = { 'apikey': key, 'Authorization': 'Bearer ' + key, 'Content-Type': 'application/json', 'Prefer': 'return=representation' }
+        function from(table) {
+            let _url = url + '/rest/v1/' + table
+            let _filters = []
+            let _order = null
+            let _single = false
+            const q = {
+                select: function(cols) { _url += '?select=' + (cols||'*'); return q },
+                eq: function(col, val) { _filters.push(col + '=eq.' + val); return q },
+                order: function(col, opts) { _order = col + (opts && opts.ascending===false ? '.desc' : '.asc'); return q },
+                single: function() { _single = true; return q },
+                upsert: function(data) {
+                    const u = url + '/rest/v1/' + table
+                    return fetch(u, { method: 'POST', headers: Object.assign({}, headers, {'Prefer':'resolution=merge-duplicates,return=representation'}), body: JSON.stringify(data) })
+                        .then(r => r.json()).then(d => ({ data: d, error: null })).catch(e => ({ data: null, error: e }))
+                },
+                insert: function(data) {
+                    const u = url + '/rest/v1/' + table
+                    return fetch(u, { method: 'POST', headers: headers, body: JSON.stringify(data) })
+                        .then(r => r.json()).then(d => ({ data: d, error: null })).catch(e => ({ data: null, error: e }))
+                },
+                update: function(data) {
+                    const self = q
+                    self._updateData = data
+                    self.eq = function(col, val) { _filters.push(col + '=eq.' + val); return self }
+                    const origThen = self.then
+                    return {
+                        eq: function(col, val) {
+                            _filters.push(col + '=eq.' + val)
+                            let u = url + '/rest/v1/' + table + '?' + _filters.join('&')
+                            return fetch(u, { method: 'PATCH', headers: headers, body: JSON.stringify(data) })
+                                .then(r => r.ok ? { data: null, error: null } : { data: null, error: r.status }).catch(e => ({ data: null, error: e }))
+                        }
+                    }
+                },
+                delete: function() {
+                    return {
+                        eq: function(col, val) {
+                            let u = url + '/rest/v1/' + table + '?' + col + '=eq.' + val
+                            return fetch(u, { method: 'DELETE', headers: headers })
+                                .then(r => ({ data: null, error: r.ok ? null : r.status })).catch(e => ({ data: null, error: e }))
+                        }
+                    }
+                },
+                then: function(resolve, reject) {
+                    let u = _url
+                    if (_filters.length) u += (_url.includes('?') ? '&' : '?') + _filters.join('&')
+                    if (_order) u += (_url.includes('?') || _filters.length ? '&' : '?') + 'order=' + _order
+                    const h = Object.assign({}, headers)
+                    if (_single) h['Accept'] = 'application/vnd.pgrst.object+json'
+                    return fetch(u, { headers: h })
+                        .then(r => r.ok ? r.json() : Promise.reject(r.status))
+                        .then(d => resolve({ data: _single ? d : (Array.isArray(d) ? d : [d]), error: null }))
+                        .catch(e => resolve({ data: _single ? null : [], error: e }))
+                }
+            }
+            return q
+        }
+        return { from }
+    }
+    window._supabaseClient = createClient(
+        'https://fjkxahhoacqlpiafmfyd.supabase.co',
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZqa3hhaGhvYWNxbHBpYWZtZnlkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgzMTkwMjQsImV4cCI6MjA5Mzg5NTAyNH0.Ls3gaXRso3BgcDAByoYeQQot_KbAOfREvxyW8u4vkGA'
+    )
+})()
+</script>
+<script>
+const supabase = window._supabaseClient
 
 // ===== PASSWORD CHECK =====
 const FALLBACK_PASS = 'UoN@Coffee#2026!'
@@ -614,7 +695,7 @@ async function loadTools() {
     try {
         const { data, error } = await supabase.from('tools').select('*').order('id')
         if (error || !data || data.length === 0) { await seedTools() }
-        else { tools = data.map(t => ({ id: t.id, title: t.title, desc: t.description, icon: t.icon, color: t.color, btnText: t.btn_text })); renderTools() }
+        else { tools = data.map(t => ({ id: t.id, title: t.title, desc: t.description, icon: t.icon, color: t.color, btnText: t.btn_text, linkUrl: t.link_url||'', isEnabled: t.is_enabled !== false })); renderTools() }
     } catch(e) { tools = defaultTools.map(t => ({...t, desc: t.description, btnText: t.btn_text})); renderTools() }
 }
 
@@ -671,13 +752,7 @@ function renderBusTables() {
 function renderBusTable(gender, routes) {
     const el = document.getElementById(`bus${gender.charAt(0).toUpperCase() + gender.slice(1)}Table`)
     if (!el) return
-    el.innerHTML = routes.map(r => `
-        <div class="bus-route">
-            <span class="route-name">📍 ${r.route}</span>
-            <span class="route-time">🕖 ${r.departure}</span>
-            <span class="route-return">↩️ ${r.returnTime}</span>
-            <span class="route-status ${r.status === 'active' ? 'status-active' : 'status-full'}">${r.status === 'active' ? 'متاح' : 'مكتمل'}</span>
-        </div>`).join('')
+    el.innerHTML = routes.map(r => '<div class="bus-route"><span class="route-name">📍 ' + r.route + '</span><span class="route-time">🕖 ' + r.departure + '</span><span class="route-return">↩️ ' + r.returnTime + '</span><span class="route-status ' + (r.status === 'active' ? 'status-active' : 'status-full') + '">' + (r.status === 'active' ? 'متاح' : 'مكتمل') + '</span></div>').join('')
 }
 
 window.switchBusTab = function(tab, btn) {
@@ -698,13 +773,12 @@ function renderBusAdminRows() {
 function renderBusAdminSection(gender, routes) {
     const el = document.getElementById(`bus${gender.charAt(0).toUpperCase() + gender.slice(1)}Admin`)
     if (!el) return
-    el.innerHTML = routes.map((r, i) => `
-        <div class="bus-admin-row">
-            <input type="text" value="${r.route}" onchange="updateBusRow('${gender}',${i},'route',this.value)">
-            <input type="text" value="${r.departure}" onchange="updateBusRow('${gender}',${i},'departure',this.value)">
-            <input type="text" value="${r.returnTime}" onchange="updateBusRow('${gender}',${i},'returnTime',this.value)">
-            <button onclick="removeBusRow('${gender}',${i})">×</button>
-        </div>`).join('')
+    el.innerHTML = routes.map(function(r, i) { return '<div class="bus-admin-row">' +
+            '<input type="text" value="' + r.route + '" onchange="updateBusRow(\'' + gender + '\',' + i + ',\'route\',this.value)">' +
+            '<input type="text" value="' + r.departure + '" onchange="updateBusRow(\'' + gender + '\',' + i + ',\'departure\',this.value)">' +
+            '<input type="text" value="' + r.returnTime + '" onchange="updateBusRow(\'' + gender + '\',' + i + ',\'returnTime\',this.value)">' +
+            '<button onclick="removeBusRow(\'' + gender + '\',' + i + ')">×</button>' +
+            '</div>' }).join('')
 }
 
 window.updateBusRow = function(gender, index, field, value) {
@@ -733,33 +807,36 @@ window.saveBusSchedule = async function() {
 }
 
 // ===== INIT =====
-window.addEventListener('DOMContentLoaded', async () => {
-    setTimeout(() => document.querySelectorAll('.reveal').forEach(el => el.classList.add('active')), 2000)
-    // إخفاء الـ loading بعد 4 ثواني على أي حال
-    setTimeout(() => document.getElementById('loadingOverlay').classList.add('hidden'), 4000)
-    try {
-        await Promise.all([loadTools(), loadSettings(), loadBusData()])
-    } catch(e) { console.log('init error', e) }
+window.addEventListener('DOMContentLoaded', () => {
+    // أظهر كل شيء فوراً
+    renderTools()
+    renderBusTables()
     updateUI()
     initScrollReveal()
     initCounters()
     initParallax()
     botAddMsg('bot', 'مرحباً بك في UoN Coffee! 👋\n\nأنا مساعدك الذكي لجامعة نزوى 🎓\nاسألني عن الكليات، الروابط، مواعيد الباصات، أو أي شيء!')
     document.getElementById('loadingOverlay').classList.add('hidden')
+    document.querySelectorAll('.reveal').forEach(el => el.classList.add('active'))
+    // حمّل من Supabase في الخلفية
+    setTimeout(() => { loadTools(); loadSettings(); loadBusData(); checkMaintenance(); }, 200)
 })
 
 // ===== RENDER TOOLS =====
 function renderTools() {
     const grid = document.getElementById('toolsGrid')
     if (!tools.length) { grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:3rem;color:var(--text-dim);">لا توجد أدوات بعد</div>'; return }
-    grid.innerHTML = tools.map(tool => `
-        <div class="tool-card" data-id="${tool.id}" style="--card-color:${tool.color};">
-            <button class="admin-edit-btn" onclick="event.stopPropagation();editTool(${tool.id})" title="تعديل"><i class="fas fa-pen"></i></button>
-            <div class="tool-icon" style="background:${tool.color}20;color:${tool.color};"><i class="fas ${tool.icon}"></i></div>
-            <h3>${tool.title}</h3>
-            <p>${tool.desc}</p>
-            <button class="tool-link" style="color:${tool.color};" onclick="openTool(${tool.id})">${tool.btnText} <i class="fas fa-arrow-left"></i></button>
-        </div>`).join('')
+    grid.innerHTML = tools.map(tool => {
+        const disabled = tool.isEnabled === false
+        const ic = tool.icon === 'fa-whatsapp' ? 'fab fa-whatsapp' : 'fas ' + tool.icon
+        return '<div class="tool-card" data-id="' + tool.id + '" style="--card-color:' + tool.color + ';' + (disabled ? 'opacity:0.5;filter:grayscale(0.5)' : '') + '">' +
+            '<button class="admin-edit-btn" onclick="event.stopPropagation();editTool(' + tool.id + ')" title="تعديل"><i class="fas fa-pen"></i></button>' +
+            (disabled ? '<div style="position:absolute;top:8px;right:8px;background:rgba(251,146,60,0.15);border:1px solid rgba(251,146,60,0.4);color:#fb923c;font-size:0.7rem;font-weight:700;padding:0.2rem 0.6rem;border-radius:50px;z-index:2;">🔜 قريباً</div>' : '') +
+            '<div class="tool-icon" style="background:' + tool.color + '20;color:' + tool.color + ';"><i class="' + ic + '"></i></div>' +
+            '<h3>' + tool.title + '</h3><p>' + tool.desc + '</p>' +
+            '<button class="tool-link" style="color:' + tool.color + ';' + (disabled ? 'opacity:0.5;cursor:not-allowed' : '') + '" onclick="openTool(' + tool.id + ')">' + tool.btnText + ' <i class="fas fa-arrow-left"></i></button>' +
+            '</div>'
+    }).join('')
 }
 
 window.openTool = function(id) {
@@ -846,6 +923,7 @@ window.openPanel = function() {
     document.getElementById('editSection').style.display = 'none'
     renderPasswordsList()
     renderBusAdminRows()
+    renderToolsToggleList()
 }
 window.closePanel = function() {
     document.getElementById('adminPanel').classList.remove('open')
@@ -924,9 +1002,7 @@ window.addToolHandler = async function() {
 // ===== PASSWORDS (ADMIN ONLY) =====
 function renderPasswordsList() {
     if (currentAdmin?.role !== 'admin') { document.getElementById('passwordsList').innerHTML = '<p style="color:var(--text-dim);font-size:0.85rem;">فقط المشرف الرئيسي يمكنه إدارة كلمات المرور</p>'; return }
-    document.getElementById('passwordsList').innerHTML = `
-        <div class="password-item"><div><span>••••••••••••••</span><span class="role">المشرف الرئيسي</span></div></div>
-        <p style="font-size:0.8rem;color:var(--text-dim);margin-top:0.5rem;">كلمة المرور الرئيسية محمية ولا تظهر</p>`
+    document.getElementById('passwordsList').innerHTML = '<div class="password-item"><div><span>••••••••••••••</span><span class="role">المشرف الرئيسي</span></div></div><p style="font-size:0.8rem;color:var(--text-dim);margin-top:0.5rem;">كلمة المرور الرئيسية محمية ولا تظهر</p>'
 }
 
 window.addPassword = async function() {
@@ -948,7 +1024,7 @@ window.saveSettings = async function() {
     const title = document.getElementById('siteTitle').value
     const headline = document.getElementById('siteHeadline').value
     const desc = document.getElementById('siteDesc').value
-    document.getElementById('heroTitle').innerHTML = headline.replace(/\n/g, '<br>')
+    document.getElementById('heroTitle').innerHTML = headline.split('\n').join('<br>')
     document.getElementById('heroDesc').textContent = desc
     document.title = title
     await dbSaveSettings('title', title)
@@ -960,7 +1036,7 @@ window.saveSettings = async function() {
 async function loadSettings() {
     const settings = await dbGetSettings()
     if (settings.title) { if(document.getElementById('siteTitle')) document.getElementById('siteTitle').value = settings.title; document.title = settings.title }
-    if (settings.headline) { if(document.getElementById('siteHeadline')) document.getElementById('siteHeadline').value = settings.headline; document.getElementById('heroTitle').innerHTML = settings.headline.replace(/\n/g, '<br>') }
+    if (settings.headline) { if(document.getElementById('siteHeadline')) document.getElementById('siteHeadline').value = settings.headline; document.getElementById('heroTitle').innerHTML = settings.headline.split('\n').join('<br>') }
     if (settings.desc) { if(document.getElementById('siteDesc')) document.getElementById('siteDesc').value = settings.desc; document.getElementById('heroDesc').textContent = settings.desc }
 }
 
@@ -987,8 +1063,17 @@ function getBotReply(q) {
 function botAddMsg(type, text) {
     const c = document.getElementById('botMsgs')
     const d = document.createElement('div')
-    d.style.cssText = `display:flex;gap:10px;animation:slideInUp .3s ease;${type==='user'?'flex-direction:row-reverse':''}`
-    d.innerHTML = `<div style="width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#00d4ff,#0099cc);display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;">${type==='bot'?'☕':'🎓'}</div><div style="max-width:78%;padding:10px 14px;border-radius:14px;font-size:13px;line-height:1.8;${type==='bot'?'background:rgba(0,212,255,0.08);border:1px solid rgba(0,212,255,0.12);color:#e2e8f0;border-radius:4px 14px 14px 14px':'background:linear-gradient(135deg,#00d4ff,#0099cc);color:#0a0e27;border-radius:14px 4px 14px 14px'}">${text.replace(/\n/g,'<br>')}</div>`
+    d.style.display = 'flex'
+    d.style.gap = '10px'
+    d.style.animation = 'slideInUp .3s ease'
+    if (type === 'user') d.style.flexDirection = 'row-reverse'
+    var icon = type === 'bot' ? '☕' : '🎓'
+    var formattedText = text.split('\n').join('<br>')
+    var bubbleStyle = type === 'bot'
+        ? 'background:rgba(0,212,255,0.08);border:1px solid rgba(0,212,255,0.12);color:#e2e8f0;border-radius:4px 14px 14px 14px'
+        : 'background:linear-gradient(135deg,#00d4ff,#0099cc);color:#0a0e27;border-radius:14px 4px 14px 14px'
+    d.innerHTML = '<div style="width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#00d4ff,#0099cc);display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;">' + icon + '</div>' +
+        '<div style="max-width:78%;padding:10px 14px;border-radius:14px;font-size:13px;line-height:1.8;' + bubbleStyle + '">' + formattedText + '</div>'
     c.appendChild(d)
     c.scrollTop = c.scrollHeight
 }
@@ -1009,7 +1094,7 @@ window.addCalcRow = function() {
     const r = document.createElement('div')
     r.className = 'calc-row'
     r.style.cssText = 'display:flex;gap:8px;'
-    r.innerHTML = `<input type="text" placeholder="اسم المادة" style="flex:1;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:11px 12px;color:white;font-family:'Tajawal',sans-serif;font-size:13px;outline:none;"><select style="background:var(--dark);border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:11px 8px;color:white;font-family:'Tajawal',sans-serif;font-size:12px;outline:none;"><option value="">الساعات</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option></select><select style="background:var(--dark);border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:11px 8px;color:white;font-family:'Tajawal',sans-serif;font-size:12px;outline:none;"><option value="">التقدير</option><option value="4.0">A (4.0)</option><option value="3.7">A- (3.7)</option><option value="3.3">B+ (3.3)</option><option value="3.0">B (3.0)</option><option value="2.7">B- (2.7)</option><option value="2.3">C+ (2.3)</option><option value="2.0">C (2.0)</option><option value="1.0">D (1.0)</option><option value="0">F (0.0)</option></select><button onclick="removeCalcRow(this)" style="width:34px;height:34px;background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.15);border-radius:8px;color:#ef4444;cursor:pointer;font-size:16px;">×</button>`
+    r.innerHTML = '<input type="text" placeholder="اسم المادة" style="flex:1;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:11px 12px;color:white;font-family:\'Tajawal\',sans-serif;font-size:13px;outline:none;"><select style="background:var(--dark);border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:11px 8px;color:white;font-family:\'Tajawal\',sans-serif;font-size:12px;outline:none;"><option value="">الساعات</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option></select><select style="background:var(--dark);border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:11px 8px;color:white;font-family:\'Tajawal\',sans-serif;font-size:12px;outline:none;"><option value="">التقدير</option><option value="4.0">A (4.0)</option><option value="3.7">A- (3.7)</option><option value="3.3">B+ (3.3)</option><option value="3.0">B (3.0)</option><option value="2.7">B- (2.7)</option><option value="2.3">C+ (2.3)</option><option value="2.0">C (2.0)</option><option value="1.0">D (1.0)</option><option value="0">F (0.0)</option></select><button onclick="removeCalcRow(this)" style="width:34px;height:34px;background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.15);border-radius:8px;color:#ef4444;cursor:pointer;font-size:16px;">×</button>'
     document.getElementById('calcRows').appendChild(r)
 }
 window.removeCalcRow = function(b) { if (document.querySelectorAll('.calc-row').length > 1) b.parentElement.remove() }
@@ -1075,11 +1160,76 @@ window.toggleMenu = function() {
     else nl.style.cssText='display:flex;position:absolute;top:100%;left:0;right:0;flex-direction:column;background:var(--dark-light);padding:2rem;gap:1.5rem;z-index:999;'
 }
 
+// ===== TOOLS TOGGLE =====
+window.quickToggleTool = async function(id, enabled) {
+    const tool = tools.find(t => t.id === id)
+    if (!tool) return
+    tool.isEnabled = enabled
+    renderTools()
+    try { await supabase.from('tools').update({ is_enabled: enabled }).eq('id', id) } catch(e) {}
+    showToast(enabled ? '✅ الأداة مفعّلة' : '🔜 الأداة موقوفة')
+}
+
+window.resetToolsToDefault = async function() {
+    if (currentAdmin?.role !== 'admin') return
+    if (!confirm('إعادة ضبط جميع الأدوات للافتراضي؟')) return
+    tools = defaultTools.map(t => ({ id: t.id, title: t.title, desc: t.description, icon: t.icon, color: t.color, btnText: t.btn_text, linkUrl: t.link_url || '', isEnabled: true }))
+    renderTools()
+    for (const tool of defaultTools) {
+        try { await supabase.from('tools').upsert({ id: tool.id, title: tool.title, description: tool.description, icon: tool.icon, color: tool.color, btn_text: tool.btn_text, link_url: tool.link_url || '', is_enabled: true }) } catch(e) {}
+    }
+    showToast('تم إعادة الضبط!')
+}
+
+function renderToolsToggleList() {
+    const list = document.getElementById('toolsToggleList')
+    if (!list) return
+    list.innerHTML = tools.map(tool => {
+        const on = tool.isEnabled !== false
+        const ic = tool.icon === 'fa-whatsapp' ? 'fab fa-whatsapp' : 'fas ' + tool.icon
+        return '<div style="display:flex;align-items:center;gap:10px;padding:0.65rem 0.9rem;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:10px;margin-bottom:6px;">' +
+            '<div style="width:30px;height:30px;border-radius:8px;background:' + tool.color + '15;color:' + tool.color + ';display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:0.85rem;"><i class="' + ic + '"></i></div>' +
+            '<span style="flex:1;font-weight:700;font-size:0.85rem;">' + tool.title + '</span>' +
+            '<label style="position:relative;display:inline-block;width:40px;height:22px;flex-shrink:0;cursor:pointer;">' +
+            '<input type="checkbox" ' + (on ? 'checked' : '') + ' onchange="quickToggleTool(' + tool.id + ',this.checked)" style="opacity:0;width:0;height:0;position:absolute;">' +
+            '<span style="position:absolute;inset:0;background:' + (on ? 'rgba(107,203,119,0.3)' : 'rgba(239,68,68,0.2)') + ';border-radius:20px;border:1px solid ' + (on ? 'rgba(107,203,119,0.5)' : 'rgba(239,68,68,0.3)') + ';cursor:pointer;transition:all 0.3s;" onclick="this.previousElementSibling.click()"></span>' +
+            '<span style="position:absolute;width:16px;height:16px;background:white;border-radius:50%;top:2px;transition:left 0.3s;left:' + (on ? '20px' : '2px') + ';pointer-events:none;"></span>' +
+            '</label></div>'
+    }).join('')
+}
+
+// ===== MAINTENANCE =====
+window.toggleMaintenance = async function(checked) {
+    try { await supabase.from('settings').upsert({ key: 'maintenance_mode', value: checked ? 'true' : 'false' }) } catch(e) {}
+    showToast(checked ? '⚠️ وضع الصيانة مفعّل' : '✅ وضع الصيانة مُوقف')
+}
+
+window.saveMaintenance = async function() {
+    const msg = document.getElementById('maintenanceMessage')?.value || ''
+    try { await supabase.from('settings').upsert({ key: 'maintenance_message', value: msg }) } catch(e) {}
+    showToast('تم حفظ رسالة الصيانة!')
+}
+
+async function checkMaintenance() {
+    try {
+        if (currentAdmin) return
+        const { data } = await supabase.from('settings').select('value').eq('key', 'maintenance_mode').single()
+        if (data?.value === 'true') {
+            const { data: m } = await supabase.from('settings').select('value').eq('key', 'maintenance_message').single()
+            const el = document.getElementById('maintenanceOverlay')
+            if (el) { if (m?.value) document.getElementById('maintenanceMsg').innerHTML = m.value.split('\n').join('<br>'); el.style.display = 'flex' }
+        }
+    } catch(e) {}
+}
+
 // Restore session on load
 ;(function() {
     const saved = sessionStorage.getItem('nu_admin')
     if (saved) try { currentAdmin = JSON.parse(saved) } catch(e) {}
 })()
 </script>
-</body>
-</html>
+<div id="maintenanceOverlay" style="display:none;position:fixed;inset:0;background:#0a0e27;z-index:99998;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:2rem;">
+    <div style="font-size:4rem;margin-bottom:1rem;">🔧</div>
+    <div style="font-size:clamp(2rem,5vw,3rem);font-weight:900;color:#fb923c;margin-bottom:1rem;">الموقع تحت الصيانة</div>
+    <p id="maintenanceMsg" style="color:#a0aec0;max-width:500px;line-height:1.8;margin-bottom:2rem;">نعمل على تحسين المنصة 🚀</p>
+    <div style="display:inline-flex;align-items:center;gap:8px;padding:0.6rem 1.5rem;background:rgba(251,146,60,0.1);border:1px solid rgba(251,146,60,0.3);border-radius:50px;color:#fb923c;font-weight:700;"><i class="fas fa-tools"></i> جاري التحديث...</div>
