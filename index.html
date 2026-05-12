@@ -1,4 +1,4 @@
-
+<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
@@ -340,7 +340,7 @@
     </div>
 
     <!-- Bus Schedule Admin -->
-    <div class="panel-section" id="busAdminSection">
+    <div class="panel-section" id="busAdminSection" style="display:none;">
         <h3><i class="fas fa-bus"></i> إدارة مواعيد الباصات</h3>
         <div style="margin-bottom:1rem;">
             <label style="font-size:0.9rem;color:var(--text-muted);font-weight:600;display:block;margin-bottom:0.5rem;">باص الأولاد 🚌</label>
@@ -379,10 +379,14 @@
     <div class="panel-section">
         <h3><i class="fas fa-toggle-on"></i> تفعيل / إيقاف الأدوات</h3>
         <div id="toolsToggleList"></div>
-        <button onclick="resetToolsToDefault()" style="width:100%;margin-top:0.8rem;padding:0.75rem;background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2);border-radius:10px;color:#ef4444;font-weight:700;font-family:'Tajawal',sans-serif;cursor:pointer;font-size:0.85rem;"><i class="fas fa-redo"></i> إعادة ضبط الأدوات للافتراضي</button>
+        <div style="display:flex;gap:8px;margin-top:0.8rem;">
+            <button onclick="resetToolsToDefault()" style="flex:1;padding:0.75rem;background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2);border-radius:10px;color:#ef4444;font-weight:700;font-family:'Tajawal',sans-serif;cursor:pointer;font-size:0.82rem;"><i class="fas fa-redo"></i> إعادة الضبط</button>
+            <button onclick="toggleBusAdmin()" style="flex:1;padding:0.75rem;background:rgba(244,114,182,0.08);border:1px solid rgba(244,114,182,0.2);border-radius:10px;color:#f472b6;font-weight:700;font-family:'Tajawal',sans-serif;cursor:pointer;font-size:0.82rem;"><i class="fas fa-bus"></i> إدارة الباصات</button>
+        </div>
     </div>
 
-    <!-- Site Settings -->
+    <!-- Add Tool -->
+    <div class="panel-section">
     <div class="panel-section">
         <h3><i class="fas fa-sliders-h"></i> إعدادات الموقع</h3>
         <div class="form-group"><label>عنوان الموقع</label><input type="text" id="siteTitle" value="جامعة نزوى - منصة الطالب"></div>
@@ -1160,6 +1164,14 @@ window.toggleMenu = function() {
     else nl.style.cssText='display:flex;position:absolute;top:100%;left:0;right:0;flex-direction:column;background:var(--dark-light);padding:2rem;gap:1.5rem;z-index:999;'
 }
 
+window.toggleBusAdmin = function() {
+    const sec = document.getElementById('busAdminSection')
+    if (!sec) return
+    const isHidden = sec.style.display === 'none'
+    sec.style.display = isHidden ? 'block' : 'none'
+    if (isHidden) { renderBusAdminRows(); sec.scrollIntoView({behavior:'smooth'}) }
+}
+
 // ===== TOOLS TOGGLE =====
 window.quickToggleTool = async function(id, enabled) {
     const tool = tools.find(t => t.id === id)
@@ -1233,3 +1245,6 @@ async function checkMaintenance() {
     <div style="font-size:clamp(2rem,5vw,3rem);font-weight:900;color:#fb923c;margin-bottom:1rem;">الموقع تحت الصيانة</div>
     <p id="maintenanceMsg" style="color:#a0aec0;max-width:500px;line-height:1.8;margin-bottom:2rem;">نعمل على تحسين المنصة 🚀</p>
     <div style="display:inline-flex;align-items:center;gap:8px;padding:0.6rem 1.5rem;background:rgba(251,146,60,0.1);border:1px solid rgba(251,146,60,0.3);border-radius:50px;color:#fb923c;font-weight:700;"><i class="fas fa-tools"></i> جاري التحديث...</div>
+</div>
+</body>
+</html>
