@@ -350,20 +350,6 @@ let currentFilter = 'all'
 
 window.addEventListener('DOMContentLoaded', async () => {
     setTimeout(()=>document.getElementById('loadingOverlay')?.classList.add('hidden'),1000);
-    // Check maintenance (uses existing supabase instance)
-    try {
-        const _adm = sessionStorage.getItem('uon_bus_admin')||sessionStorage.getItem('uon_feat_admin')||sessionStorage.getItem('uon_sum_admin')||sessionStorage.getItem('nu_admin')
-        if (!_adm) {
-            supabase.from('settings').select('value').eq('key','maintenance_mode').single().then(r=>{
-                if(r.data?.value==='true'){
-                    supabase.from('settings').select('value').eq('key','maintenance_message').single().then(r2=>{
-                        const el=document.getElementById('maintOverlay')
-                        if(el){if(r2.data?.value)document.getElementById('maintMsg').innerHTML=r2.data.value.replace(/\n/g,'<br>');el.style.display='flex'}
-                    })
-                }
-            })
-        }
-    } catch(e){}
     const saved = sessionStorage.getItem('uon_sum_admin')
     if (saved) try { currentAdmin = JSON.parse(saved); updateAdminUI() } catch(e) {}
     setTimeout(() => document.getElementById('loadingOverlay').classList.add('hidden'), 4000)
@@ -556,11 +542,5 @@ function initReveal() {
 }
 </script>
 
-<div id="maintOverlay" style="display:none;position:fixed;inset:0;background:#0a0e27;z-index:99998;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:2rem;font-family:'Tajawal',sans-serif;color:#e2e8f0;">
-    <div style="font-size:4rem;margin-bottom:1rem;">🔧</div>
-    <div style="font-size:2.5rem;font-weight:900;color:#fb923c;margin-bottom:1rem;">الموقع تحت الصيانة</div>
-    <p id="maintMsg" style="color:#a0aec0;max-width:500px;line-height:1.8;margin-bottom:2rem;">نعمل على تحسين المنصة 🚀</p>
-    <a href="index.html" style="padding:0.8rem 2rem;background:#00d4ff;border-radius:12px;color:#0a0e27;font-weight:800;text-decoration:none;">العودة للرئيسية</a>
-</div>
 </body>
 </html>
