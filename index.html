@@ -35,7 +35,6 @@
     @keyframes pulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(0,212,255,0.4); } 50% { box-shadow: 0 0 0 15px rgba(0,212,255,0); } }
     @keyframes float { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-20px); } }
     @keyframes spin { to { transform: rotate(360deg); } }
-    @keyframes forceReveal { to { opacity: 1; transform: translateY(0); } }
 
     /* ===== LOADING ===== */
     .loading-overlay { position: fixed; inset: 0; background: var(--dark); z-index: 99999; display: flex; align-items: center; justify-content: center; transition: opacity 0.5s; }
@@ -246,7 +245,7 @@
     @keyframes heartbeat { 0%,100%{transform:scale(1)}50%{transform:scale(1.2)} }
     .heart { color: var(--secondary); display: inline-block; animation: heartbeat 1.5s infinite; }
 
-    .reveal { opacity: 0; transform: translateY(30px); transition: all 0.8s ease; animation: forceReveal 0.8s ease 2s forwards; }
+    .reveal { opacity: 0; transform: translateY(30px); transition: all 0.8s ease; }
     .reveal.active { opacity: 1; transform: translateY(0); }
 
     @media (max-width: 768px) {
@@ -457,7 +456,12 @@
         <h2>الأدوات المتاحة</h2>
         <p>مجموعة شاملة من الأدوات المصممة خصيصاً لتلبية احتياجاتك الأكاديمية في جامعة نزوى</p>
     </div>
-    <div class="tools-grid" id="toolsGrid"></div>
+    <div class="tools-grid" id="toolsGrid">
+        <div style="grid-column:1/-1;text-align:center;padding:3rem;color:var(--text-dim);">
+            <i class="fas fa-spinner fa-spin" style="font-size:2rem;margin-bottom:1rem;display:block;color:var(--primary)"></i>
+            جاري تحميل الأدوات...
+        </div>
+    </div>
 </section>
 
 <!-- Features -->
@@ -593,9 +597,9 @@ const defaultTools = [
     { id: 5, title: "مكتبة الملخصات", description: "ملخصات وشروحات من طلاب نزوى لجميع الكليات والمواد", icon: "fa-book-open", color: "#a78bfa", btn_text: "تصفح الملخصات" },
     { id: 6, title: "دليل المطاعم", description: "أقرب المطاعم والكافيهات حول جامعة نزوى مع التقييمات", icon: "fa-utensils", color: "#fb923c", btn_text: "شوف المطاعم" },
     { id: 7, title: "خريطة الجامعة", description: "خريطة تفاعلية لمواقع الكليات والمرافق داخل الحرم الجامعي", icon: "fa-map-marked-alt", color: "#38bdf8", btn_text: "افتح الخريطة" },
-    { id: 8, title: "مواعيد الباصات", description: "جداول ذهاب وعودة باصات الطلاب محدّثة يومياً للأولاد والبنات", icon: "fa-bus", color: "#f472b6", btn_text: "شوف المواعيد", link_url: "bus.html" },
-    { id: 9, title: "مجموعات الواتساب", description: "انضم لمجموعات موادك وكليتك — تواصل مع زملائك", icon: "fa-whatsapp", color: "#25D366", btn_text: "انضم الحين", link_url: "whatsapp.html" },
-    { id: 10, title: "مشاريع الطلاب", description: "اكتشف مشاريع زملائك الإبداعية وصوّت لأفضلها 🚀", icon: "fa-rocket", color: "#a78bfa", btn_text: "اكتشف المشاريع", link_url: "projects.html" }
+    { id: 8, title: "مواعيد الباصات", description: "جداول ذهاب وعودة باصات الطلاب محدّثة يومياً للأولاد والبنات", icon: "fa-bus", color: "#f472b6", btn_text: "شوف المواعيد" },
+    { id: 9, title: "مجموعات الواتساب", description: "انضم لمجموعات موادك وكليتك — تواصل مع زملائك", icon: "fa-whatsapp", color: "#25D366", btn_text: "انضم الحين" },
+    { id: 10, title: "مشاريع الطلاب", description: "اكتشف مشاريع زملائك الإبداعية وصوّت لأفضلها 🚀", icon: "fa-rocket", color: "#a78bfa", btn_text: "اكتشف المشاريع" }
 ]
 
 const defaultBoys = [
@@ -616,7 +620,7 @@ const defaultGirls = [
 ]
 
 // ===== STATE =====
-let tools = defaultTools.map(t => ({ id: t.id, title: t.title, desc: t.description, icon: t.icon, color: t.color, btnText: t.btn_text, linkUrl: t.link_url||"", isEnabled: true }))
+let tools = []
 let currentAdmin = null
 let editingToolId = null
 let selectedColor = "#00d4ff"
@@ -627,11 +631,9 @@ let busData = { boys: [], girls: [], bookingUrl: '#' }
 async function loadTools() {
     try {
         const { data, error } = await supabase.from('tools').select('*').order('id')
-        if (!error && data && data.length > 0) {
-            tools = data.map(t => ({ id: t.id, title: t.title, desc: t.description, icon: t.icon, color: t.color, btnText: t.btn_text, linkUrl: t.link_url||'', isEnabled: t.is_enabled !== false }))
-            renderTools()
-        } else { seedTools().catch(function(){}) }
-    } catch(e) {}
+        if (error || !data || data.length === 0) { await seedTools() }
+        else { tools = data.map(t => ({ id: t.id, title: t.title, desc: t.description, icon: t.icon, color: t.color, btnText: t.btn_text })); renderTools() }
+    } catch(e) { tools = defaultTools.map(t => ({...t, desc: t.description, btnText: t.btn_text})); renderTools() }
 }
 
 async function seedTools() {
@@ -749,47 +751,50 @@ window.saveBusSchedule = async function() {
 }
 
 // ===== INIT =====
-window.addEventListener('DOMContentLoaded', function() {
-    // Force show all hidden elements after 1.5s
-    setTimeout(function() {
-        document.querySelectorAll('.reveal').forEach(function(el) { el.classList.add('active') })
-    }, 1500)
-
-    renderTools()
-    renderBusTables()
+window.addEventListener('DOMContentLoaded', async () => {
+    setTimeout(() => document.querySelectorAll('.reveal').forEach(el => el.classList.add('active')), 2000)
+    // إخفاء الـ loading بعد 4 ثواني على أي حال
+    setTimeout(() => document.getElementById('loadingOverlay').classList.add('hidden'), 4000)
+    try {
+        await Promise.all([loadTools(), loadSettings(), loadBusData()])
+    } catch(e) { console.log('init error', e) }
     updateUI()
     initScrollReveal()
     initCounters()
     initParallax()
     botAddMsg('bot', 'مرحباً بك في UoN Coffee! 👋\n\nأنا مساعدك الذكي لجامعة نزوى 🎓\nاسألني عن الكليات، الروابط، مواعيد الباصات، أو أي شيء!')
     document.getElementById('loadingOverlay').classList.add('hidden')
-    setTimeout(function() { loadTools(); loadSettings(); loadBusData(); }, 100)
 })
 
 // ===== RENDER TOOLS =====
 function renderTools() {
     const grid = document.getElementById('toolsGrid')
-    if (!grid) return
-    grid.innerHTML = tools.map(tool => {
-        const disabled = tool.isEnabled === false
-        const ic = tool.icon === 'fa-whatsapp' ? 'fab fa-whatsapp' : 'fas ' + tool.icon
-        return '<div class="tool-card" data-id="' + tool.id + '" style="--card-color:' + tool.color + ';' + (disabled ? 'opacity:0.5;filter:grayscale(0.5)' : '') + '">' +
-            '<button class="admin-edit-btn" onclick="event.stopPropagation();editTool(' + tool.id + ')" title="تعديل"><i class="fas fa-pen"></i></button>' +
-            (disabled ? '<div style="position:absolute;top:8px;right:8px;background:rgba(251,146,60,0.15);border:1px solid rgba(251,146,60,0.4);color:#fb923c;font-size:0.7rem;font-weight:700;padding:0.2rem 0.6rem;border-radius:50px;z-index:2;">🔜 قريباً</div>' : '') +
-            '<div class="tool-icon" style="background:' + tool.color + '20;color:' + tool.color + ';"><i class="' + ic + '"></i></div>' +
-            '<h3>' + tool.title + '</h3><p>' + tool.desc + '</p>' +
-            '<button class="tool-link" style="color:' + tool.color + ';' + (disabled ? 'opacity:0.5;cursor:not-allowed' : '') + '" onclick="openTool(' + tool.id + ')">' + tool.btnText + ' <i class="fas fa-arrow-left"></i></button>' +
-            '</div>'
-    }).join('')
+    if (!tools.length) { grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:3rem;color:var(--text-dim);">لا توجد أدوات بعد</div>'; return }
+    grid.innerHTML = tools.map(tool => `
+        <div class="tool-card" data-id="${tool.id}" style="--card-color:${tool.color};">
+            <button class="admin-edit-btn" onclick="event.stopPropagation();editTool(${tool.id})" title="تعديل"><i class="fas fa-pen"></i></button>
+            <div class="tool-icon" style="background:${tool.color}20;color:${tool.color};"><i class="fas ${tool.icon}"></i></div>
+            <h3>${tool.title}</h3>
+            <p>${tool.desc}</p>
+            <button class="tool-link" style="color:${tool.color};" onclick="openTool(${tool.id})">${tool.btnText} <i class="fas fa-arrow-left"></i></button>
+        </div>`).join('')
 }
 
 window.openTool = function(id) {
-    const tool = tools.find(t => t.id === id)
-    if (tool && tool.isEnabled === false) { showToast('هذه الأداة غير متاحة حالياً 🔜', 'error'); return }
-    if (tool && tool.linkUrl) { window.location.href = tool.linkUrl; return }
-    if (id === 1) { document.getElementById('botSection').scrollIntoView({behavior:'smooth'}); return }
-    if (id === 2) { document.getElementById('calcSection').scrollIntoView({behavior:'smooth'}); return }
-    showToast('قريباً! 🔜')
+    const actions = {
+        1: () => document.getElementById('botSection').scrollIntoView({behavior:'smooth'}),
+        2: () => document.getElementById('calcSection').scrollIntoView({behavior:'smooth'}),
+        3: () => window.location.href = 'features.html',
+        4: () => window.location.href = 'features.html#conf',
+        5: () => window.location.href = 'summaries.html',
+        6: () => window.location.href = 'features.html#rest',
+        7: () => window.location.href = 'tools.html',
+        8: () => window.location.href = 'bus.html',
+    }
+    if (actions[id]) actions[id]()
+    else if (id === 9) window.location.href = 'whatsapp.html'
+    else if (id === 10) window.location.href = 'projects.html'
+    else showToast(`قريباً! 🔜`)
 }
 
 // ===== LOGIN (SECURE) =====
@@ -1086,23 +1091,6 @@ window.toggleMenu = function() {
     const nl = document.querySelector('.nav-links')
     if (nl.style.display==='flex') nl.style.display='none'
     else nl.style.cssText='display:flex;position:absolute;top:100%;left:0;right:0;flex-direction:column;background:var(--dark-light);padding:2rem;gap:1.5rem;z-index:999;'
-}
-
-window.quickToggleTool = function(id, enabled) {
-    var tool = tools.find(function(t){return t.id===id})
-    if(!tool) return
-    tool.isEnabled = enabled
-    renderTools()
-    supabase.from('tools').update({is_enabled:enabled}).eq('id',id).then(function(){})
-    showToast(enabled ? '✅ الأداة مفعّلة' : '🔜 الأداة موقوفة')
-}
-
-window.resetToolsToDefault = async function() {
-    if (!confirm('إعادة ضبط الأدوات للافتراضي؟')) return
-    tools = defaultTools.map(t => ({ id: t.id, title: t.title, desc: t.description, icon: t.icon, color: t.color, btnText: t.btn_text, linkUrl: t.link_url||'', isEnabled: true }))
-    renderTools()
-    await seedTools()
-    showToast('تم إعادة الضبط!')
 }
 
 // Restore session on load
