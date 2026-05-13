@@ -318,6 +318,16 @@
         <button class="btn-danger" onclick="deleteToolHandler()"><i class="fas fa-trash"></i> حذف الأداة</button>
     </div>
 
+    <!-- Tools Toggle -->
+    <div class="panel-section">
+        <h3><i class="fas fa-toggle-on"></i> تفعيل / إيقاف الأدوات</h3>
+        <div id="toolsToggleList"></div>
+        <div style="display:flex;gap:8px;margin-top:0.8rem;">
+            <button onclick="resetToolsToDefault()" style="flex:1;padding:0.7rem;background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2);border-radius:10px;color:#ef4444;font-weight:700;font-family:Tajawal,sans-serif;cursor:pointer;font-size:0.82rem;"><i class="fas fa-redo"></i> إعادة الضبط</button>
+            <button onclick="toggleBusAdmin()" style="flex:1;padding:0.7rem;background:rgba(244,114,182,0.08);border:1px solid rgba(244,114,182,0.2);border-radius:10px;color:#f472b6;font-weight:700;font-family:Tajawal,sans-serif;cursor:pointer;font-size:0.82rem;"><i class="fas fa-bus"></i> إدارة الباصات</button>
+        </div>
+    </div>
+
     <!-- Add Tool -->
     <div class="panel-section">
         <h3><i class="fas fa-plus-circle"></i> إضافة أداة جديدة</h3>
@@ -340,7 +350,7 @@
     </div>
 
     <!-- Bus Schedule Admin -->
-    <div class="panel-section" id="busAdminSection">
+    <div class="panel-section" id="busAdminSection" style="display:none;">
         <h3><i class="fas fa-bus"></i> إدارة مواعيد الباصات</h3>
         <div style="margin-bottom:1rem;">
             <label style="font-size:0.9rem;color:var(--text-muted);font-weight:600;display:block;margin-bottom:0.5rem;">باص الأولاد 🚌</label>
@@ -382,6 +392,15 @@
         <div class="form-group"><label>الشعار الرئيسي</label><input type="text" id="siteHeadline" value="منصتك الشاملة للحياة الأكاديمية"></div>
         <div class="form-group"><label>الوصف</label><textarea id="siteDesc">أدوات ذكية، ملخصات، جداول دراسية، وكل ما تحتاجه للنجاح</textarea></div>
         <button class="btn-save" onclick="saveSettings()"><i class="fas fa-save"></i> حفظ الإعدادات</button>
+        <div style="margin-top:1.5rem;padding-top:1.5rem;border-top:1px solid rgba(255,255,255,0.06);">
+            <h3 style="color:#fb923c;margin-bottom:1rem;font-size:1rem;display:flex;align-items:center;gap:8px;"><i class="fas fa-hard-hat"></i> وضع الصيانة</h3>
+            <div style="display:flex;align-items:center;gap:10px;background:rgba(251,146,60,0.06);border:1px solid rgba(251,146,60,0.2);border-radius:10px;padding:0.8rem;margin-bottom:0.8rem;">
+                <input type="checkbox" id="maintenanceToggle" style="width:18px;height:18px;accent-color:#fb923c;cursor:pointer;" onchange="toggleMaintenance(this.checked)">
+                <label for="maintenanceToggle" style="margin:0;cursor:pointer;font-weight:700;color:#fb923c;">🔧 تفعيل وضع الصيانة</label>
+            </div>
+            <div class="form-group"><label>رسالة الصيانة</label><textarea id="maintenanceMessage" style="min-height:60px;" placeholder="نعمل على تحسين المنصة..."></textarea></div>
+            <button class="btn-save" style="background:linear-gradient(135deg,#fb923c,#f97316);" onclick="saveMaintenance()"><i class="fas fa-save"></i> حفظ الرسالة</button>
+        </div>
     </div>
 </div>
 
@@ -738,7 +757,7 @@ window.addEventListener('DOMContentLoaded', function() {
     initParallax()
     botAddMsg('bot', 'مرحباً بك في UoN Coffee! 👋\n\nأنا مساعدك الذكي لجامعة نزوى 🎓\nاسألني عن الكليات، الروابط، مواعيد الباصات، أو أي شيء!')
     document.getElementById('loadingOverlay').classList.add('hidden')
-    setTimeout(function(){ loadTools(); loadSettings(); loadBusData(); }, 300)
+    setTimeout(function(){ loadTools(); loadSettings(); loadBusData(); checkMaintenance(); }, 300)
 })
 
 // ===== RENDER TOOLS =====
@@ -838,7 +857,7 @@ window.openPanel = function() {
     document.getElementById('panelOverlay').classList.add('show')
     document.getElementById('editSection').style.display = 'none'
     renderPasswordsList()
-    renderBusAdminRows()
+    renderToolsToggleList()
 }
 window.closePanel = function() {
     document.getElementById('adminPanel').classList.remove('open')
@@ -1068,11 +1087,86 @@ window.toggleMenu = function() {
     else nl.style.cssText='display:flex;position:absolute;top:100%;left:0;right:0;flex-direction:column;background:var(--dark-light);padding:2rem;gap:1.5rem;z-index:999;'
 }
 
+
+
+window.toggleMaintenance = function(checked) {
+    supabase.from('settings').upsert({key:'maintenance_mode',value:checked?'true':'false'}).then(function(){})
+    showToast(checked ? '⚠️ وضع الصيانة مفعّل' : '✅ وضع الصيانة مُوقف')
+}
+
+window.saveMaintenance = function() {
+    var msg = document.getElementById('maintenanceMessage').value || ''
+    supabase.from('settings').upsert({key:'maintenance_message',value:msg}).then(function(){})
+    showToast('تم حفظ رسالة الصيانة!')
+}
+
+function checkMaintenance() {
+    supabase.from('settings').select('value').eq('key','maintenance_mode').single().then(function(r) {
+        if (r.data && r.data.value === 'true' && !currentAdmin) {
+            supabase.from('settings').select('value').eq('key','maintenance_message').single().then(function(r2) {
+                var el = document.getElementById('maintenanceOverlay')
+                if (el) {
+                    if (r2.data && r2.data.value) document.getElementById('maintenanceMsg').textContent = r2.data.value
+                    el.style.display = 'flex'
+                }
+            })
+        }
+    })
+}
+
+window.toggleBusAdmin = function() {
+    var sec = document.getElementById('busAdminSection')
+    if (!sec) return
+    var hidden = sec.style.display === 'none' || sec.style.display === ''
+    sec.style.display = hidden ? 'block' : 'none'
+    if (hidden) { renderBusAdminRows(); sec.scrollIntoView({behavior:'smooth'}) }
+}
+
+window.quickToggleTool = function(id, enabled) {
+    var tool = tools.find(function(t){return t.id===id})
+    if (!tool) return
+    tool.isEnabled = enabled
+    renderTools()
+    supabase.from('tools').update({is_enabled:enabled}).eq('id',id).then(function(){})
+    showToast(enabled ? '✅ الأداة مفعّلة' : '🔜 الأداة موقوفة')
+}
+
+window.resetToolsToDefault = function() {
+    if (!confirm('إعادة ضبط الأدوات للافتراضي؟')) return
+    tools = defaultTools.map(function(t){return{id:t.id,title:t.title,desc:t.description,icon:t.icon,color:t.color,btnText:t.btn_text,linkUrl:'',isEnabled:true}})
+    renderTools()
+    for (var i=0; i<defaultTools.length; i++) {
+        var t = defaultTools[i]
+        supabase.from('tools').upsert({id:t.id,title:t.title,description:t.description,icon:t.icon,color:t.color,btn_text:t.btn_text,link_url:'',is_enabled:true}).then(function(){})
+    }
+    showToast('تم إعادة الضبط!')
+}
+
+function renderToolsToggleList() {
+    var list = document.getElementById('toolsToggleList')
+    if (!list) return
+    list.innerHTML = tools.map(function(tool) {
+        var on = tool.isEnabled !== false
+        var ic = tool.icon === 'fa-whatsapp' ? 'fab fa-whatsapp' : 'fas ' + tool.icon
+        return '<div style="display:flex;align-items:center;gap:10px;padding:0.6rem 0.8rem;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:10px;margin-bottom:6px;">' +
+            '<div style="width:28px;height:28px;border-radius:7px;background:' + tool.color + '15;color:' + tool.color + ';display:flex;align-items:center;justify-content:center;font-size:0.8rem;flex-shrink:0;"><i class="' + ic + '"></i></div>' +
+            '<span style="flex:1;font-weight:700;font-size:0.83rem;">' + tool.title + '</span>' +
+            '<input type="checkbox" ' + (on?'checked':'') + ' onchange="quickToggleTool(' + tool.id + ',this.checked)" style="width:18px;height:18px;accent-color:#6bcb77;cursor:pointer;">' +
+            '</div>'
+    }).join('')
+}
+
 // Restore session on load
 ;(function() {
     const saved = sessionStorage.getItem('nu_admin')
     if (saved) try { currentAdmin = JSON.parse(saved) } catch(e) {}
 })()
 </script>
+<div id="maintenanceOverlay" style="display:none;position:fixed;inset:0;background:#0a0e27;z-index:99998;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:2rem;">
+    <div style="font-size:4rem;margin-bottom:1rem;">🔧</div>
+    <div style="font-size:clamp(2rem,5vw,3rem);font-weight:900;color:#fb923c;margin-bottom:1rem;">الموقع تحت الصيانة</div>
+    <p id="maintenanceMsg" style="color:#a0aec0;max-width:500px;line-height:1.8;margin-bottom:2rem;">نعمل على تحسين المنصة 🚀</p>
+    <div style="display:inline-flex;align-items:center;gap:8px;padding:0.6rem 1.5rem;background:rgba(251,146,60,0.1);border:1px solid rgba(251,146,60,0.3);border-radius:50px;color:#fb923c;font-weight:700;"><i class="fas fa-tools"></i> جاري التحديث...</div>
+</div>
 </body>
 </html>
