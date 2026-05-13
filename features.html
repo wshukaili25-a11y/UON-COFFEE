@@ -1,6 +1,4 @@
-
 <!DOCTYPE html>
-
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
@@ -36,37 +34,37 @@ body { font-family: 'Tajawal', sans-serif; background: var(--dark); color: var(-
 @keyframes pulse { 0%,100%{opacity:1}50%{opacity:.5} }
 
 /* LOADING */
-.loading-overlay { position: fixed; inset: 0; background: var(–dark); z-index: 99999; display: flex; align-items: center; justify-content: center; transition: opacity 0.5s; }
+.loading-overlay { position: fixed; inset: 0; background: var(--dark); z-index: 99999; display: flex; align-items: center; justify-content: center; transition: opacity 0.5s; }
 .loading-overlay.hidden { display: none !important; }
-.loading-spinner { width: 50px; height: 50px; border: 3px solid rgba(0,212,255,0.1); border-top-color: var(–primary); border-radius: 50%; animation: spin 0.8s linear infinite; }
+.loading-spinner { width: 50px; height: 50px; border: 3px solid rgba(0,212,255,0.1); border-top-color: var(--primary); border-radius: 50%; animation: spin 0.8s linear infinite; }
 
 /* TOAST */
-.toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(100px); background: var(–success); color: white; padding: 1rem 2rem; border-radius: 12px; font-weight: 700; z-index: 10000; opacity: 0; transition: all 0.4s; display: flex; align-items: center; gap: 8px; }
+.toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(100px); background: var(--success); color: white; padding: 1rem 2rem; border-radius: 12px; font-weight: 700; z-index: 10000; opacity: 0; transition: all 0.4s; display: flex; align-items: center; gap: 8px; }
 .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
-.toast.error { background: var(–danger); }
+.toast.error { background: var(--danger); }
 
 /* NAVBAR */
 .navbar { position: fixed; top: 0; width: 100%; padding: 1rem 5%; display: flex; justify-content: space-between; align-items: center; z-index: 1000; background: rgba(10,14,39,0.9); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(255,255,255,0.05); transition: all 0.3s; }
 .navbar.scrolled { padding: 0.7rem 5%; background: rgba(10,14,39,0.98); }
 .logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
-.logo-icon { width: 45px; height: 45px; background: linear-gradient(135deg,#00d4ff,#0099cc); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 1.3rem; color: var(–dark); }
+.logo-icon { width: 45px; height: 45px; background: linear-gradient(135deg,#00d4ff,#0099cc); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 1.3rem; color: var(--dark); }
 .logo-text { color: white; font-size: 1.3rem; font-weight: 700; }
-.logo-text span { color: var(–primary); }
+.logo-text span { color: var(--primary); }
 
 /* Page tabs in nav */
 .nav-tabs { display: flex; gap: 0.5rem; }
-.nav-tab { padding: 0.55rem 1.2rem; background: transparent; border: 1px solid rgba(255,255,255,0.1); border-radius: 50px; color: var(–text-muted); font-family: ‘Tajawal’, sans-serif; font-size: 0.85rem; font-weight: 700; cursor: pointer; transition: all 0.3s; }
-.nav-tab.active, .nav-tab:hover { background: rgba(0,212,255,0.1); border-color: var(–primary); color: var(–primary); }
+.nav-tab { padding: 0.55rem 1.2rem; background: transparent; border: 1px solid rgba(255,255,255,0.1); border-radius: 50px; color: var(--text-muted); font-family: 'Tajawal', sans-serif; font-size: 0.85rem; font-weight: 700; cursor: pointer; transition: all 0.3s; }
+.nav-tab.active, .nav-tab:hover { background: rgba(0,212,255,0.1); border-color: var(--primary); color: var(--primary); }
 .nav-actions { display: flex; gap: 0.8rem; align-items: center; }
-.nav-home { padding: 0.55rem 1.2rem; background: linear-gradient(135deg,#00d4ff,#0099cc); border: none; border-radius: 10px; color: var(–dark); font-weight: 700; font-family: ‘Tajawal’, sans-serif; cursor: pointer; font-size: 0.85rem; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; transition: all 0.3s; }
+.nav-home { padding: 0.55rem 1.2rem; background: linear-gradient(135deg,#00d4ff,#0099cc); border: none; border-radius: 10px; color: var(--dark); font-weight: 700; font-family: 'Tajawal', sans-serif; cursor: pointer; font-size: 0.85rem; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; transition: all 0.3s; }
 .nav-home:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,212,255,0.3); }
-.admin-nav-btn { padding: 0.55rem 1.1rem; background: transparent; border: 1.5px solid var(–warning); border-radius: 10px; color: var(–warning); font-weight: 700; font-family: ‘Tajawal’, sans-serif; cursor: pointer; font-size: 0.85rem; display: none; align-items: center; gap: 6px; transition: all 0.3s; }
+.admin-nav-btn { padding: 0.55rem 1.1rem; background: transparent; border: 1.5px solid var(--warning); border-radius: 10px; color: var(--warning); font-weight: 700; font-family: 'Tajawal', sans-serif; cursor: pointer; font-size: 0.85rem; display: none; align-items: center; gap: 6px; transition: all 0.3s; }
 .admin-nav-btn.show { display: flex; }
-.admin-nav-btn:hover { background: var(–warning); color: var(–dark); }
-.logout-nav-btn { padding: 0.55rem 1.1rem; background: transparent; border: 1.5px solid var(–text-dim); border-radius: 10px; color: var(–text-dim); font-weight: 700; font-family: ‘Tajawal’, sans-serif; cursor: pointer; font-size: 0.85rem; display: none; align-items: center; gap: 6px; transition: all 0.3s; }
+.admin-nav-btn:hover { background: var(--warning); color: var(--dark); }
+.logout-nav-btn { padding: 0.55rem 1.1rem; background: transparent; border: 1.5px solid var(--text-dim); border-radius: 10px; color: var(--text-dim); font-weight: 700; font-family: 'Tajawal', sans-serif; cursor: pointer; font-size: 0.85rem; display: none; align-items: center; gap: 6px; transition: all 0.3s; }
 .logout-nav-btn.show { display: flex; }
-.logout-nav-btn:hover { border-color: var(–danger); color: var(–danger); }
-.admin-badge-feat { position: fixed; top: 80px; left: 20px; z-index: 999; background: linear-gradient(135deg,var(–secondary),#ee5a5a); padding: 0.4rem 1rem; border-radius: 50px; font-size: 0.78rem; font-weight: 700; display: none; align-items: center; gap: 6px; }
+.logout-nav-btn:hover { border-color: var(--danger); color: var(--danger); }
+.admin-badge-feat { position: fixed; top: 80px; left: 20px; z-index: 999; background: linear-gradient(135deg,var(--secondary),#ee5a5a); padding: 0.4rem 1rem; border-radius: 50px; font-size: 0.78rem; font-weight: 700; display: none; align-items: center; gap: 6px; }
 .admin-badge-feat.show { display: flex; }
 .mobile-menu { display: none; font-size: 1.5rem; color: white; cursor: pointer; }
 
@@ -76,24 +74,24 @@ body { font-family: 'Tajawal', sans-serif; background: var(--dark); color: var(-
 
 /* SECTION HEADER */
 .section-header { text-align: center; margin-bottom: 3rem; }
-.section-header .badge { display: inline-flex; align-items: center; gap: 6px; padding: 0.4rem 1rem; background: rgba(0,212,255,0.1); border: 1px solid rgba(0,212,255,0.2); border-radius: 50px; font-size: 0.8rem; color: var(–primary); margin-bottom: 1rem; }
-.section-header h2 { font-size: clamp(1.8rem,4vw,2.8rem); font-weight: 900; background: linear-gradient(135deg,#fff 0%,var(–primary) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 0.8rem; }
-.section-header p { color: var(–text-dim); font-size: 1rem; max-width: 550px; margin: 0 auto; }
+.section-header .badge { display: inline-flex; align-items: center; gap: 6px; padding: 0.4rem 1rem; background: rgba(0,212,255,0.1); border: 1px solid rgba(0,212,255,0.2); border-radius: 50px; font-size: 0.8rem; color: var(--primary); margin-bottom: 1rem; }
+.section-header h2 { font-size: clamp(1.8rem,4vw,2.8rem); font-weight: 900; background: linear-gradient(135deg,#fff 0%,var(--primary) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 0.8rem; }
+.section-header p { color: var(--text-dim); font-size: 1rem; max-width: 550px; margin: 0 auto; }
 
 /* BG CIRCLES */
 .page-bg { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
 .page-bg .circle { position: absolute; border-radius: 50%; filter: blur(100px); opacity: 0.07; }
-.page-bg .c1 { width: 600px; height: 600px; background: var(–primary); top: -20%; right: -15%; animation: float 10s ease-in-out infinite; }
-.page-bg .c2 { width: 400px; height: 400px; background: var(–secondary); bottom: -10%; left: -10%; animation: float 14s ease-in-out infinite reverse; }
+.page-bg .c1 { width: 600px; height: 600px; background: var(--primary); top: -20%; right: -15%; animation: float 10s ease-in-out infinite; }
+.page-bg .c2 { width: 400px; height: 400px; background: var(--secondary); bottom: -10%; left: -10%; animation: float 14s ease-in-out infinite reverse; }
 
 /* ═══════════ MAP ═══════════ */
 .map-wrap { max-width: 960px; margin: 0 auto; position: relative; z-index: 1; }
 .map-search { display: flex; gap: 10px; margin-bottom: 1.5rem; max-width: 500px; margin-inline: auto; margin-bottom: 2rem; }
-.map-search input { flex: 1; background: var(–dark-light); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 12px 16px; color: var(–text); font-family: ‘Tajawal’, sans-serif; font-size: 0.9rem; outline: none; transition: border-color 0.3s; }
-.map-search input:focus { border-color: var(–primary); }
-.map-search button { background: linear-gradient(135deg,#00d4ff,#0099cc); border: none; border-radius: 12px; padding: 12px 20px; color: var(–dark); font-weight: 700; font-family: ‘Tajawal’, sans-serif; cursor: pointer; transition: all 0.3s; }
+.map-search input { flex: 1; background: var(--dark-light); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 12px 16px; color: var(--text); font-family: 'Tajawal', sans-serif; font-size: 0.9rem; outline: none; transition: border-color 0.3s; }
+.map-search input:focus { border-color: var(--primary); }
+.map-search button { background: linear-gradient(135deg,#00d4ff,#0099cc); border: none; border-radius: 12px; padding: 12px 20px; color: var(--dark); font-weight: 700; font-family: 'Tajawal', sans-serif; cursor: pointer; transition: all 0.3s; }
 .map-search button:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,212,255,0.3); }
-.map-board { background: var(–dark-light); border: 1px solid rgba(255,255,255,0.06); border-radius: 24px; padding: 2rem; min-height: 520px; overflow: hidden; }
+.map-board { background: var(--dark-light); border: 1px solid rgba(255,255,255,0.06); border-radius: 24px; padding: 2rem; min-height: 520px; overflow: hidden; }
 .map-grid { display: grid; grid-template-columns: repeat(12,1fr); grid-template-rows: repeat(10,46px); gap: 4px; }
 .mb { border-radius: 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; transition: all 0.3s; border: 1px solid transparent; }
 .mb:hover { transform: scale(1.06); z-index: 10; box-shadow: 0 8px 24px rgba(0,0,0,0.4); }
@@ -115,124 +113,124 @@ body { font-family: 'Tajawal', sans-serif; background: var(--dark); color: var(-
 .road-h { background: rgba(255,255,255,0.04); border-radius: 4px; grid-column:1/13; grid-row:5/6; }
 .road-v { background: rgba(255,255,255,0.04); border-radius: 4px; grid-column:6/7; grid-row:1/11; }
 .map-legend { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-top: 1.5rem; }
-.leg-item { display: flex; align-items: center; gap: 8px; background: var(–dark-light); border: 1px solid rgba(255,255,255,0.06); border-radius: 50px; padding: 6px 14px; font-size: 11px; color: var(–text-muted); cursor: pointer; transition: all 0.3s; }
-.leg-item:hover { border-color: var(–primary); color: var(–primary); }
+.leg-item { display: flex; align-items: center; gap: 8px; background: var(--dark-light); border: 1px solid rgba(255,255,255,0.06); border-radius: 50px; padding: 6px 14px; font-size: 11px; color: var(--text-muted); cursor: pointer; transition: all 0.3s; }
+.leg-item:hover { border-color: var(--primary); color: var(--primary); }
 .leg-dot { width: 8px; height: 8px; border-radius: 2px; flex-shrink: 0; }
 /* Tooltip */
-.tooltip { position: fixed; background: var(–dark-light); border: 1px solid rgba(0,212,255,0.2); border-radius: 14px; padding: 14px 18px; pointer-events: none; z-index: 1000; display: none; max-width: 230px; box-shadow: 0 12px 40px rgba(0,0,0,0.4); }
-.tt-title { font-weight: 900; font-size: 14px; color: var(–text); margin-bottom: 6px; }
-.tt-desc { font-size: 12px; color: var(–text-muted); line-height: 1.7; }
-.tt-tag { display: inline-block; font-size: 9px; background: rgba(0,212,255,0.1); border: 1px solid rgba(0,212,255,0.2); color: var(–primary); padding: 2px 8px; border-radius: 50px; margin-top: 8px; }
+.tooltip { position: fixed; background: var(--dark-light); border: 1px solid rgba(0,212,255,0.2); border-radius: 14px; padding: 14px 18px; pointer-events: none; z-index: 1000; display: none; max-width: 230px; box-shadow: 0 12px 40px rgba(0,0,0,0.4); }
+.tt-title { font-weight: 900; font-size: 14px; color: var(--text); margin-bottom: 6px; }
+.tt-desc { font-size: 12px; color: var(--text-muted); line-height: 1.7; }
+.tt-tag { display: inline-block; font-size: 9px; background: rgba(0,212,255,0.1); border: 1px solid rgba(0,212,255,0.2); color: var(--primary); padding: 2px 8px; border-radius: 50px; margin-top: 8px; }
 
 /* ═══════════ CONFESSIONS ═══════════ */
 .conf-wrap { max-width: 720px; margin: 0 auto; position: relative; z-index: 1; }
-.conf-form { background: var(–dark-light); border: 1px solid rgba(255,255,255,0.06); border-radius: 20px; padding: 2rem; margin-bottom: 2rem; }
+.conf-form { background: var(--dark-light); border: 1px solid rgba(255,255,255,0.06); border-radius: 20px; padding: 2rem; margin-bottom: 2rem; }
 .conf-form-title { font-size: 1.1rem; font-weight: 800; margin-bottom: 1.2rem; }
 .cf-cats { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 1rem; }
-.cf-cat { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); color: var(–text-muted); font-size: 11px; font-weight: 700; padding: 5px 14px; border-radius: 50px; cursor: pointer; font-family: ‘Tajawal’, sans-serif; transition: all 0.3s; }
-.cf-cat.sel { background: rgba(0,212,255,0.12); border-color: rgba(0,212,255,0.3); color: var(–primary); }
-.cf-ta { width: 100%; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 14px; color: var(–text); font-family: ‘Tajawal’, sans-serif; font-size: 0.9rem; resize: none; outline: none; line-height: 1.8; min-height: 100px; margin-bottom: 1rem; transition: border-color 0.3s; }
-.cf-ta::placeholder { color: var(–text-dim); }
+.cf-cat { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); color: var(--text-muted); font-size: 11px; font-weight: 700; padding: 5px 14px; border-radius: 50px; cursor: pointer; font-family: 'Tajawal', sans-serif; transition: all 0.3s; }
+.cf-cat.sel { background: rgba(0,212,255,0.12); border-color: rgba(0,212,255,0.3); color: var(--primary); }
+.cf-ta { width: 100%; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 14px; color: var(--text); font-family: 'Tajawal', sans-serif; font-size: 0.9rem; resize: none; outline: none; line-height: 1.8; min-height: 100px; margin-bottom: 1rem; transition: border-color 0.3s; }
+.cf-ta::placeholder { color: var(--text-dim); }
 .cf-ta:focus { border-color: rgba(0,212,255,0.3); }
 .cf-row { display: flex; gap: 10px; align-items: center; }
-.cf-anon { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(–text-muted); flex: 1; }
-.cf-anon input { accent-color: var(–primary); }
-.cf-send { background: linear-gradient(135deg,#00d4ff,#0099cc); color: var(–dark); font-size: 0.9rem; font-weight: 800; padding: 10px 24px; border-radius: 10px; border: none; cursor: pointer; font-family: ‘Tajawal’, sans-serif; transition: all 0.3s; }
+.cf-anon { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-muted); flex: 1; }
+.cf-anon input { accent-color: var(--primary); }
+.cf-send { background: linear-gradient(135deg,#00d4ff,#0099cc); color: var(--dark); font-size: 0.9rem; font-weight: 800; padding: 10px 24px; border-radius: 10px; border: none; cursor: pointer; font-family: 'Tajawal', sans-serif; transition: all 0.3s; }
 .cf-send:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,212,255,0.3); }
 .conf-filter { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 1.5rem; }
-.cf-f { background: var(–dark-light); border: 1px solid rgba(255,255,255,0.06); color: var(–text-muted); font-size: 11px; font-weight: 700; padding: 6px 14px; border-radius: 50px; cursor: pointer; font-family: ‘Tajawal’, sans-serif; transition: all 0.3s; }
-.cf-f.active { background: rgba(0,212,255,0.1); border-color: rgba(0,212,255,0.3); color: var(–primary); }
+.cf-f { background: var(--dark-light); border: 1px solid rgba(255,255,255,0.06); color: var(--text-muted); font-size: 11px; font-weight: 700; padding: 6px 14px; border-radius: 50px; cursor: pointer; font-family: 'Tajawal', sans-serif; transition: all 0.3s; }
+.cf-f.active { background: rgba(0,212,255,0.1); border-color: rgba(0,212,255,0.3); color: var(--primary); }
 .conf-feed { display: flex; flex-direction: column; gap: 14px; }
-.cc-card { background: var(–dark-light); border: 1px solid rgba(255,255,255,0.05); border-radius: 18px; padding: 1.5rem; transition: all 0.3s; animation: slideInUp 0.4s ease; position: relative; }
+.cc-card { background: var(--dark-light); border: 1px solid rgba(255,255,255,0.05); border-radius: 18px; padding: 1.5rem; transition: all 0.3s; animation: slideInUp 0.4s ease; position: relative; }
 .cc-card:hover { border-color: rgba(0,212,255,0.15); transform: translateY(-2px); }
 .cc-top { display: flex; align-items: center; gap: 10px; margin-bottom: 1rem; }
 .cc-avatar { width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg,#00d4ff,#0099cc); display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
 .cc-meta { flex: 1; }
-.cc-user { font-size: 12px; font-weight: 700; color: var(–primary); }
-.cc-time { font-size: 10px; color: var(–text-dim); }
-.cc-cat-badge { font-size: 9px; background: rgba(0,212,255,0.1); border: 1px solid rgba(0,212,255,0.2); color: var(–primary); padding: 2px 8px; border-radius: 50px; }
-.cc-text { font-size: 0.9rem; color: var(–text); line-height: 1.9; margin-bottom: 1rem; }
+.cc-user { font-size: 12px; font-weight: 700; color: var(--primary); }
+.cc-time { font-size: 10px; color: var(--text-dim); }
+.cc-cat-badge { font-size: 9px; background: rgba(0,212,255,0.1); border: 1px solid rgba(0,212,255,0.2); color: var(--primary); padding: 2px 8px; border-radius: 50px; }
+.cc-text { font-size: 0.9rem; color: var(--text); line-height: 1.9; margin-bottom: 1rem; }
 .cc-actions { display: flex; gap: 8px; }
-.cc-act { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); color: var(–text-muted); font-size: 11px; padding: 5px 12px; border-radius: 50px; cursor: pointer; font-family: ‘Tajawal’, sans-serif; transition: all 0.3s; }
-.cc-act:hover { border-color: rgba(0,212,255,0.3); color: var(–primary); }
-.cc-act.liked { background: rgba(0,212,255,0.1); color: var(–primary); border-color: rgba(0,212,255,0.3); }
-.conf-del { position: absolute; top: 12px; left: 12px; background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.2); color: var(–danger); font-size: 10px; padding: 3px 10px; border-radius: 50px; cursor: pointer; display: none; font-family: ‘Tajawal’, sans-serif; }
+.cc-act { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); color: var(--text-muted); font-size: 11px; padding: 5px 12px; border-radius: 50px; cursor: pointer; font-family: 'Tajawal', sans-serif; transition: all 0.3s; }
+.cc-act:hover { border-color: rgba(0,212,255,0.3); color: var(--primary); }
+.cc-act.liked { background: rgba(0,212,255,0.1); color: var(--primary); border-color: rgba(0,212,255,0.3); }
+.conf-del { position: absolute; top: 12px; left: 12px; background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.2); color: var(--danger); font-size: 10px; padding: 3px 10px; border-radius: 50px; cursor: pointer; display: none; font-family: 'Tajawal', sans-serif; }
 .admin-mode .conf-del { display: block; }
 
 /* ═══════════ RESTAURANTS ═══════════ */
 .rest-wrap { max-width: 1100px; margin: 0 auto; position: relative; z-index: 1; }
 .rest-filters { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 2rem; justify-content: center; }
-.rf { background: var(–dark-light); border: 1px solid rgba(255,255,255,0.06); color: var(–text-muted); font-size: 0.85rem; font-weight: 700; padding: 7px 18px; border-radius: 50px; cursor: pointer; font-family: ‘Tajawal’, sans-serif; transition: all 0.3s; }
-.rf.active, .rf:hover { background: rgba(0,212,255,0.1); border-color: rgba(0,212,255,0.3); color: var(–primary); }
+.rf { background: var(--dark-light); border: 1px solid rgba(255,255,255,0.06); color: var(--text-muted); font-size: 0.85rem; font-weight: 700; padding: 7px 18px; border-radius: 50px; cursor: pointer; font-family: 'Tajawal', sans-serif; transition: all 0.3s; }
+.rf.active, .rf:hover { background: rgba(0,212,255,0.1); border-color: rgba(0,212,255,0.3); color: var(--primary); }
 .rest-grid { display: grid; grid-template-columns: repeat(auto-fill,minmax(280px,1fr)); gap: 1.5rem; }
-.rc { background: var(–dark-light); border: 1px solid rgba(255,255,255,0.05); border-radius: 20px; overflow: hidden; transition: all 0.3s; position: relative; }
+.rc { background: var(--dark-light); border: 1px solid rgba(255,255,255,0.05); border-radius: 20px; overflow: hidden; transition: all 0.3s; position: relative; }
 .rc:hover { border-color: rgba(0,212,255,0.2); transform: translateY(-5px); box-shadow: 0 15px 40px rgba(0,0,0,0.3); }
 .rc-img { height: 130px; display: flex; align-items: center; justify-content: center; font-size: 56px; background: linear-gradient(135deg,rgba(0,212,255,0.08),rgba(10,14,39,0.8)); position: relative; }
 .rc-badge { position: absolute; top: 10px; right: 10px; font-size: 9px; font-weight: 700; padding: 3px 10px; border-radius: 50px; letter-spacing: 1px; }
-.badge-open { background: rgba(107,203,119,0.15); border: 1px solid rgba(107,203,119,0.3); color: var(–success); }
-.badge-close { background: rgba(239,68,68,0.15); border: 1px solid rgba(239,68,68,0.3); color: var(–danger); }
+.badge-open { background: rgba(107,203,119,0.15); border: 1px solid rgba(107,203,119,0.3); color: var(--success); }
+.badge-close { background: rgba(239,68,68,0.15); border: 1px solid rgba(239,68,68,0.3); color: var(--danger); }
 .rc-body { padding: 1.3rem; }
-.rc-stars { color: var(–accent); font-size: 12px; margin-bottom: 4px; }
-.rc-name { font-size: 1.15rem; font-weight: 800; color: var(–text); margin-bottom: 3px; }
-.rc-type { font-size: 0.75rem; color: var(–primary); margin-bottom: 8px; letter-spacing: 1px; font-weight: 600; }
-.rc-desc { font-size: 0.85rem; color: var(–text-muted); line-height: 1.7; margin-bottom: 10px; }
+.rc-stars { color: var(--accent); font-size: 12px; margin-bottom: 4px; }
+.rc-name { font-size: 1.15rem; font-weight: 800; color: var(--text); margin-bottom: 3px; }
+.rc-type { font-size: 0.75rem; color: var(--primary); margin-bottom: 8px; letter-spacing: 1px; font-weight: 600; }
+.rc-desc { font-size: 0.85rem; color: var(--text-muted); line-height: 1.7; margin-bottom: 10px; }
 .rc-info { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 10px; }
-.rc-inf { display: flex; align-items: center; gap: 4px; font-size: 11px; color: var(–text-dim); }
+.rc-inf { display: flex; align-items: center; gap: 4px; font-size: 11px; color: var(--text-dim); }
 .rc-price { font-size: 11px; font-weight: 700; }
-.rc-price.cheap { color: var(–success); }
-.rc-price.mid { color: var(–accent); }
-.rc-price.exp { color: var(–danger); }
+.rc-price.cheap { color: var(--success); }
+.rc-price.mid { color: var(--accent); }
+.rc-price.exp { color: var(--danger); }
 .rc-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
-.rc-tag { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); color: var(–text-dim); font-size: 10px; padding: 2px 8px; border-radius: 50px; }
-.rc-btn { width: 100%; background: linear-gradient(135deg,#00d4ff,#0099cc); color: var(–dark); border: none; border-radius: 10px; padding: 10px; font-size: 0.85rem; font-weight: 800; cursor: pointer; font-family: ‘Tajawal’, sans-serif; transition: all 0.3s; }
+.rc-tag { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); color: var(--text-dim); font-size: 10px; padding: 2px 8px; border-radius: 50px; }
+.rc-btn { width: 100%; background: linear-gradient(135deg,#00d4ff,#0099cc); color: var(--dark); border: none; border-radius: 10px; padding: 10px; font-size: 0.85rem; font-weight: 800; cursor: pointer; font-family: 'Tajawal', sans-serif; transition: all 0.3s; }
 .rc-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(0,212,255,0.3); }
-.rest-del { position: absolute; top: 8px; left: 8px; background: rgba(239,68,68,0.12); border: 1px solid rgba(239,68,68,0.25); color: var(–danger); font-size: 10px; padding: 3px 8px; border-radius: 50px; cursor: pointer; display: none; font-family: ‘Tajawal’, sans-serif; z-index: 10; }
+.rest-del { position: absolute; top: 8px; left: 8px; background: rgba(239,68,68,0.12); border: 1px solid rgba(239,68,68,0.25); color: var(--danger); font-size: 10px; padding: 3px 8px; border-radius: 50px; cursor: pointer; display: none; font-family: 'Tajawal', sans-serif; z-index: 10; }
 .admin-mode .rest-del { display: block; }
 .add-rest { background: rgba(0,212,255,0.04); border: 1px dashed rgba(0,212,255,0.2); border-radius: 18px; padding: 2rem; text-align: center; cursor: pointer; transition: all 0.3s; margin-top: 1.5rem; }
 .add-rest:hover { background: rgba(0,212,255,0.08); border-color: rgba(0,212,255,0.4); }
 .add-rest-icon { font-size: 2rem; margin-bottom: 0.5rem; }
-.add-rest-text { font-size: 1rem; font-weight: 800; color: var(–primary); }
-.add-rest-sub { font-size: 0.8rem; color: var(–text-dim); margin-top: 4px; }
+.add-rest-text { font-size: 1rem; font-weight: 800; color: var(--primary); }
+.add-rest-sub { font-size: 0.8rem; color: var(--text-dim); margin-top: 4px; }
 
 /* MODAL */
 .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(10px); z-index: 1000; display: none; align-items: center; justify-content: center; padding: 24px; }
 .modal.show { display: flex; }
-.modal-box { background: var(–dark-light); border: 1px solid rgba(255,255,255,0.08); border-radius: 24px; padding: 2rem; width: 100%; max-width: 480px; max-height: 90vh; overflow-y: auto; }
-.modal-title { font-size: 1.3rem; font-weight: 900; color: var(–text); margin-bottom: 1.5rem; display: flex; align-items: center; gap: 8px; }
-.minp { width: 100%; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 11px 14px; color: var(–text); font-family: ‘Tajawal’, sans-serif; font-size: 0.9rem; outline: none; margin-bottom: 12px; transition: border-color 0.3s; }
-.minp:focus { border-color: var(–primary); }
-.minp::placeholder { color: var(–text-dim); }
+.modal-box { background: var(--dark-light); border: 1px solid rgba(255,255,255,0.08); border-radius: 24px; padding: 2rem; width: 100%; max-width: 480px; max-height: 90vh; overflow-y: auto; }
+.modal-title { font-size: 1.3rem; font-weight: 900; color: var(--text); margin-bottom: 1.5rem; display: flex; align-items: center; gap: 8px; }
+.minp { width: 100%; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 11px 14px; color: var(--text); font-family: 'Tajawal', sans-serif; font-size: 0.9rem; outline: none; margin-bottom: 12px; transition: border-color 0.3s; }
+.minp:focus { border-color: var(--primary); }
+.minp::placeholder { color: var(--text-dim); }
 .mstar { display: flex; gap: 8px; margin-bottom: 12px; font-size: 24px; cursor: pointer; }
 .mstar span { transition: transform 0.2s; }
 .mstar span:hover { transform: scale(1.2); }
 .mbtns { display: flex; gap: 10px; margin-top: 8px; }
-.mbtn-cancel { flex: 1; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); color: var(–text-muted); border-radius: 10px; padding: 12px; font-size: 0.9rem; cursor: pointer; font-family: ‘Tajawal’, sans-serif; transition: all 0.3s; }
+.mbtn-cancel { flex: 1; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); color: var(--text-muted); border-radius: 10px; padding: 12px; font-size: 0.9rem; cursor: pointer; font-family: 'Tajawal', sans-serif; transition: all 0.3s; }
 .mbtn-cancel:hover { background: rgba(255,255,255,0.08); }
-.mbtn-save { flex: 2; background: linear-gradient(135deg,#00d4ff,#0099cc); color: var(–dark); border: none; border-radius: 10px; padding: 12px; font-size: 0.9rem; font-weight: 800; cursor: pointer; font-family: ‘Tajawal’, sans-serif; transition: all 0.3s; }
+.mbtn-save { flex: 2; background: linear-gradient(135deg,#00d4ff,#0099cc); color: var(--dark); border: none; border-radius: 10px; padding: 12px; font-size: 0.9rem; font-weight: 800; cursor: pointer; font-family: 'Tajawal', sans-serif; transition: all 0.3s; }
 .mbtn-save:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(0,212,255,0.3); }
 
 /* ADMIN PANEL */
-.admin-panel { position: fixed; top: 0; right: -450px; width: 430px; max-width: 100%; height: 100vh; background: var(–dark-light); border-left: 1px solid rgba(255,255,255,0.08); z-index: 9998; transition: right 0.4s; overflow-y: auto; padding: 2rem; }
+.admin-panel { position: fixed; top: 0; right: -450px; width: 430px; max-width: 100%; height: 100vh; background: var(--dark-light); border-left: 1px solid rgba(255,255,255,0.08); z-index: 9998; transition: right 0.4s; overflow-y: auto; padding: 2rem; }
 .admin-panel.open { right: 0; }
 .admin-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 9997; display: none; }
 .admin-overlay.show { display: block; }
 .admin-panel-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; padding-bottom: 1.5rem; border-bottom: 1px solid rgba(255,255,255,0.08); }
 .admin-panel-header h2 { font-size: 1.3rem; font-weight: 900; display: flex; align-items: center; gap: 8px; }
-.admin-panel-header h2 i { color: var(–warning); }
-.close-panel { width: 38px; height: 38px; border-radius: 10px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); color: var(–text-muted); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.3s; }
-.close-panel:hover { background: var(–danger); color: white; border-color: var(–danger); }
+.admin-panel-header h2 i { color: var(--warning); }
+.close-panel { width: 38px; height: 38px; border-radius: 10px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); color: var(--text-muted); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.3s; }
+.close-panel:hover { background: var(--danger); color: white; border-color: var(--danger); }
 .ap-section { margin-bottom: 1.8rem; padding-bottom: 1.8rem; border-bottom: 1px solid rgba(255,255,255,0.05); }
 .ap-section:last-child { border-bottom: none; }
-.ap-section h3 { font-size: 0.95rem; font-weight: 700; color: var(–primary); margin-bottom: 1rem; display: flex; align-items: center; gap: 8px; }
+.ap-section h3 { font-size: 0.95rem; font-weight: 700; color: var(--primary); margin-bottom: 1rem; display: flex; align-items: center; gap: 8px; }
 .ap-stat { background: rgba(0,212,255,0.05); border: 1px solid rgba(0,212,255,0.1); border-radius: 12px; padding: 1rem; display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
-.ap-stat-label { font-size: 12px; color: var(–text-muted); }
-.ap-stat-val { font-family: monospace; font-size: 1.5rem; color: var(–primary); font-weight: 700; }
-.ap-action { width: 100%; background: rgba(0,212,255,0.06); border: 1px solid rgba(0,212,255,0.15); color: var(–primary); font-size: 0.85rem; font-weight: 700; padding: 10px 14px; border-radius: 10px; cursor: pointer; font-family: ‘Tajawal’, sans-serif; transition: all 0.3s; text-align: right; display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+.ap-stat-label { font-size: 12px; color: var(--text-muted); }
+.ap-stat-val { font-family: monospace; font-size: 1.5rem; color: var(--primary); font-weight: 700; }
+.ap-action { width: 100%; background: rgba(0,212,255,0.06); border: 1px solid rgba(0,212,255,0.15); color: var(--primary); font-size: 0.85rem; font-weight: 700; padding: 10px 14px; border-radius: 10px; cursor: pointer; font-family: 'Tajawal', sans-serif; transition: all 0.3s; text-align: right; display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
 .ap-action:hover { background: rgba(0,212,255,0.12); }
-.ap-action.danger { color: var(–danger); border-color: rgba(239,68,68,0.2); background: rgba(239,68,68,0.05); }
+.ap-action.danger { color: var(--danger); border-color: rgba(239,68,68,0.2); background: rgba(239,68,68,0.05); }
 .ap-action.danger:hover { background: rgba(239,68,68,0.12); }
-.ap-login-badge { font-size: 10px; color: var(–success); font-family: monospace; margin-bottom: 1rem; display: flex; align-items: center; gap: 6px; }
-.ap-login-badge::before { content:’’; width:6px; height:6px; background:var(–success); border-radius:50%; flex-shrink:0; animation: pulse 1.5s infinite; }
+.ap-login-badge { font-size: 10px; color: var(--success); font-family: monospace; margin-bottom: 1rem; display: flex; align-items: center; gap: 6px; }
+.ap-login-badge::before { content:''; width:6px; height:6px; background:var(--success); border-radius:50%; flex-shrink:0; animation: pulse 1.5s infinite; }
 
 /* Admin delete BTN on bus */
 .admin-fab { position: fixed; bottom: 24px; left: 24px; z-index: 999; width: 46px; height: 46px; background: rgba(0,212,255,0.1); border: 1px solid rgba(0,212,255,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 1.1rem; transition: all 0.3s; backdrop-filter: blur(8px); }
@@ -242,33 +240,30 @@ body { font-family: 'Tajawal', sans-serif; background: var(--dark); color: var(-
 .reveal.active { opacity: 1; transform: translateY(0); }
 
 @media (max-width: 768px) {
-.nav-tabs { display: none; }
-.mobile-menu { display: block; }
-.rest-grid { grid-template-columns: 1fr; }
-.map-grid { grid-template-columns: repeat(12,1fr); grid-template-rows: repeat(10,36px); }
-.mb-name { font-size: 7px; }
-.mb-icon { font-size: 16px; }
-.admin-panel { width: 100%; right: -100%; }
+    .nav-tabs { display: none; }
+    .mobile-menu { display: block; }
+    .rest-grid { grid-template-columns: 1fr; }
+    .map-grid { grid-template-columns: repeat(12,1fr); grid-template-rows: repeat(10,36px); }
+    .mb-name { font-size: 7px; }
+    .mb-icon { font-size: 16px; }
+    .admin-panel { width: 100%; right: -100%; }
 }
-</style>
 
+        .maint-overlay{display:none;position:fixed;inset:0;background:#0a0e27;z-index:99998;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:2rem;font-family:'Tajawal',sans-serif;color:#e2e8f0;}
+</style>
 </head>
 <body>
 
 <!-- BG -->
-
 <div class="page-bg"><div class="circle c1"></div><div class="circle c2"></div></div>
 
 <!-- Loading -->
-
 <div class="loading-overlay" id="loadingOverlay"><div class="loading-spinner"></div></div>
 
 <!-- Toast -->
-
 <div class="toast" id="toast"><i class="fas fa-check-circle"></i><span id="toastMsg"></span></div>
 
 <!-- Tooltip -->
-
 <div class="tooltip" id="tooltip">
     <div class="tt-title" id="tt-title"></div>
     <div class="tt-desc" id="tt-desc"></div>
@@ -276,61 +271,54 @@ body { font-family: 'Tajawal', sans-serif; background: var(--dark); color: var(-
 </div>
 
 <!-- Admin Badge -->
-
 <div class="admin-badge-feat" id="adminBadge"><i class="fas fa-crown"></i> <span id="adminLabel">مشرف</span></div>
 
 <!-- Admin Overlay -->
-
 <div class="admin-overlay" id="adminOverlay" onclick="closeAdminPanel()"></div>
 
 <!-- Admin Panel -->
-
 <div class="admin-panel" id="adminPanel">
     <div class="admin-panel-header">
         <h2><i class="fas fa-cog"></i> لوحة التحكم</h2>
         <button class="close-panel" onclick="closeAdminPanel()"><i class="fas fa-times"></i></button>
     </div>
 
-```
-<!-- Login -->
-<div class="ap-section" id="apLogin">
-    <h3><i class="fas fa-lock"></i> تسجيل الدخول</h3>
-    <input type="password" id="apPass" class="minp" placeholder="كلمة المرور..." onkeydown="if(event.key==='Enter')apLogin()">
-    <button onclick="apLogin()" style="width:100%;background:linear-gradient(135deg,#00d4ff,#0099cc);color:var(--dark);border:none;border-radius:10px;padding:12px;font-size:0.9rem;font-weight:800;cursor:pointer;font-family:'Tajawal',sans-serif;">دخول ⚡</button>
-</div>
-
-<!-- Controls (shown after login) -->
-<div id="apControls" style="display:none;">
-    <div class="ap-login-badge" id="apLoginBadge">مرحباً!</div>
-
-    <div class="ap-section">
-        <h3><i class="fas fa-chart-bar"></i> الإحصائيات</h3>
-        <div class="ap-stat"><span class="ap-stat-label">الاعترافات</span><span class="ap-stat-val" id="confCount">0</span></div>
-        <div class="ap-stat"><span class="ap-stat-label">المطاعم</span><span class="ap-stat-val" id="restCount">0</span></div>
+    <!-- Login -->
+    <div class="ap-section" id="apLogin">
+        <h3><i class="fas fa-lock"></i> تسجيل الدخول</h3>
+        <input type="password" id="apPass" class="minp" placeholder="كلمة المرور..." onkeydown="if(event.key==='Enter')apLogin()">
+        <button onclick="apLogin()" style="width:100%;background:linear-gradient(135deg,#00d4ff,#0099cc);color:var(--dark);border:none;border-radius:10px;padding:12px;font-size:0.9rem;font-weight:800;cursor:pointer;font-family:'Tajawal',sans-serif;">دخول ⚡</button>
     </div>
 
-    <div class="ap-section">
-        <h3><i class="fas fa-tools"></i> الإجراءات</h3>
-        <button class="ap-action" onclick="goPage('conf')"><i class="fas fa-comments"></i> إدارة الاعترافات</button>
-        <button class="ap-action" onclick="goPage('rest')"><i class="fas fa-utensils"></i> إدارة المطاعم</button>
-        <button class="ap-action" onclick="goPage('rest');closeAdminPanel();setTimeout(openModal,300)"><i class="fas fa-plus"></i> إضافة مطعم</button>
-    </div>
+    <!-- Controls (shown after login) -->
+    <div id="apControls" style="display:none;">
+        <div class="ap-login-badge" id="apLoginBadge">مرحباً!</div>
 
-    <div class="ap-section" id="apMainAdminOnly">
-        <h3><i class="fas fa-trash"></i> إجراءات متقدمة</h3>
-        <button class="ap-action danger" onclick="clearAllConf()"><i class="fas fa-broom"></i> حذف كل الاعترافات</button>
-    </div>
+        <div class="ap-section">
+            <h3><i class="fas fa-chart-bar"></i> الإحصائيات</h3>
+            <div class="ap-stat"><span class="ap-stat-label">الاعترافات</span><span class="ap-stat-val" id="confCount">0</span></div>
+            <div class="ap-stat"><span class="ap-stat-label">المطاعم</span><span class="ap-stat-val" id="restCount">0</span></div>
+        </div>
 
-    <div class="ap-section">
-        <button class="ap-action danger" onclick="apLogout()"><i class="fas fa-sign-out-alt"></i> تسجيل خروج</button>
-    </div>
-</div>
-```
+        <div class="ap-section">
+            <h3><i class="fas fa-tools"></i> الإجراءات</h3>
+            <button class="ap-action" onclick="goPage('conf')"><i class="fas fa-comments"></i> إدارة الاعترافات</button>
+            <button class="ap-action" onclick="goPage('rest')"><i class="fas fa-utensils"></i> إدارة المطاعم</button>
+            <button class="ap-action" onclick="goPage('rest');closeAdminPanel();setTimeout(openModal,300)"><i class="fas fa-plus"></i> إضافة مطعم</button>
+        </div>
 
+        <div class="ap-section" id="apMainAdminOnly">
+            <h3><i class="fas fa-trash"></i> إجراءات متقدمة</h3>
+            <button class="ap-action danger" onclick="clearAllConf()"><i class="fas fa-broom"></i> حذف كل الاعترافات</button>
+        </div>
+
+        <div class="ap-section">
+            <button class="ap-action danger" onclick="apLogout()"><i class="fas fa-sign-out-alt"></i> تسجيل خروج</button>
+        </div>
+    </div>
 </div>
 
 <!-- Navbar -->
-
 <nav class="navbar" id="navbar">
     <a href="index.html" class="logo">
         <div class="logo-icon">NU</div>
@@ -350,11 +338,9 @@ body { font-family: 'Tajawal', sans-serif; background: var(--dark); color: var(-
 </nav>
 
 <!-- Admin FAB -->
-
 <div class="admin-fab" onclick="openAdminPanel()" title="لوحة التحكم"><i class="fas fa-cog"></i></div>
 
 <!-- ═══ MAP PAGE ═══ -->
-
 <div class="page active" id="page-map">
     <div class="section-header reveal">
         <span class="badge"><i class="fas fa-map-marked-alt"></i> تفاعلية محدّثة</span>
@@ -399,7 +385,6 @@ body { font-family: 'Tajawal', sans-serif; background: var(--dark); color: var(-
 </div>
 
 <!-- ═══ CONFESSIONS PAGE ═══ -->
-
 <div class="page" id="page-conf">
     <div class="section-header reveal">
         <span class="badge">😅 مجهول · آمن · مضحك</span>
@@ -435,7 +420,6 @@ body { font-family: 'Tajawal', sans-serif; background: var(--dark); color: var(-
 </div>
 
 <!-- ═══ RESTAURANTS PAGE ═══ -->
-
 <div class="page" id="page-rest">
     <div class="section-header reveal">
         <span class="badge">📍 حول جامعة نزوى</span>
@@ -461,7 +445,6 @@ body { font-family: 'Tajawal', sans-serif; background: var(--dark); color: var(-
 </div>
 
 <!-- Modal -->
-
 <div class="modal" id="modal">
     <div class="modal-box">
         <div class="modal-title">➕ إضافة مطعم جديد</div>
@@ -539,7 +522,21 @@ let ratingSelected = 5
 
 // ===== INIT =====
 window.addEventListener('DOMContentLoaded', async () => {
-    setTimeout(()=>document.getElementById('loadingOverlay')?.classList.add('hidden'),1000);
+    // Check maintenance
+    setTimeout(function() {
+        try {
+            var adm = sessionStorage.getItem('uon_bus_admin')||sessionStorage.getItem('uon_feat_admin')||sessionStorage.getItem('uon_sum_admin')||sessionStorage.getItem('nu_admin')
+            if (adm) return
+            supabase.from('settings').select('value').eq('key','maintenance_mode').single().then(function(r){
+                if (r.data && r.data.value === 'true') {
+                    supabase.from('settings').select('value').eq('key','maintenance_message').single().then(function(r2){
+                        var el = document.getElementById('maintOverlay')
+                        if (el) { if(r2.data&&r2.data.value) document.getElementById('maintMsg').textContent=r2.data.value; el.style.display='flex' }
+                    })
+                }
+            })
+        } catch(e){}
+    }, 500)
     const saved = sessionStorage.getItem('uon_feat_admin')
     if (saved) try { currentAdmin = JSON.parse(saved); updateAdminUI() } catch(e) {}
 
@@ -924,5 +921,11 @@ window.toggleMobileMenu = function() {
 }
 </script>
 
+<div class="maint-overlay" id="maintOverlay">
+    <div style="font-size:4rem;margin-bottom:1rem;">🔧</div>
+    <div style="font-size:2.5rem;font-weight:900;color:#fb923c;margin-bottom:1rem;">الموقع تحت الصيانة</div>
+    <p id="maintMsg" style="color:#a0aec0;max-width:500px;line-height:1.8;margin-bottom:2rem;">نعمل على تحسين المنصة 🚀</p>
+    <a href="index.html" style="padding:0.8rem 2rem;background:#00d4ff;border-radius:12px;color:#0a0e27;font-weight:800;text-decoration:none;display:inline-block;">العودة للرئيسية</a>
+</div>
 </body>
 </html>
