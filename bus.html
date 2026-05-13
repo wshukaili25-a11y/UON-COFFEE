@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
@@ -21,107 +20,107 @@ body { font-family:'Tajawal',sans-serif; background:var(--dark); color:var(--tex
 @keyframes slideInUp { from{opacity:0;transform:translateY(30px)} to{opacity:1;transform:translateY(0)} }
 @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-12px)} }
 
-.loading-overlay { position:fixed; inset:0; background:var(–dark); z-index:99999; display:flex; align-items:center; justify-content:center; transition:opacity .5s; }
+.loading-overlay { position:fixed; inset:0; background:var(--dark); z-index:99999; display:flex; align-items:center; justify-content:center; transition:opacity .5s; }
 .loading-overlay.hidden { display: none !important; }
-.spinner { width:44px; height:44px; border:3px solid rgba(0,212,255,.1); border-top-color:var(–primary); border-radius:50%; animation:spin .8s linear infinite; }
-.toast { position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(80px); background:var(–success); color:#fff; padding:.8rem 1.8rem; border-radius:12px; font-weight:700; z-index:10000; opacity:0; transition:all .4s; display:flex; align-items:center; gap:8px; }
+.spinner { width:44px; height:44px; border:3px solid rgba(0,212,255,.1); border-top-color:var(--primary); border-radius:50%; animation:spin .8s linear infinite; }
+.toast { position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(80px); background:var(--success); color:#fff; padding:.8rem 1.8rem; border-radius:12px; font-weight:700; z-index:10000; opacity:0; transition:all .4s; display:flex; align-items:center; gap:8px; }
 .toast.show { transform:translateX(-50%) translateY(0); opacity:1; }
-.toast.error { background:var(–danger); }
+.toast.error { background:var(--danger); }
 
 .navbar { position:fixed; top:0; width:100%; padding:.9rem 5%; display:flex; justify-content:space-between; align-items:center; z-index:1000; background:rgba(10,14,39,.93); backdrop-filter:blur(20px); border-bottom:1px solid rgba(255,255,255,.05); }
 .logo { display:flex; align-items:center; gap:10px; text-decoration:none; }
-.logo-icon { width:40px; height:40px; background:linear-gradient(135deg,#00d4ff,#0099cc); border-radius:10px; display:flex; align-items:center; justify-content:center; font-weight:900; font-size:1.1rem; color:var(–dark); }
+.logo-icon { width:40px; height:40px; background:linear-gradient(135deg,#00d4ff,#0099cc); border-radius:10px; display:flex; align-items:center; justify-content:center; font-weight:900; font-size:1.1rem; color:var(--dark); }
 .logo-text { color:#fff; font-size:1.1rem; font-weight:700; }
-.logo-text span { color:var(–primary); }
+.logo-text span { color:var(--primary); }
 .nav-right { display:flex; gap:.7rem; align-items:center; }
-.nav-home { padding:.5rem 1.2rem; background:linear-gradient(135deg,#00d4ff,#0099cc); border:none; border-radius:10px; color:var(–dark); font-weight:700; font-family:‘Tajawal’,sans-serif; cursor:pointer; font-size:.85rem; text-decoration:none; display:inline-flex; align-items:center; gap:6px; transition:all .3s; }
+.nav-home { padding:.5rem 1.2rem; background:linear-gradient(135deg,#00d4ff,#0099cc); border:none; border-radius:10px; color:var(--dark); font-weight:700; font-family:'Tajawal',sans-serif; cursor:pointer; font-size:.85rem; text-decoration:none; display:inline-flex; align-items:center; gap:6px; transition:all .3s; }
 .nav-home:hover { transform:translateY(-2px); box-shadow:0 8px 24px rgba(0,212,255,.3); }
-.admin-nav-btn { padding:.5rem 1.1rem; background:transparent; border:1.5px solid var(–warning); border-radius:10px; color:var(–warning); font-weight:700; font-family:‘Tajawal’,sans-serif; cursor:pointer; font-size:.82rem; display:none; align-items:center; gap:6px; transition:all .3s; }
+.admin-nav-btn { padding:.5rem 1.1rem; background:transparent; border:1.5px solid var(--warning); border-radius:10px; color:var(--warning); font-weight:700; font-family:'Tajawal',sans-serif; cursor:pointer; font-size:.82rem; display:none; align-items:center; gap:6px; transition:all .3s; }
 .admin-nav-btn.show { display:flex; }
-.admin-nav-btn:hover { background:var(–warning); color:var(–dark); }
-.logout-btn { padding:.5rem 1rem; background:transparent; border:1.5px solid var(–text-dim); border-radius:10px; color:var(–text-dim); font-weight:700; font-family:‘Tajawal’,sans-serif; cursor:pointer; font-size:.82rem; display:none; align-items:center; gap:6px; transition:all .3s; }
+.admin-nav-btn:hover { background:var(--warning); color:var(--dark); }
+.logout-btn { padding:.5rem 1rem; background:transparent; border:1.5px solid var(--text-dim); border-radius:10px; color:var(--text-dim); font-weight:700; font-family:'Tajawal',sans-serif; cursor:pointer; font-size:.82rem; display:none; align-items:center; gap:6px; transition:all .3s; }
 .logout-btn.show { display:flex; }
-.logout-btn:hover { border-color:var(–danger); color:var(–danger); }
+.logout-btn:hover { border-color:var(--danger); color:var(--danger); }
 
-.admin-badge { position:fixed; top:70px; left:16px; z-index:999; background:linear-gradient(135deg,var(–secondary),#ee5a5a); padding:.4rem .9rem; border-radius:50px; font-size:.75rem; font-weight:700; display:none; align-items:center; gap:5px; }
+.admin-badge { position:fixed; top:70px; left:16px; z-index:999; background:linear-gradient(135deg,var(--secondary),#ee5a5a); padding:.4rem .9rem; border-radius:50px; font-size:.75rem; font-weight:700; display:none; align-items:center; gap:5px; }
 .admin-badge.show { display:flex; }
 
 .page-bg { position:fixed; inset:0; pointer-events:none; z-index:0; overflow:hidden; }
 .page-bg .c { position:absolute; border-radius:50%; filter:blur(90px); opacity:.07; }
-.page-bg .c1 { width:500px; height:500px; background:var(–primary); top:-15%; right:-10%; animation:float 10s ease-in-out infinite; }
-.page-bg .c2 { width:350px; height:350px; background:var(–secondary); bottom:-10%; left:-8%; animation:float 13s ease-in-out infinite reverse; }
+.page-bg .c1 { width:500px; height:500px; background:var(--primary); top:-15%; right:-10%; animation:float 10s ease-in-out infinite; }
+.page-bg .c2 { width:350px; height:350px; background:var(--secondary); bottom:-10%; left:-8%; animation:float 13s ease-in-out infinite reverse; }
 
 main { padding:90px 5% 60px; max-width:900px; margin:0 auto; position:relative; z-index:1; }
 
 .page-hero { text-align:center; padding:2rem 0 2.5rem; }
-.hero-badge { display:inline-flex; align-items:center; gap:6px; padding:.4rem 1rem; background:rgba(0,212,255,.1); border:1px solid rgba(0,212,255,.2); border-radius:50px; font-size:.8rem; color:var(–primary); margin-bottom:1rem; }
-.page-hero h1 { font-size:clamp(1.8rem,4vw,2.8rem); font-weight:900; background:linear-gradient(135deg,#fff 0%,var(–primary) 100%); -webkit-background-clip:text; -webkit-text-fill-color:transparent; margin-bottom:.6rem; }
-.page-hero p { color:var(–text-dim); font-size:.95rem; }
+.hero-badge { display:inline-flex; align-items:center; gap:6px; padding:.4rem 1rem; background:rgba(0,212,255,.1); border:1px solid rgba(0,212,255,.2); border-radius:50px; font-size:.8rem; color:var(--primary); margin-bottom:1rem; }
+.page-hero h1 { font-size:clamp(1.8rem,4vw,2.8rem); font-weight:900; background:linear-gradient(135deg,#fff 0%,var(--primary) 100%); -webkit-background-clip:text; -webkit-text-fill-color:transparent; margin-bottom:.6rem; }
+.page-hero p { color:var(--text-dim); font-size:.95rem; }
 
 .bus-tabs { display:flex; gap:1rem; justify-content:center; margin-bottom:2rem; }
-.bus-tab { padding:.75rem 2rem; background:var(–dark-light); border:2px solid rgba(255,255,255,.08); border-radius:50px; color:var(–text-muted); font-weight:700; font-family:‘Tajawal’,sans-serif; cursor:pointer; transition:all .3s; font-size:.95rem; }
-.bus-tab.active { border-color:var(–primary); color:var(–primary); background:rgba(0,212,255,.1); }
+.bus-tab { padding:.75rem 2rem; background:var(--dark-light); border:2px solid rgba(255,255,255,.08); border-radius:50px; color:var(--text-muted); font-weight:700; font-family:'Tajawal',sans-serif; cursor:pointer; transition:all .3s; font-size:.95rem; }
+.bus-tab.active { border-color:var(--primary); color:var(--primary); background:rgba(0,212,255,.1); }
 
 .bus-panel { display:none; animation:slideInUp .4s ease; }
 .bus-panel.active { display:block; }
 
-.bus-card { background:var(–dark-light); border:1px solid rgba(255,255,255,.06); border-radius:20px; overflow:hidden; margin-bottom:1.5rem; }
+.bus-card { background:var(--dark-light); border:1px solid rgba(255,255,255,.06); border-radius:20px; overflow:hidden; margin-bottom:1.5rem; }
 .bus-card-head { padding:1.2rem 1.8rem; background:rgba(0,212,255,.06); border-bottom:1px solid rgba(0,212,255,.1); display:flex; align-items:center; justify-content:space-between; }
 .bus-card-head h3 { font-size:1rem; font-weight:800; display:flex; align-items:center; gap:8px; }
 .bus-gender-badge { font-size:.72rem; padding:.25rem .7rem; border-radius:50px; font-weight:700; }
-.badge-boys { background:rgba(0,212,255,.15); color:var(–primary); border:1px solid rgba(0,212,255,.3); }
-.badge-girls { background:rgba(255,107,107,.15); color:var(–secondary); border:1px solid rgba(255,107,107,.3); }
-.bus-days { font-size:.78rem; color:var(–text-dim); }
+.badge-boys { background:rgba(0,212,255,.15); color:var(--primary); border:1px solid rgba(0,212,255,.3); }
+.badge-girls { background:rgba(255,107,107,.15); color:var(--secondary); border:1px solid rgba(255,107,107,.3); }
+.bus-days { font-size:.78rem; color:var(--text-dim); }
 
 .bus-route { padding:1.1rem 1.8rem; border-bottom:1px solid rgba(255,255,255,.04); display:grid; grid-template-columns:1fr auto auto auto; gap:1rem; align-items:center; transition:background .2s; }
 .bus-route:last-child { border-bottom:none; }
 .bus-route:hover { background:rgba(255,255,255,.02); }
 .route-name { font-weight:700; font-size:.92rem; display:flex; align-items:center; gap:6px; }
-.route-time { font-family:monospace; font-size:.9rem; color:var(–primary); }
-.route-return { font-family:monospace; font-size:.9rem; color:var(–accent); }
+.route-time { font-family:monospace; font-size:.9rem; color:var(--primary); }
+.route-return { font-family:monospace; font-size:.9rem; color:var(--accent); }
 .route-status { font-size:.72rem; padding:.25rem .7rem; border-radius:50px; font-weight:700; white-space:nowrap; }
-.status-active { background:rgba(107,203,119,.15); color:var(–success); border:1px solid rgba(107,203,119,.3); }
-.status-full { background:rgba(251,146,60,.15); color:var(–warning); border:1px solid rgba(251,146,60,.3); }
+.status-active { background:rgba(107,203,119,.15); color:var(--success); border:1px solid rgba(107,203,119,.3); }
+.status-full { background:rgba(251,146,60,.15); color:var(--warning); border:1px solid rgba(251,146,60,.3); }
 
 .book-banner { background:linear-gradient(135deg,rgba(0,212,255,.08),rgba(0,153,204,.04)); border:1px solid rgba(0,212,255,.15); border-radius:18px; padding:1.5rem 2rem; display:flex; align-items:center; justify-content:space-between; gap:1rem; flex-wrap:wrap; margin-top:1.5rem; }
 .book-text h4 { font-size:1rem; font-weight:800; margin-bottom:.3rem; }
-.book-text p { color:var(–text-dim); font-size:.85rem; }
-.book-btn { padding:.75rem 1.8rem; background:linear-gradient(135deg,#00d4ff,#0099cc); border:none; border-radius:12px; color:var(–dark); font-weight:800; font-family:‘Tajawal’,sans-serif; cursor:pointer; transition:all .3s; text-decoration:none; display:inline-flex; align-items:center; gap:8px; font-size:.9rem; white-space:nowrap; }
+.book-text p { color:var(--text-dim); font-size:.85rem; }
+.book-btn { padding:.75rem 1.8rem; background:linear-gradient(135deg,#00d4ff,#0099cc); border:none; border-radius:12px; color:var(--dark); font-weight:800; font-family:'Tajawal',sans-serif; cursor:pointer; transition:all .3s; text-decoration:none; display:inline-flex; align-items:center; gap:8px; font-size:.9rem; white-space:nowrap; }
 .book-btn:hover { transform:translateY(-2px); box-shadow:0 10px 30px rgba(0,212,255,.4); }
 
 /* ADMIN PANEL */
-.admin-panel { position:fixed; top:0; right:-430px; width:410px; max-width:100%; height:100vh; background:var(–dark-light); border-left:1px solid rgba(255,255,255,.08); z-index:1500; transition:right .4s; overflow-y:auto; padding:1.8rem; }
+.admin-panel { position:fixed; top:0; right:-430px; width:410px; max-width:100%; height:100vh; background:var(--dark-light); border-left:1px solid rgba(255,255,255,.08); z-index:1500; transition:right .4s; overflow-y:auto; padding:1.8rem; }
 .admin-panel.open { right:0; }
 .admin-overlay { position:fixed; inset:0; background:rgba(0,0,0,.5); z-index:1499; display:none; }
 .admin-overlay.show { display:block; }
 .ap-head { display:flex; justify-content:space-between; align-items:center; margin-bottom:1.8rem; padding-bottom:1.2rem; border-bottom:1px solid rgba(255,255,255,.08); }
 .ap-head h2 { font-size:1.2rem; font-weight:900; display:flex; align-items:center; gap:8px; }
-.ap-head h2 i { color:var(–warning); }
-.close-ap { width:36px; height:36px; border-radius:10px; background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.08); color:var(–text-muted); cursor:pointer; display:flex; align-items:center; justify-content:center; transition:all .3s; }
-.close-ap:hover { background:var(–danger); color:#fff; }
+.ap-head h2 i { color:var(--warning); }
+.close-ap { width:36px; height:36px; border-radius:10px; background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.08); color:var(--text-muted); cursor:pointer; display:flex; align-items:center; justify-content:center; transition:all .3s; }
+.close-ap:hover { background:var(--danger); color:#fff; }
 .ap-section { margin-bottom:1.5rem; padding-bottom:1.5rem; border-bottom:1px solid rgba(255,255,255,.05); }
 .ap-section:last-child { border-bottom:none; }
-.ap-section h3 { font-size:.9rem; font-weight:700; color:var(–primary); margin-bottom:.8rem; display:flex; align-items:center; gap:6px; }
-.ap-login-badge { font-size:.8rem; color:var(–success); margin-bottom:1rem; display:flex; align-items:center; gap:6px; }
-.ap-login-badge::before { content:’’; width:6px; height:6px; background:var(–success); border-radius:50%; flex-shrink:0; }
-.minp { width:100%; padding:.8rem 1rem; background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.1); border-radius:10px; color:var(–text); font-family:‘Tajawal’,sans-serif; font-size:.88rem; outline:none; margin-bottom:8px; transition:border-color .3s; }
-.minp:focus { border-color:var(–primary); }
-.minp::placeholder { color:var(–text-dim); }
-.mlabel { font-size:.8rem; color:var(–text-muted); margin-bottom:4px; display:block; font-weight:600; }
+.ap-section h3 { font-size:.9rem; font-weight:700; color:var(--primary); margin-bottom:.8rem; display:flex; align-items:center; gap:6px; }
+.ap-login-badge { font-size:.8rem; color:var(--success); margin-bottom:1rem; display:flex; align-items:center; gap:6px; }
+.ap-login-badge::before { content:''; width:6px; height:6px; background:var(--success); border-radius:50%; flex-shrink:0; }
+.minp { width:100%; padding:.8rem 1rem; background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.1); border-radius:10px; color:var(--text); font-family:'Tajawal',sans-serif; font-size:.88rem; outline:none; margin-bottom:8px; transition:border-color .3s; }
+.minp:focus { border-color:var(--primary); }
+.minp::placeholder { color:var(--text-dim); }
+.mlabel { font-size:.8rem; color:var(--text-muted); margin-bottom:4px; display:block; font-weight:600; }
 .mgroup { margin-bottom:10px; }
-.btn-save { width:100%; padding:.85rem; background:var(–success); border:none; border-radius:10px; color:#fff; font-weight:800; font-size:.9rem; font-family:‘Tajawal’,sans-serif; cursor:pointer; transition:all .3s; display:flex; align-items:center; justify-content:center; gap:6px; margin-top:8px; }
+.btn-save { width:100%; padding:.85rem; background:var(--success); border:none; border-radius:10px; color:#fff; font-weight:800; font-size:.9rem; font-family:'Tajawal',sans-serif; cursor:pointer; transition:all .3s; display:flex; align-items:center; justify-content:center; gap:6px; margin-top:8px; }
 .btn-save:hover { transform:translateY(-1px); box-shadow:0 8px 24px rgba(107,203,119,.3); }
-.ap-action { width:100%; background:rgba(0,212,255,.06); border:1px solid rgba(0,212,255,.15); color:var(–primary); font-size:.85rem; font-weight:700; padding:.8rem 1rem; border-radius:10px; cursor:pointer; font-family:‘Tajawal’,sans-serif; transition:all .3s; text-align:right; display:flex; align-items:center; gap:8px; margin-bottom:6px; }
+.ap-action { width:100%; background:rgba(0,212,255,.06); border:1px solid rgba(0,212,255,.15); color:var(--primary); font-size:.85rem; font-weight:700; padding:.8rem 1rem; border-radius:10px; cursor:pointer; font-family:'Tajawal',sans-serif; transition:all .3s; text-align:right; display:flex; align-items:center; gap:8px; margin-bottom:6px; }
 .ap-action:hover { background:rgba(0,212,255,.12); }
-.ap-action.danger { color:var(–danger); border-color:rgba(239,68,68,.2); background:rgba(239,68,68,.05); }
+.ap-action.danger { color:var(--danger); border-color:rgba(239,68,68,.2); background:rgba(239,68,68,.05); }
 
 /* Bus admin rows */
 .bus-admin-row { display:grid; grid-template-columns:2fr 1fr 1fr auto; gap:6px; margin-bottom:6px; align-items:center; }
-.bar { padding:.6rem .7rem; background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.1); border-radius:8px; color:var(–text); font-family:‘Tajawal’,sans-serif; font-size:.82rem; outline:none; }
-.bar:focus { border-color:var(–primary); }
-.bar-del { width:30px; height:30px; background:rgba(239,68,68,.08); border:1px solid rgba(239,68,68,.15); border-radius:8px; color:var(–danger); cursor:pointer; display:flex; align-items:center; justify-content:center; }
-.bar-add { width:100%; padding:.6rem; background:rgba(0,212,255,.04); border:1px dashed rgba(0,212,255,.2); border-radius:8px; color:rgba(0,212,255,.5); font-size:.82rem; cursor:pointer; font-family:‘Tajawal’,sans-serif; transition:all .3s; margin-top:4px; }
-.bar-add:hover { background:rgba(0,212,255,.08); color:var(–primary); }
+.bar { padding:.6rem .7rem; background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.1); border-radius:8px; color:var(--text); font-family:'Tajawal',sans-serif; font-size:.82rem; outline:none; }
+.bar:focus { border-color:var(--primary); }
+.bar-del { width:30px; height:30px; background:rgba(239,68,68,.08); border:1px solid rgba(239,68,68,.15); border-radius:8px; color:var(--danger); cursor:pointer; display:flex; align-items:center; justify-content:center; }
+.bar-add { width:100%; padding:.6rem; background:rgba(0,212,255,.04); border:1px dashed rgba(0,212,255,.2); border-radius:8px; color:rgba(0,212,255,.5); font-size:.82rem; cursor:pointer; font-family:'Tajawal',sans-serif; transition:all .3s; margin-top:4px; }
+.bar-add:hover { background:rgba(0,212,255,.08); color:var(--primary); }
 
 .admin-fab { position:fixed; bottom:22px; left:22px; z-index:999; width:44px; height:44px; background:rgba(0,212,255,.1); border:1px solid rgba(0,212,255,.2); border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:1rem; transition:all .3s; backdrop-filter:blur(8px); }
 .admin-fab:hover { background:rgba(0,212,255,.2); transform:scale(1.1); }
@@ -130,13 +129,14 @@ main { padding:90px 5% 60px; max-width:900px; margin:0 auto; position:relative; 
 .reveal.active { opacity:1; transform:translateY(0); }
 
 @media(max-width:600px) {
-.bus-route { grid-template-columns:1fr 1fr; gap:.5rem; }
-.route-return { display:none; }
-.book-banner { flex-direction:column; text-align:center; }
-.admin-panel { width:100%; right:-100%; }
+    .bus-route { grid-template-columns:1fr 1fr; gap:.5rem; }
+    .route-return { display:none; }
+    .book-banner { flex-direction:column; text-align:center; }
+    .admin-panel { width:100%; right:-100%; }
 }
-</style>
 
+        .maint-overlay{display:none;position:fixed;inset:0;background:#0a0e27;z-index:99998;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:2rem;font-family:'Tajawal',sans-serif;color:#e2e8f0;}
+</style>
 </head>
 <body>
 
@@ -147,57 +147,52 @@ main { padding:90px 5% 60px; max-width:900px; margin:0 auto; position:relative; 
 <div class="admin-overlay" id="adminOverlay" onclick="closeAP()"></div>
 
 <!-- Admin Panel -->
-
 <div class="admin-panel" id="adminPanel">
     <div class="ap-head">
         <h2><i class="fas fa-cog"></i> إدارة الباصات</h2>
         <button class="close-ap" onclick="closeAP()"><i class="fas fa-times"></i></button>
     </div>
 
-```
-<div class="ap-section" id="apLoginSection">
-    <h3><i class="fas fa-lock"></i> تسجيل الدخول</h3>
-    <input type="password" class="minp" id="apPass" placeholder="كلمة المرور..." onkeydown="if(event.key==='Enter')apLogin()">
-    <button onclick="apLogin()" style="width:100%;background:linear-gradient(135deg,#00d4ff,#0099cc);color:var(--dark);border:none;border-radius:10px;padding:11px;font-size:.9rem;font-weight:800;cursor:pointer;font-family:'Tajawal',sans-serif;margin-top:4px;">دخول ⚡</button>
-</div>
+    <div class="ap-section" id="apLoginSection">
+        <h3><i class="fas fa-lock"></i> تسجيل الدخول</h3>
+        <input type="password" class="minp" id="apPass" placeholder="كلمة المرور..." onkeydown="if(event.key==='Enter')apLogin()">
+        <button onclick="apLogin()" style="width:100%;background:linear-gradient(135deg,#00d4ff,#0099cc);color:var(--dark);border:none;border-radius:10px;padding:11px;font-size:.9rem;font-weight:800;cursor:pointer;font-family:'Tajawal',sans-serif;margin-top:4px;">دخول ⚡</button>
+    </div>
 
-<div id="apControls" style="display:none;">
-    <div class="ap-section">
-        <div class="ap-login-badge" id="apBadgeText">مرحباً!</div>
+    <div id="apControls" style="display:none;">
+        <div class="ap-section">
+            <div class="ap-login-badge" id="apBadgeText">مرحباً!</div>
 
-        <h3><i class="fas fa-bus"></i> جدول الأولاد 🚌</h3>
-        <div style="font-size:.75rem;color:var(--text-dim);margin-bottom:8px;display:grid;grid-template-columns:2fr 1fr 1fr auto;gap:6px;">
-            <span>المنطقة</span><span>الذهاب</span><span>العودة</span><span></span>
+            <h3><i class="fas fa-bus"></i> جدول الأولاد 🚌</h3>
+            <div style="font-size:.75rem;color:var(--text-dim);margin-bottom:8px;display:grid;grid-template-columns:2fr 1fr 1fr auto;gap:6px;">
+                <span>المنطقة</span><span>الذهاب</span><span>العودة</span><span></span>
+            </div>
+            <div id="busBoysAdmin"></div>
+            <button class="bar-add" onclick="addBusRow('boys')">+ إضافة رحلة</button>
         </div>
-        <div id="busBoysAdmin"></div>
-        <button class="bar-add" onclick="addBusRow('boys')">+ إضافة رحلة</button>
-    </div>
 
-    <div class="ap-section">
-        <h3><i class="fas fa-bus"></i> جدول البنات 🚌</h3>
-        <div style="font-size:.75rem;color:var(--text-dim);margin-bottom:8px;display:grid;grid-template-columns:2fr 1fr 1fr auto;gap:6px;">
-            <span>المنطقة</span><span>الذهاب</span><span>العودة</span><span></span>
+        <div class="ap-section">
+            <h3><i class="fas fa-bus"></i> جدول البنات 🚌</h3>
+            <div style="font-size:.75rem;color:var(--text-dim);margin-bottom:8px;display:grid;grid-template-columns:2fr 1fr 1fr auto;gap:6px;">
+                <span>المنطقة</span><span>الذهاب</span><span>العودة</span><span></span>
+            </div>
+            <div id="busGirlsAdmin"></div>
+            <button class="bar-add" onclick="addBusRow('girls')">+ إضافة رحلة</button>
         </div>
-        <div id="busGirlsAdmin"></div>
-        <button class="bar-add" onclick="addBusRow('girls')">+ إضافة رحلة</button>
-    </div>
 
-    <div class="ap-section">
-        <h3><i class="fas fa-link"></i> رابط الحجز</h3>
-        <input type="text" class="minp" id="busBookingUrl" placeholder="https://...">
-        <button class="btn-save" onclick="saveBus()"><i class="fas fa-save"></i> حفظ الجداول</button>
-    </div>
+        <div class="ap-section">
+            <h3><i class="fas fa-link"></i> رابط الحجز</h3>
+            <input type="text" class="minp" id="busBookingUrl" placeholder="https://...">
+            <button class="btn-save" onclick="saveBus()"><i class="fas fa-save"></i> حفظ الجداول</button>
+        </div>
 
-    <div class="ap-section">
-        <button class="ap-action danger" onclick="apLogout()"><i class="fas fa-sign-out-alt"></i> تسجيل خروج</button>
+        <div class="ap-section">
+            <button class="ap-action danger" onclick="apLogout()"><i class="fas fa-sign-out-alt"></i> تسجيل خروج</button>
+        </div>
     </div>
-</div>
-```
-
 </div>
 
 <!-- Navbar -->
-
 <nav class="navbar">
     <a href="index.html" class="logo">
         <div class="logo-icon">NU</div>
@@ -219,43 +214,40 @@ main { padding:90px 5% 60px; max-width:900px; margin:0 auto; position:relative; 
         <p>جداول الذهاب والعودة لباصات الطلاب — الأحد إلى الخميس</p>
     </div>
 
-```
-<div class="bus-tabs reveal">
-    <button class="bus-tab active" onclick="switchTab('boys',this)">🚌 باص الأولاد</button>
-    <button class="bus-tab" onclick="switchTab('girls',this)">🚌 باص البنات</button>
-</div>
+    <div class="bus-tabs reveal">
+        <button class="bus-tab active" onclick="switchTab('boys',this)">🚌 باص الأولاد</button>
+        <button class="bus-tab" onclick="switchTab('girls',this)">🚌 باص البنات</button>
+    </div>
 
-<div class="bus-panel active" id="busPanel-boys">
-    <div class="bus-card reveal">
-        <div class="bus-card-head">
-            <h3>🚌 جدول باص الأولاد <span class="bus-gender-badge badge-boys">أولاد</span></h3>
-            <span class="bus-days">الأحد - الخميس</span>
+    <div class="bus-panel active" id="busPanel-boys">
+        <div class="bus-card reveal">
+            <div class="bus-card-head">
+                <h3>🚌 جدول باص الأولاد <span class="bus-gender-badge badge-boys">أولاد</span></h3>
+                <span class="bus-days">الأحد - الخميس</span>
+            </div>
+            <div id="busBoysTable"></div>
         </div>
-        <div id="busBoysTable"></div>
     </div>
-</div>
 
-<div class="bus-panel" id="busPanel-girls">
-    <div class="bus-card reveal">
-        <div class="bus-card-head">
-            <h3>🚌 جدول باص البنات <span class="bus-gender-badge badge-girls">بنات</span></h3>
-            <span class="bus-days">الأحد - الخميس</span>
+    <div class="bus-panel" id="busPanel-girls">
+        <div class="bus-card reveal">
+            <div class="bus-card-head">
+                <h3>🚌 جدول باص البنات <span class="bus-gender-badge badge-girls">بنات</span></h3>
+                <span class="bus-days">الأحد - الخميس</span>
+            </div>
+            <div id="busGirlsTable"></div>
         </div>
-        <div id="busGirlsTable"></div>
     </div>
-</div>
 
-<div class="book-banner reveal">
-    <div class="book-text">
-        <h4>📋 حجز موعد الباص</h4>
-        <p>سجّل حضورك واحجز مقعدك مسبقاً</p>
+    <div class="book-banner reveal">
+        <div class="book-text">
+            <h4>📋 حجز موعد الباص</h4>
+            <p>سجّل حضورك واحجز مقعدك مسبقاً</p>
+        </div>
+        <a href="#" id="bookingLink" target="_blank" class="book-btn">
+            <i class="fas fa-calendar-check"></i> احجز الآن
+        </a>
     </div>
-    <a href="#" id="bookingLink" target="_blank" class="book-btn">
-        <i class="fas fa-calendar-check"></i> احجز الآن
-    </a>
-</div>
-```
-
 </main>
 
 <script type="module">
@@ -296,7 +288,21 @@ let busData = { boys: [...defaultBoys], girls: [...defaultGirls], bookingUrl: '#
 let currentAdmin = null
 
 window.addEventListener('DOMContentLoaded', async () => {
-    setTimeout(()=>document.getElementById('loadingOverlay')?.classList.add('hidden'),1000);
+    // Check maintenance
+    setTimeout(function() {
+        try {
+            var adm = sessionStorage.getItem('uon_bus_admin')||sessionStorage.getItem('uon_feat_admin')||sessionStorage.getItem('uon_sum_admin')||sessionStorage.getItem('nu_admin')
+            if (adm) return
+            supabase.from('settings').select('value').eq('key','maintenance_mode').single().then(function(r){
+                if (r.data && r.data.value === 'true') {
+                    supabase.from('settings').select('value').eq('key','maintenance_message').single().then(function(r2){
+                        var el = document.getElementById('maintOverlay')
+                        if (el) { if(r2.data&&r2.data.value) document.getElementById('maintMsg').textContent=r2.data.value; el.style.display='flex' }
+                    })
+                }
+            })
+        } catch(e){}
+    }, 500)
     const saved = sessionStorage.getItem('uon_bus_admin')
     if (saved) try { currentAdmin = JSON.parse(saved); updateAdminUI() } catch(e) {}
     setTimeout(() => document.getElementById('loadingOverlay').classList.add('hidden'), 4000)
@@ -437,5 +443,11 @@ function initReveal() {
 }
 </script>
 
+<div class="maint-overlay" id="maintOverlay">
+    <div style="font-size:4rem;margin-bottom:1rem;">🔧</div>
+    <div style="font-size:2.5rem;font-weight:900;color:#fb923c;margin-bottom:1rem;">الموقع تحت الصيانة</div>
+    <p id="maintMsg" style="color:#a0aec0;max-width:500px;line-height:1.8;margin-bottom:2rem;">نعمل على تحسين المنصة 🚀</p>
+    <a href="index.html" style="padding:0.8rem 2rem;background:#00d4ff;border-radius:12px;color:#0a0e27;font-weight:800;text-decoration:none;display:inline-block;">العودة للرئيسية</a>
+</div>
 </body>
 </html>
