@@ -780,6 +780,8 @@ function renderTools() {
 }
 
 window.openTool = function(id) {
+    var tool = tools.find(function(t){return t.id===id})
+    if (tool && tool.isEnabled === false) { showToast('هذه الأداة غير متاحة حالياً 🔜', 'error'); return }
     const actions = {
         1: () => document.getElementById('botSection').scrollIntoView({behavior:'smooth'}),
         2: () => document.getElementById('calcSection').scrollIntoView({behavior:'smooth'}),
