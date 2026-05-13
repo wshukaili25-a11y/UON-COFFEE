@@ -594,7 +594,7 @@ const defaultTools = [
     { id: 6, title: "دليل المطاعم", description: "أقرب المطاعم والكافيهات حول جامعة نزوى مع التقييمات", icon: "fa-utensils", color: "#fb923c", btn_text: "شوف المطاعم" },
     { id: 7, title: "خريطة الجامعة", description: "خريطة تفاعلية لمواقع الكليات والمرافق داخل الحرم الجامعي", icon: "fa-map-marked-alt", color: "#38bdf8", btn_text: "افتح الخريطة" },
     { id: 8, title: "مواعيد الباصات", description: "جداول ذهاب وعودة باصات الطلاب محدّثة يومياً للأولاد والبنات", icon: "fa-bus", color: "#f472b6", btn_text: "شوف المواعيد" },
-    { id: 9, title: "مجموعات الواتساب", description: "انضم لمجموعات موادك وكليتك", icon: "fa-whatsapp", color: "#25D366", btn_text: "انضم الحين" },
+    { id: 9, title: "مجموعات الواتساب", description: "انضم لمجموعات موادك وكليتك", icon: "fab fa-whatsapp", color: "#25D366", btn_text: "انضم الحين" },
     { id: 10, title: "مشاريع الطلاب", description: "اكتشف مشاريع زملائك وصوّت لأفضلها 🚀", icon: "fa-rocket", color: "#a78bfa", btn_text: "اكتشف المشاريع" }
 ]
 
@@ -763,15 +763,20 @@ window.addEventListener('DOMContentLoaded', function() {
 // ===== RENDER TOOLS =====
 function renderTools() {
     const grid = document.getElementById('toolsGrid')
+    if (!grid) return
     if (!tools.length) { grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:3rem;color:var(--text-dim);">لا توجد أدوات بعد</div>'; return }
-    grid.innerHTML = tools.map(tool => `
-        <div class="tool-card" data-id="${tool.id}" style="--card-color:${tool.color};">
-            <button class="admin-edit-btn" onclick="event.stopPropagation();editTool(${tool.id})" title="تعديل"><i class="fas fa-pen"></i></button>
-            <div class="tool-icon" style="background:${tool.color}20;color:${tool.color};"><i class="fas ${tool.icon}"></i></div>
-            <h3>${tool.title}</h3>
-            <p>${tool.desc}</p>
-            <button class="tool-link" style="color:${tool.color};" onclick="openTool(${tool.id})">${tool.btnText} <i class="fas fa-arrow-left"></i></button>
-        </div>`).join('')
+    grid.innerHTML = tools.map(function(tool) {
+        var disabled = tool.isEnabled === false
+        var ic = tool.icon.indexOf(' ') !== -1 ? tool.icon : 'fas ' + tool.icon
+        return '<div class="tool-card" data-id="' + tool.id + '" style="--card-color:' + tool.color + ';' + (disabled ? 'opacity:0.45;filter:grayscale(0.6);' : '') + '">' +
+            '<button class="admin-edit-btn" onclick="event.stopPropagation();editTool(' + tool.id + ')" title="تعديل"><i class="fas fa-pen"></i></button>' +
+            (disabled ? '<div style="position:absolute;top:8px;right:8px;background:rgba(251,146,60,0.15);border:1px solid rgba(251,146,60,0.4);color:#fb923c;font-size:0.7rem;font-weight:700;padding:0.2rem 0.6rem;border-radius:50px;z-index:2;">🔜 قريباً</div>' : '') +
+            '<div class="tool-icon" style="background:' + tool.color + '20;color:' + tool.color + ';"><i class="' + ic + '"></i></div>' +
+            '<h3>' + tool.title + '</h3>' +
+            '<p>' + tool.desc + '</p>' +
+            '<button class="tool-link" style="color:' + tool.color + ';' + (disabled ? 'opacity:0.5;cursor:not-allowed;' : '') + '" onclick="openTool(' + tool.id + ')">' + tool.btnText + ' <i class="fas fa-arrow-left"></i></button>' +
+            '</div>'
+    }).join('')
 }
 
 window.openTool = function(id) {
@@ -1127,8 +1132,11 @@ window.quickToggleTool = function(id, enabled) {
     if (!tool) return
     tool.isEnabled = enabled
     renderTools()
-    supabase.from('tools').update({is_enabled:enabled}).eq('id',id).then(function(){})
-    showToast(enabled ? '✅ الأداة مفعّلة' : '🔜 الأداة موقوفة')
+    renderToolsToggleList()
+    supabase.from('tools').update({is_enabled: enabled}).eq('id', id).then(function(r){
+        if (r.error) showToast('خطأ في الحفظ', 'error')
+        else showToast(enabled ? '✅ ' + tool.title + ' مفعّلة' : '🔜 ' + tool.title + ' موقوفة')
+    })
 }
 
 window.resetToolsToDefault = function() {
@@ -1147,7 +1155,7 @@ function renderToolsToggleList() {
     if (!list) return
     list.innerHTML = tools.map(function(tool) {
         var on = tool.isEnabled !== false
-        var ic = tool.icon === 'fa-whatsapp' ? 'fab fa-whatsapp' : 'fas ' + tool.icon
+        var ic = tool.icon.indexOf(' ') !== -1 ? tool.icon : 'fas ' + tool.icon
         return '<div style="display:flex;align-items:center;gap:10px;padding:0.6rem 0.8rem;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:10px;margin-bottom:6px;">' +
             '<div style="width:28px;height:28px;border-radius:7px;background:' + tool.color + '15;color:' + tool.color + ';display:flex;align-items:center;justify-content:center;font-size:0.8rem;flex-shrink:0;"><i class="' + ic + '"></i></div>' +
             '<span style="flex:1;font-weight:700;font-size:0.83rem;">' + tool.title + '</span>' +
