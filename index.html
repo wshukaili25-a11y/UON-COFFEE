@@ -628,13 +628,13 @@ async function loadTools() {
     try {
         const { data, error } = await supabase.from('tools').select('*').order('id')
         if (error || !data || data.length === 0) { await seedTools() }
-        else { tools = data.map(t => ({ id: t.id, title: t.title, desc: t.description, icon: t.icon, color: t.color, btnText: t.btn_text })); renderTools() }
+        else { tools = data.map(function(t){ return { id: t.id, title: t.title, desc: t.description, icon: t.icon, color: t.color, btnText: t.btn_text, linkUrl: t.link_url||'', isEnabled: t.is_enabled === null ? true : (t.is_enabled !== false) } }); renderTools(); renderToolsToggleList() }
     } catch(e) { tools = defaultTools.map(t => ({...t, desc: t.description, btnText: t.btn_text})); renderTools() }
 }
 
 async function seedTools() {
     for (const tool of defaultTools) {
-        await supabase.from('tools').insert({ id: tool.id, title: tool.title, description: tool.description, icon: tool.icon, color: tool.color, btn_text: tool.btn_text })
+        await supabase.from('tools').upsert({ id: tool.id, title: tool.title, description: tool.description, icon: tool.icon, color: tool.color, btn_text: tool.btn_text, link_url: '', is_enabled: true })
     }
     await loadTools()
 }
