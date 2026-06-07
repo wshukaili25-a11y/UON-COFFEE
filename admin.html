@@ -845,15 +845,5 @@ window.showToast = function(msg, type) {
 // Auto refresh every minute
 setInterval(loadAll, 60000)
 </script>
-
-<script type="module">
-import {getCurrentUser,isAdmin} from './supabase.js';
-const u=await getCurrentUser();
-if(!u){ location.href='login.html'; }
-else{
- const ok=await isAdmin();
- if(!ok){ document.body.innerHTML='<h1 style="text-align:center">Access Denied</h1>'; }
-}
-</script><!-- ADMIN_GUARD_V20 -->
 </body>
 </html>
