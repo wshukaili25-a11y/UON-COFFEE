@@ -83,3 +83,28 @@ export async function setSetting(key, value) {
   await supabase.from('settings')
     .upsert({ key, value })
 }
+
+
+// AUTH
+export async function signIn(email,password){
+ return await supabase.auth.signInWithPassword({email,password})
+}
+export async function signOut(){
+ return await supabase.auth.signOut()
+}
+export async function getCurrentUser(){
+ const {data}=await supabase.auth.getUser()
+ return data.user
+}
+export async function isAdmin(){
+ const user=await getCurrentUser()
+ if(!user) return false
+ const {data}=await supabase.from('profiles').select('role').eq('id',user.id).single()
+ return data?.role==='admin'
+}
+
+// SUMMARIES
+export async function getSummaries(){
+ const {data}=await supabase.from('summaries').select('*').order('created_at',{ascending:false})
+ return data||[]
+}
