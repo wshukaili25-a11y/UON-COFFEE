@@ -776,7 +776,8 @@ window.saveBusSchedule = async function() {
 // ===== INIT =====
 window.addEventListener('DOMContentLoaded', async () => {
     // إخفاء الـ loading بعد 4 ثواني على أي حال
-    setTimeout(() =>    
+    setTimeout(() => document.getElementById('loadingOverlay').classList.add('hidden'), 4000)
+
     // ===== EXAM BANNER =====
     try {
         const { data: _ebData } = await supabase.from('settings').select('*').in('key',['exam_mode','exam_title','exam_msg','exam_emoji'])
@@ -792,7 +793,6 @@ window.addEventListener('DOMContentLoaded', async () => {
             }
         }
     } catch(e) {}
-    document.getElementById('loadingOverlay').classList.add('hidden'), 4000)
     try {
         await Promise.all([loadTools(), loadSettings(), loadBusData()])
     } catch(e) { console.log('init error', e) }
