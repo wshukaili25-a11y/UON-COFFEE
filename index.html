@@ -1035,10 +1035,7 @@ function botAddMsg(type, text, isLoading = false) {
     const msgId = 'msg_' + Date.now() + Math.random()
     d.id = msgId
     d.style.cssText = 'display:flex;gap:10px;animation:slideInUp .3s ease;' + (type==='user' ? 'flex-direction:row-reverse' : '')
-    const bubble = isLoading
-        ? `<span style="letter-spacing:2px;color:var(--primary)">•••</span>`
-        : text.replace(/
-/g,'<br>')
+    const bubble = isLoading ? '<span style="letter-spacing:2px;color:var(--primary)">•••</span>' : text.replace(/\n/g,'<br>')
     const avatar = type === 'bot' ? '☕' : '🎓'
     const bubbleStyle = type === 'bot'
         ? 'background:rgba(0,212,255,0.08);border:1px solid rgba(0,212,255,0.12);color:#e2e8f0;border-radius:4px 14px 14px 14px'
@@ -1062,8 +1059,7 @@ window.botSend = async function() {
     const reply = await callClaudeAPI(text)
 
     const loadingEl = document.getElementById(loadingId)
-    if (loadingEl) loadingEl.querySelector('div:last-child').innerHTML = reply.replace(/
-/g,'<br>')
+    if (loadingEl) loadingEl.querySelector('div:last-child').innerHTML = reply.replace(/\n/g,'<br>')
 
     inp.disabled = false
     inp.focus()
@@ -1073,8 +1069,7 @@ window.botSQ = function(text) { document.getElementById('botInput').value = text
 window.clearBotChat = function() {
     document.getElementById('botMsgs').innerHTML = ''
     botHistory = []
-    botAddMsg('bot', 'تمت مسح المحادثة! ☕
-كيف أقدر أساعدك؟')
+    botAddMsg('bot', 'تمت مسح المحادثة! ☕ كيف أقدر أساعدك؟')
 }
 
 // ===== CALCULATOR =====
