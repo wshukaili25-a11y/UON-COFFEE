@@ -240,6 +240,7 @@ nav { position:sticky; top:0; z-index:100; background:rgba(10,14,39,0.92); backd
 <div class="page-bg"><div class="c c1"></div><div class="c c2"></div><div class="c c3"></div></div>
 <div class="loading-overlay" id="loadingOverlay"><div class="spinner"></div></div>
 <div class="toast" id="toast"></div>
+<div class="exam-banner" id="examBanner"></div>
 
 <!-- NAV -->
 
@@ -717,7 +718,23 @@ window.rejectProject = async function(id) {
 
 // ===== INIT =====
 window.addEventListener('DOMContentLoaded', async () => {
-    setTimeout(() => document.getElementById('loadingOverlay').classList.add('hidden'), 5000)
+    setTimeout(() =>    
+    // ===== EXAM BANNER =====
+    try {
+        const { data: _ebData } = await supabase.from('settings').select('*').in('key',['exam_mode','exam_title','exam_msg','exam_emoji'])
+        if (_ebData) {
+            const _ebMap = {}
+            _ebData.forEach(r => _ebMap[r.key] = r.value)
+            if (_ebMap.exam_mode === 'true') {
+                const _icon = _ebMap.exam_emoji || '🎯'
+                const _title = _ebMap.exam_title || 'فترة الاختبارات النهائية'
+                const _msg = _ebMap.exam_msg || 'بالتوفيق لجميع الطلاب!'
+                const _el = document.getElementById('examBanner')
+                if (_el) { _el.textContent = _icon + ' ' + _title + ' — ' + _msg; _el.classList.add('show'); document.body.classList.add('has-exam-banner') }
+            }
+        }
+    } catch(e) {}
+    document.getElementById('loadingOverlay').classList.add('hidden'), 5000)
     try {
         // Check maintenance
         const { data: m } = await supabase.from('settings').select('value').eq('key', 'maintenance_mode').single()
