@@ -264,7 +264,14 @@
             .bus-book-banner { flex-direction: column; text-align: center; }
             .summaries-grid { grid-template-columns: 1fr 1fr; }
         }
-    </style>
+    
+
+.exam-banner { display:none; width:100%; background:linear-gradient(90deg,#b91c1c,#dc2626,#b91c1c); color:#fff; text-align:center; padding:.65rem 1rem; font-size:.88rem; font-weight:800; font-family:'Tajawal',sans-serif; position:fixed; top:0; left:0; right:0; z-index:99999; box-shadow:0 2px 12px rgba(185,28,28,.5); letter-spacing:.3px; animation:examPulse 3s ease-in-out infinite; }
+.exam-banner.show { display:block; }
+@keyframes examPulse { 0%,100%{opacity:1} 50%{opacity:.88} }
+body.has-exam-banner { padding-top: 40px !important; }
+body.has-exam-banner .navbar { top: 40px !important; }
+</style>
 </head>
 <body>
 
@@ -603,13 +610,11 @@ async function checkPassword(password) {
 const defaultTools = [
     { id: 1, title: "مساعد AI ذكي", description: "بوت ذكي يجيب عن كل شيء يخص جامعة نزوى — متاح 24/7", icon: "fa-robot", color: "#00d4ff", btn_text: "جرب الآن" },
     { id: 2, title: "حاسبة المعدل", description: "احسب معدلك الفصلي بسهولة — أضف موادك وساعاتها وتقديراتها", icon: "fa-calculator", color: "#ff6b6b", btn_text: "احسب معدلك" },
-    { id: 3, title: "مولد الجداول", description: "أنشئ جداولك الدراسية تلقائياً مع تجنب التعارضات", icon: "fa-calendar-alt", color: "#ffd93d", btn_text: "أنشئ جدولك" },
     { id: 4, title: "اعترافات الطلاب", description: "شارك اعترافك الجامعي بشكل مجهول — كلنا في نفس الوضع 😅", icon: "fa-comments", color: "#6bcb77", btn_text: "اعترف الحين" },
     { id: 5, title: "مكتبة الملخصات", description: "ملخصات وشروحات من طلاب نزوى لجميع الكليات والمواد", icon: "fa-book-open", color: "#a78bfa", btn_text: "تصفح الملخصات" },
     { id: 6, title: "دليل المطاعم", description: "أقرب المطاعم والكافيهات حول جامعة نزوى مع التقييمات", icon: "fa-utensils", color: "#fb923c", btn_text: "شوف المطاعم" },
     { id: 7, title: "خريطة الجامعة", description: "خريطة تفاعلية لمواقع الكليات والمرافق داخل الحرم الجامعي", icon: "fa-map-marked-alt", color: "#38bdf8", btn_text: "افتح الخريطة" },
     { id: 8, title: "مواعيد الباصات", description: "جداول ذهاب وعودة باصات الطلاب محدّثة يومياً للأولاد والبنات", icon: "fa-bus", color: "#f472b6", btn_text: "شوف المواعيد" },
-    { id: 9, title: "الجدول الدراسي", description: "أنشئ جدولك الدراسي الأسبوعي بذكاء مع كشف التعارضات تلقائياً", icon: "fa-calendar-alt", color: "#ffd93d", btn_text: "أنشئ جدولك" },
     { id: 10, title: "مجموعات الواتساب", description: "ابحث عن مجموعة مادتك أو أضف مجموعتك لمساعدة زملائك", icon: "fa-whatsapp", color: "#25d366", btn_text: "ابحث عن مجموعة" },
     { id: 11, title: "سوق الطلاب", description: "بيع وشراء وتبادل الكتب والأدوات الدراسية بين طلاب الجامعة", icon: "fa-store", color: "#ffd93d", btn_text: "تسوّق الآن" }
 ]
@@ -771,7 +776,23 @@ window.saveBusSchedule = async function() {
 // ===== INIT =====
 window.addEventListener('DOMContentLoaded', async () => {
     // إخفاء الـ loading بعد 4 ثواني على أي حال
-    setTimeout(() => document.getElementById('loadingOverlay').classList.add('hidden'), 4000)
+    setTimeout(() =>    
+    // ===== EXAM BANNER =====
+    try {
+        const { data: _ebData } = await supabase.from('settings').select('*').in('key',['exam_mode','exam_title','exam_msg','exam_emoji'])
+        if (_ebData) {
+            const _ebMap = {}
+            _ebData.forEach(r => _ebMap[r.key] = r.value)
+            if (_ebMap.exam_mode === 'true') {
+                const _icon = _ebMap.exam_emoji || '🎯'
+                const _title = _ebMap.exam_title || 'فترة الاختبارات النهائية'
+                const _msg = _ebMap.exam_msg || 'بالتوفيق لجميع الطلاب!'
+                const _el = document.getElementById('examBanner')
+                if (_el) { _el.textContent = _icon + ' ' + _title + ' — ' + _msg; _el.classList.add('show'); document.body.classList.add('has-exam-banner') }
+            }
+        }
+    } catch(e) {}
+    document.getElementById('loadingOverlay').classList.add('hidden'), 4000)
     try {
         await Promise.all([loadTools(), loadSettings(), loadBusData()])
     } catch(e) { console.log('init error', e) }
@@ -802,13 +823,11 @@ window.openTool = function(id) {
     const actions = {
         1: () => document.getElementById('botSection').scrollIntoView({behavior:'smooth'}),
         2: () => document.getElementById('calcSection').scrollIntoView({behavior:'smooth'}),
-        3: () => window.location.href = 'features.html',
         4: () => window.location.href = 'features.html#conf',
         5: () => window.location.href = 'summaries.html',
         6: () => window.location.href = 'features.html#rest',
         7: () => window.location.href = 'tools.html',
         8: () => window.location.href = 'bus.html',
-        9: () => window.location.href = 'schedule.html',
         10: () => window.location.href = 'groups.html',
         11: () => window.location.href = 'marketplace.html',
     }
@@ -1200,7 +1219,6 @@ window.globalSearch = function(q) {
         { name:'مكتبة الملخصات', url:'summaries.html', icon:'📚', desc:'ملخصات لجميع الكليات والمواد' },
         { name:'مجموعات الواتساب', url:'groups.html', icon:'💬', desc:'مجموعات المواد الدراسية' },
         { name:'سوق الطلاب', url:'marketplace.html', icon:'🛍️', desc:'بيع وشراء الكتب والأدوات' },
-        { name:'الجدول الدراسي', url:'schedule.html', icon:'📅', desc:'أنشئ جدولك الأسبوعي' },
         { name:'مواعيد الباصات', url:'bus.html', icon:'🚌', desc:'جداول الذهاب والعودة' },
         { name:'مكتبة الأدوات', url:'tools.html', icon:'🛠️', desc:'أدوات الذكاء الاصطناعي والدراسة' },
         { name:'الخريطة التفاعلية', url:'features.html', icon:'🗺️', desc:'خريطة مباني الجامعة' },
