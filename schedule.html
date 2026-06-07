@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UoN Coffee — الجدول الدراسي</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<style>
+:root {
+    --primary:#00d4ff; --secondary:#ff6b6b; --accent:#ffd93d;
+    --success:#6bcb77; --warning:#fb923c; --danger:#ef4444;
+    --dark:#0a0e27; --dark-light:#1a1f3d; --dark-lighter:#2d3561;
+    --text:#e2e8f0; --text-muted:#a0aec0; --text-dim:#718096;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Tajawal',sans-serif;background:var(--dark);color:var(--text);overflow-x:hidden}
+::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:var(--dark)}::-webkit-scrollbar-thumb{background:var(--dark-lighter);border-radius:3px}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes slideIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+
+.loading-overlay{position:fixed;inset:0;background:var(--dark);z-index:99999;display:flex;align-items:center;justify-content:center;transition:opacity .5s}
+.loading-overlay.hidden{opacity:0;pointer-events:none}
+.spinner{width:44px;height:44px;border:3px solid rgba(0,212,255,.1);border-top-color:var(--primary);border-radius:50%;animation:spin .8s linear infinite}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--success);color:#fff;padding:.8rem 1.8rem;border-radius:12px;font-weight:700;z-index:10000;opacity:0;transition:all .4s;display:flex;align-items:center;gap:8px}
+.toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+.toast.error{background:var(--danger)}
+
+.navbar{position:fixed;top:0;width:100%;padding:.9rem 5%;display:flex;justify-content:space-between;align-items:center;z-index:1000;background:rgba(10,14,39,.93);backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,255,255,.05)}
+.logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+.logo-icon{width:40px;height:40px;background:linear-gradient(135deg,#00d4ff,#0099cc);border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:1.1rem;color:var(--dark)}
+.logo-text{color:#fff;font-size:1.1rem;font-weight:700}
+.logo-text span{color:var(--primary)}
+.nav-home{padding:.5rem 1.2rem;background:linear-gradient(135deg,#00d4ff,#0099cc);border:none;border-radius:10px;color:var(--dark);font-weight:700;font-family:'Tajawal',sans-serif;cursor:pointer;font-size:.85rem;text-decoration:none;display:inline-flex;align-items:center;gap:6px;transition:all .3s}
+.nav-home:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,212,255,.3)}
+
+.page-bg{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+.page-bg .c{position:absolute;border-radius:50%;filter:blur(90px);opacity:.07}
+.page-bg .c1{width:500px;height:500px;background:var(--primary);top:-15%;right:-10%;animation:float 10s ease-in-out infinite}
+.page-bg .c2{width:350px;height:350px;background:var(--accent);bottom:-10%;left:-8%;animation:float 13s ease-in-out infinite reverse}
+
+main{padding:90px 5% 60px;max-width:1000px;margin:0 auto;position:relative;z-index:1}
+
+.page-hero{text-align:center;padding:2rem 0 2.5rem}
+.hero-badge{display:inline-flex;align-items:center;gap:6px;padding:.4rem 1rem;background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.2);border-radius:50px;font-size:.8rem;color:var(--primary);margin-bottom:1rem}
+.page-hero h1{font-size:clamp(1.8rem,4vw,2.8rem);font-weight:900;background:linear-gradient(135deg,#fff 0%,var(--primary) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:.6rem}
+.page-hero p{color:var(--text-dim);font-size:.95rem}
+
+/* STEPS */
+.steps-tabs{display:flex;gap:.5rem;margin-bottom:2rem;background:var(--dark-light);border-radius:14px;padding:.4rem}
+.step-tab{flex:1;padding:.7rem;border-radius:10px;font-size:.85rem;font-weight:700;cursor:pointer;border:none;font-family:'Tajawal',sans-serif;color:var(--text-muted);background:transparent;transition:all .3s;text-align:center}
+.step-tab.active{background:linear-gradient(135deg,#00d4ff,#0099cc);color:var(--dark)}
+
+/* STEP PANELS */
+.step-panel{display:none;animation:slideIn .3s ease}
+.step-panel.active{display:block}
+
+/* ADD SUBJECTS */
+.add-subject-form{background:var(--dark-light);border:1px solid rgba(255,255,255,.06);border-radius:18px;padding:1.5rem;margin-bottom:1.5rem}
+.form-row{display:grid;grid-template-columns:2fr 1fr 1fr 1fr auto;gap:10px;align-items:end;margin-bottom:10px}
+.finp{width:100%;padding:.8rem 1rem;background:var(--dark);border:1px solid rgba(255,255,255,.1);border-radius:10px;color:var(--text);font-family:'Tajawal',sans-serif;font-size:.88rem;outline:none;transition:border-color .3s}
+.finp:focus{border-color:var(--primary)}
+.finp::placeholder{color:var(--text-dim)}
+.fsel{width:100%;padding:.8rem .7rem;background:var(--dark);border:1px solid rgba(255,255,255,.1);border-radius:10px;color:var(--text);font-family:'Tajawal',sans-serif;font-size:.82rem;outline:none}
+.flabel{font-size:.75rem;color:var(--text-muted);font-weight:600;margin-bottom:4px;display:block}
+.fadd-btn{padding:.8rem 1.4rem;background:linear-gradient(135deg,#00d4ff,#0099cc);border:none;border-radius:10px;color:var(--dark);font-weight:800;font-family:'Tajawal',sans-serif;cursor:pointer;white-space:nowrap;transition:all .3s}
+.fadd-btn:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(0,212,255,.3)}
+
+/* SUBJECTS LIST */
+.subjects-list{display:flex;flex-direction:column;gap:.6rem;margin-bottom:1.5rem}
+.subject-card{background:var(--dark-light);border:1px solid rgba(255,255,255,.06);border-radius:14px;padding:1rem 1.2rem;display:flex;align-items:center;gap:12px;transition:all .3s}
+.subject-card:hover{border-color:rgba(0,212,255,.15)}
+.subject-color{width:12px;height:12px;border-radius:50%;flex-shrink:0}
+.subject-name{font-weight:700;font-size:.92rem;flex:1}
+.subject-info{font-size:.78rem;color:var(--text-dim);display:flex;gap:12px}
+.subject-info span{display:flex;align-items:center;gap:4px}
+.subject-del{width:30px;height:30px;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.15);border-radius:8px;color:var(--danger);cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+
+/* DAYS SELECTOR */
+.days-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:.6rem;margin-bottom:1rem}
+.day-btn{padding:.7rem;background:var(--dark);border:2px solid rgba(255,255,255,.08);border-radius:12px;color:var(--text-muted);font-family:'Tajawal',sans-serif;font-size:.82rem;font-weight:700;cursor:pointer;transition:all .3s;text-align:center}
+.day-btn.active{background:rgba(0,212,255,.1);border-color:var(--primary);color:var(--primary)}
+
+/* SCHEDULE TABLE */
+.schedule-wrap{overflow-x:auto}
+.schedule-table{width:100%;border-collapse:collapse;min-width:600px}
+.schedule-table th{background:var(--dark-light);padding:.8rem 1rem;font-size:.8rem;color:var(--text-muted);font-weight:700;text-align:center;border:1px solid rgba(255,255,255,.05)}
+.schedule-table td{padding:.5rem;border:1px solid rgba(255,255,255,.04);vertical-align:top;min-width:100px;height:50px}
+.schedule-table .time-col{background:var(--dark-light);font-size:.78rem;color:var(--text-dim);text-align:center;font-family:monospace;white-space:nowrap;padding:.5rem}
+.slot{border-radius:8px;padding:.4rem .6rem;font-size:.75rem;font-weight:700;cursor:pointer;transition:all .2s;line-height:1.4}
+.slot:hover{transform:scale(1.02)}
+.slot .slot-name{display:block}
+.slot .slot-room{font-size:.68rem;opacity:.8}
+
+/* NOTIFICATIONS */
+.notif-banner{background:linear-gradient(135deg,rgba(251,146,60,.1),rgba(251,146,60,.05));border:1px solid rgba(251,146,60,.2);border-radius:14px;padding:1rem 1.2rem;margin-bottom:1rem;display:flex;align-items:center;gap:10px}
+.notif-banner i{color:var(--warning);font-size:1.1rem;flex-shrink:0}
+.notif-banner-text{font-size:.88rem}
+
+/* GENERATE BTN */
+.generate-btn{width:100%;padding:1.1rem;background:linear-gradient(135deg,#00d4ff,#0099cc);border:none;border-radius:14px;color:var(--dark);font-weight:900;font-size:1rem;font-family:'Tajawal',sans-serif;cursor:pointer;transition:all .3s;display:flex;align-items:center;justify-content:center;gap:8px;margin-top:1rem}
+.generate-btn:hover{transform:translateY(-2px);box-shadow:0 12px 32px rgba(0,212,255,.4)}
+
+/* EXPORT */
+.export-row{display:flex;gap:.8rem;flex-wrap:wrap;margin-top:1rem}
+.export-btn{padding:.7rem 1.4rem;border-radius:10px;font-size:.85rem;font-weight:700;cursor:pointer;font-family:'Tajawal',sans-serif;transition:all .3s;display:flex;align-items:center;gap:6px}
+.export-primary{background:linear-gradient(135deg,#00d4ff,#0099cc);color:var(--dark);border:none}
+.export-secondary{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);color:var(--text-muted)}
+.export-secondary:hover{background:rgba(255,255,255,.1);color:var(--text)}
+
+/* EMPTY */
+.empty-schedule{text-align:center;padding:4rem 2rem;color:var(--text-dim)}
+.empty-schedule .empty-icon{font-size:3rem;margin-bottom:1rem;display:block}
+
+.reveal{opacity:0;transform:translateY(20px);transition:opacity .6s ease,transform .6s ease}
+.reveal.active{opacity:1;transform:translateY(0)}
+
+@media(max-width:600px){
+    .form-row{grid-template-columns:1fr 1fr;gap:8px}
+    .form-row .fadd-btn{grid-column:1/-1}
+    .days-grid{grid-template-columns:repeat(5,1fr)}
+    .export-row{flex-direction:column}
+}
+</style>
+</head>
+<body>
+<div class="page-bg"><div class="c c1"></div><div class="c c2"></div></div>
+<div class="loading-overlay" id="loadingOverlay"><div class="spinner"></div></div>
+<div class="toast" id="toast"><i class="fas fa-check-circle"></i><span id="toastMsg"></span></div>
+
+<nav class="navbar">
+    <a href="index.html" class="logo">
+        <div class="logo-icon">NU</div>
+        <div class="logo-text">Nizwa <span>University</span></div>
+    </a>
+    <a href="index.html" class="nav-home"><i class="fas fa-arrow-right"></i> الرئيسية</a>
+</nav>
+
+<main>
+    <div class="page-hero reveal">
+        <div class="hero-badge"><i class="fas fa-calendar-alt"></i> ذكي وتلقائي</div>
+        <h1>الجدول الدراسي 📅</h1>
+        <p>أدخل موادك ومواعيدها — وسيتم إنشاء جدولك تلقائياً</p>
+    </div>
+
+    <div class="steps-tabs reveal">
+        <button class="step-tab active" onclick="switchStep(0,this)">1️⃣ المواد</button>
+        <button class="step-tab" onclick="switchStep(1,this)">2️⃣ المواعيد</button>
+        <button class="step-tab" onclick="switchStep(2,this)">3️⃣ الجدول</button>
+    </div>
+
+    <!-- STEP 1: ADD SUBJECTS -->
+    <div class="step-panel active" id="step0">
+        <div class="add-subject-form reveal">
+            <h3 style="font-size:1rem;font-weight:800;margin-bottom:1rem;display:flex;align-items:center;gap:8px"><i class="fas fa-plus-circle" style="color:var(--primary)"></i> إضافة مادة</h3>
+            <div class="form-row">
+                <div>
+                    <span class="flabel">اسم المادة / الرمز</span>
+                    <input type="text" class="finp" id="subName" placeholder="مثال: MATH101 - رياضيات">
+                </div>
+                <div>
+                    <span class="flabel">الساعات</span>
+                    <select class="fsel" id="subHours">
+                        <option value="1">1 ساعة</option>
+                        <option value="2">2 ساعة</option>
+                        <option value="3" selected>3 ساعات</option>
+                        <option value="4">4 ساعات</option>
+                    </select>
+                </div>
+                <div>
+                    <span class="flabel">اللون</span>
+                    <select class="fsel" id="subColor">
+                        <option value="#00d4ff">أزرق</option>
+                        <option value="#ff6b6b">أحمر</option>
+                        <option value="#6bcb77">أخضر</option>
+                        <option value="#ffd93d">أصفر</option>
+                        <option value="#a78bfa">بنفسجي</option>
+                        <option value="#fb923c">برتقالي</option>
+                        <option value="#f472b6">وردي</option>
+                        <option value="#38bdf8">سماوي</option>
+                    </select>
+                </div>
+                <div>
+                    <span class="flabel">القاعة (اختياري)</span>
+                    <input type="text" class="finp" id="subRoom" placeholder="B-101">
+                </div>
+                <button class="fadd-btn" onclick="addSubject()"><i class="fas fa-plus"></i> إضافة</button>
+            </div>
+        </div>
+
+        <div class="subjects-list" id="subjectsList">
+            <div style="text-align:center;color:var(--text-dim);padding:2rem;font-size:.88rem;">
+                لم تضف أي مادة بعد — ابدأ بإضافة موادك أعلاه 👆
+            </div>
+        </div>
+
+        <button class="generate-btn" onclick="switchStep(1,document.querySelectorAll('.step-tab')[1])">
+            <i class="fas fa-arrow-left"></i> التالي: تحديد المواعيد
+        </button>
+    </div>
+
+    <!-- STEP 2: SET TIMES -->
+    <div class="step-panel" id="step1">
+        <div class="add-subject-form reveal">
+            <h3 style="font-size:1rem;font-weight:800;margin-bottom:1.2rem;display:flex;align-items:center;gap:8px"><i class="fas fa-clock" style="color:var(--accent)"></i> إضافة موعد للمادة</h3>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+                <div>
+                    <span class="flabel">المادة</span>
+                    <select class="fsel" id="slotSubject" style="width:100%"></select>
+                </div>
+                <div>
+                    <span class="flabel">اليوم</span>
+                    <select class="fsel" id="slotDay" style="width:100%">
+                        <option value="0">الأحد</option>
+                        <option value="1">الاثنين</option>
+                        <option value="2">الثلاثاء</option>
+                        <option value="3">الأربعاء</option>
+                        <option value="4">الخميس</option>
+                    </select>
+                </div>
+                <div>
+                    <span class="flabel">وقت البداية</span>
+                    <select class="fsel" id="slotStart" style="width:100%">
+                        <option value="8">8:00 ص</option>
+                        <option value="9">9:00 ص</option>
+                        <option value="10">10:00 ص</option>
+                        <option value="11">11:00 ص</option>
+                        <option value="12">12:00 م</option>
+                        <option value="13">1:00 م</option>
+                        <option value="14">2:00 م</option>
+                        <option value="15">3:00 م</option>
+                        <option value="16">4:00 م</option>
+                    </select>
+                </div>
+                <div>
+                    <span class="flabel">المدة</span>
+                    <select class="fsel" id="slotDuration" style="width:100%">
+                        <option value="1">ساعة واحدة</option>
+                        <option value="2" selected>ساعتان</option>
+                        <option value="3">3 ساعات</option>
+                    </select>
+                </div>
+            </div>
+            <button class="fadd-btn" onclick="addSlot()" style="width:100%"><i class="fas fa-plus"></i> إضافة الموعد</button>
+        </div>
+
+        <div id="slotsList" style="margin-bottom:1.5rem"></div>
+
+        <button class="generate-btn" onclick="generateSchedule()">
+            <i class="fas fa-magic"></i> إنشاء الجدول الآن
+        </button>
+    </div>
+
+    <!-- STEP 3: SCHEDULE VIEW -->
+    <div class="step-panel" id="step2">
+        <div id="conflictWarnings"></div>
+        <div class="content-card reveal" style="background:var(--dark-light);border:1px solid rgba(255,255,255,.06);border-radius:18px;padding:1.5rem;margin-bottom:1.5rem">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.2rem;flex-wrap:wrap;gap:8px">
+                <h3 style="font-size:1rem;font-weight:800;display:flex;align-items:center;gap:8px"><i class="fas fa-calendar-week" style="color:var(--primary)"></i> جدولك الأسبوعي</h3>
+                <div style="display:flex;gap:6px;flex-wrap:wrap" id="legendRow"></div>
+            </div>
+            <div class="schedule-wrap">
+                <div id="scheduleOutput">
+                    <div class="empty-schedule">
+                        <span class="empty-icon">📅</span>
+                        <p>أضف موادك ومواعيدها أولاً</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="export-row">
+            <button class="export-btn export-primary" onclick="printSchedule()"><i class="fas fa-print"></i> طباعة الجدول</button>
+            <button class="export-btn export-secondary" onclick="saveSchedule()"><i class="fas fa-save"></i> حفظ محلياً</button>
+            <button class="export-btn export-secondary" onclick="clearSchedule()"><i class="fas fa-trash"></i> مسح الكل</button>
+        </div>
+    </div>
+</main>
+
+<script>
+const DAYS = ['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس']
+const HOURS = [8,9,10,11,12,13,14,15,16,17]
+const HOUR_LABELS = ['8ص','9ص','10ص','11ص','12م','1م','2م','3م','4م','5م']
+
+let subjects = JSON.parse(localStorage.getItem('uon_subjects') || '[]')
+let slots = JSON.parse(localStorage.getItem('uon_slots') || '[]')
+
+function save() {
+    localStorage.setItem('uon_subjects', JSON.stringify(subjects))
+    localStorage.setItem('uon_slots', JSON.stringify(slots))
+}
+
+window.switchStep = function(idx, btn) {
+    document.querySelectorAll('.step-tab').forEach(t => t.classList.remove('active'))
+    document.querySelectorAll('.step-panel').forEach(p => p.classList.remove('active'))
+    btn.classList.add('active')
+    document.getElementById('step'+idx).classList.add('active')
+    if (idx === 1) populateSlotSubjects()
+    if (idx === 2) generateSchedule()
+}
+
+window.addSubject = function() {
+    const name = document.getElementById('subName').value.trim()
+    if (!name) { showToast('أدخل اسم المادة', 'error'); return }
+    const sub = {
+        id: Date.now(),
+        name,
+        hours: parseInt(document.getElementById('subHours').value),
+        color: document.getElementById('subColor').value,
+        room: document.getElementById('subRoom').value.trim()
+    }
+    subjects.push(sub)
+    save()
+    document.getElementById('subName').value = ''
+    document.getElementById('subRoom').value = ''
+    renderSubjects()
+    showToast('تمت إضافة المادة! ✅')
+}
+
+function renderSubjects() {
+    const el = document.getElementById('subjectsList')
+    if (!subjects.length) {
+        el.innerHTML = '<div style="text-align:center;color:var(--text-dim);padding:2rem;font-size:.88rem;">لم تضف أي مادة بعد 👆</div>'
+        return
+    }
+    el.innerHTML = subjects.map(s => `
+        <div class="subject-card">
+            <div class="subject-color" style="background:${s.color}"></div>
+            <div class="subject-name">${s.name}</div>
+            <div class="subject-info">
+                <span><i class="fas fa-clock"></i> ${s.hours} ساعات</span>
+                ${s.room ? `<span><i class="fas fa-door-open"></i> ${s.room}</span>` : ''}
+            </div>
+            <button class="subject-del" onclick="deleteSubject(${s.id})"><i class="fas fa-times"></i></button>
+        </div>`).join('')
+}
+
+window.deleteSubject = function(id) {
+    subjects = subjects.filter(s => s.id !== id)
+    slots = slots.filter(sl => sl.subjectId !== id)
+    save()
+    renderSubjects()
+}
+
+function populateSlotSubjects() {
+    const sel = document.getElementById('slotSubject')
+    sel.innerHTML = subjects.length
+        ? subjects.map(s => `<option value="${s.id}">${s.name}</option>`).join('')
+        : '<option value="">لا توجد مواد — أضف أولاً</option>'
+}
+
+window.addSlot = function() {
+    const subId = parseInt(document.getElementById('slotSubject').value)
+    if (!subId) { showToast('أضف مادة أولاً', 'error'); return }
+    const day = parseInt(document.getElementById('slotDay').value)
+    const start = parseInt(document.getElementById('slotStart').value)
+    const duration = parseInt(document.getElementById('slotDuration').value)
+    // Check conflict
+    const conflict = slots.find(sl => sl.day === day && !(start >= sl.start + sl.duration || start + duration <= sl.start))
+    if (conflict) {
+        const sub = subjects.find(s => s.id === conflict.subjectId)
+        showToast(`تعارض مع ${sub?.name || 'مادة أخرى'}!`, 'error')
+        return
+    }
+    slots.push({ id: Date.now(), subjectId: subId, day, start, duration })
+    save()
+    renderSlots()
+    showToast('تم إضافة الموعد! ✅')
+}
+
+function renderSlots() {
+    const el = document.getElementById('slotsList')
+    if (!slots.length) { el.innerHTML = ''; return }
+    el.innerHTML = `<div style="display:flex;flex-direction:column;gap:.5rem">` +
+        slots.map(sl => {
+            const sub = subjects.find(s => s.id === sl.subjectId)
+            return `<div style="background:var(--dark-light);border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:.8rem 1rem;display:flex;align-items:center;gap:10px;">
+                <div style="width:10px;height:10px;border-radius:50%;background:${sub?.color || '#00d4ff'};flex-shrink:0"></div>
+                <span style="font-weight:700;font-size:.88rem;flex:1">${sub?.name || '—'}</span>
+                <span style="font-size:.78rem;color:var(--text-dim)">${DAYS[sl.day]} | ${sl.start > 12 ? sl.start-12+'م' : sl.start+'ص'} (${sl.duration} س)</span>
+                <button onclick="deleteSlot(${sl.id})" style="width:26px;height:26px;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.15);border-radius:7px;color:var(--danger);cursor:pointer"><i class="fas fa-times" style="font-size:.65rem"></i></button>
+            </div>`
+        }).join('') + '</div>'
+}
+
+window.deleteSlot = function(id) {
+    slots = slots.filter(sl => sl.id !== id)
+    save()
+    renderSlots()
+}
+
+window.generateSchedule = function() {
+    const output = document.getElementById('scheduleOutput')
+    const legend = document.getElementById('legendRow')
+    const warnings = document.getElementById('conflictWarnings')
+
+    if (!subjects.length || !slots.length) {
+        output.innerHTML = '<div class="empty-schedule"><span class="empty-icon">📅</span><p>أضف موادك ومواعيدها أولاً</p></div>'
+        legend.innerHTML = ''
+        warnings.innerHTML = ''
+        return
+    }
+
+    // Build grid
+    const grid = {}
+    HOURS.forEach(h => { grid[h] = {}; DAYS.forEach((_,i) => grid[h][i] = null) })
+    slots.forEach(sl => {
+        for (let h = sl.start; h < sl.start + sl.duration; h++) {
+            if (grid[h]) grid[h][sl.day] = { ...sl, isFirst: h === sl.start }
+        }
+    })
+
+    // Table
+    let html = '<table class="schedule-table"><thead><tr><th>الوقت</th>'
+    DAYS.forEach(d => html += `<th>${d}</th>`)
+    html += '</tr></thead><tbody>'
+
+    HOURS.forEach((h, hi) => {
+        html += `<tr><td class="time-col">${HOUR_LABELS[hi]}</td>`
+        DAYS.forEach((_, di) => {
+            const cell = grid[h][di]
+            if (cell) {
+                const sub = subjects.find(s => s.id === cell.subjectId)
+                if (cell.isFirst) {
+                    html += `<td rowspan="${cell.duration}" style="padding:4px;">
+                        <div class="slot" style="background:${sub?.color || '#00d4ff'}20;border:1.5px solid ${sub?.color || '#00d4ff'}40;color:${sub?.color || '#00d4ff'}">
+                            <span class="slot-name">${sub?.name?.split('-')[0] || '—'}</span>
+                            ${sub?.room ? `<span class="slot-room">🚪 ${sub.room}</span>` : ''}
+                        </div>
+                    </td>`
+                }
+            } else {
+                html += '<td></td>'
+            }
+        })
+        html += '</tr>'
+    })
+    html += '</tbody></table>'
+    output.innerHTML = html
+
+    // Legend
+    legend.innerHTML = subjects.map(s => `
+        <div style="display:flex;align-items:center;gap:5px;font-size:.75rem;color:var(--text-muted)">
+            <div style="width:10px;height:10px;border-radius:3px;background:${s.color}"></div>
+            ${s.name.split('-')[0]}
+        </div>`).join('')
+
+    warnings.innerHTML = ''
+    showToast('تم إنشاء الجدول! 🎉')
+}
+
+window.printSchedule = function() { window.print() }
+window.saveSchedule = function() { showToast('تم الحفظ تلقائياً في المتصفح ✅') }
+window.clearSchedule = function() {
+    if (!confirm('هل تريد مسح الجدول كاملاً؟')) return
+    subjects = []; slots = []; save()
+    renderSubjects(); renderSlots()
+    document.getElementById('scheduleOutput').innerHTML = '<div class="empty-schedule"><span class="empty-icon">📅</span><p>أضف موادك ومواعيدها أولاً</p></div>'
+    showToast('تم المسح', 'error')
+}
+
+function showToast(msg, type) {
+    const t = document.getElementById('toast')
+    document.getElementById('toastMsg').textContent = msg
+    t.className = 'toast show'+(type==='error'?' error':'')
+    t.querySelector('i').className = type==='error'?'fas fa-exclamation-circle':'fas fa-check-circle'
+    setTimeout(() => t.classList.remove('show'), 3000)
+}
+
+// Init
+renderSubjects()
+renderSlots()
+document.getElementById('loadingOverlay').classList.add('hidden')
+const obs = new IntersectionObserver(es => es.forEach(e => { if(e.isIntersecting) e.target.classList.add('active') }), {threshold:.1})
+document.querySelectorAll('.reveal').forEach(el => obs.observe(el))
+</script>
+</body>
+</html>
