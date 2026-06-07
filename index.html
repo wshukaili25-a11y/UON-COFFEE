@@ -641,11 +641,17 @@ let busData = { boys: [], girls: [], bookingUrl: '#' }
 
 // ===== SUPABASE =====
 async function loadTools() {
+    // Show default tools immediately
+    tools = defaultTools.map(t => ({...t, desc: t.description, btnText: t.btn_text}))
+    renderTools()
+    // Try to load from Supabase in background
     try {
         const { data, error } = await supabase.from('tools').select('*').order('id')
-        if (error || !data || data.length === 0) { await seedTools() }
-        else { tools = data.map(t => ({ id: t.id, title: t.title, desc: t.description, icon: t.icon, color: t.color, btnText: t.btn_text })); renderTools() }
-    } catch(e) { tools = defaultTools.map(t => ({...t, desc: t.description, btnText: t.btn_text})); renderTools() }
+        if (!error && data && data.length > 0) {
+            tools = data.map(t => ({ id: t.id, title: t.title, desc: t.description, icon: t.icon, color: t.color, btnText: t.btn_text }))
+            renderTools()
+        }
+    } catch(e) {}
 }
 
 async function seedTools() {
