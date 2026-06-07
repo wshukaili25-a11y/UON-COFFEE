@@ -148,6 +148,13 @@ main { padding:90px 5% 60px; max-width:1100px; margin:0 auto; position:relative;
     .admin-panel { width:100%; right:-100%; }
     .filters { gap:.4rem; }
 }
+
+
+.exam-banner { display:none; width:100%; background:linear-gradient(90deg,#b91c1c,#dc2626,#b91c1c); color:#fff; text-align:center; padding:.65rem 1rem; font-size:.88rem; font-weight:800; font-family:'Tajawal',sans-serif; position:fixed; top:0; left:0; right:0; z-index:99999; box-shadow:0 2px 12px rgba(185,28,28,.5); letter-spacing:.3px; animation:examPulse 3s ease-in-out infinite; }
+.exam-banner.show { display:block; }
+@keyframes examPulse { 0%,100%{opacity:1} 50%{opacity:.88} }
+body.has-exam-banner { padding-top: 40px !important; }
+body.has-exam-banner .navbar { top: 40px !important; }
 </style>
 </head>
 <body>
@@ -155,6 +162,7 @@ main { padding:90px 5% 60px; max-width:1100px; margin:0 auto; position:relative;
 <div class="page-bg"><div class="c c1"></div><div class="c c2"></div></div>
 <div class="loading-overlay" id="loadingOverlay"><div class="spinner"></div></div>
 <div class="toast" id="toast"><i class="fas fa-check-circle"></i><span id="toastMsg"></span></div>
+<div class="exam-banner" id="examBanner"></div>
 <div class="admin-badge" id="adminBadge"><i class="fas fa-crown"></i><span id="adminLabel">مشرف</span></div>
 <div class="admin-overlay" id="adminOverlay" onclick="closeAP()"></div>
 
@@ -341,7 +349,23 @@ let currentFilter = 'all'
 window.addEventListener('DOMContentLoaded', async () => {
     const saved = sessionStorage.getItem('uon_sum_admin')
     if (saved) try { currentAdmin = JSON.parse(saved); updateAdminUI() } catch(e) {}
-    setTimeout(() => document.getElementById('loadingOverlay').classList.add('hidden'), 4000)
+    setTimeout(() =>    
+    // ===== EXAM BANNER =====
+    try {
+        const { data: _ebData } = await supabase.from('settings').select('*').in('key',['exam_mode','exam_title','exam_msg','exam_emoji'])
+        if (_ebData) {
+            const _ebMap = {}
+            _ebData.forEach(r => _ebMap[r.key] = r.value)
+            if (_ebMap.exam_mode === 'true') {
+                const _icon = _ebMap.exam_emoji || '🎯'
+                const _title = _ebMap.exam_title || 'فترة الاختبارات النهائية'
+                const _msg = _ebMap.exam_msg || 'بالتوفيق لجميع الطلاب!'
+                const _el = document.getElementById('examBanner')
+                if (_el) { _el.textContent = _icon + ' ' + _title + ' — ' + _msg; _el.classList.add('show'); document.body.classList.add('has-exam-banner') }
+            }
+        }
+    } catch(e) {}
+    document.getElementById('loadingOverlay').classList.add('hidden'), 4000)
     try { await loadSummaries() } catch(e) {}
     document.getElementById('loadingOverlay').classList.add('hidden')
     renderColleges()
