@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UoN Coffee — بنك الأسئلة</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<style>
+:root{--primary:#00d4ff;--secondary:#ff6b6b;--accent:#ffd93d;--success:#6bcb77;--warning:#fb923c;--danger:#ef4444;--dark:#0a0e27;--dark-light:#1a1f3d;--dark-lighter:#2d3561;--text:#e2e8f0;--text-muted:#a0aec0;--text-dim:#718096}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Tajawal',sans-serif;background:var(--dark);color:var(--text);overflow-x:hidden}
+::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:var(--dark)}::-webkit-scrollbar-thumb{background:var(--dark-lighter);border-radius:3px}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+@keyframes slideIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.loading-overlay{position:fixed;inset:0;background:var(--dark);z-index:99999;display:flex;align-items:center;justify-content:center;transition:opacity .5s}
+.loading-overlay.hidden{opacity:0;pointer-events:none}
+.spinner{width:44px;height:44px;border:3px solid rgba(0,212,255,.1);border-top-color:var(--primary);border-radius:50%;animation:spin .8s linear infinite}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--success);color:#fff;padding:.8rem 1.8rem;border-radius:12px;font-weight:700;z-index:10000;opacity:0;transition:all .4s;display:flex;align-items:center;gap:8px}
+.toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+.toast.error{background:var(--danger)}
+.navbar{position:fixed;top:0;width:100%;padding:.9rem 5%;display:flex;justify-content:space-between;align-items:center;z-index:1000;background:rgba(10,14,39,.93);backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,255,255,.05)}
+.logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+.logo-icon{width:40px;height:40px;background:linear-gradient(135deg,#00d4ff,#0099cc);border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:1.1rem;color:var(--dark)}
+.logo-text{color:#fff;font-size:1.1rem;font-weight:700}
+.logo-text span{color:var(--primary)}
+.nav-home{padding:.5rem 1.2rem;background:linear-gradient(135deg,#00d4ff,#0099cc);border:none;border-radius:10px;color:var(--dark);font-weight:700;font-family:'Tajawal',sans-serif;cursor:pointer;font-size:.85rem;text-decoration:none;display:inline-flex;align-items:center;gap:6px;transition:all .3s}
+.nav-home:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,212,255,.3)}
+.page-bg{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+.page-bg .c{position:absolute;border-radius:50%;filter:blur(90px);opacity:.07}
+.page-bg .c1{width:500px;height:500px;background:var(--secondary);top:-15%;right:-10%;animation:float 10s ease-in-out infinite}
+.page-bg .c2{width:350px;height:350px;background:var(--primary);bottom:-10%;left:-8%;animation:float 13s ease-in-out infinite reverse}
+main{padding:90px 5% 60px;max-width:1000px;margin:0 auto;position:relative;z-index:1}
+.page-hero{text-align:center;padding:2rem 0 2.5rem}
+.hero-badge{display:inline-flex;align-items:center;gap:6px;padding:.4rem 1rem;background:rgba(255,107,107,.1);border:1px solid rgba(255,107,107,.2);border-radius:50px;font-size:.8rem;color:var(--secondary);margin-bottom:1rem}
+.page-hero h1{font-size:clamp(1.8rem,4vw,2.8rem);font-weight:900;background:linear-gradient(135deg,#fff 0%,var(--secondary) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:.6rem}
+.page-hero p{color:var(--text-dim);font-size:.95rem}
+
+/* TOOLBAR */
+.toolbar{display:flex;gap:.8rem;margin-bottom:1.5rem;flex-wrap:wrap}
+.search-inp{flex:1;min-width:180px;padding:.75rem 1rem;background:var(--dark-light);border:1px solid rgba(255,255,255,.08);border-radius:12px;color:var(--text);font-family:'Tajawal',sans-serif;font-size:.9rem;outline:none;transition:border-color .3s}
+.search-inp:focus{border-color:var(--secondary)}
+.search-inp::placeholder{color:var(--text-dim)}
+.add-q-btn{padding:.75rem 1.5rem;background:linear-gradient(135deg,var(--secondary),#ee5a5a);border:none;border-radius:12px;color:#fff;font-weight:800;font-family:'Tajawal',sans-serif;cursor:pointer;font-size:.88rem;display:flex;align-items:center;gap:6px;transition:all .3s;white-space:nowrap}
+.add-q-btn:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(255,107,107,.3)}
+
+/* FILTERS */
+.filters{display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:1.8rem}
+.filter-btn{padding:.5rem 1.1rem;background:var(--dark-light);border:1px solid rgba(255,255,255,.07);border-radius:50px;color:var(--text-muted);font-size:.82rem;font-weight:700;cursor:pointer;font-family:'Tajawal',sans-serif;transition:all .3s}
+.filter-btn.active{background:rgba(255,107,107,.1);border-color:rgba(255,107,107,.3);color:var(--secondary)}
+
+/* QUESTIONS */
+.questions-list{display:flex;flex-direction:column;gap:1rem;margin-bottom:2rem}
+.q-card{background:var(--dark-light);border:1px solid rgba(255,255,255,.06);border-radius:18px;padding:1.4rem;transition:all .3s;animation:slideIn .3s ease;position:relative}
+.q-card:hover{border-color:rgba(255,107,107,.2);transform:translateX(-3px)}
+.q-header{display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap}
+.q-college{font-size:.72rem;padding:.2rem .6rem;border-radius:50px;font-weight:700}
+.q-subject{font-size:.8rem;color:var(--text-muted);font-weight:600}
+.q-year{font-size:.72rem;background:rgba(255,107,107,.1);border:1px solid rgba(255,107,107,.2);color:var(--secondary);padding:.2rem .6rem;border-radius:50px;font-weight:700}
+.q-type{font-size:.72rem;background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.2);color:var(--primary);padding:.2rem .6rem;border-radius:50px;font-weight:700}
+.q-text{font-size:.95rem;font-weight:600;color:var(--text);margin-bottom:12px;line-height:1.7}
+.q-answer{background:rgba(107,203,119,.06);border:1px solid rgba(107,203,119,.15);border-radius:10px;padding:.8rem 1rem;margin-bottom:10px;display:none}
+.q-answer.show{display:block}
+.q-answer-label{font-size:.72rem;color:var(--success);font-weight:700;margin-bottom:4px}
+.q-answer-text{font-size:.88rem;color:var(--text-muted)}
+.q-actions{display:flex;gap:.5rem;align-items:center;flex-wrap:wrap}
+.q-btn{padding:.4rem .9rem;border-radius:8px;font-size:.78rem;font-weight:700;cursor:pointer;font-family:'Tajawal',sans-serif;transition:all .3s;border:none}
+.q-show-ans{background:rgba(107,203,119,.1);border:1px solid rgba(107,203,119,.2)!important;color:var(--success);border:none}
+.q-like{background:rgba(255,107,107,.08);border:1px solid rgba(255,107,107,.15)!important;color:var(--secondary);border:none}
+.q-like.liked{background:rgba(255,107,107,.18)}
+.q-del{background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.15)!important;color:var(--danger);border:none;display:none}
+.admin-mode .q-del{display:inline-block}
+.q-votes{font-size:.78rem;color:var(--text-dim);margin-right:auto}
+
+/* MODAL */
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(10px);z-index:2000;display:none;align-items:center;justify-content:center;padding:20px}
+.modal.show{display:flex}
+.modal-box{background:var(--dark-light);border:1px solid rgba(255,255,255,.08);border-radius:22px;padding:2rem;width:100%;max-width:520px;max-height:90vh;overflow-y:auto;animation:slideIn .3s ease}
+.modal-title{font-size:1.2rem;font-weight:900;margin-bottom:1.5rem}
+.finp{width:100%;padding:.8rem 1rem;background:var(--dark);border:1px solid rgba(255,255,255,.1);border-radius:10px;color:var(--text);font-family:'Tajawal',sans-serif;font-size:.88rem;outline:none;margin-bottom:10px;transition:border-color .3s}
+.finp:focus{border-color:var(--secondary)}
+.finp::placeholder{color:var(--text-dim)}
+.flabel{font-size:.78rem;color:var(--text-muted);font-weight:600;margin-bottom:4px;display:block}
+.fgroup{margin-bottom:.8rem}
+.fta{min-height:80px;resize:vertical}
+.mbtns{display:flex;gap:8px;margin-top:8px}
+.mbtn-cancel{flex:1;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);color:var(--text-muted);border-radius:10px;padding:11px;font-size:.9rem;cursor:pointer;font-family:'Tajawal',sans-serif}
+.mbtn-save{flex:2;background:linear-gradient(135deg,var(--secondary),#ee5a5a);color:#fff;border:none;border-radius:10px;padding:11px;font-size:.9rem;font-weight:800;cursor:pointer;font-family:'Tajawal',sans-serif}
+
+/* STATS */
+.stats-chips{display:flex;gap:.8rem;margin-bottom:1.8rem;flex-wrap:wrap}
+.stat-chip{background:var(--dark-light);border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:.6rem 1rem;font-size:.82rem;font-weight:700;display:flex;align-items:center;gap:6px}
+
+/* ADMIN */
+.admin-fab{position:fixed;bottom:22px;left:22px;z-index:999;width:44px;height:44px;background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.2);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:1rem;transition:all .3s;backdrop-filter:blur(8px)}
+.admin-fab:hover{background:rgba(0,212,255,.2);transform:scale(1.1)}
+.admin-badge{position:fixed;top:70px;left:16px;z-index:999;background:linear-gradient(135deg,var(--secondary),#ee5a5a);padding:.4rem .9rem;border-radius:50px;font-size:.75rem;font-weight:700;display:none;align-items:center;gap:5px}
+.admin-badge.show{display:flex}
+.admin-panel{position:fixed;top:0;right:-420px;width:400px;max-width:100%;height:100vh;background:var(--dark-light);border-left:1px solid rgba(255,255,255,.08);z-index:1500;transition:right .4s;overflow-y:auto;padding:1.8rem}
+.admin-panel.open{right:0}
+.admin-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1499;display:none}
+.admin-overlay.show{display:block}
+.ap-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;padding-bottom:1.2rem;border-bottom:1px solid rgba(255,255,255,.08)}
+.ap-head h2{font-size:1.1rem;font-weight:900;display:flex;align-items:center;gap:8px}
+.close-ap{width:34px;height:34px;border-radius:10px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);color:var(--text-muted);cursor:pointer;display:flex;align-items:center;justify-content:center}
+.close-ap:hover{background:var(--danger);color:#fff}
+.ap-section{margin-bottom:1.5rem;padding-bottom:1.5rem;border-bottom:1px solid rgba(255,255,255,.05)}
+.ap-section h3{font-size:.9rem;font-weight:700;color:var(--primary);margin-bottom:.8rem}
+.ap-login-badge{font-size:.8rem;color:var(--success);margin-bottom:1rem;display:flex;align-items:center;gap:6px}
+.ap-login-badge::before{content:'';width:6px;height:6px;background:var(--success);border-radius:50%}
+.minp{width:100%;padding:.8rem 1rem;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:10px;color:var(--text);font-family:'Tajawal',sans-serif;font-size:.88rem;outline:none;margin-bottom:8px}
+.ap-action{width:100%;background:rgba(0,212,255,.06);border:1px solid rgba(0,212,255,.15);color:var(--primary);font-size:.85rem;font-weight:700;padding:.8rem 1rem;border-radius:10px;cursor:pointer;font-family:'Tajawal',sans-serif;display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.ap-action.danger{color:var(--danger);border-color:rgba(239,68,68,.2);background:rgba(239,68,68,.05)}
+
+.college-colors{اقتصاد:'rgba(107,203,119,.12)',هندسة:'rgba(251,146,60,.12)',علوم:'rgba(164,139,250,.12)',صحية:'rgba(255,107,107,.12)',تأسيس:'rgba(0,212,255,.12)'}
+
+.reveal{opacity:0;transform:translateY(20px);transition:opacity .6s ease,transform .6s ease}
+.reveal.active{opacity:1;transform:translateY(0)}
+.empty-state{text-align:center;padding:3rem;color:var(--text-dim);background:var(--dark-light);border-radius:18px}
+.empty-icon{font-size:3rem;display:block;margin-bottom:1rem}
+@media(max-width:600px){.toolbar{flex-direction:column}.search-inp{width:100%}.admin-panel{width:100%;right:-100%}}
+</style>
+</head>
+<body>
+<div class="page-bg"><div class="c c1"></div><div class="c c2"></div></div>
+<div class="loading-overlay" id="loadingOverlay"><div class="spinner"></div></div>
+<div class="toast" id="toast"><i class="fas fa-check-circle"></i><span id="toastMsg"></span></div>
+<div class="admin-badge" id="adminBadge"><i class="fas fa-crown"></i><span id="adminLabel">مشرف</span></div>
+<div class="admin-overlay" id="adminOverlay" onclick="closeAP()"></div>
+
+<div class="admin-panel" id="adminPanel">
+    <div class="ap-head">
+        <h2><i class="fas fa-cog" style="color:var(--warning)"></i> إدارة الأسئلة</h2>
+        <button class="close-ap" onclick="closeAP()"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="ap-section" id="apLoginSection">
+        <h3><i class="fas fa-lock"></i> تسجيل الدخول</h3>
+        <input type="password" class="minp" id="apPass" placeholder="كلمة المرور..." onkeydown="if(event.key==='Enter')apLogin()">
+        <button onclick="apLogin()" style="width:100%;background:linear-gradient(135deg,#00d4ff,#0099cc);color:var(--dark);border:none;border-radius:10px;padding:11px;font-size:.9rem;font-weight:800;cursor:pointer;font-family:'Tajawal',sans-serif;">دخول ⚡</button>
+    </div>
+    <div id="apControls" style="display:none">
+        <div class="ap-section">
+            <div class="ap-login-badge" id="apBadgeText">مرحباً!</div>
+        </div>
+        <div class="ap-section">
+            <button class="ap-action danger" onclick="clearAll()"><i class="fas fa-trash"></i> حذف كل الأسئلة</button>
+            <button class="ap-action danger" onclick="apLogout()"><i class="fas fa-sign-out-alt"></i> خروج</button>
+        </div>
+    </div>
+</div>
+
+<!-- Add Question Modal -->
+<div class="modal" id="qModal">
+    <div class="modal-box">
+        <div class="modal-title">❓ إضافة سؤال اختبار</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+            <div class="fgroup">
+                <span class="flabel">الكلية *</span>
+                <select class="finp" id="qCollege">
+                    <option value="">اختر</option>
+                    <option value="اقتصاد">💼 الاقتصاد</option>
+                    <option value="هندسة">🏗️ الهندسة</option>
+                    <option value="علوم">🔬 العلوم</option>
+                    <option value="صحية">⚕️ الصحية</option>
+                    <option value="تأسيس">📖 التأسيس</option>
+                </select>
+            </div>
+            <div class="fgroup"><span class="flabel">المادة / الرمز *</span><input class="finp" id="qSubject" placeholder="MATH101"></div>
+            <div class="fgroup">
+                <span class="flabel">نوع السؤال</span>
+                <select class="finp" id="qType">
+                    <option value="mcq">اختيار متعدد</option>
+                    <option value="essay">مقالي</option>
+                    <option value="tf">صح أم خطأ</option>
+                    <option value="calc">حسابي</option>
+                </select>
+            </div>
+            <div class="fgroup"><span class="flabel">السنة / الفصل</span><input class="finp" id="qYear" placeholder="2024 - فصل 1"></div>
+        </div>
+        <div class="fgroup"><span class="flabel">نص السؤال *</span><textarea class="finp fta" id="qText" placeholder="اكتب السؤال هنا..."></textarea></div>
+        <div class="fgroup"><span class="flabel">الإجابة (اختياري — للمذاكرة)</span><textarea class="finp fta" id="qAnswer" placeholder="الإجابة النموذجية..."></textarea></div>
+        <div class="mbtns">
+            <button class="mbtn-cancel" onclick="closeQModal()">إلغاء</button>
+            <button class="mbtn-save" onclick="submitQuestion()">إضافة السؤال ✅</button>
+        </div>
+    </div>
+</div>
+
+<nav class="navbar">
+    <a href="index.html" class="logo">
+        <div class="logo-icon">NU</div>
+        <div class="logo-text">Nizwa <span>University</span></div>
+    </a>
+    <a href="index.html" class="nav-home"><i class="fas fa-arrow-right"></i> الرئيسية</a>
+</nav>
+<div class="admin-fab" onclick="openAP()"><i class="fas fa-cog"></i></div>
+
+<main>
+    <div class="page-hero reveal">
+        <div class="hero-badge"><i class="fas fa-question-circle"></i> اختبارات سابقة</div>
+        <h1>بنك الأسئلة ❓</h1>
+        <p>أسئلة اختبارات سابقة من طلاب جامعة نزوى — مصنفة ومنظمة</p>
+    </div>
+
+    <div class="stats-chips reveal" id="statsChips">
+        <div class="stat-chip"><span>❓</span> <span id="totalQ">0</span> سؤال</div>
+        <div class="stat-chip"><span>📚</span> <span id="totalSubjects">0</span> مادة</div>
+        <div class="stat-chip"><span>🏛️</span> <span id="totalColleges">0</span> كلية</div>
+    </div>
+
+    <div class="toolbar reveal">
+        <input class="search-inp" id="searchInp" placeholder="ابحث في الأسئلة..." oninput="filterQ()">
+        <button class="add-q-btn" onclick="openQModal()"><i class="fas fa-plus"></i> إضافة سؤال</button>
+    </div>
+
+    <div class="filters reveal" id="filtersRow">
+        <button class="filter-btn active" onclick="setFilter('all',this)">الكل</button>
+        <button class="filter-btn" onclick="setFilter('اقتصاد',this)">💼 اقتصاد</button>
+        <button class="filter-btn" onclick="setFilter('هندسة',this)">🏗️ هندسة</button>
+        <button class="filter-btn" onclick="setFilter('علوم',this)">🔬 علوم</button>
+        <button class="filter-btn" onclick="setFilter('صحية',this)">⚕️ صحية</button>
+        <button class="filter-btn" onclick="setFilter('تأسيس',this)">📖 تأسيس</button>
+    </div>
+
+    <div class="questions-list" id="questionsList">
+        <div class="empty-state"><span class="empty-icon">❓</span><p>جاري التحميل...</p></div>
+    </div>
+</main>
+
+<script type="module">
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
+const supabase = createClient(
+    'https://fjkxahhoacqlpiafmfyd.supabase.co',
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZqa3hhaGhvYWNxbHBpYWZtZnlkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgzMTkwMjQsImV4cCI6MjA5Mzg5NTAyNH0.Ls3gaXRso3BgcDAByoYeQQot_KbAOfREvxyW8u4vkGA'
+)
+
+const FALLBACK = 'UoN@Coffee#2026!'
+async function checkPass(p) {
+    if (p === FALLBACK) return { role:'admin', label:'المشرف الرئيسي' }
+    try {
+        const { data } = await supabase.from('admin_passwords').select('*')
+        if (data) for (const r of data) if (r.password_plain === p) return { role:r.role, label:r.label }
+    } catch(e) {}
+    return null
+}
+
+const COLLEGE_COLORS = { اقتصاد:'rgba(107,203,119,.12)', هندسة:'rgba(251,146,60,.12)', علوم:'rgba(164,139,250,.12)', صحية:'rgba(255,107,107,.12)', تأسيس:'rgba(0,212,255,.12)' }
+const COLLEGE_TEXT = { اقتصاد:'#6bcb77', هندسة:'#fb923c', علوم:'#a78bfa', صحية:'#ff6b6b', تأسيس:'#00d4ff' }
+const TYPE_LABELS = { mcq:'اختيار متعدد', essay:'مقالي', tf:'صح / خطأ', calc:'حسابي' }
+
+let questions = []
+let currentAdmin = null
+let currentFilter = 'all'
+let likedQ = JSON.parse(localStorage.getItem('uon_liked_q') || '[]')
+
+window.addEventListener('DOMContentLoaded', async () => {
+    const saved = sessionStorage.getItem('uon_q_admin')
+    if (saved) try { currentAdmin = JSON.parse(saved); updateAdminUI() } catch(e) {}
+    setTimeout(() => document.getElementById('loadingOverlay').classList.add('hidden'), 4000)
+    await loadQuestions()
+    document.getElementById('loadingOverlay').classList.add('hidden')
+    initReveal()
+})
+
+async function loadQuestions() {
+    try {
+        const { data, error } = await supabase.from('exam_questions').select('*').order('votes', { ascending:false })
+        if (error) throw error
+        questions = data || []
+    } catch(e) { questions = [] }
+    renderQuestions()
+    updateStats()
+}
+
+function renderQuestions() {
+    const list = document.getElementById('questionsList')
+    const search = document.getElementById('searchInp').value.toLowerCase()
+    let filtered = currentFilter === 'all' ? [...questions] : questions.filter(q => q.college === currentFilter)
+    if (search) filtered = filtered.filter(q => q.text?.toLowerCase().includes(search) || q.subject?.toLowerCase().includes(search))
+
+    if (!filtered.length) {
+        list.innerHTML = '<div class="empty-state"><span class="empty-icon">🔍</span><p>لا توجد أسئلة — كن الأول وأضف سؤالاً!</p></div>'
+        return
+    }
+
+    list.innerHTML = filtered.map(q => `
+        <div class="q-card" id="q-${q.id}">
+            <div class="q-header">
+                <span class="q-college" style="background:${COLLEGE_COLORS[q.college]||'rgba(255,255,255,.08)'};color:${COLLEGE_TEXT[q.college]||'#fff'};border:1px solid ${COLLEGE_TEXT[q.college]||'rgba(255,255,255,.2)'}40">${q.college}</span>
+                <span class="q-subject">${q.subject}</span>
+                ${q.year ? `<span class="q-year">${q.year}</span>` : ''}
+                ${q.type ? `<span class="q-type">${TYPE_LABELS[q.type]||q.type}</span>` : ''}
+            </div>
+            <div class="q-text">${q.text}</div>
+            ${q.answer ? `
+                <div class="q-answer" id="ans-${q.id}">
+                    <div class="q-answer-label">✅ الإجابة النموذجية</div>
+                    <div class="q-answer-text">${q.answer}</div>
+                </div>` : ''}
+            <div class="q-actions">
+                ${q.answer ? `<button class="q-btn q-show-ans" onclick="toggleAnswer('${q.id}')">👁️ الإجابة</button>` : ''}
+                <button class="q-btn q-like ${likedQ.includes(q.id)?'liked':''}" onclick="likeQ('${q.id}',${q.votes||0})">❤️ ${q.votes||0}</button>
+                <button class="q-btn q-del" onclick="deleteQ('${q.id}')">🗑️ حذف</button>
+            </div>
+        </div>`).join('')
+}
+
+window.toggleAnswer = function(id) {
+    const el = document.getElementById('ans-'+id)
+    if (el) el.classList.toggle('show')
+}
+
+window.likeQ = async function(id, current) {
+    if (likedQ.includes(id)) return
+    likedQ.push(id)
+    localStorage.setItem('uon_liked_q', JSON.stringify(likedQ))
+    const newVotes = current + 1
+    try { await supabase.from('exam_questions').update({ votes: newVotes }).eq('id', id) } catch(e) {}
+    const q = questions.find(q => q.id == id)
+    if (q) q.votes = newVotes
+    renderQuestions()
+}
+
+window.deleteQ = async function(id) {
+    if (!currentAdmin) return
+    if (!confirm('حذف هذا السؤال؟')) return
+    try { await supabase.from('exam_questions').delete().eq('id', id); await loadQuestions(); showToast('تم الحذف', 'error') } catch(e) {}
+}
+
+window.setFilter = (f, btn) => {
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'))
+    btn.classList.add('active')
+    currentFilter = f
+    renderQuestions()
+}
+
+window.filterQ = renderQuestions
+
+function updateStats() {
+    document.getElementById('totalQ').textContent = questions.length
+    document.getElementById('totalSubjects').textContent = new Set(questions.map(q => q.subject)).size
+    document.getElementById('totalColleges').textContent = new Set(questions.map(q => q.college)).size
+}
+
+window.openQModal = () => document.getElementById('qModal').classList.add('show')
+window.closeQModal = () => document.getElementById('qModal').classList.remove('show')
+
+window.submitQuestion = async function() {
+    const college = document.getElementById('qCollege').value
+    const subject = document.getElementById('qSubject').value.trim()
+    const text = document.getElementById('qText').value.trim()
+    if (!college || !subject || !text) { showToast('أدخل الكلية والمادة والسؤال', 'error'); return }
+    try {
+        await supabase.from('exam_questions').insert({
+            college, subject, text,
+            answer: document.getElementById('qAnswer').value.trim() || null,
+            type: document.getElementById('qType').value,
+            year: document.getElementById('qYear').value.trim() || null,
+            votes: 0
+        })
+        closeQModal()
+        ;['qSubject','qText','qAnswer','qYear'].forEach(id => document.getElementById(id).value = '')
+        document.getElementById('qCollege').value = ''
+        await loadQuestions()
+        showToast('تم إضافة السؤال! ✅')
+    } catch(e) { showToast('خطأ في الإضافة', 'error') }
+}
+
+window.clearAll = async function() {
+    if (!confirm('حذف كل الأسئلة؟')) return
+    try { await supabase.from('exam_questions').delete().neq('id', 0); await loadQuestions(); showToast('تم الحذف', 'error') } catch(e) {}
+}
+
+window.openAP = () => { document.getElementById('adminPanel').classList.add('open'); document.getElementById('adminOverlay').classList.add('show') }
+window.closeAP = () => { document.getElementById('adminPanel').classList.remove('open'); document.getElementById('adminOverlay').classList.remove('show') }
+
+window.apLogin = async function() {
+    const pass = document.getElementById('apPass').value
+    if (!pass) return
+    const matched = await checkPass(pass)
+    if (matched) {
+        currentAdmin = matched
+        sessionStorage.setItem('uon_q_admin', JSON.stringify(matched))
+        document.getElementById('apPass').value = ''
+        updateAdminUI()
+        showToast('مرحباً! ✅')
+    } else { showToast('كلمة المرور غير صحيحة', 'error') }
+}
+
+window.apLogout = function() {
+    currentAdmin = null
+    sessionStorage.removeItem('uon_q_admin')
+    updateAdminUI()
+    closeAP()
+}
+
+function updateAdminUI() {
+    const isAdmin = !!currentAdmin
+    document.getElementById('apLoginSection').style.display = isAdmin ? 'none' : 'block'
+    document.getElementById('apControls').style.display = isAdmin ? 'block' : 'none'
+    document.getElementById('adminBadge').classList.toggle('show', isAdmin)
+    if (isAdmin) document.getElementById('apBadgeText').textContent = 'مرحباً ' + currentAdmin.label + '! 👋'
+    document.body.classList.toggle('admin-mode', isAdmin)
+    renderQuestions()
+}
+
+function showToast(msg, type) {
+    const t = document.getElementById('toast')
+    document.getElementById('toastMsg').textContent = msg
+    t.className = 'toast show'+(type==='error'?' error':'')
+    t.querySelector('i').className = type==='error'?'fas fa-exclamation-circle':'fas fa-check-circle'
+    setTimeout(() => t.classList.remove('show'), 3000)
+}
+
+function initReveal() {
+    const obs = new IntersectionObserver(es => es.forEach(e => { if(e.isIntersecting) e.target.classList.add('active') }), {threshold:.1})
+    document.querySelectorAll('.reveal').forEach(el => obs.observe(el))
+}
+</script>
+</body>
+</html>
