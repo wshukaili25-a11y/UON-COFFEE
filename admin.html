@@ -124,6 +124,8 @@ body { font-family:'Tajawal',sans-serif; background:var(--dark); color:var(--tex
 .fbtn { padding:.8rem 1.5rem; background:linear-gradient(135deg,#00d4ff,#0099cc); border:none; border-radius:10px; color:var(--dark); font-weight:800; font-size:.9rem; font-family:'Tajawal',sans-serif; cursor:pointer; transition:all .3s; }
 .fbtn:hover { transform:translateY(-1px); box-shadow:0 8px 24px rgba(0,212,255,.3); }
 .fbtn-danger { background:linear-gradient(135deg,var(--danger),#dc2626); color:#fff; }
+.exam-emoji-opt { cursor:pointer; font-size:1.3rem; padding:4px 6px; border-radius:8px; border:2px solid transparent; transition:all .2s; }
+.exam-emoji-opt.sel { border-color:var(--primary); background:rgba(0,212,255,.1); }
 
 /* NOTIFICATIONS */
 .notif-item { display:flex; gap:12px; padding:1rem 0; border-bottom:1px solid rgba(255,255,255,.05); align-items:flex-start; }
@@ -166,11 +168,15 @@ body { font-family:'Tajawal',sans-serif; background:var(--dark); color:var(--tex
     .bus-row .bus-sel { display:none; }
 }
 </style>
+<style>
+.test-mode-badge { position:fixed; bottom:22px; right:22px; z-index:9999; background:linear-gradient(135deg,#f59e0b,#d97706); padding:.35rem .85rem; border-radius:50px; font-size:.72rem; font-weight:800; display:flex; align-items:center; gap:5px; color:#1a1a2e; box-shadow:0 2px 14px rgba(245,158,11,.45); pointer-events:none; }
+</style>
 </head>
 <body>
 
 <div class="loading-overlay" id="loadingOverlay"><div class="spinner"></div></div>
 <div class="toast" id="toast"><i class="fas fa-check-circle"></i><span id="toastMsg"></span></div>
+<div class="test-mode-badge">🧪 وضع تجريبي</div>
 
 <!-- LOGIN -->
 <div class="login-screen" id="loginScreen">
@@ -224,6 +230,7 @@ body { font-family:'Tajawal',sans-serif; background:var(--dark); color:var(--tex
             <div class="nav-item" onclick="showSection('bus',this)"><i class="fas fa-bus"></i> مواعيد الباصات</div>
             <div class="nav-item" onclick="showSection('tools',this)"><i class="fas fa-tools"></i> الأدوات</div>
             <div class="nav-item" onclick="showSection('passwords',this)"><i class="fas fa-key"></i> كلمات المرور</div>
+            <div class="nav-item" onclick="showSection('sitesettings',this)"><i class="fas fa-sliders-h"></i> إعدادات الموقع</div>
         </div>
 
         <div class="sidebar-footer">
@@ -394,14 +401,66 @@ body { font-family:'Tajawal',sans-serif; background:var(--dark); color:var(--tex
         <div class="section" id="section-tools">
             <div class="page-header">
                 <h1>الأدوات 🛠️</h1>
-                <p>إدارة تصنيفات وأدوات الطلاب</p>
+                <p>إدارة تصنيفات وأدوات الطلاب — تشغيل وإيقاف الأدوات مباشرة</p>
+            </div>
+            <div class="content-card" id="toolsAdminCard">
+                <div class="card-header">
+                    <div class="card-title"><i class="fas fa-tools" style="color:var(--primary)"></i> التصنيفات والأدوات</div>
+                    <a href="tools.html" target="_blank" class="card-action"><i class="fas fa-external-link-alt"></i> فتح الصفحة</a>
+                </div>
+                <div id="toolsAdminList"><div style="color:var(--text-dim);font-size:.85rem;text-align:center;padding:2rem;">جارٍ التحميل...</div></div>
+            </div>
+        </div>
+
+        <!-- SITE SETTINGS -->
+        <div class="section" id="section-sitesettings">
+            <div class="page-header">
+                <h1>إعدادات الموقع ⚙️</h1>
+                <p>تحكم في حالة الموقع وأوضاعه</p>
             </div>
             <div class="content-card">
                 <div class="card-header">
-                    <div class="card-title"><i class="fas fa-tools" style="color:var(--primary)"></i> الأدوات</div>
-                    <a href="tools.html" target="_blank" class="card-action"><i class="fas fa-external-link-alt"></i> فتح صفحة الأدوات</a>
+                    <div class="card-title"><i class="fas fa-graduation-cap" style="color:#ef4444"></i> وضع الاختبارات</div>
                 </div>
-                <p style="color:var(--text-dim);font-size:.85rem;">التعديل على الأدوات يتم مباشرة من صفحة <a href="tools.html" target="_blank" style="color:var(--primary);">tools.html</a> بعد تسجيل الدخول.</p>
+                <p style="color:var(--text-dim);font-size:.85rem;margin-bottom:1.2rem;">عند التفعيل يظهر شريط أحمر في أعلى جميع صفحات الموقع يُنبّه الطلاب بوجود اختبارات.</p>
+
+                <!-- Preview -->
+                <div id="examBannerPreview" style="display:none;background:#c0392b;color:#fff;text-align:center;padding:.6rem 1rem;border-radius:10px;font-size:.85rem;font-weight:700;margin-bottom:1rem;direction:rtl;">
+                    <span id="previewIcon">🎯</span> <span id="previewTitle">فترة الاختبارات النهائية</span> — <span id="previewMsg">بالتوفيق لجميع الطلاب!</span>
+                </div>
+
+                <!-- Fields -->
+                <div class="form-grid" style="margin-bottom:1rem;">
+                    <div class="fgroup">
+                        <span class="flabel">عنوان الشريط</span>
+                        <input type="text" class="finp" id="examBannerTitle" placeholder="مثال: فترة الاختبارات النهائية" oninput="updateExamPreview()">
+                    </div>
+                    <div class="fgroup">
+                        <span class="flabel">الرسالة</span>
+                        <input type="text" class="finp" id="examBannerMsg" placeholder="مثال: بالتوفيق لجميع الطلاب! 🎯" oninput="updateExamPreview()">
+                    </div>
+                    <div class="fgroup">
+                        <span class="flabel">الأيقونة</span>
+                        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:4px;">
+                            <span class="exam-emoji-opt sel" onclick="selectExamEmoji(this,'🎯')">🎯</span>
+                            <span class="exam-emoji-opt" onclick="selectExamEmoji(this,'📝')">📝</span>
+                            <span class="exam-emoji-opt" onclick="selectExamEmoji(this,'📚')">📚</span>
+                            <span class="exam-emoji-opt" onclick="selectExamEmoji(this,'⏰')">⏰</span>
+                            <span class="exam-emoji-opt" onclick="selectExamEmoji(this,'🔥')">🔥</span>
+                            <span class="exam-emoji-opt" onclick="selectExamEmoji(this,'💪')">💪</span>
+                            <span class="exam-emoji-opt" onclick="selectExamEmoji(this,'🏆')">🏆</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Toggle row -->
+                <div style="display:flex;align-items:center;justify-content:space-between;background:var(--dark);border-radius:14px;padding:1rem 1.2rem;border:1px solid rgba(255,255,255,.07);">
+                    <div>
+                        <div style="font-weight:700;font-size:.95rem;" id="examModeLabel">جارٍ التحميل...</div>
+                        <div style="font-size:.78rem;color:var(--text-dim);margin-top:3px;" id="examModeDesc"></div>
+                    </div>
+                    <button id="examModeBtn" onclick="toggleExamMode()" style="padding:.55rem 1.4rem;border-radius:10px;border:none;font-size:.88rem;font-weight:800;font-family:Tajawal,sans-serif;cursor:pointer;transition:all .25s;">...</button>
+                </div>
             </div>
         </div>
 
@@ -507,6 +566,8 @@ async function loadAll() {
         loadRestaurants(),
         loadBusData(),
         loadPasswords(),
+        loadToolsAdmin(),
+        loadTestMode(),
     ])
 }
 
@@ -781,6 +842,129 @@ window.saveBusData = async function() {
         await supabase.from('settings').upsert({key:'bus_booking_url', value:busData.bookingUrl})
         showToast('تم حفظ الجداول! ✅')
     } catch(e) { showToast('خطأ في الحفظ', 'error') }
+}
+
+// ===== EXAM MODE =====
+let examModeActive = false
+let selectedExamEmoji = '🎯'
+
+async function loadTestMode() {
+    try {
+        const { data } = await supabase.from('settings').select('*').in('key', ['exam_mode','exam_title','exam_msg','exam_emoji'])
+        if (data) {
+            const map = {}
+            data.forEach(r => map[r.key] = r.value)
+            examModeActive = map.exam_mode === 'true'
+            document.getElementById('examBannerTitle').value = map.exam_title || 'فترة الاختبارات النهائية'
+            document.getElementById('examBannerMsg').value = map.exam_msg || 'بالتوفيق لجميع الطلاب!'
+            selectedExamEmoji = map.exam_emoji || '🎯'
+            document.querySelectorAll('.exam-emoji-opt').forEach(e => e.classList.toggle('sel', e.textContent.trim() === selectedExamEmoji))
+        }
+    } catch(e) { examModeActive = false }
+    renderExamModeUI()
+    updateExamPreview()
+}
+
+function renderExamModeUI() {
+    const label = document.getElementById('examModeLabel')
+    const desc = document.getElementById('examModeDesc')
+    const btn = document.getElementById('examModeBtn')
+    const preview = document.getElementById('examBannerPreview')
+    if (!label) return
+    if (examModeActive) {
+        label.textContent = '🔴 وضع الاختبارات مفعّل'
+        label.style.color = '#ef4444'
+        desc.textContent = 'الشريط الأحمر يظهر الآن لجميع الطلاب'
+        btn.textContent = '⏸ إيقاف'
+        btn.style.background = 'rgba(239,68,68,.15)'
+        btn.style.color = '#ef4444'
+        btn.style.border = '1px solid rgba(239,68,68,.3)'
+        preview.style.display = 'block'
+    } else {
+        label.textContent = '⚪ وضع الاختبارات موقوف'
+        label.style.color = 'var(--text)'
+        desc.textContent = 'الموقع يعمل بشكل طبيعي'
+        btn.textContent = '▶ تفعيل'
+        btn.style.background = 'rgba(239,68,68,.1)'
+        btn.style.color = '#ef4444'
+        btn.style.border = '1px solid rgba(239,68,68,.2)'
+        if (preview) preview.style.display = 'none'
+    }
+}
+
+window.updateExamPreview = function() {
+    const title = document.getElementById('examBannerTitle').value || 'فترة الاختبارات النهائية'
+    const msg = document.getElementById('examBannerMsg').value || 'بالتوفيق لجميع الطلاب!'
+    document.getElementById('previewIcon').textContent = selectedExamEmoji
+    document.getElementById('previewTitle').textContent = title
+    document.getElementById('previewMsg').textContent = msg
+    if (examModeActive) document.getElementById('examBannerPreview').style.display = 'block'
+}
+
+window.selectExamEmoji = function(el, emoji) {
+    document.querySelectorAll('.exam-emoji-opt').forEach(e => e.classList.remove('sel'))
+    el.classList.add('sel')
+    selectedExamEmoji = emoji
+    updateExamPreview()
+}
+
+window.toggleExamMode = async function() {
+    examModeActive = !examModeActive
+    const title = document.getElementById('examBannerTitle').value.trim() || 'فترة الاختبارات النهائية'
+    const msg = document.getElementById('examBannerMsg').value.trim() || 'بالتوفيق لجميع الطلاب!'
+    try {
+        await supabase.from('settings').upsert({ key:'exam_mode', value: String(examModeActive) })
+        await supabase.from('settings').upsert({ key:'exam_title', value: title })
+        await supabase.from('settings').upsert({ key:'exam_msg', value: msg })
+        await supabase.from('settings').upsert({ key:'exam_emoji', value: selectedExamEmoji })
+        renderExamModeUI()
+        showToast(examModeActive ? 'تم تفعيل وضع الاختبارات 🎯' : 'تم إيقاف وضع الاختبارات', examModeActive ? '' : 'error')
+    } catch(e) {
+        examModeActive = !examModeActive
+        showToast('خطأ في الحفظ', 'error')
+    }
+}
+
+// ===== TOOLS ADMIN =====
+async function loadToolsAdmin() {
+    try {
+        const { data, error } = await supabase.from('tools_categories').select('*, tools_items(*)').order('sort_order')
+        const el = document.getElementById('toolsAdminList')
+        if (error || !data || !data.length) {
+            el.innerHTML = '<div style="color:var(--text-dim);font-size:.85rem;text-align:center;padding:1.5rem;">لا توجد أدوات. افتح <a href="tools.html" target="_blank" style="color:var(--primary);">صفحة الأدوات</a> لإضافتها.</div>'
+            return
+        }
+        el.innerHTML = data.map(cat => `
+            <div style="margin-bottom:1.2rem;">
+                <div style="font-size:.82rem;font-weight:800;color:${cat.color || 'var(--primary)'};margin-bottom:.5rem;padding:.3rem 0;border-bottom:1px solid rgba(255,255,255,.06);">
+                    ${cat.emoji || '🛠️'} ${cat.name} <span style="font-weight:400;color:var(--text-dim);font-size:.75rem;">(${(cat.tools_items||[]).length} أداة)</span>
+                </div>
+                ${(cat.tools_items || []).map(t => `
+                <div style="display:flex;align-items:center;justify-content:space-between;padding:.55rem .4rem;border-bottom:1px solid rgba(255,255,255,.04);">
+                    <div style="display:flex;align-items:center;gap:10px;">
+                        <span style="font-size:1.1rem;">${t.emoji || '🔗'}</span>
+                        <div>
+                            <div style="font-size:.85rem;font-weight:700;${t.disabled?'color:var(--text-dim);text-decoration:line-through;':''}">${t.name}</div>
+                            ${t.coming_soon ? '<span style="font-size:.7rem;color:var(--warning);">قريباً</span>' : ''}
+                        </div>
+                    </div>
+                    <button onclick="toggleAdminTool('${t.id}', ${!!t.disabled})" 
+                        style="padding:.3rem .75rem;border-radius:8px;border:1px solid ${t.disabled?'rgba(107,203,119,.3)':'rgba(239,68,68,.3)'};background:${t.disabled?'rgba(107,203,119,.1)':'rgba(239,68,68,.1)'};color:${t.disabled?'#6bcb77':'#ef4444'};cursor:pointer;font-size:.78rem;font-weight:700;font-family:Tajawal,sans-serif;transition:all .2s;">
+                        ${t.disabled ? '▶ تشغيل' : '⏸ إيقاف'}
+                    </button>
+                </div>`).join('')}
+            </div>`).join('')
+    } catch(e) {
+        document.getElementById('toolsAdminList').innerHTML = '<div style="color:var(--text-dim);font-size:.85rem;">تعذّر تحميل الأدوات</div>'
+    }
+}
+
+window.toggleAdminTool = async function(toolId, currentDisabled) {
+    try {
+        await supabase.from('tools_items').update({ disabled: !currentDisabled }).eq('id', toolId)
+        await loadToolsAdmin()
+        showToast(currentDisabled ? 'تم تشغيل الأداة ✅' : 'تم إيقاف الأداة', currentDisabled ? '' : 'error')
+    } catch(e) { showToast('خطأ في التحديث', 'error') }
 }
 
 // ===== PASSWORDS =====
