@@ -149,11 +149,6 @@ body { font-family:'Tajawal',sans-serif; background:var(--dark); color:var(--tex
 .mobile-sidebar-btn { display:none; position:fixed; top:16px; right:16px; z-index:9998; width:44px; height:44px; background:var(--dark-light); border:1px solid rgba(255,255,255,.1); border-radius:12px; align-items:center; justify-content:center; cursor:pointer; font-size:1.1rem; }
 .sidebar-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.5); z-index:9997; }
 
-/* BUS ADMIN */
-.bus-row { display:grid; grid-template-columns:2fr 1fr 1fr 1fr auto; gap:6px; margin-bottom:6px; align-items:center; }
-.bus-inp { padding:.6rem .7rem; background:var(--dark); border:1px solid rgba(255,255,255,.1); border-radius:8px; color:var(--text); font-family:'Tajawal',sans-serif; font-size:.82rem; outline:none; }
-.bus-inp:focus { border-color:var(--primary); }
-.bus-sel { padding:.6rem .5rem; background:var(--dark); border:1px solid rgba(255,255,255,.1); border-radius:8px; color:var(--text); font-family:'Tajawal',sans-serif; font-size:.78rem; outline:none; }
 .bus-del { width:30px; height:30px; background:rgba(239,68,68,.08); border:1px solid rgba(239,68,68,.15); border-radius:8px; color:var(--danger); cursor:pointer; display:flex; align-items:center; justify-content:center; }
 
 @media(max-width:768px) {
@@ -163,9 +158,7 @@ body { font-family:'Tajawal',sans-serif; background:var(--dark); color:var(--tex
     .mobile-sidebar-btn { display:flex; }
     .main { padding:1rem; padding-top:70px; }
     .stats-row { grid-template-columns:1fr 1fr; }
-    .form-grid { grid-template-columns:1fr; }
-    .bus-row { grid-template-columns:1fr 1fr 1fr auto; }
-    .bus-row .bus-sel { display:none; }
+    .form-grid { grid-template-columns:1fr; }    .bus-row .bus-sel { display:none; }
 }
 </style>
 <style>
@@ -223,11 +216,13 @@ body { font-family:'Tajawal',sans-serif; background:var(--dark); color:var(--tex
             <div class="nav-item" onclick="showSection('confessions',this)"><i class="fas fa-comments"></i> الاعترافات <span class="nav-badge" id="navConfBadge" style="display:none">0</span></div>
             <div class="nav-item" onclick="showSection('summaries',this)"><i class="fas fa-book"></i> الملخصات <span class="nav-badge" id="navSumBadge" style="display:none">0</span></div>
             <div class="nav-item" onclick="showSection('restaurants',this)"><i class="fas fa-utensils"></i> المطاعم</div>
+            <div class="nav-item" onclick="showSection('groups',this)"><i class="fab fa-whatsapp"></i> مجموعات الواتساب <span class="nav-badge" id="navGroupBadge" style="display:none">0</span></div>
+            <div class="nav-item" onclick="showSection('marketplace',this)"><i class="fas fa-store"></i> سوق الطلاب <span class="nav-badge" id="navMktBadge" style="display:none">0</span></div>
+            <div class="nav-item" onclick="showSection('projects',this)"><i class="fas fa-code"></i> المشاريع <span class="nav-badge" id="navProjBadge" style="display:none">0</span></div>
         </div>
 
         <div class="nav-section">
             <div class="nav-label">الإعدادات</div>
-            <div class="nav-item" onclick="showSection('bus',this)"><i class="fas fa-bus"></i> مواعيد الباصات</div>
             <div class="nav-item" onclick="showSection('tools',this)"><i class="fas fa-tools"></i> الأدوات</div>
             <div class="nav-item" onclick="showSection('passwords',this)"><i class="fas fa-key"></i> كلمات المرور</div>
             <div class="nav-item" onclick="showSection('sitesettings',this)"><i class="fas fa-sliders-h"></i> إعدادات الموقع</div>
@@ -239,7 +234,6 @@ body { font-family:'Tajawal',sans-serif; background:var(--dark); color:var(--tex
                 <a href="index.html" target="_blank" class="nav-item"><i class="fas fa-home"></i> الرئيسية</a>
                 <a href="features.html" target="_blank" class="nav-item"><i class="fas fa-star"></i> الميزات</a>
                 <a href="tools.html" target="_blank" class="nav-item"><i class="fas fa-wrench"></i> الأدوات</a>
-                <a href="bus.html" target="_blank" class="nav-item"><i class="fas fa-bus"></i> الباصات</a>
                 <a href="summaries.html" target="_blank" class="nav-item"><i class="fas fa-book-open"></i> الملخصات</a>
             </div>
             <div class="logout-item" onclick="doLogout()"><i class="fas fa-sign-out-alt"></i> تسجيل الخروج</div>
@@ -256,10 +250,13 @@ body { font-family:'Tajawal',sans-serif; background:var(--dark); color:var(--tex
                 <p>مرحباً! إليك ملخص نشاط الموقع</p>
             </div>
             <div class="stats-row" id="statsRow">
-                <div class="stat-card"><div class="stat-top"><div class="stat-icon" style="background:rgba(0,212,255,.1);color:var(--primary)"><i class="fas fa-comments"></i></div><span class="stat-change neutral">اعترافات</span></div><div class="stat-value" id="statConfessions">—</div><div class="stat-label">إجمالي الاعترافات</div></div>
-                <div class="stat-card"><div class="stat-top"><div class="stat-icon" style="background:rgba(107,203,119,.1);color:var(--success)"><i class="fas fa-book"></i></div><span class="stat-change neutral">ملخصات</span></div><div class="stat-value" id="statSummaries">—</div><div class="stat-label">طلبات الملخصات</div></div>
+                <div class="stat-card"><div class="stat-top"><div class="stat-icon" style="background:rgba(0,212,255,.1);color:var(--primary)"><i class="fas fa-comments"></i></div><span class="stat-change neutral">اعترافات</span></div><div class="stat-value" id="statConfessions">—</div><div class="stat-label">الاعترافات</div></div>
+                <div class="stat-card"><div class="stat-top"><div class="stat-icon" style="background:rgba(107,203,119,.1);color:var(--success)"><i class="fas fa-book"></i></div><span class="stat-change neutral">ملخصات</span></div><div class="stat-value" id="statSummaries">—</div><div class="stat-label">الملخصات</div></div>
                 <div class="stat-card"><div class="stat-top"><div class="stat-icon" style="background:rgba(251,146,60,.1);color:var(--warning)"><i class="fas fa-clock"></i></div><span class="stat-change up">جديد</span></div><div class="stat-value" id="statPending">—</div><div class="stat-label">بانتظار الموافقة</div></div>
-                <div class="stat-card"><div class="stat-top"><div class="stat-icon" style="background:rgba(255,107,107,.1);color:var(--secondary)"><i class="fas fa-utensils"></i></div><span class="stat-change neutral">مطاعم</span></div><div class="stat-value" id="statRestaurants">—</div><div class="stat-label">المطاعم المضافة</div></div>
+                <div class="stat-card"><div class="stat-top"><div class="stat-icon" style="background:rgba(37,211,102,.1);color:#25d366"><i class="fab fa-whatsapp"></i></div><span class="stat-change neutral">مجموعات</span></div><div class="stat-value" id="statGroups">—</div><div class="stat-label">مجموعات الواتساب</div></div>
+                <div class="stat-card"><div class="stat-top"><div class="stat-icon" style="background:rgba(255,209,61,.1);color:var(--warning)"><i class="fas fa-store"></i></div><span class="stat-change neutral">سوق</span></div><div class="stat-value" id="statMkt">—</div><div class="stat-label">إعلانات السوق</div></div>
+                <div class="stat-card"><div class="stat-top"><div class="stat-icon" style="background:rgba(164,139,250,.1);color:#a78bfa"><i class="fas fa-code"></i></div><span class="stat-change neutral">مشاريع</span></div><div class="stat-value" id="statProj">—</div><div class="stat-label">المشاريع</div></div>
+                <div class="stat-card"><div class="stat-top"><div class="stat-icon" style="background:rgba(255,107,107,.1);color:var(--secondary)"><i class="fas fa-utensils"></i></div><span class="stat-change neutral">مطاعم</span></div><div class="stat-value" id="statRestaurants">—</div><div class="stat-label">المطاعم</div></div>
                 <div class="stat-card"><div class="stat-top"><div class="stat-icon" style="background:rgba(164,139,250,.1);color:#a78bfa"><i class="fas fa-bell"></i></div><span class="stat-change up">إشعارات</span></div><div class="stat-value" id="statNotifs">—</div><div class="stat-label">إشعارات غير مقروءة</div></div>
             </div>
 
@@ -269,7 +266,6 @@ body { font-family:'Tajawal',sans-serif; background:var(--dark); color:var(--tex
                     <a href="index.html" target="_blank" class="quick-link"><div class="quick-link-icon">🏠</div><div class="quick-link-text">الرئيسية</div></a>
                     <a href="features.html" target="_blank" class="quick-link"><div class="quick-link-icon">⭐</div><div class="quick-link-text">الميزات</div></a>
                     <a href="tools.html" target="_blank" class="quick-link"><div class="quick-link-icon">🛠️</div><div class="quick-link-text">الأدوات</div></a>
-                    <a href="bus.html" target="_blank" class="quick-link"><div class="quick-link-icon">🚌</div><div class="quick-link-text">الباصات</div></a>
                     <a href="summaries.html" target="_blank" class="quick-link"><div class="quick-link-icon">📚</div><div class="quick-link-text">الملخصات</div></a>
                     <div class="quick-link" onclick="showSection('confessions',document.querySelector('[onclick*=confessions]'))"><div class="quick-link-icon">💬</div><div class="quick-link-text">الاعترافات</div></div>
                 </div>
@@ -368,32 +364,74 @@ body { font-family:'Tajawal',sans-serif; background:var(--dark); color:var(--tex
             </div>
         </div>
 
-        <!-- BUS -->
-        <div class="section" id="section-bus">
+        <!-- GROUPS -->
+        <div class="section" id="section-groups">
             <div class="page-header">
-                <h1>مواعيد الباصات 🚌</h1>
-                <p>تحديث جداول الذهاب والعودة</p>
+                <h1>مجموعات الواتساب 💬</h1>
+                <p>مراجعة وموافقة المجموعات المضافة من الطلاب</p>
             </div>
             <div class="content-card">
-                <div class="card-header"><div class="card-title"><i class="fas fa-bus" style="color:var(--primary)"></i> باص الأولاد</div></div>
-                <div style="font-size:.75rem;color:var(--text-dim);display:grid;grid-template-columns:2fr 1fr 1fr 1fr auto;gap:6px;padding:0 0 6px;border-bottom:1px solid rgba(255,255,255,.05);margin-bottom:6px;">
-                    <span>المنطقة</span><span>وقت الذهاب</span><span>وقت العودة</span><span>الحالة</span><span></span>
+                <div class="card-header">
+                    <div class="card-title"><i class="fab fa-whatsapp" style="color:#25d366"></i> بانتظار الموافقة</div>
+                    <a href="groups.html" target="_blank" class="card-action"><i class="fas fa-external-link-alt"></i> فتح الصفحة</a>
                 </div>
-                <div id="busBoysRows"></div>
-                <button onclick="addBusRow('boys')" style="width:100%;padding:.6rem;background:rgba(0,212,255,.04);border:1px dashed rgba(0,212,255,.2);border-radius:8px;color:rgba(0,212,255,.5);font-size:.82rem;cursor:pointer;font-family:'Tajawal',sans-serif;margin-top:6px;">+ إضافة رحلة</button>
-            </div>
-            <div class="content-card">
-                <div class="card-header"><div class="card-title"><i class="fas fa-bus" style="color:var(--secondary)"></i> باص البنات</div></div>
-                <div style="font-size:.75rem;color:var(--text-dim);display:grid;grid-template-columns:2fr 1fr 1fr 1fr auto;gap:6px;padding:0 0 6px;border-bottom:1px solid rgba(255,255,255,.05);margin-bottom:6px;">
-                    <span>المنطقة</span><span>وقت الذهاب</span><span>وقت العودة</span><span>الحالة</span><span></span>
+                <div style="overflow-x:auto;">
+                    <table class="data-table">
+                        <thead><tr><th>المادة</th><th>الكلية</th><th>المضيف</th><th>الرابط</th><th>إجراء</th></tr></thead>
+                        <tbody id="groupPendingBody"><tr><td colspan="5" style="text-align:center;color:var(--text-dim);padding:2rem;">جاري التحميل...</td></tr></tbody>
+                    </table>
                 </div>
-                <div id="busGirlsRows"></div>
-                <button onclick="addBusRow('girls')" style="width:100%;padding:.6rem;background:rgba(255,107,107,.04);border:1px dashed rgba(255,107,107,.2);border-radius:8px;color:rgba(255,107,107,.5);font-size:.82rem;cursor:pointer;font-family:'Tajawal',sans-serif;margin-top:6px;">+ إضافة رحلة</button>
             </div>
             <div class="content-card">
-                <div class="card-header"><div class="card-title"><i class="fas fa-link" style="color:var(--accent)"></i> رابط الحجز</div></div>
-                <div class="fgroup"><input type="url" class="finp" id="busBookUrl" placeholder="https://..."></div>
-                <button class="fbtn" onclick="saveBusData()"><i class="fas fa-save"></i> حفظ الجداول</button>
+                <div class="card-header">
+                    <div class="card-title"><i class="fas fa-check-circle" style="color:var(--success)"></i> المجموعات المعتمدة</div>
+                </div>
+                <div style="overflow-x:auto;">
+                    <table class="data-table">
+                        <thead><tr><th>المادة</th><th>الكلية</th><th>الرابط</th><th>إجراء</th></tr></thead>
+                        <tbody id="groupApprovedBody"><tr><td colspan="4" style="text-align:center;color:var(--text-dim);padding:2rem;">جاري التحميل...</td></tr></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- MARKETPLACE -->
+        <div class="section" id="section-marketplace">
+            <div class="page-header">
+                <h1>سوق الطلاب 🛍️</h1>
+                <p>إدارة إعلانات البيع والشراء</p>
+            </div>
+            <div class="content-card">
+                <div class="card-header">
+                    <div class="card-title"><i class="fas fa-store" style="color:var(--warning)"></i> جميع الإعلانات</div>
+                    <a href="marketplace.html" target="_blank" class="card-action"><i class="fas fa-external-link-alt"></i> فتح الصفحة</a>
+                </div>
+                <div style="overflow-x:auto;">
+                    <table class="data-table">
+                        <thead><tr><th>العنوان</th><th>النوع</th><th>السعر</th><th>البائع</th><th>إجراء</th></tr></thead>
+                        <tbody id="mktTableBody"><tr><td colspan="5" style="text-align:center;color:var(--text-dim);padding:2rem;">جاري التحميل...</td></tr></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- PROJECTS -->
+        <div class="section" id="section-projects">
+            <div class="page-header">
+                <h1>المشاريع 💻</h1>
+                <p>إدارة مشاريع الطلاب المعروضة</p>
+            </div>
+            <div class="content-card">
+                <div class="card-header">
+                    <div class="card-title"><i class="fas fa-code" style="color:var(--primary)"></i> جميع المشاريع</div>
+                    <a href="projects.html" target="_blank" class="card-action"><i class="fas fa-external-link-alt"></i> فتح الصفحة</a>
+                </div>
+                <div style="overflow-x:auto;">
+                    <table class="data-table">
+                        <thead><tr><th>المشروع</th><th>التصنيف</th><th>صاحبه</th><th>GitHub</th><th>إجراء</th></tr></thead>
+                        <tbody id="projTableBody"><tr><td colspan="5" style="text-align:center;color:var(--text-dim);padding:2rem;">جاري التحميل...</td></tr></tbody>
+                    </table>
+                </div>
             </div>
         </div>
 
@@ -512,7 +550,6 @@ async function checkPass(p) {
 }
 
 let currentAdmin = null
-let busData = { boys:[], girls:[], bookingUrl:'#' }
 let notifications = []
 
 // ===== LOGIN =====
@@ -564,7 +601,9 @@ async function loadAll() {
         loadConfessions(),
         loadSummaries(),
         loadRestaurants(),
-        loadBusData(),
+        loadGroups(),
+        loadMarketplace(),
+        loadProjects(),
         loadPasswords(),
         loadToolsAdmin(),
         loadTestMode(),
@@ -574,11 +613,14 @@ async function loadAll() {
 // ===== STATS =====
 async function loadStats() {
     try {
-        const [conf, sum, rest, notif] = await Promise.all([
+        const [conf, sum, rest, notif, grp, mkt, proj] = await Promise.all([
             supabase.from('confessions').select('id', { count:'exact' }),
             supabase.from('summaries').select('id,approved', { count:'exact' }),
             supabase.from('restaurants').select('id', { count:'exact' }),
             supabase.from('notifications').select('id,is_read'),
+            supabase.from('whatsapp_groups').select('id,approved', { count:'exact' }),
+            supabase.from('marketplace_items').select('id', { count:'exact' }),
+            supabase.from('projects').select('id', { count:'exact' }),
         ])
         document.getElementById('statConfessions').textContent = conf.count || 0
         document.getElementById('statSummaries').textContent = sum.count || 0
@@ -587,14 +629,14 @@ async function loadStats() {
         document.getElementById('statRestaurants').textContent = rest.count || 0
         const unread = notif.data ? notif.data.filter(n => !n.is_read).length : 0
         document.getElementById('statNotifs').textContent = unread
-        if (unread > 0) {
-            document.getElementById('navNotifBadge').textContent = unread
-            document.getElementById('navNotifBadge').style.display = 'inline-block'
-        }
-        if (pending > 0) {
-            document.getElementById('navSumBadge').textContent = pending
-            document.getElementById('navSumBadge').style.display = 'inline-block'
-        }
+        if (unread > 0) { document.getElementById('navNotifBadge').textContent = unread; document.getElementById('navNotifBadge').style.display = 'inline-block' }
+        if (pending > 0) { document.getElementById('navSumBadge').textContent = pending; document.getElementById('navSumBadge').style.display = 'inline-block' }
+        // groups pending
+        const grpPending = grp.data ? grp.data.filter(g => !g.approved).length : 0
+        if (grpPending > 0) { document.getElementById('navGroupBadge').textContent = grpPending; document.getElementById('navGroupBadge').style.display = 'inline-block' }
+        document.getElementById('statGroups').textContent = grp.count || 0
+        document.getElementById('statMkt').textContent = mkt.count || 0
+        document.getElementById('statProj').textContent = proj.count || 0
     } catch(e) {}
     loadRecentActivity()
 }
@@ -778,73 +820,7 @@ window.deleteRest = async function(id) {
     try { await supabase.from('restaurants').delete().eq('id', id); await loadRestaurants(); showToast('تم الحذف', 'error') } catch(e) {}
 }
 
-// ===== BUS =====
-const defaultBoys = [
-    { route:'نزوى المدينة', departure:'07:00 ص', returnTime:'04:00 م', status:'active' },
-    { route:'بهلاء', departure:'06:45 ص', returnTime:'04:00 م', status:'active' },
-    { route:'عبري', departure:'06:30 ص', returnTime:'04:00 م', status:'active' },
-    { route:'الحمراء', departure:'06:50 ص', returnTime:'04:00 م', status:'full' },
-    { route:'إزكي', departure:'07:10 ص', returnTime:'04:00 م', status:'active' },
-]
-const defaultGirls = [
-    { route:'نزوى المدينة', departure:'07:00 ص', returnTime:'04:00 م', status:'active' },
-    { route:'بهلاء', departure:'06:45 ص', returnTime:'04:00 م', status:'active' },
-    { route:'عبري', departure:'06:30 ص', returnTime:'04:00 م', status:'active' },
-    { route:'الحمراء', departure:'06:50 ص', returnTime:'04:00 م', status:'active' },
-    { route:'إزكي', departure:'07:10 ص', returnTime:'04:00 م', status:'full' },
-]
-
-async function loadBusData() {
-    try {
-        const { data } = await supabase.from('settings').select('*')
-        if (data) {
-            const map = {}
-            data.forEach(r => map[r.key] = r.value)
-            busData.boys = map.bus_boys ? JSON.parse(map.bus_boys) : defaultBoys
-            busData.girls = map.bus_girls ? JSON.parse(map.bus_girls) : defaultGirls
-            busData.bookingUrl = map.bus_booking_url || ''
-        }
-    } catch(e) { busData.boys = defaultBoys; busData.girls = defaultGirls }
-    renderBusRows()
-    document.getElementById('busBookUrl').value = busData.bookingUrl
-}
-
-function renderBusRows() {
-    renderBusSection('boys', busData.boys)
-    renderBusSection('girls', busData.girls)
-}
-
-function renderBusSection(g, routes) {
-    const el = document.getElementById(`bus${g==='boys'?'Boys':'Girls'}Rows`)
-    if (!el) return
-    el.innerHTML = routes.map((r,i) => `
-        <div class="bus-row">
-            <input class="bus-inp" value="${r.route}" onchange="updateBus('${g}',${i},'route',this.value)">
-            <input class="bus-inp" value="${r.departure}" onchange="updateBus('${g}',${i},'departure',this.value)">
-            <input class="bus-inp" value="${r.returnTime}" onchange="updateBus('${g}',${i},'returnTime',this.value)">
-            <select class="bus-sel" onchange="updateBus('${g}',${i},'status',this.value)">
-                <option value="active" ${r.status==='active'?'selected':''}>متاح</option>
-                <option value="full" ${r.status==='full'?'selected':''}>مكتمل</option>
-            </select>
-            <button class="bus-del" onclick="removeBusRow('${g}',${i})"><i class="fas fa-times"></i></button>
-        </div>`).join('')
-}
-
-window.updateBus = (g,i,f,v) => { busData[g][i][f] = v }
-window.addBusRow = (g) => { busData[g].push({route:'منطقة جديدة',departure:'07:00 ص',returnTime:'04:00 م',status:'active'}); renderBusSection(g, busData[g]) }
-window.removeBusRow = (g,i) => { busData[g].splice(i,1); renderBusSection(g, busData[g]) }
-
-window.saveBusData = async function() {
-    busData.bookingUrl = document.getElementById('busBookUrl').value
-    try {
-        await supabase.from('settings').upsert({key:'bus_boys', value:JSON.stringify(busData.boys)})
-        await supabase.from('settings').upsert({key:'bus_girls', value:JSON.stringify(busData.girls)})
-        await supabase.from('settings').upsert({key:'bus_booking_url', value:busData.bookingUrl})
-        showToast('تم حفظ الجداول! ✅')
-    } catch(e) { showToast('خطأ في الحفظ', 'error') }
-}
-
-// ===== EXAM MODE =====
+// ===== EXAM MODE =====// ===== EXAM MODE =====
 let examModeActive = false
 let selectedExamEmoji = '🎯'
 
@@ -924,6 +900,70 @@ window.toggleExamMode = async function() {
         showToast('خطأ في الحفظ', 'error')
     }
 }
+
+        showToast('خطأ في الحفظ', 'error')
+    }
+}
+
+// ===== GROUPS =====
+async function loadGroups() {
+    try {
+        const { data } = await supabase.from('whatsapp_groups').select('*').order('created_at', { ascending:false })
+        if (!data) return
+        const pending = data.filter(g => !g.approved)
+        const approved = data.filter(g => g.approved)
+        document.getElementById('groupPendingBody').innerHTML = pending.length
+            ? pending.map(g => `<tr>
+                <td style="font-weight:700">${g.subject||'—'}</td><td>${g.college||'—'}</td>
+                <td style="color:var(--text-dim);font-size:.8rem;">${g.host_name||'مجهول'}</td>
+                <td><a href="${g.link}" target="_blank" style="color:#25d366;font-size:.8rem;">🔗 رابط</a></td>
+                <td><div class="td-actions">
+                    <button class="btn-approve" onclick="approveGroup('${g.id}')">✅ قبول</button>
+                    <button class="btn-reject" onclick="deleteGroup('${g.id}')">❌ رفض</button>
+                </div></td></tr>`).join('')
+            : '<tr><td colspan="5" style="text-align:center;color:var(--text-dim);padding:1.5rem;">لا توجد طلبات معلقة ✅</td></tr>'
+        document.getElementById('groupApprovedBody').innerHTML = approved.length
+            ? approved.map(g => `<tr>
+                <td style="font-weight:700">${g.subject||'—'}</td><td>${g.college||'—'}</td>
+                <td><a href="${g.link}" target="_blank" style="color:#25d366;font-size:.8rem;">🔗 رابط</a></td>
+                <td><button class="btn-del" onclick="deleteGroup('${g.id}')"><i class="fas fa-trash"></i></button></td></tr>`).join('')
+            : '<tr><td colspan="4" style="text-align:center;color:var(--text-dim);padding:1.5rem;">لا توجد مجموعات معتمدة بعد</td></tr>'
+    } catch(e) {}
+}
+window.approveGroup = async (id) => { try { await supabase.from('whatsapp_groups').update({approved:true}).eq('id',id); loadGroups(); loadStats(); showToast('تم القبول ✅') } catch(e){} }
+window.deleteGroup = async (id) => { if(!confirm('حذف؟')) return; try { await supabase.from('whatsapp_groups').delete().eq('id',id); loadGroups(); loadStats(); showToast('تم الحذف','error') } catch(e){} }
+
+// ===== MARKETPLACE =====
+async function loadMarketplace() {
+    try {
+        const { data } = await supabase.from('marketplace_items').select('*').order('created_at', { ascending:false })
+        const tbody = document.getElementById('mktTableBody')
+        if (!data || !data.length) { tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--text-dim);padding:2rem;">لا توجد إعلانات</td></tr>'; return }
+        tbody.innerHTML = data.map(m => `<tr>
+            <td style="font-weight:700">${m.title||'—'}</td>
+            <td><span class="td-badge ${m.type==='sell'?'badge-approved':'badge-pending'}">${m.type==='sell'?'بيع':'شراء'}</span></td>
+            <td style="color:var(--success)">${m.price?m.price+' ر.ع':'مجاني'}</td>
+            <td style="color:var(--text-dim);font-size:.8rem;">${m.seller_name||'مجهول'}</td>
+            <td><button class="btn-del" onclick="deleteMkt('${m.id}')"><i class="fas fa-trash"></i></button></td></tr>`).join('')
+    } catch(e) {}
+}
+window.deleteMkt = async (id) => { if(!confirm('حذف؟')) return; try { await supabase.from('marketplace_items').delete().eq('id',id); loadMarketplace(); loadStats(); showToast('تم الحذف','error') } catch(e){} }
+
+// ===== PROJECTS =====
+async function loadProjects() {
+    try {
+        const { data } = await supabase.from('projects').select('*').order('created_at', { ascending:false })
+        const tbody = document.getElementById('projTableBody')
+        if (!data || !data.length) { tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--text-dim);padding:2rem;">لا توجد مشاريع</td></tr>'; return }
+        tbody.innerHTML = data.map(p => `<tr>
+            <td style="font-weight:700">${p.title||'—'}</td>
+            <td style="color:var(--text-dim);font-size:.82rem;">${p.category||'—'}</td>
+            <td style="color:var(--text-dim);font-size:.8rem;">${p.author_name||'مجهول'}</td>
+            <td>${p.github_url?`<a href="${p.github_url}" target="_blank" style="color:var(--primary);font-size:.8rem;"><i class="fab fa-github"></i> GitHub</a>`:'—'}</td>
+            <td><button class="btn-del" onclick="deleteProject('${p.id}')"><i class="fas fa-trash"></i></button></td></tr>`).join('')
+    } catch(e) {}
+}
+window.deleteProject = async (id) => { if(!confirm('حذف؟')) return; try { await supabase.from('projects').delete().eq('id',id); loadProjects(); loadStats(); showToast('تم الحذف','error') } catch(e){} }
 
 // ===== TOOLS ADMIN =====
 async function loadToolsAdmin() {
