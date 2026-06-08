@@ -310,6 +310,11 @@ body.has-exam-banner .navbar{top:40px!important}
         <h2><i class="fas fa-cog"></i> لوحة التحكم</h2>
         <button class="close-panel" onclick="closePanel()"><i class="fas fa-times"></i></button>
     </div>
+    <div class="panel-section">
+        <a href="admin.html" style="display:flex;align-items:center;justify-content:center;gap:8px;padding:.9rem;background:linear-gradient(135deg,rgba(0,212,255,.15),rgba(0,153,204,.1));border:1px solid rgba(0,212,255,.3);border-radius:12px;color:var(--primary);font-weight:800;font-size:.95rem;text-decoration:none;">
+            <i class="fas fa-chart-pie"></i> فتح Dashboard الكامل
+        </a>
+    </div>
 
     <!-- Edit Tool -->
     <div class="panel-section" id="editSection" style="display:none;">
@@ -357,25 +362,6 @@ body.has-exam-banner .navbar{top:40px!important}
     </div>
 
     <!-- Bus Schedule Admin -->
-    <div class="panel-section" id="busAdminSection">
-        <h3><i class="fas fa-bus"></i> إدارة مواعيد الباصات</h3>
-        <div style="margin-bottom:1rem;">
-            <label style="font-size:0.9rem;color:var(--text-muted);font-weight:600;display:block;margin-bottom:0.5rem;">باص الأولاد 🚌</label>
-            <div id="busBoysAdmin"></div>
-            <button onclick="addBusRow('boys')" style="width:100%;padding:0.6rem;background:rgba(0,212,255,0.05);border:1px dashed rgba(0,212,255,0.2);border-radius:8px;color:rgba(0,212,255,0.5);font-size:0.85rem;cursor:pointer;font-family:'Tajawal',sans-serif;margin-top:6px;">+ إضافة رحلة</button>
-        </div>
-        <div style="margin-bottom:1rem;">
-            <label style="font-size:0.9rem;color:var(--text-muted);font-weight:600;display:block;margin-bottom:0.5rem;">باص البنات 🚌</label>
-            <div id="busGirlsAdmin"></div>
-            <button onclick="addBusRow('girls')" style="width:100%;padding:0.6rem;background:rgba(255,107,107,0.05);border:1px dashed rgba(255,107,107,0.2);border-radius:8px;color:rgba(255,107,107,0.5);font-size:0.85rem;cursor:pointer;font-family:'Tajawal',sans-serif;margin-top:6px;">+ إضافة رحلة</button>
-        </div>
-        <div class="form-group">
-            <label>رابط حجز الباص</label>
-            <input type="text" id="busBookingUrl" placeholder="https://...">
-        </div>
-        <button class="btn-save" onclick="saveBusSchedule()"><i class="fas fa-save"></i> حفظ الجداول</button>
-    </div>
-
     <!-- Passwords -->
     <div class="panel-section">
         <h3><i class="fas fa-key"></i> إدارة كلمات المرور</h3>
@@ -819,6 +805,7 @@ window.openTool = function(id) {
         5: () => window.location.href = 'summaries.html',
         6: () => window.location.href = 'features.html#rest',
         7: () => window.location.href = 'tools.html',
+        9: () => window.location.href = 'schedule.html',
         10: () => window.location.href = 'groups.html',
         11: () => window.location.href = 'marketplace.html',
     }
@@ -1162,33 +1149,8 @@ window.toggleMenu = function() {
     else nl.style.cssText='display:flex;position:absolute;top:100%;left:0;right:0;flex-direction:column;background:var(--dark-light);padding:2rem;gap:1.5rem;z-index:999;'
 }
 
-// ===== EXAM MODE =====
-function checkExamMode() {
-    const examMode = localStorage.getItem('uon_exam_mode') === 'true'
-    const banner = document.getElementById('examBanner')
-    if (banner) banner.style.display = examMode ? 'flex' : 'none'
-}
-
-window.toggleExamMode = function(state) {
-    localStorage.setItem('uon_exam_mode', state)
-    checkExamMode()
-    if (state) showToast('تم تفعيل وضع الاختبارات! 📚 بالتوفيق')
-}
-
-// Admin exam mode toggle in panel
-async function addExamToggle() {
-    const settingsSection = document.querySelector('#adminPanel .panel-section:last-child')
-    if (settingsSection && !document.getElementById('examToggleBtn')) {
-        const btn = document.createElement('button')
-        btn.id = 'examToggleBtn'
-        btn.className = 'btn-save'
-        btn.style.marginTop = '10px'
-        btn.style.background = 'linear-gradient(135deg,var(--danger),#dc2626)'
-        btn.innerHTML = '<i class="fas fa-graduation-cap"></i> تفعيل وضع الاختبارات'
-        btn.onclick = () => toggleExamMode(localStorage.getItem('uon_exam_mode') !== 'true')
-        settingsSection.appendChild(btn)
-    }
-}
+// ===== EXAM MODE (handled by Supabase in DOMContentLoaded) =====
+function checkExamMode() {} // legacy stub - do nothing
 
 // ===== GLOBAL SEARCH =====
 window.openGlobalSearch = function() {
