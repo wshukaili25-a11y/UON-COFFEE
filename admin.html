@@ -992,11 +992,19 @@ async function loadToolsAdmin() {
 }
 
 window.toggleAdminTool = async function(toolId, currentDisabled) {
+    const btn = event.target
+    btn.disabled = true
+    btn.textContent = '...'
     try {
-        await supabase.from('tools_items').update({ disabled: !currentDisabled }).eq('id', toolId)
+        const { error } = await supabase.from('tools_items').update({ disabled: !currentDisabled }).eq('id', toolId)
+        if (error) throw error
         await loadToolsAdmin()
-        showToast(currentDisabled ? 'تم تشغيل الأداة ✅' : 'تم إيقاف الأداة', currentDisabled ? '' : 'error')
-    } catch(e) { showToast('خطأ في التحديث', 'error') }
+        showToast(currentDisabled ? 'تم تشغيل الأداة ✅' : 'تم إيقاف الأداة ⏸', currentDisabled ? '' : 'error')
+    } catch(e) {
+        showToast('خطأ: تأكد من صلاحيات Supabase — شغّل SQL المطلوب', 'error')
+        btn.disabled = false
+        await loadToolsAdmin()
+    }
 }
 
 // ===== PASSWORDS =====
