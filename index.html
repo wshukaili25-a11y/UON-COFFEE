@@ -266,17 +266,22 @@
         }
     
 
-.exam-banner { display:none; width:100%; background:linear-gradient(90deg,#b91c1c,#dc2626,#b91c1c); color:#fff; text-align:center; padding:.65rem 1rem; font-size:.88rem; font-weight:800; font-family:'Tajawal',sans-serif; position:fixed; top:0; left:0; right:0; z-index:99999; box-shadow:0 2px 12px rgba(185,28,28,.5); letter-spacing:.3px; animation:examPulse 3s ease-in-out infinite; }
-.exam-banner.show { display:block; }
-@keyframes examPulse { 0%,100%{opacity:1} 50%{opacity:.88} }
-body.has-exam-banner { padding-top: 40px !important; }
-body.has-exam-banner .navbar { top: 40px !important; }
+
+ 50%{opacity:.88} }
+
+
+.exam-banner{display:none;width:100%;background:linear-gradient(90deg,#b91c1c,#dc2626,#b91c1c);color:#fff;text-align:center;padding:.65rem 1rem;font-size:.88rem;font-weight:800;font-family:'Tajawal',sans-serif;position:fixed;top:0;left:0;right:0;z-index:99999;box-shadow:0 2px 12px rgba(185,28,28,.5);letter-spacing:.3px;animation:examPulse 3s ease-in-out infinite}
+.exam-banner.show{display:block}
+@keyframes examPulse{0%,100%{opacity:1}50%{opacity:.88}}
+body.has-exam-banner{padding-top:40px!important}
+body.has-exam-banner .navbar{top:40px!important}
 </style>
 </head>
 <body>
 
 <!-- Loading -->
-<div class="loading-overlay" id="loadingOverlay"><div class="loading-spinner"></div></div>
+<div class="loading-overlay" id="loadingOverlay"><div class="loading-spinner"></div>
+<div class="exam-banner" id="examBanner"></div></div>
 
 <!-- Toast -->
 <div class="toast" id="toast"><i class="fas fa-check-circle"></i><span id="toastMsg"></span></div>
@@ -425,11 +430,7 @@ body.has-exam-banner .navbar { top: 40px !important; }
 </nav>
 
 <!-- Exam Mode Banner -->
-<div id="examBanner" style="display:none;position:fixed;top:65px;width:100%;z-index:999;background:linear-gradient(135deg,rgba(239,68,68,.95),rgba(220,38,38,.95));backdrop-filter:blur(10px);padding:.7rem 5%;display:none;align-items:center;justify-content:space-between;gap:1rem;border-bottom:1px solid rgba(255,255,255,.1);">
-    <div style="display:flex;align-items:center;gap:10px;font-size:.9rem;font-weight:700;">
-        <span style="font-size:1.2rem;">📚</span>
-        <span>وضع الاختبارات مفعّل — بالتوفيق لجميع الطلاب! 🎯</span>
-    </div>
+
     <div style="display:flex;gap:.6rem;align-items:center;">
         <a href="summaries.html" style="padding:.4rem .9rem;background:rgba(255,255,255,.2);border-radius:8px;color:#fff;text-decoration:none;font-size:.8rem;font-weight:700;">📚 الملخصات</a>
         <a href="tools.html" style="padding:.4rem .9rem;background:rgba(255,255,255,.2);border-radius:8px;color:#fff;text-decoration:none;font-size:.8rem;font-weight:700;">🛠️ الأدوات</a>
@@ -615,6 +616,7 @@ const defaultTools = [
     { id: 6, title: "دليل المطاعم", description: "أقرب المطاعم والكافيهات حول جامعة نزوى مع التقييمات", icon: "fa-utensils", color: "#fb923c", btn_text: "شوف المطاعم" },
     { id: 7, title: "خريطة الجامعة", description: "خريطة تفاعلية لمواقع الكليات والمرافق داخل الحرم الجامعي", icon: "fa-map-marked-alt", color: "#38bdf8", btn_text: "افتح الخريطة" },
     { id: 10, title: "مجموعات الواتساب", description: "ابحث عن مجموعة مادتك أو أضف مجموعتك لمساعدة زملائك", icon: "fa-whatsapp", color: "#25d366", btn_text: "ابحث عن مجموعة" },
+    { id: 9, title: "الجدول الدراسي", description: "أنشئ جدولك الأسبوعي بسهولة — أضف موادك ورموزها وأماكنها واطبعه", icon: "fa-calendar-alt", color: "#a78bfa", btn_text: "أنشئ جدولك" },
     { id: 11, title: "سوق الطلاب", description: "بيع وشراء وتبادل الكتب والأدوات الدراسية بين طلاب الجامعة", icon: "fa-store", color: "#ffd93d", btn_text: "تسوّق الآن" }
 ]
 
@@ -775,23 +777,14 @@ window.saveBusSchedule = async function() {
 // ===== INIT =====
 window.addEventListener('DOMContentLoaded', async () => {
     // إخفاء الـ loading بعد 4 ثواني على أي حال
-    setTimeout(() => document.getElementById('loadingOverlay').classList.add('hidden'), 4000)
-
-    // ===== EXAM BANNER =====
+    setTimeout(() =>     // ===== EXAM BANNER =====
     try {
-        const { data: _ebData } = await supabase.from('settings').select('*').in('key',['exam_mode','exam_title','exam_msg','exam_emoji'])
-        if (_ebData) {
-            const _ebMap = {}
-            _ebData.forEach(r => _ebMap[r.key] = r.value)
-            if (_ebMap.exam_mode === 'true') {
-                const _icon = _ebMap.exam_emoji || '🎯'
-                const _title = _ebMap.exam_title || 'فترة الاختبارات النهائية'
-                const _msg = _ebMap.exam_msg || 'بالتوفيق لجميع الطلاب!'
-                const _el = document.getElementById('examBanner')
-                if (_el) { _el.textContent = _icon + ' ' + _title + ' — ' + _msg; _el.classList.add('show'); document.body.classList.add('has-exam-banner') }
-            }
-        }
+        const {data:_eb} = await supabase.from('settings').select('*').in('key',['exam_mode','exam_title','exam_msg','exam_emoji'])
+        if(_eb){const _m={};_eb.forEach(r=>_m[r.key]=r.value);if(_m.exam_mode==='true'){const _el=document.getElementById('examBanner');if(_el){_el.textContent=(_m.exam_emoji||'🎯')+' '+(_m.exam_title||'فترة الاختبارات')+' — '+(_m.exam_msg||'بالتوفيق!');_el.classList.add('show');document.body.classList.add('has-exam-banner')}}}
     } catch(e) {}
+    document.getElementById('loadingOverlay').classList.add('hidden'), 4000)
+
+    
     try {
         await Promise.all([loadTools(), loadSettings(), loadBusData()])
     } catch(e) { console.log('init error', e) }
