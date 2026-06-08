@@ -614,7 +614,6 @@ const defaultTools = [
     { id: 5, title: "مكتبة الملخصات", description: "ملخصات وشروحات من طلاب نزوى لجميع الكليات والمواد", icon: "fa-book-open", color: "#a78bfa", btn_text: "تصفح الملخصات" },
     { id: 6, title: "دليل المطاعم", description: "أقرب المطاعم والكافيهات حول جامعة نزوى مع التقييمات", icon: "fa-utensils", color: "#fb923c", btn_text: "شوف المطاعم" },
     { id: 7, title: "خريطة الجامعة", description: "خريطة تفاعلية لمواقع الكليات والمرافق داخل الحرم الجامعي", icon: "fa-map-marked-alt", color: "#38bdf8", btn_text: "افتح الخريطة" },
-    { id: 8, title: "مواعيد الباصات", description: "جداول ذهاب وعودة باصات الطلاب محدّثة يومياً للأولاد والبنات", icon: "fa-bus", color: "#f472b6", btn_text: "شوف المواعيد" },
     { id: 10, title: "مجموعات الواتساب", description: "ابحث عن مجموعة مادتك أو أضف مجموعتك لمساعدة زملائك", icon: "fa-whatsapp", color: "#25d366", btn_text: "ابحث عن مجموعة" },
     { id: 11, title: "سوق الطلاب", description: "بيع وشراء وتبادل الكتب والأدوات الدراسية بين طلاب الجامعة", icon: "fa-store", color: "#ffd93d", btn_text: "تسوّق الآن" }
 ]
@@ -827,7 +826,6 @@ window.openTool = function(id) {
         5: () => window.location.href = 'summaries.html',
         6: () => window.location.href = 'features.html#rest',
         7: () => window.location.href = 'tools.html',
-        8: () => window.location.href = 'bus.html',
         10: () => window.location.href = 'groups.html',
         11: () => window.location.href = 'marketplace.html',
     }
@@ -1219,7 +1217,6 @@ window.globalSearch = function(q) {
         { name:'مكتبة الملخصات', url:'summaries.html', icon:'📚', desc:'ملخصات لجميع الكليات والمواد' },
         { name:'مجموعات الواتساب', url:'groups.html', icon:'💬', desc:'مجموعات المواد الدراسية' },
         { name:'سوق الطلاب', url:'marketplace.html', icon:'🛍️', desc:'بيع وشراء الكتب والأدوات' },
-        { name:'مواعيد الباصات', url:'bus.html', icon:'🚌', desc:'جداول الذهاب والعودة' },
         { name:'مكتبة الأدوات', url:'tools.html', icon:'🛠️', desc:'أدوات الذكاء الاصطناعي والدراسة' },
         { name:'الخريطة التفاعلية', url:'features.html', icon:'🗺️', desc:'خريطة مباني الجامعة' },
         { name:'دليل المطاعم', url:'features.html', icon:'🍕', desc:'مطاعم وكافيهات قريبة' },
