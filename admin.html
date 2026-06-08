@@ -213,7 +213,7 @@ body { font-family:'Tajawal',sans-serif; background:var(--dark); color:var(--tex
 
         <div class="nav-section">
             <div class="nav-label">المحتوى</div>
-            <div class="nav-item" onclick="showSection('confessions',this)"><i class="fas fa-comments"></i> الاعترافات <span class="nav-badge" id="navConfBadge" style="display:none">0</span></div>
+            <div class="nav-item" onclick="showSection('confessions',this)"><i class="fas fa-bullhorn"></i> الإعلانات <span class="nav-badge" id="navConfBadge" style="display:none">0</span></div>
             <div class="nav-item" onclick="showSection('summaries',this)"><i class="fas fa-book"></i> الملخصات <span class="nav-badge" id="navSumBadge" style="display:none">0</span></div>
             <div class="nav-item" onclick="showSection('restaurants',this)"><i class="fas fa-utensils"></i> المطاعم</div>
             <div class="nav-item" onclick="showSection('groups',this)"><i class="fab fa-whatsapp"></i> مجموعات الواتساب <span class="nav-badge" id="navGroupBadge" style="display:none">0</span></div>
@@ -250,14 +250,13 @@ body { font-family:'Tajawal',sans-serif; background:var(--dark); color:var(--tex
                 <p>مرحباً! إليك ملخص نشاط الموقع</p>
             </div>
             <div class="stats-row" id="statsRow">
-                <div class="stat-card"><div class="stat-top"><div class="stat-icon" style="background:rgba(0,212,255,.1);color:var(--primary)"><i class="fas fa-comments"></i></div><span class="stat-change neutral">اعترافات</span></div><div class="stat-value" id="statConfessions">—</div><div class="stat-label">الاعترافات</div></div>
+                <div class="stat-card"><div class="stat-top"><div class="stat-icon" style="background:rgba(0,212,255,.1);color:var(--primary)"><i class="fas fa-bullhorn"></i></div><span class="stat-change neutral">إعلانات</span></div><div class="stat-value" id="statConfessions">—</div><div class="stat-label">الاعترافات</div></div>
                 <div class="stat-card"><div class="stat-top"><div class="stat-icon" style="background:rgba(107,203,119,.1);color:var(--success)"><i class="fas fa-book"></i></div><span class="stat-change neutral">ملخصات</span></div><div class="stat-value" id="statSummaries">—</div><div class="stat-label">الملخصات</div></div>
                 <div class="stat-card"><div class="stat-top"><div class="stat-icon" style="background:rgba(251,146,60,.1);color:var(--warning)"><i class="fas fa-clock"></i></div><span class="stat-change up">جديد</span></div><div class="stat-value" id="statPending">—</div><div class="stat-label">بانتظار الموافقة</div></div>
                 <div class="stat-card"><div class="stat-top"><div class="stat-icon" style="background:rgba(37,211,102,.1);color:#25d366"><i class="fab fa-whatsapp"></i></div><span class="stat-change neutral">مجموعات</span></div><div class="stat-value" id="statGroups">—</div><div class="stat-label">مجموعات الواتساب</div></div>
                 <div class="stat-card"><div class="stat-top"><div class="stat-icon" style="background:rgba(255,209,61,.1);color:var(--warning)"><i class="fas fa-store"></i></div><span class="stat-change neutral">سوق</span></div><div class="stat-value" id="statMkt">—</div><div class="stat-label">إعلانات السوق</div></div>
                 <div class="stat-card"><div class="stat-top"><div class="stat-icon" style="background:rgba(164,139,250,.1);color:#a78bfa"><i class="fas fa-code"></i></div><span class="stat-change neutral">مشاريع</span></div><div class="stat-value" id="statProj">—</div><div class="stat-label">المشاريع</div></div>
-                <div class="stat-card"><div class="stat-top"><div class="stat-icon" style="background:rgba(255,107,107,.1);color:var(--secondary)"><i class="fas fa-utensils"></i></div><span class="stat-change neutral">مطاعم</span></div><div class="stat-value" id="statRestaurants">—</div><div class="stat-label">المطاعم</div></div>
-                <div class="stat-card"><div class="stat-top"><div class="stat-icon" style="background:rgba(164,139,250,.1);color:#a78bfa"><i class="fas fa-bell"></i></div><span class="stat-change up">إشعارات</span></div><div class="stat-value" id="statNotifs">—</div><div class="stat-label">إشعارات غير مقروءة</div></div>
+                <div class="stat-card"><div class="stat-top"><div class="stat-icon" style="background:rgba(255,107,107,.1);color:var(--secondary)"><i class="fas fa-tools"></i></div><span class="stat-change neutral">أدوات</span></div><div class="stat-value" id="statRestaurants">—</div><div class="stat-label">الأدوات</div></div>
             </div>
 
             <div class="content-card">
@@ -295,12 +294,12 @@ body { font-family:'Tajawal',sans-serif; background:var(--dark); color:var(--tex
         <!-- CONFESSIONS -->
         <div class="section" id="section-confessions">
             <div class="page-header">
-                <h1>الاعترافات 💬</h1>
-                <p>إدارة اعترافات الطلاب</p>
+                <h1>الإعلانات 📢</h1>
+                <p>إدارة إعلانات الجامعة</p>
             </div>
             <div class="content-card">
                 <div class="card-header">
-                    <div class="card-title"><i class="fas fa-comments" style="color:var(--primary)"></i> جميع الاعترافات</div>
+                    <div class="card-title"><i class="fas fa-bullhorn" style="color:var(--primary)"></i> جميع الإعلانات</div>
                     <button class="card-action danger" onclick="clearAllConf()" style="color:var(--danger);border-color:rgba(239,68,68,.3);background:rgba(239,68,68,.06);">
                         <i class="fas fa-trash"></i> حذف الكل
                     </button>
@@ -597,10 +596,8 @@ function showDashboard() {
 async function loadAll() {
     await Promise.all([
         loadStats(),
-        loadNotifications(),
         loadConfessions(),
         loadSummaries(),
-        loadRestaurants(),
         loadGroups(),
         loadMarketplace(),
         loadProjects(),
@@ -613,25 +610,20 @@ async function loadAll() {
 // ===== STATS =====
 async function loadStats() {
     try {
-        const [conf, sum, rest, notif, grp, mkt, proj] = await Promise.all([
-            supabase.from('confessions').select('id', { count:'exact' }),
+        const [ann, sum, tools, grp, mkt, proj] = await Promise.all([
+            supabase.from('announcements').select('id', { count:'exact' }),
             supabase.from('summaries').select('id,approved', { count:'exact' }),
-            supabase.from('restaurants').select('id', { count:'exact' }),
-            supabase.from('notifications').select('id,is_read'),
+            supabase.from('tools_items').select('id', { count:'exact' }),
             supabase.from('whatsapp_groups').select('id,approved', { count:'exact' }),
-            supabase.from('marketplace_items').select('id', { count:'exact' }),
+            supabase.from('marketplace').select('id', { count:'exact' }),
             supabase.from('projects').select('id', { count:'exact' }),
         ])
-        document.getElementById('statConfessions').textContent = conf.count || 0
+        document.getElementById('statConfessions').textContent = ann.count || 0
         document.getElementById('statSummaries').textContent = sum.count || 0
         const pending = sum.data ? sum.data.filter(s => !s.approved).length : 0
         document.getElementById('statPending').textContent = pending
-        document.getElementById('statRestaurants').textContent = rest.count || 0
-        const unread = notif.data ? notif.data.filter(n => !n.is_read).length : 0
-        document.getElementById('statNotifs').textContent = unread
-        if (unread > 0) { document.getElementById('navNotifBadge').textContent = unread; document.getElementById('navNotifBadge').style.display = 'inline-block' }
+        document.getElementById('statRestaurants').textContent = tools.count || 0
         if (pending > 0) { document.getElementById('navSumBadge').textContent = pending; document.getElementById('navSumBadge').style.display = 'inline-block' }
-        // groups pending
         const grpPending = grp.data ? grp.data.filter(g => !g.approved).length : 0
         if (grpPending > 0) { document.getElementById('navGroupBadge').textContent = grpPending; document.getElementById('navGroupBadge').style.display = 'inline-block' }
         document.getElementById('statGroups').textContent = grp.count || 0
@@ -644,7 +636,7 @@ async function loadStats() {
 // ===== RECENT ACTIVITY =====
 async function loadRecentActivity() {
     try {
-        const { data: confs } = await supabase.from('confessions').select('*').order('created_at', { ascending:false }).limit(3)
+        const { data: confs } = await supabase.from('announcements').select('*').order('created_at', { ascending:false }).limit(3)
         const { data: sums } = await supabase.from('summaries').select('*').order('created_at', { ascending:false }).limit(3)
         const activities = [
             ...(confs||[]).map(c => ({ type:'conf', text:c.text?.substring(0,60)+'...', time:c.created_at })),
@@ -679,7 +671,7 @@ function formatTime(ts) {
 // ===== NOTIFICATIONS =====
 async function loadNotifications() {
     try {
-        const { data } = await supabase.from('notifications').select('*').order('created_at', { ascending:false }).limit(30)
+        const { data } = await supabase.from('announcements').select('*').order('created_at', { ascending:false }).limit(30)
         notifications = data || []
         renderNotifications()
     } catch(e) {}
@@ -704,7 +696,7 @@ function renderNotifications() {
 }
 
 window.markOneRead = async function(id) {
-    try { await supabase.from('notifications').update({ is_read:true }).eq('id', id) } catch(e) {}
+    try { await supabase.from('announcements').update({ is_read:true }).eq('id', id) } catch(e) {}
     const n = notifications.find(n => n.id == id)
     if (n) n.is_read = true
     renderNotifications()
@@ -712,7 +704,7 @@ window.markOneRead = async function(id) {
 }
 
 window.markAllRead = async function() {
-    try { await supabase.from('notifications').update({ is_read:true }).eq('is_read', false) } catch(e) {}
+    try { await supabase.from('announcements').update({ is_read:true }).eq('is_read', false) } catch(e) {}
     notifications.forEach(n => n.is_read = true)
     renderNotifications()
     loadStats()
@@ -722,7 +714,7 @@ window.markAllRead = async function() {
 // ===== CONFESSIONS =====
 async function loadConfessions() {
     try {
-        const { data } = await supabase.from('confessions').select('*').order('created_at', { ascending:false })
+        const { data } = await supabase.from('announcements').select('*').order('created_at', { ascending:false })
         const tbody = document.getElementById('confTableBody')
         if (!data || !data.length) { tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--text-dim);padding:2rem;">لا توجد اعترافات</td></tr>'; return }
         tbody.innerHTML = data.map(c => `
@@ -739,12 +731,12 @@ async function loadConfessions() {
 
 window.deleteConf = async function(id) {
     if (!confirm('حذف هذا الاعتراف؟')) return
-    try { await supabase.from('confessions').delete().eq('id', id); await loadConfessions(); showToast('تم الحذف', 'error') } catch(e) {}
+    try { await supabase.from('announcements').delete().eq('id', id); await loadConfessions(); showToast('تم الحذف', 'error') } catch(e) {}
 }
 
 window.clearAllConf = async function() {
     if (!confirm('هل أنت متأكد من حذف كل الاعترافات؟')) return
-    try { await supabase.from('confessions').delete().neq('id', 0); await loadConfessions(); showToast('تم حذف كل الاعترافات', 'error') } catch(e) {}
+    try { await supabase.from('announcements').delete().neq('id', 0); await loadConfessions(); showToast('تم حذف كل الاعترافات', 'error') } catch(e) {}
 }
 
 // ===== SUMMARIES =====
@@ -801,7 +793,7 @@ window.deleteSum = async function(id) {
 // ===== RESTAURANTS =====
 async function loadRestaurants() {
     try {
-        const { data } = await supabase.from('restaurants').select('*').order('created_at', { ascending:false })
+        const { data } = await supabase.from('announcements').select('*').order('created_at', { ascending:false })
         const tbody = document.getElementById('restTableBody')
         if (!data || !data.length) { tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--text-dim);padding:2rem;">لا توجد مطاعم</td></tr>'; return }
         tbody.innerHTML = data.map(r => `
@@ -817,7 +809,7 @@ async function loadRestaurants() {
 
 window.deleteRest = async function(id) {
     if (!confirm('حذف هذا المطعم؟')) return
-    try { await supabase.from('restaurants').delete().eq('id', id); await loadRestaurants(); showToast('تم الحذف', 'error') } catch(e) {}
+    try { await supabase.from('announcements').delete().eq('id', id); await loadRestaurants(); showToast('تم الحذف', 'error') } catch(e) {}
 }
 
 // ===== EXAM MODE =====// ===== EXAM MODE =====
@@ -936,7 +928,7 @@ window.deleteGroup = async (id) => { if(!confirm('حذف؟')) return; try { awai
 // ===== MARKETPLACE =====
 async function loadMarketplace() {
     try {
-        const { data } = await supabase.from('marketplace_items').select('*').order('created_at', { ascending:false })
+        const { data } = await supabase.from('marketplace').select('*').order('created_at', { ascending:false })
         const tbody = document.getElementById('mktTableBody')
         if (!data || !data.length) { tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--text-dim);padding:2rem;">لا توجد إعلانات</td></tr>'; return }
         tbody.innerHTML = data.map(m => `<tr>
@@ -947,7 +939,7 @@ async function loadMarketplace() {
             <td><button class="btn-del" onclick="deleteMkt('${m.id}')"><i class="fas fa-trash"></i></button></td></tr>`).join('')
     } catch(e) {}
 }
-window.deleteMkt = async (id) => { if(!confirm('حذف؟')) return; try { await supabase.from('marketplace_items').delete().eq('id',id); loadMarketplace(); loadStats(); showToast('تم الحذف','error') } catch(e){} }
+window.deleteMkt = async (id) => { if(!confirm('حذف؟')) return; try { await supabase.from('marketplace').delete().eq('id',id); loadMarketplace(); loadStats(); showToast('تم الحذف','error') } catch(e){} }
 
 // ===== PROJECTS =====
 async function loadProjects() {
