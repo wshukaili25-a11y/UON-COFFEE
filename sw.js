@@ -1,4 +1,4 @@
-const CACHE = 'uon-coffee-v1'
+const CACHE = 'uon-coffee-v3'
 const ASSETS = [
   '/',
   '/index.html',
@@ -27,6 +27,7 @@ self.addEventListener('activate', e => {
   self.clients.claim()
 })
 
+// Network first — دائماً يجيب من الشبكة أولاً
 self.addEventListener('fetch', e => {
   if (e.request.method !== 'GET') return
   e.respondWith(
