@@ -145,8 +145,6 @@
         .bus-tab:hover { border-color: var(--primary); color: var(--primary); }
         .bus-panel { display: none; }
         .bus-panel.active { display: block; animation: slideInUp 0.4s ease; }
-        .bus-table-wrap { background: var(--dark-light); border: 1px solid rgba(255,255,255,0.08); border-radius: 20px; overflow: hidden; }
-        .bus-table-head { padding: 1.2rem 2rem; background: rgba(0,212,255,0.08); border-bottom: 1px solid rgba(0,212,255,0.1); display: flex; align-items: center; justify-content: space-between; }
         .bus-table-head h3 { font-size: 1.1rem; font-weight: 800; display: flex; align-items: center; gap: 8px; }
         .bus-badge { font-size: 0.75rem; padding: 0.3rem 0.8rem; border-radius: 50px; font-weight: 700; }
         .bus-badge.boys { background: rgba(0,212,255,0.15); color: var(--primary); border: 1px solid rgba(0,212,255,0.3); }
@@ -179,10 +177,6 @@
         .summaries-cta p { color: var(--text-dim); margin-bottom: 1rem; }
 
         /* ===== ADMIN PANEL ===== */
-        .admin-panel { position: fixed; top: 0; right: -500px; width: 500px; max-width: 100%; height: 100vh; background: var(--dark-light); border-left: 1px solid rgba(255,255,255,0.1); z-index: 9998; transition: right 0.4s; overflow-y: auto; padding: 2rem; }
-        .admin-panel.open { right: 0; }
-        .admin-panel-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 9997; display: none; opacity: 0; transition: opacity 0.3s; }
-        .admin-panel-overlay.show { display: block; opacity: 1; }
         .panel-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; padding-bottom: 1.5rem; border-bottom: 1px solid rgba(255,255,255,0.1); }
         .panel-header h2 { font-size: 1.5rem; font-weight: 900; display: flex; align-items: center; gap: 10px; }
         .panel-header h2 i { color: var(--warning); }
@@ -259,7 +253,6 @@
             .tools-grid { grid-template-columns: 1fr; }
             .hero-buttons { flex-direction: column; align-items: center; }
             .btn-primary, .btn-secondary { width: 100%; max-width: 280px; justify-content: center; }
-            .admin-panel { width: 100%; right: -100%; }
             .bus-route { grid-template-columns: 1fr 1fr; gap: 0.5rem; }
             .bus-book-banner { flex-direction: column; text-align: center; }
             .summaries-grid { grid-template-columns: 1fr 1fr; }
@@ -287,9 +280,6 @@ body.has-exam-banner .navbar{top:40px!important}
 <div class="toast" id="toast"><i class="fas fa-check-circle"></i><span id="toastMsg"></span></div>
 
 <!-- Login Overlay -->
-<div class="login-overlay" id="loginOverlay">
-    <div class="login-box">
-        <div class="login-icon"><i class="fas fa-lock"></i></div>
         <h2>لوحة التحكم</h2>
         <p>هذه المنطقة مخصصة للمشرفين فقط</p>
         <div class="input-group">
@@ -302,25 +292,10 @@ body.has-exam-banner .navbar{top:40px!important}
 </div>
 
 <div class="admin-badge" id="adminBadge"><i class="fas fa-crown"></i> <span id="adminRoleLabel">وضع المشرف</span></div>
-<div class="admin-panel-overlay" id="panelOverlay" onclick="closePanel()"></div>
 
-<!-- Admin Panel -->
-<div class="admin-panel" id="adminPanel">
-    <div class="panel-header">
-        <h2><i class="fas fa-cog"></i> لوحة التحكم</h2>
-        <button class="close-panel" onclick="closePanel()"><i class="fas fa-times"></i></button>
-    </div>
-    <div class="panel-section">
-        <a href="admin.html" style="display:flex;align-items:center;justify-content:center;gap:8px;padding:.9rem;background:linear-gradient(135deg,rgba(0,212,255,.15),rgba(0,153,204,.1));border:1px solid rgba(0,212,255,.3);border-radius:12px;color:var(--primary);font-weight:800;font-size:.95rem;text-decoration:none;">
-            <i class="fas fa-chart-pie"></i> فتح Dashboard الكامل
-        </a>
-    </div>
 
     <!-- Edit Tool -->
-    <div class="panel-section" id="editSection" style="display:none;">
-        <h3><i class="fas fa-edit"></i> تعديل الأداة</h3>
-        <div class="form-group"><label>اسم الأداة</label><input type="text" id="editTitle"></div>
-        <div class="form-group"><label>الوصف</label><textarea id="editDesc"></textarea></div>
+            <div class="form-group"><label>الوصف</label><textarea id="editDesc"></textarea></div>
         <div class="form-group"><label>الأيقونة</label><input type="text" id="editIcon" placeholder="fa-robot"><small>Font Awesome icon name</small></div>
         <div class="form-group">
             <label>لون الأداة</label>
@@ -407,10 +382,10 @@ body.has-exam-banner .navbar{top:40px!important}
         <li><a href="features.html" target="_blank" style="color:var(--warning)!important;">🔥 الميزات</a></li>
     </ul>
     <div class="nav-actions">
-        <button class="admin-nav-btn" id="adminBtn" onclick="openPanel()"><i class="fas fa-cog"></i> لوحة التحكم</button>
-        <button class="logout-btn" id="logoutBtn" onclick="logout()"><i class="fas fa-sign-out-alt"></i> خروج</button>
+        <button class="admin-nav-btn" id="adminBtn" onclick="window.location.href='admin.html'"><i class="fas fa-cog"></i> لوحة التحكم</button>
+        
         <button onclick="openGlobalSearch()" style="width:36px;height:36px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:10px;color:var(--text-muted);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .3s;" title="بحث"><i class="fas fa-search"></i></button>
-        <button class="nav-btn" id="loginBtn" onclick="showLogin()"><i class="fas fa-user-shield"></i> أدمن</button>
+        <button class="nav-btn" id="loginBtn" onclick="window.location.href='admin.html'"><i class="fas fa-user-shield"></i> أدمن</button>
     </div>
     <div class="mobile-menu" onclick="toggleMenu()"><i class="fas fa-bars"></i></div>
 </nav>
@@ -580,58 +555,7 @@ const supabase = createClient(
 
 // ===== PASSWORD CHECK =====
 const FALLBACK_PASS = 'UoN@Coffee#2026!'
-async function checkPassword(password) {
-    if (password === FALLBACK_PASS) return { role: 'admin', label: 'المشرف الرئيسي' }
-    try {
-        const { data } = await supabase.from('admin_passwords').select('*')
-        if (data) {
-            for (const row of data) {
-                if (row.password_plain === password) return { role: row.role, label: row.label }
-            }
-        }
-    } catch(e) {}
-    return null
-}
 
-// ===== DEFAULT DATA =====
-const defaultTools = [
-    { id: 1, title: "مساعد AI ذكي", description: "بوت ذكي يجيب عن كل شيء يخص جامعة نزوى — متاح 24/7", icon: "fa-robot", color: "#00d4ff", btn_text: "جرب الآن" },
-    { id: 2, title: "حاسبة المعدل", description: "احسب معدلك الفصلي بسهولة — أضف موادك وساعاتها وتقديراتها", icon: "fa-calculator", color: "#ff6b6b", btn_text: "احسب معدلك" },
-    { id: 4, title: "اعترافات الطلاب", description: "شارك اعترافك الجامعي بشكل مجهول — كلنا في نفس الوضع 😅", icon: "fa-comments", color: "#6bcb77", btn_text: "اعترف الحين" },
-    { id: 5, title: "مكتبة الملخصات", description: "ملخصات وشروحات من طلاب نزوى لجميع الكليات والمواد", icon: "fa-book-open", color: "#a78bfa", btn_text: "تصفح الملخصات" },
-    { id: 6, title: "دليل المطاعم", description: "أقرب المطاعم والكافيهات حول جامعة نزوى مع التقييمات", icon: "fa-utensils", color: "#fb923c", btn_text: "شوف المطاعم" },
-    { id: 7, title: "خريطة الجامعة", description: "خريطة تفاعلية لمواقع الكليات والمرافق داخل الحرم الجامعي", icon: "fa-map-marked-alt", color: "#38bdf8", btn_text: "افتح الخريطة" },
-    { id: 10, title: "مجموعات الواتساب", description: "ابحث عن مجموعة مادتك أو أضف مجموعتك لمساعدة زملائك", icon: "fa-whatsapp", color: "#25d366", btn_text: "ابحث عن مجموعة" },
-    { id: 9, title: "الجدول الدراسي", description: "أنشئ جدولك الأسبوعي بسهولة — أضف موادك ورموزها وأماكنها واطبعه", icon: "fa-calendar-alt", color: "#a78bfa", btn_text: "أنشئ جدولك" },
-    { id: 11, title: "سوق الطلاب", description: "بيع وشراء وتبادل الكتب والأدوات الدراسية بين طلاب الجامعة", icon: "fa-store", color: "#ffd93d", btn_text: "تسوّق الآن" }
-]
-
-const defaultBoys = [
-    { route: "نزوى المدينة", departure: "07:00 ص", returnTime: "04:00 م", status: "active" },
-    { route: "بهلاء", departure: "06:45 ص", returnTime: "04:00 م", status: "active" },
-    { route: "عبري", departure: "06:30 ص", returnTime: "04:00 م", status: "active" },
-    { route: "الحمراء", departure: "06:50 ص", returnTime: "04:00 م", status: "full" },
-    { route: "إزكي", departure: "07:10 ص", returnTime: "04:00 م", status: "active" },
-    { route: "سمائل", departure: "06:40 ص", returnTime: "04:00 م", status: "active" },
-]
-const defaultGirls = [
-    { route: "نزوى المدينة", departure: "07:00 ص", returnTime: "04:00 م", status: "active" },
-    { route: "بهلاء", departure: "06:45 ص", returnTime: "04:00 م", status: "active" },
-    { route: "عبري", departure: "06:30 ص", returnTime: "04:00 م", status: "active" },
-    { route: "الحمراء", departure: "06:50 ص", returnTime: "04:00 م", status: "active" },
-    { route: "إزكي", departure: "07:10 ص", returnTime: "04:00 م", status: "full" },
-    { route: "سمائل", departure: "06:40 ص", returnTime: "04:00 م", status: "active" },
-]
-
-// ===== STATE =====
-let tools = []
-let currentAdmin = null
-let editingToolId = null
-let selectedColor = "#00d4ff"
-let selectedNewColor = "#00d4ff"
-let busData = { boys: [], girls: [], bookingUrl: '#' }
-
-// ===== SUPABASE =====
 async function loadTools() {
     // Show default tools immediately
     tools = defaultTools.map(t => ({...t, desc: t.description, btnText: t.btn_text}))
@@ -676,38 +600,6 @@ async function dbGetSettings() {
 }
 
 // ===== BUS DATA =====
-async function loadBusData() {
-    try {
-        const settings = await dbGetSettings()
-        busData.boys = settings.bus_boys ? JSON.parse(settings.bus_boys) : defaultBoys
-        busData.girls = settings.bus_girls ? JSON.parse(settings.bus_girls) : defaultGirls
-        busData.bookingUrl = settings.bus_booking_url || '#'
-    } catch(e) {
-        busData.boys = defaultBoys
-        busData.girls = defaultGirls
-    }
-    renderBusTables()
-}
-
-function renderBusTables() {
-    renderBusTable('boys', busData.boys)
-    renderBusTable('girls', busData.girls)
-    const link = document.getElementById('busBookingLink')
-    if (link) link.href = busData.bookingUrl || '#'
-}
-
-function renderBusTable(gender, routes) {
-    const el = document.getElementById(`bus${gender.charAt(0).toUpperCase() + gender.slice(1)}Table`)
-    if (!el) return
-    el.innerHTML = routes.map(r => `
-        <div class="bus-route">
-            <span class="route-name">📍 ${r.route}</span>
-            <span class="route-time">🕖 ${r.departure}</span>
-            <span class="route-return">↩️ ${r.returnTime}</span>
-            <span class="route-status ${r.status === 'active' ? 'status-active' : 'status-full'}">${r.status === 'active' ? 'متاح' : 'مكتمل'}</span>
-        </div>`).join('')
-}
-
 window.switchBusTab = function(tab, btn) {
     document.querySelectorAll('.bus-tab').forEach(b => b.classList.remove('active'))
     document.querySelectorAll('.bus-panel').forEach(p => p.classList.remove('active'))
@@ -716,51 +608,10 @@ window.switchBusTab = function(tab, btn) {
 }
 
 // Bus admin rows
-function renderBusAdminRows() {
-    renderBusAdminSection('boys', busData.boys)
-    renderBusAdminSection('girls', busData.girls)
-    const urlInput = document.getElementById('busBookingUrl')
-    if (urlInput) urlInput.value = busData.bookingUrl || ''
-}
 
-function renderBusAdminSection(gender, routes) {
-    const el = document.getElementById(`bus${gender.charAt(0).toUpperCase() + gender.slice(1)}Admin`)
-    if (!el) return
-    el.innerHTML = routes.map((r, i) => `
-        <div class="bus-admin-row">
-            <input type="text" value="${r.route}" onchange="updateBusRow('${gender}',${i},'route',this.value)">
-            <input type="text" value="${r.departure}" onchange="updateBusRow('${gender}',${i},'departure',this.value)">
-            <input type="text" value="${r.returnTime}" onchange="updateBusRow('${gender}',${i},'returnTime',this.value)">
-            <button onclick="removeBusRow('${gender}',${i})">×</button>
-        </div>`).join('')
-}
 
-window.updateBusRow = function(gender, index, field, value) {
-    busData[gender][index][field] = value
-}
 
-window.addBusRow = function(gender) {
-    busData[gender].push({ route: 'منطقة جديدة', departure: '07:00 ص', returnTime: '04:00 م', status: 'active' })
-    renderBusAdminSection(gender, busData[gender])
-}
 
-window.removeBusRow = function(gender, index) {
-    busData[gender].splice(index, 1)
-    renderBusAdminSection(gender, busData[gender])
-}
-
-window.saveBusSchedule = async function() {
-    if (currentAdmin?.role !== 'admin') { showToast('فقط المشرف الرئيسي يمكنه التعديل', 'error'); return }
-    const url = document.getElementById('busBookingUrl').value
-    busData.bookingUrl = url
-    await dbSaveSettings('bus_boys', JSON.stringify(busData.boys))
-    await dbSaveSettings('bus_girls', JSON.stringify(busData.girls))
-    await dbSaveSettings('bus_booking_url', url)
-    renderBusTables()
-    showToast('تم حفظ جداول الباصات!')
-}
-
-// ===== INIT =====
 window.addEventListener('DOMContentLoaded', async () => {
     // إخفاء الـ loading بعد 4 ثواني على أي حال
     setTimeout(() => document.getElementById('loadingOverlay').classList.add('hidden'), 4000)
@@ -814,169 +665,26 @@ window.openTool = function(id) {
 }
 
 // ===== LOGIN (SECURE) =====
-window.showLogin = function() {
-    document.getElementById('loginOverlay').classList.add('active')
-    document.getElementById('adminPassword').focus()
-}
+window.showLogin = function() { window.location.href = 'admin.html' }
 
-window.login = async function() {
-    const input = document.getElementById('adminPassword').value
-    const error = document.getElementById('loginError')
-    if (!input) return
 
-    const matched = await checkPassword(input)
 
-    if (matched) {
-        currentAdmin = matched
-        sessionStorage.setItem('nu_admin', JSON.stringify(matched))
-        document.getElementById('loginOverlay').classList.remove('active')
-        document.getElementById('adminPassword').value = ''
-        error.classList.remove('show')
-        updateUI()
-        showToast(`مرحباً ${matched.label}! ✅`)
-    } else {
-        error.classList.add('show')
-        document.querySelector('.login-box').style.animation = 'shake 0.5s ease'
-        setTimeout(() => document.querySelector('.login-box').style.animation = '', 500)
-    }
-}
 
-window.logout = function() {
-    currentAdmin = null
-    sessionStorage.removeItem('nu_admin')
-    updateUI()
-    showToast('تم تسجيل الخروج', 'error')
-}
-
-function updateUI() {
-    // Try restore session
-    if (!currentAdmin) {
-        const saved = sessionStorage.getItem('nu_admin')
-        if (saved) try { currentAdmin = JSON.parse(saved) } catch(e) {}
-    }
-    const isAdmin = currentAdmin !== null
-    const isMainAdmin = isAdmin && currentAdmin.role === 'admin'
-    const isEditor = isAdmin && (currentAdmin.role === 'admin' || currentAdmin.role === 'editor')
-
-    document.getElementById('adminBadge').classList.toggle('show', isAdmin)
-    if (isAdmin) document.getElementById('adminRoleLabel').textContent = currentAdmin.label || 'مشرف'
-    document.getElementById('adminBtn').classList.toggle('show', isAdmin)
-    document.getElementById('logoutBtn').classList.toggle('show', isAdmin)
-    document.getElementById('loginBtn').classList.toggle('show', !isAdmin)
-    document.body.classList.toggle('admin-mode', isEditor)
-
-    // Hide passwords & settings sections from non-main-admins
-    const pwSection = document.querySelector('#adminPanel .panel-section:nth-child(5)')
-    const settingsSection = document.querySelector('#adminPanel .panel-section:last-child')
-    if (pwSection) pwSection.style.display = isMainAdmin ? 'block' : 'none'
-    if (settingsSection) settingsSection.style.display = isMainAdmin ? 'block' : 'none'
-}
-
-// ===== ADMIN PANEL =====
-window.openPanel = function() {
-    if (!currentAdmin) return
-    document.getElementById('adminPanel').classList.add('open')
-    document.getElementById('panelOverlay').classList.add('show')
-    document.getElementById('editSection').style.display = 'none'
-    renderPasswordsList()
-    renderBusAdminRows()
-}
-window.closePanel = function() {
-    document.getElementById('adminPanel').classList.remove('open')
-    document.getElementById('panelOverlay').classList.remove('show')
-    editingToolId = null
-}
-
-window.editTool = function(id) {
-    if (currentAdmin?.role !== 'admin' && currentAdmin?.role !== 'editor') { showToast('ليس لديك صلاحية التعديل', 'error'); return }
-    const tool = tools.find(t => t.id === id)
-    if (!tool) return
-    editingToolId = id
-    document.getElementById('editTitle').value = tool.title
-    document.getElementById('editDesc').value = tool.desc
-    document.getElementById('editIcon').value = tool.icon
-    document.getElementById('editBtnText').value = tool.btnText
-    selectedColor = tool.color
-    document.querySelectorAll('#editSection .color-option').forEach(opt => opt.classList.toggle('selected', opt.dataset.color === tool.color))
-    document.getElementById('editSection').style.display = 'block'
-    openPanel()
-}
+window.openPanel = function() { window.location.href = 'admin.html' }
 
 window.selectColor = function(el) {
     document.querySelectorAll('#editSection .color-option').forEach(opt => opt.classList.remove('selected'))
     el.classList.add('selected'); selectedColor = el.dataset.color
 }
 
-window.saveToolHandler = async function() {
-    if (!editingToolId) return
-    if (currentAdmin?.role !== 'admin' && currentAdmin?.role !== 'editor') { showToast('ليس لديك صلاحية', 'error'); return }
-    const tool = tools.find(t => t.id === editingToolId)
-    if (tool) {
-        tool.title = document.getElementById('editTitle').value
-        tool.desc = document.getElementById('editDesc').value
-        tool.icon = document.getElementById('editIcon').value
-        tool.color = selectedColor
-        tool.btnText = document.getElementById('editBtnText').value
-        await dbSaveTool(tool)
-        renderTools()
-        closePanel()
-        showToast('تم حفظ التغييرات!')
-    }
-}
 
-window.deleteToolHandler = async function() {
-    if (!editingToolId) return
-    if (currentAdmin?.role !== 'admin') { showToast('فقط المشرف الرئيسي يمكنه الحذف', 'error'); return }
-    if (!confirm('هل أنت متأكد من حذف هذه الأداة؟')) return
-    await dbDeleteTool(editingToolId)
-    tools = tools.filter(t => t.id !== editingToolId)
-    renderTools()
-    closePanel()
-    showToast('تم حذف الأداة', 'error')
-}
 
 window.selectNewColor = function(el) {
     document.querySelectorAll('.panel-section:not(#editSection) .color-option').forEach(opt => opt.classList.remove('selected'))
     el.classList.add('selected'); selectedNewColor = el.dataset.color
 }
 
-window.addToolHandler = async function() {
-    if (currentAdmin?.role !== 'admin') { showToast('فقط المشرف الرئيسي يمكنه إضافة أدوات', 'error'); return }
-    const title = document.getElementById('newTitle').value
-    const desc = document.getElementById('newDesc').value
-    if (!title || !desc) { showToast('يرجى ملء جميع الحقول', 'error'); return }
-    const newTool = { title, desc, icon: document.getElementById('newIcon').value || 'fa-tools', color: selectedNewColor, btnText: document.getElementById('newBtnText').value || 'جرب الآن' }
-    await dbSaveTool(newTool)
-    await loadTools()
-    document.getElementById('newTitle').value = ''
-    document.getElementById('newDesc').value = ''
-    document.getElementById('newIcon').value = ''
-    document.getElementById('newBtnText').value = ''
-    showToast('تم إضافة الأداة!')
-}
 
-// ===== PASSWORDS (ADMIN ONLY) =====
-function renderPasswordsList() {
-    if (currentAdmin?.role !== 'admin') { document.getElementById('passwordsList').innerHTML = '<p style="color:var(--text-dim);font-size:0.85rem;">فقط المشرف الرئيسي يمكنه إدارة كلمات المرور</p>'; return }
-    document.getElementById('passwordsList').innerHTML = `
-        <div class="password-item"><div><span>••••••••••••••</span><span class="role">المشرف الرئيسي</span></div></div>
-        <p style="font-size:0.8rem;color:var(--text-dim);margin-top:0.5rem;">كلمة المرور الرئيسية محمية ولا تظهر</p>`
-}
-
-window.addPassword = async function() {
-    if (currentAdmin?.role !== 'admin') { showToast('فقط المشرف الرئيسي', 'error'); return }
-    const pass = document.getElementById('newPassword').value
-    const role = document.getElementById('newRole').value
-    const labels = { admin: 'مشرف رئيسي', editor: 'محرر', viewer: 'مشاهد' }
-    if (!pass) { showToast('أدخل كلمة المرور', 'error'); return }
-    try {
-        await supabase.from('admin_passwords').insert({ password_plain: pass, role, label: labels[role] })
-        document.getElementById('newPassword').value = ''
-        showToast('تم إضافة كلمة المرور!')
-    } catch(e) { showToast('خطأ في الحفظ', 'error') }
-}
-
-// ===== SETTINGS =====
 window.saveSettings = async function() {
     if (currentAdmin?.role !== 'admin') { showToast('فقط المشرف الرئيسي', 'error'); return }
     const title = document.getElementById('siteTitle').value
@@ -1252,7 +960,7 @@ window.addEventListener('beforeinstallprompt', e => {
 
 // Restore session on load
 ;(function() {
-    const saved = sessionStorage.getItem('nu_admin')
+    const saved = 
     if (saved) try { currentAdmin = JSON.parse(saved) } catch(e) {}
 })()
 </script>
