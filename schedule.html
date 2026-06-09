@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>الجدول الدراسي | UON Coffee</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0d0d1a;--card:#161628;--dark:#1a1a2e;--primary:#00d4ff;--secondary:#ff6b6b;--success:#6bcb77;--warning:#ffd93d;--text:#e8e8f0;--text-dim:#8888aa;--border:rgba(255,255,255,.08)}
+body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding-bottom:80px}
+
+/* NAV */
+.navbar{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(13,13,26,.95);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:0 5%;height:64px;display:flex;align-items:center;justify-content:space-between}
+.nav-logo{font-size:1.1rem;font-weight:900;background:linear-gradient(135deg,var(--primary),#a78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.nav-back{display:flex;align-items:center;gap:6px;color:var(--text-dim);font-size:.85rem;cursor:pointer;text-decoration:none;transition:color .2s}
+.nav-back:hover{color:var(--primary)}
+
+/* PAGE BG */
+.page-bg{position:fixed;inset:0;overflow:hidden;z-index:0;pointer-events:none}
+.c{position:absolute;border-radius:50%;filter:blur(80px);opacity:.07}
+.c1{width:400px;height:400px;background:var(--primary);top:-10%;right:-5%}
+.c2{width:300px;height:300px;background:#a78bfa;bottom:-5%;left:-5%}
+
+main{padding:80px 5% 40px;max-width:900px;margin:0 auto;position:relative;z-index:1}
+
+/* HERO */
+.page-hero{text-align:center;padding:2rem 0 2.5rem}
+.hero-badge{display:inline-flex;align-items:center;gap:6px;padding:.4rem 1rem;background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.2);border-radius:50px;font-size:.8rem;color:var(--primary);margin-bottom:1rem}
+.page-hero h1{font-size:clamp(1.8rem,4vw,2.6rem);font-weight:900;background:linear-gradient(135deg,#fff 30%,var(--primary) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:.5rem}
+.page-hero p{color:var(--text-dim);font-size:.9rem}
+
+/* ACTIONS BAR */
+.actions-bar{display:flex;gap:10px;margin-bottom:1.5rem;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;gap:7px;padding:.65rem 1.2rem;border-radius:12px;border:none;font-family:'Tajawal',sans-serif;font-size:.88rem;font-weight:700;cursor:pointer;transition:all .25s}
+.btn-primary{background:linear-gradient(135deg,var(--primary),#0099cc);color:#0d0d1a}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(0,212,255,.3)}
+.btn-success{background:rgba(107,203,119,.15);color:var(--success);border:1px solid rgba(107,203,119,.3)}
+.btn-success:hover{background:rgba(107,203,119,.25)}
+.btn-warning{background:rgba(255,217,61,.15);color:var(--warning);border:1px solid rgba(255,217,61,.3)}
+.btn-warning:hover{background:rgba(255,217,61,.25)}
+.btn-danger{background:rgba(255,107,107,.12);color:var(--secondary);border:1px solid rgba(255,107,107,.25)}
+.btn-danger:hover{background:rgba(255,107,107,.22)}
+
+/* SCHEDULE GRID */
+.schedule-card{background:var(--card);border-radius:16px;border:1px solid var(--border);overflow:hidden;margin-bottom:1.5rem}
+.schedule-header{display:grid;grid-template-columns:100px repeat(5,1fr);border-bottom:1px solid var(--border)}
+.day-header{padding:.7rem .4rem;text-align:center;font-size:.82rem;font-weight:800;color:var(--primary);background:rgba(0,212,255,.05);border-left:1px solid var(--border)}
+.day-header:first-child{background:transparent;color:var(--text-dim);font-size:.75rem}
+.time-row{display:grid;grid-template-columns:100px repeat(5,1fr);border-bottom:1px solid var(--border)}
+.time-row:last-child{border-bottom:none}
+.time-label{padding:.5rem .6rem;display:flex;align-items:center;justify-content:center;font-size:.72rem;color:var(--text-dim);font-weight:700;border-left:1px solid var(--border);background:rgba(255,255,255,.02)}
+.slot{padding:.3rem;border-left:1px solid var(--border);min-height:64px;cursor:pointer;transition:background .2s;position:relative}
+.slot:hover{background:rgba(0,212,255,.05)}
+.slot.has-course{cursor:default}
+.slot:hover .slot-add{opacity:1}
+.slot-add{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:1.1rem;color:rgba(0,212,255,.3);opacity:0;transition:opacity .2s}
+.course-block{background:var(--course-color, rgba(0,212,255,.15));border:1px solid var(--course-border, rgba(0,212,255,.3));border-radius:8px;padding:.4rem .5rem;height:100%;display:flex;flex-direction:column;gap:2px;position:relative}
+.course-code{font-size:.68rem;font-weight:800;color:var(--course-text, var(--primary));letter-spacing:.3px}
+.course-name{font-size:.72rem;font-weight:700;color:var(--text);line-height:1.2}
+.course-room{font-size:.65rem;color:var(--text-dim);display:flex;align-items:center;gap:3px;margin-top:2px}
+.course-hours{font-size:.62rem;color:var(--text-dim)}
+.course-del{position:absolute;top:3px;left:3px;width:16px;height:16px;background:rgba(255,107,107,.2);border:none;border-radius:4px;cursor:pointer;font-size:.6rem;color:var(--secondary);display:none;align-items:center;justify-content:center;transition:background .2s}
+.course-block:hover .course-del{display:flex}
+.course-del:hover{background:rgba(255,107,107,.4)}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(6px);z-index:200;display:none;align-items:center;justify-content:center;padding:1rem}
+.modal-overlay.show{display:flex}
+.modal{background:var(--card);border-radius:20px;border:1px solid var(--border);padding:1.5rem;width:100%;max-width:420px;max-height:90vh;overflow-y:auto}
+.modal-title{font-size:1.1rem;font-weight:800;margin-bottom:1.2rem;display:flex;align-items:center;gap:8px}
+.fgroup{margin-bottom:1rem}
+.flabel{font-size:.8rem;color:var(--text-dim);font-weight:600;margin-bottom:5px;display:block}
+.finp{width:100%;padding:.75rem 1rem;background:var(--dark);border:1px solid rgba(255,255,255,.1);border-radius:10px;color:var(--text);font-family:'Tajawal',sans-serif;font-size:.88rem;outline:none;transition:border-color .3s}
+.finp:focus{border-color:var(--primary)}
+.finp::placeholder{color:var(--text-dim)}
+.color-picker{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px}
+.color-opt{width:28px;height:28px;border-radius:50%;cursor:pointer;border:3px solid transparent;transition:all .2s}
+.color-opt.sel{border-color:#fff;transform:scale(1.15)}
+.modal-actions{display:flex;gap:8px;margin-top:1.2rem}
+.modal-actions .btn{flex:1;justify-content:center}
+
+/* SUMMARY */
+.summary-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;margin-bottom:1.5rem}
+.summary-card{background:var(--card);border-radius:12px;border:1px solid var(--border);padding:.9rem;text-align:center}
+.summary-num{font-size:1.6rem;font-weight:900;color:var(--primary)}
+.summary-label{font-size:.75rem;color:var(--text-dim);margin-top:3px}
+
+/* EXAM BANNER */
+
+50%{opacity:.88}}
+
+
+
+/* PRINT */
+@media print{
+  .navbar,.actions-bar,.page-hero,.slot-add,.course-del,.page-bg,
+  .exam-banner{display:none!important}
+  body{background:#fff;color:#000;padding:0}
+  main{padding:10px}
+  .schedule-card{border:1px solid #ccc;border-radius:0}
+  .day-header{color:#0066cc}
+  .course-block{background:#e8f4ff!important;border-color:#0066cc!important}
+  .course-name{color:#000!important}
+  .course-code{color:#0066cc!important}
+  .print-title{display:block!important}
+}
+.print-title{display:none;text-align:center;font-size:1.2rem;font-weight:900;margin-bottom:1rem;padding:10px}
+
+@media(max-width:640px){
+  .schedule-header,.time-row{grid-template-columns:60px repeat(5,1fr)}
+  .day-header{font-size:.65rem;padding:.5rem .2rem}
+  .time-label{font-size:.6rem;padding:.3rem}
+  .course-code{font-size:.58rem}
+  .course-name{font-size:.62rem}
+  .course-room{display:none}
+}
+</style>
+</head>
+<body>
+
+
+<div class="page-bg"><div class="c c1"></div><div class="c c2"></div></div>
+
+<nav class="navbar">
+  <a href="index.html" class="nav-back"><i class="fas fa-chevron-right"></i> الرئيسية</a>
+  <div class="nav-logo">☕ UON Coffee</div>
+  <span style="font-size:.8rem;color:var(--text-dim)">الجدول الدراسي</span>
+</nav>
+
+<main>
+  <div class="print-title">الجدول الدراسي — جامعة نزوى</div>
+
+  <div class="page-hero">
+    <div class="hero-badge"><i class="fas fa-calendar-alt"></i> الفصل الحالي</div>
+    <h1>جدولك الدراسي 📅</h1>
+    <p>أضف موادك وساعاتها وأماكنها — واحفظ أو اطبع جدولك</p>
+  </div>
+
+  <!-- SUMMARY -->
+  <div class="summary-grid" id="summaryGrid">
+    <div class="summary-card"><div class="summary-num" id="sumCourses">0</div><div class="summary-label">مادة</div></div>
+    <div class="summary-card"><div class="summary-num" id="sumHours">0</div><div class="summary-label">ساعة معتمدة</div></div>
+    <div class="summary-card"><div class="summary-num" id="sumDays">0</div><div class="summary-label">يوم دراسي</div></div>
+  </div>
+
+  <!-- ACTIONS -->
+  <div class="actions-bar">
+    <button class="btn btn-success" onclick="saveSchedule()"><i class="fas fa-save"></i> حفظ الجدول</button>
+    <button class="btn btn-warning" onclick="window.print()"><i class="fas fa-print"></i> طباعة</button>
+    <button class="btn btn-danger" onclick="clearSchedule()"><i class="fas fa-trash"></i> مسح الكل</button>
+  </div>
+
+  <!-- SCHEDULE TABLE -->
+  <div class="schedule-card" id="scheduleCard">
+    <div class="schedule-header">
+      <div class="day-header">الوقت</div>
+      <div class="day-header">الأحد</div>
+      <div class="day-header">الإثنين</div>
+      <div class="day-header">الثلاثاء</div>
+      <div class="day-header">الأربعاء</div>
+      <div class="day-header">الخميس</div>
+    </div>
+    <div id="slotsContainer"></div>
+  </div>
+</main>
+
+<!-- ADD COURSE MODAL -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <div class="modal-title"><i class="fas fa-plus-circle" style="color:var(--primary)"></i> إضافة مادة</div>
+    <div class="fgroup">
+      <span class="flabel">اسم المادة *</span>
+      <input class="finp" id="mCourseName" placeholder="مثال: رياضيات تطبيقية">
+    </div>
+    <div class="fgroup">
+      <span class="flabel">رمز المادة</span>
+      <input class="finp" id="mCourseCode" placeholder="مثال: MATH201" style="text-transform:uppercase">
+    </div>
+    <div class="fgroup">
+      <span class="flabel">الساعات المعتمدة</span>
+      <input class="finp" id="mHours" type="number" min="1" max="6" placeholder="مثال: 3" value="3">
+    </div>
+    <div class="fgroup">
+      <span class="flabel">المبنى / القاعة</span>
+      <input class="finp" id="mRoom" placeholder="مثال: A102 أو مبنى الهندسة">
+    </div>
+    <div class="fgroup">
+      <span class="flabel">لون المادة</span>
+      <div class="color-picker" id="colorPicker"></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-primary" onclick="confirmAddCourse()"><i class="fas fa-check"></i> إضافة</button>
+      <button class="btn btn-danger" onclick="closeModal()"><i class="fas fa-times"></i> إلغاء</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast" style="position:fixed;bottom:24px;right:50%;transform:translateX(50%);background:var(--success);color:#0d0d1a;padding:.6rem 1.4rem;border-radius:50px;font-weight:800;font-size:.85rem;z-index:9999;display:none;align-items:center;gap:6px;">
+  <i class="fas fa-check-circle"></i><span id="toastMsg"></span>
+</div>
+
+<script src="supabase.js"></script>
+<script>
+const DAYS = ['الأحد','الإثنين','الثلاثاء','الأربعاء','الخميس']
+const TIMES = ['08:00 - 08:50','09:00 - 09:50','10:00 - 10:50','11:00 - 11:50','12:00 - 12:50','13:00 - 13:50','14:00 - 14:50','15:00 - 15:50','16:00 - 16:50','17:00 - 17:50']
+const COLORS = [
+  {bg:'rgba(0,212,255,.15)',border:'rgba(0,212,255,.4)',text:'#00d4ff'},
+  {bg:'rgba(107,203,119,.15)',border:'rgba(107,203,119,.4)',text:'#6bcb77'},
+  {bg:'rgba(167,139,250,.15)',border:'rgba(167,139,250,.4)',text:'#a78bfa'},
+  {bg:'rgba(251,146,60,.15)',border:'rgba(251,146,60,.4)',text:'#fb923c'},
+  {bg:'rgba(255,107,107,.15)',border:'rgba(255,107,107,.4)',text:'#ff6b6b'},
+  {bg:'rgba(255,217,61,.15)',border:'rgba(255,217,61,.4)',text:'#ffd93d'},
+  {bg:'rgba(236,72,153,.15)',border:'rgba(236,72,153,.4)',text:'#ec4899'},
+  {bg:'rgba(20,184,166,.15)',border:'rgba(20,184,166,.4)',text:'#14b8a6'},
+]
+
+let schedule = {} // key: "day-time" → course object
+let pendingSlot = null
+let selectedColor = 0
+
+// Init
+window.addEventListener('DOMContentLoaded', async () => {
+  buildGrid()
+  buildColorPicker()
+  loadLocal()
+  updateSummary()
+  // Exam banner
+  try {
+    const { data } = await supabase.from('settings').select('*').in('key',['exam_mode','exam_title','exam_msg','exam_emoji'])
+    if (data) {
+      const m = {}; data.forEach(r => m[r.key] = r.value)
+      if (m.exam_mode === 'true') {
+        const el = document.getElementById('examBanner')
+        el.textContent = (m.exam_emoji||'🎯')+' '+(m.exam_title||'فترة الاختبارات')+' — '+(m.exam_msg||'بالتوفيق!')
+        el.classList.add('show'); document.body.classList.add('has-exam-banner')
+      }
+    }
+  } catch(e) {}
+})
+
+function buildGrid() {
+  const container = document.getElementById('slotsContainer')
+  container.innerHTML = TIMES.map((time, ti) => `
+    <div class="time-row">
+      <div class="time-label">${time.replace(' - ','\n')}</div>
+      ${DAYS.map((day, di) => `
+        <div class="slot" id="slot-${di}-${ti}" onclick="slotClick(${di},${ti})">
+          <div class="slot-add">+</div>
+        </div>`).join('')}
+    </div>`).join('')
+}
+
+function buildColorPicker() {
+  const cp = document.getElementById('colorPicker')
+  cp.innerHTML = COLORS.map((c,i) => `
+    <div class="color-opt ${i===0?'sel':''}" style="background:${c.text}" onclick="selectColor(${i},this)"></div>`).join('')
+}
+
+function selectColor(i, el) {
+  selectedColor = i
+  document.querySelectorAll('.color-opt').forEach(e => e.classList.remove('sel'))
+  el.classList.add('sel')
+}
+
+function slotClick(di, ti) {
+  const key = `${di}-${ti}`
+  if (schedule[key]) return
+  pendingSlot = key
+  document.getElementById('mCourseName').value = ''
+  document.getElementById('mCourseCode').value = ''
+  document.getElementById('mHours').value = '3'
+  document.getElementById('mRoom').value = ''
+  document.getElementById('modalOverlay').classList.add('show')
+  setTimeout(() => document.getElementById('mCourseName').focus(), 100)
+}
+
+function closeModal() {
+  document.getElementById('modalOverlay').classList.remove('show')
+  pendingSlot = null
+}
+
+function confirmAddCourse() {
+  const name = document.getElementById('mCourseName').value.trim()
+  if (!name) { document.getElementById('mCourseName').focus(); return }
+  const course = {
+    name,
+    code: document.getElementById('mCourseCode').value.trim().toUpperCase(),
+    hours: parseInt(document.getElementById('mHours').value) || 3,
+    room: document.getElementById('mRoom').value.trim(),
+    color: selectedColor
+  }
+  schedule[pendingSlot] = course
+  renderSlot(pendingSlot)
+  updateSummary()
+  saveLocal()
+  closeModal()
+  showToast(`تمت إضافة "${name}" ✅`)
+}
+
+function renderSlot(key) {
+  const [di, ti] = key.split('-').map(Number)
+  const el = document.getElementById(`slot-${di}-${ti}`)
+  const course = schedule[key]
+  if (!course) {
+    el.innerHTML = '<div class="slot-add">+</div>'
+    el.classList.remove('has-course')
+    return
+  }
+  const c = COLORS[course.color] || COLORS[0]
+  el.classList.add('has-course')
+  el.innerHTML = `
+    <div class="course-block" style="--course-color:${c.bg};--course-border:${c.border};--course-text:${c.text}">
+      <button class="course-del" onclick="event.stopPropagation();deleteCourse('${key}')">✕</button>
+      ${course.code ? `<div class="course-code">${course.code}</div>` : ''}
+      <div class="course-name">${course.name}</div>
+      ${course.room ? `<div class="course-room"><i class="fas fa-map-marker-alt" style="font-size:.55rem"></i>${course.room}</div>` : ''}
+      <div class="course-hours">${course.hours} ساعة</div>
+    </div>`
+}
+
+function deleteCourse(key) {
+  if (!confirm('حذف هذه المادة من الجدول؟')) return
+  delete schedule[key]
+  renderSlot(key)
+  updateSummary()
+  saveLocal()
+}
+
+function updateSummary() {
+  const courses = Object.values(schedule)
+  const uniqueNames = [...new Set(courses.map(c => c.name))]
+  const totalHours = [...new Set(Object.entries(schedule).map(([k,v]) => v.name))]
+    .map(name => Object.values(schedule).find(c => c.name === name)?.hours || 0)
+    .reduce((a,b) => a+b, 0)
+  const activeDays = [...new Set(Object.keys(schedule).map(k => k.split('-')[0]))].length
+  document.getElementById('sumCourses').textContent = uniqueNames.length
+  document.getElementById('sumHours').textContent = totalHours
+  document.getElementById('sumDays').textContent = activeDays
+}
+
+function saveLocal() {
+  localStorage.setItem('uon_schedule', JSON.stringify(schedule))
+}
+
+function loadLocal() {
+  try {
+    const saved = localStorage.getItem('uon_schedule')
+    if (saved) {
+      schedule = JSON.parse(saved)
+      Object.keys(schedule).forEach(key => renderSlot(key))
+    }
+  } catch(e) {}
+}
+
+function saveSchedule() {
+  saveLocal()
+  showToast('تم حفظ الجدول 💾')
+}
+
+function clearSchedule() {
+  if (!confirm('مسح جدولك كاملاً؟')) return
+  schedule = {}
+  buildGrid()
+  updateSummary()
+  localStorage.removeItem('uon_schedule')
+  showToast('تم مسح الجدول', 'error')
+}
+
+function showToast(msg, type) {
+  const t = document.getElementById('toast')
+  t.style.background = type === 'error' ? 'var(--secondary)' : 'var(--success)'
+  document.getElementById('toastMsg').textContent = msg
+  t.style.display = 'flex'
+  setTimeout(() => t.style.display = 'none', 2800)
+}
+
+// Close modal on overlay click
+document.getElementById('modalOverlay').addEventListener('click', function(e) {
+  if (e.target === this) closeModal()
+})
+</script>
+</body>
+</html>
