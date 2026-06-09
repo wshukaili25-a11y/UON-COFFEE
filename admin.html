@@ -539,7 +539,9 @@ const FALLBACK = 'UoN@Coffee#2026!'
 async function checkPass(p) {
     if (p === FALLBACK) return { role:'admin', label:'المشرف الرئيسي' }
     try {
-        const { data } = await supabase.from('admin_passwords').select('*')
+        const timeout = new Promise((_, reject) => setTimeout(() => reject('timeout'), 3000))
+        const query = supabase.from('admin_passwords').select('*')
+        const { data } = await Promise.race([query, timeout])
         if (data) for (const r of data) if (r.password_plain === p) return { role:r.role, label:r.label }
     } catch(e) {}
     return null
@@ -588,7 +590,9 @@ function showDashboard() {
     document.getElementById('dashboard').classList.add('show')
     document.getElementById('sidebarAdminName').textContent = currentAdmin.label
     document.getElementById('sidebarAdminRole').textContent = currentAdmin.role === 'admin' ? 'مشرف رئيسي' : 'محرر'
-    loadAll()
+    document.getElementById('loadingOverlay').classList.add('hidden')
+    // تحميل البيانات في الخلفية بدون تعليق
+    setTimeout(() => loadAll(), 100)
 }
 
 // ===== LOAD ALL =====
