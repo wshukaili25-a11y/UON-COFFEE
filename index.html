@@ -629,7 +629,6 @@ let currentAdmin = null
 let editingToolId = null
 let selectedColor = "#00d4ff"
 let selectedNewColor = "#00d4ff"
-let busData = { boys: [], girls: [], bookingUrl: '#' }
 
 // ===== SUPABASE =====
 async function loadTools() {
@@ -684,14 +683,9 @@ window.switchBusTab = function(tab, btn) {
 }
 
 // Bus admin rows
-window.updateBusRow = function(gender, index, field, value) {
-    busData[gender][index][field] = value
-}
 
-window.removeBusRow = function(gender, index) {
-    busData[gender].splice(index, 1)
-    renderBusAdminSection(gender, busData[gender])
-}
+
+
 
 window.addEventListener('DOMContentLoaded', async () => {
     // إخفاء الـ loading بعد 4 ثواني على أي حال
