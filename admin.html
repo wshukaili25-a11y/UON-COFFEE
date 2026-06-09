@@ -162,14 +162,12 @@ body { font-family:'Tajawal',sans-serif; background:var(--dark); color:var(--tex
 }
 </style>
 <style>
-.test-mode-badge { position:fixed; bottom:22px; right:22px; z-index:9999; background:linear-gradient(135deg,#f59e0b,#d97706); padding:.35rem .85rem; border-radius:50px; font-size:.72rem; font-weight:800; display:flex; align-items:center; gap:5px; color:#1a1a2e; box-shadow:0 2px 14px rgba(245,158,11,.45); pointer-events:none; }
 </style>
 </head>
 <body>
 
 <div class="loading-overlay" id="loadingOverlay"><div class="spinner"></div></div>
 <div class="toast" id="toast"><i class="fas fa-check-circle"></i><span id="toastMsg"></span></div>
-<div class="test-mode-badge">🧪 وضع تجريبي</div>
 
 <!-- LOGIN -->
 <div class="login-screen" id="loginScreen">
@@ -551,14 +549,12 @@ let currentAdmin = null
 let notifications = []
 
 // ===== LOGIN =====
-window.addEventListener('DOMContentLoaded', async () => {
-    // أخفِ الـ loading بعد 3 ثواني على أي حال
-    setTimeout(() => document.getElementById('loadingOverlay').classList.add('hidden'), 3000)
+window.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('loadingOverlay').classList.add('hidden')
     const saved = sessionStorage.getItem('uon_admin_dash')
     if (saved) {
         try { currentAdmin = JSON.parse(saved); showDashboard() } catch(e) {}
     }
-    document.getElementById('loadingOverlay').classList.add('hidden')
 })
 
 window.doLogin = async function() {
