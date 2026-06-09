@@ -423,6 +423,7 @@ body.has-exam-banner .navbar{top:40px!important}
         <button onclick="toggleExamMode(false)" style="background:rgba(255,255,255,.15);border:none;border-radius:8px;color:#fff;padding:.4rem .7rem;cursor:pointer;font-size:.8rem;">✕ إخفاء</button>
     </div>
 </div>
+
 <!-- Global Search -->
 <div id="globalSearchWrap" style="position:fixed;top:65px;width:100%;z-index:998;background:rgba(10,14,39,.95);backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,255,255,.05);padding:.8rem 5%;display:none;align-items:center;gap:10px;">
     <input id="globalSearchInp" placeholder="ابحث في الأدوات، الملخصات، المطاعم..." style="flex:1;padding:.7rem 1rem;background:var(--dark-light);border:1px solid rgba(255,255,255,.1);border-radius:10px;color:white;font-family:'Tajawal',sans-serif;font-size:.9rem;outline:none;" oninput="globalSearch(this.value)">
@@ -675,38 +676,6 @@ async function dbGetSettings() {
 }
 
 // ===== BUS DATA =====
-async function loadBusData() {
-    try {
-        const settings = await dbGetSettings()
-        busData.boys = settings.bus_boys ? JSON.parse(settings.bus_boys) : defaultBoys
-        busData.girls = settings.bus_girls ? JSON.parse(settings.bus_girls) : defaultGirls
-        busData.bookingUrl = settings.bus_booking_url || '#'
-    } catch(e) {
-        busData.boys = defaultBoys
-        busData.girls = defaultGirls
-    }
-    renderBusTables()
-}
-
-function renderBusTables() {
-    renderBusTable('boys', busData.boys)
-    renderBusTable('girls', busData.girls)
-    const link = document.getElementById('busBookingLink')
-    if (link) link.href = busData.bookingUrl || '#'
-}
-
-function renderBusTable(gender, routes) {
-    const el = document.getElementById(`bus${gender.charAt(0).toUpperCase() + gender.slice(1)}Table`)
-    if (!el) return
-    el.innerHTML = routes.map(r => `
-        <div class="bus-route">
-            <span class="route-name">📍 ${r.route}</span>
-            <span class="route-time">🕖 ${r.departure}</span>
-            <span class="route-return">↩️ ${r.returnTime}</span>
-            <span class="route-status ${r.status === 'active' ? 'status-active' : 'status-full'}">${r.status === 'active' ? 'متاح' : 'مكتمل'}</span>
-        </div>`).join('')
-}
-
 window.switchBusTab = function(tab, btn) {
     document.querySelectorAll('.bus-tab').forEach(b => b.classList.remove('active'))
     document.querySelectorAll('.bus-panel').forEach(p => p.classList.remove('active'))
@@ -715,32 +684,8 @@ window.switchBusTab = function(tab, btn) {
 }
 
 // Bus admin rows
-function renderBusAdminRows() {
-    renderBusAdminSection('boys', busData.boys)
-    renderBusAdminSection('girls', busData.girls)
-    const urlInput = document.getElementById('busBookingUrl')
-    if (urlInput) urlInput.value = busData.bookingUrl || ''
-}
-
-function renderBusAdminSection(gender, routes) {
-    const el = document.getElementById(`bus${gender.charAt(0).toUpperCase() + gender.slice(1)}Admin`)
-    if (!el) return
-    el.innerHTML = routes.map((r, i) => `
-        <div class="bus-admin-row">
-            <input type="text" value="${r.route}" onchange="updateBusRow('${gender}',${i},'route',this.value)">
-            <input type="text" value="${r.departure}" onchange="updateBusRow('${gender}',${i},'departure',this.value)">
-            <input type="text" value="${r.returnTime}" onchange="updateBusRow('${gender}',${i},'returnTime',this.value)">
-            <button onclick="removeBusRow('${gender}',${i})">×</button>
-        </div>`).join('')
-}
-
 window.updateBusRow = function(gender, index, field, value) {
     busData[gender][index][field] = value
-}
-
-window.addBusRow = function(gender) {
-    busData[gender].push({ route: 'منطقة جديدة', departure: '07:00 ص', returnTime: '04:00 م', status: 'active' })
-    renderBusAdminSection(gender, busData[gender])
 }
 
 window.removeBusRow = function(gender, index) {
@@ -748,18 +693,6 @@ window.removeBusRow = function(gender, index) {
     renderBusAdminSection(gender, busData[gender])
 }
 
-window.saveBusSchedule = async function() {
-    if (currentAdmin?.role !== 'admin') { showToast('فقط المشرف الرئيسي يمكنه التعديل', 'error'); return }
-    const url = document.getElementById('busBookingUrl').value
-    busData.bookingUrl = url
-    await dbSaveSettings('bus_boys', JSON.stringify(busData.boys))
-    await dbSaveSettings('bus_girls', JSON.stringify(busData.girls))
-    await dbSaveSettings('bus_booking_url', url)
-    renderBusTables()
-    showToast('تم حفظ جداول الباصات!')
-}
-
-// ===== INIT =====
 window.addEventListener('DOMContentLoaded', async () => {
     // إخفاء الـ loading بعد 4 ثواني على أي حال
     setTimeout(() => document.getElementById('loadingOverlay').classList.add('hidden'), 4000)
@@ -878,7 +811,6 @@ window.openPanel = function() {
     document.getElementById('panelOverlay').classList.add('show')
     document.getElementById('editSection').style.display = 'none'
     renderPasswordsList()
-    renderBusAdminRows()
 }
 window.closePanel = function() {
     document.getElementById('adminPanel').classList.remove('open')
