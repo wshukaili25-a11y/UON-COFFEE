@@ -270,14 +270,13 @@ let likedQ = JSON.parse(localStorage.getItem('uon_liked_q') || '[]')
 window.addEventListener('DOMContentLoaded', async () => {
     const saved = sessionStorage.getItem('uon_q_admin')
     if (saved) try { currentAdmin = JSON.parse(saved); updateAdminUI() } catch(e) {}
-    setTimeout(() =>    
-    
-        // ===== EXAM BANNER =====
+    setTimeout(() => document.getElementById('loadingOverlay').classList.add('hidden'), 4000)
+
+    // ===== EXAM BANNER =====
     try {
         const {data:_eb} = await supabase.from('settings').select('*').in('key',['exam_mode','exam_title','exam_msg','exam_emoji'])
         if(_eb){const _m={};_eb.forEach(r=>_m[r.key]=r.value);if(_m.exam_mode==='true'){const _el=document.getElementById('examBanner');if(_el){_el.textContent=(_m.exam_emoji||'🎯')+' '+(_m.exam_title||'فترة الاختبارات')+' — '+(_m.exam_msg||'بالتوفيق!');_el.classList.add('show');document.body.classList.add('has-exam-banner')}}}
     } catch(e) {}
-    document.getElementById('loadingOverlay').classList.add('hidden'), 4000)
     await loadQuestions()
     document.getElementById('loadingOverlay').classList.add('hidden')
     initReveal()
