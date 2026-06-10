@@ -607,10 +607,8 @@ window.switchBusTab = function(tab, btn) {
     document.getElementById('busPanel-' + tab).classList.add('active')
 }
 
-// Bus admin rows
-
-
-
+// Admin state
+let currentAdmin = null
 
 window.addEventListener('DOMContentLoaded', async () => {
     // إخفاء الـ loading بعد 4 ثواني على أي حال
@@ -960,7 +958,7 @@ window.addEventListener('beforeinstallprompt', e => {
 
 // Restore session on load
 ;(function() {
-    const saved = 
+    const saved = sessionStorage.getItem('nu_admin')
     if (saved) try { currentAdmin = JSON.parse(saved) } catch(e) {}
 })()
 </script>
