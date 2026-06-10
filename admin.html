@@ -162,14 +162,12 @@ body { font-family:'Tajawal',sans-serif; background:var(--dark); color:var(--tex
 }
 </style>
 <style>
-.test-mode-badge { position:fixed; bottom:22px; right:22px; z-index:9999; background:linear-gradient(135deg,#f59e0b,#d97706); padding:.35rem .85rem; border-radius:50px; font-size:.72rem; font-weight:800; display:flex; align-items:center; gap:5px; color:#1a1a2e; box-shadow:0 2px 14px rgba(245,158,11,.45); pointer-events:none; }
 </style>
 </head>
 <body>
 
 <div class="loading-overlay" id="loadingOverlay"><div class="spinner"></div></div>
 <div class="toast" id="toast"><i class="fas fa-check-circle"></i><span id="toastMsg"></span></div>
-<div class="test-mode-badge">🧪 وضع تجريبي</div>
 
 <!-- LOGIN -->
 <div class="login-screen" id="loginScreen">
@@ -291,7 +289,7 @@ body { font-family:'Tajawal',sans-serif; background:var(--dark); color:var(--tex
             </div>
         </div>
 
-        <!-- CONFESSIONS -->
+        <!-- ANNOUNCEMENTS -->
         <div class="section" id="section-confessions">
             <div class="page-header">
                 <h1>الإعلانات 📢</h1>
@@ -300,14 +298,11 @@ body { font-family:'Tajawal',sans-serif; background:var(--dark); color:var(--tex
             <div class="content-card">
                 <div class="card-header">
                     <div class="card-title"><i class="fas fa-bullhorn" style="color:var(--primary)"></i> جميع الإعلانات</div>
-                    <button class="card-action danger" onclick="clearAllConf()" style="color:var(--danger);border-color:rgba(239,68,68,.3);background:rgba(239,68,68,.06);">
-                        <i class="fas fa-trash"></i> حذف الكل
-                    </button>
                 </div>
                 <div style="overflow-x:auto;">
                     <table class="data-table" id="confTable">
-                        <thead><tr><th>الاعتراف</th><th>التصنيف</th><th>الإعجابات</th><th>الوقت</th><th>إجراء</th></tr></thead>
-                        <tbody id="confTableBody"><tr><td colspan="5" style="text-align:center;color:var(--text-dim);padding:2rem;">جاري التحميل...</td></tr></tbody>
+                        <thead><tr><th>العنوان</th><th>المحتوى</th><th>الوقت</th><th>إجراء</th></tr></thead>
+                        <tbody id="confTableBody"><tr><td colspan="4" style="text-align:center;color:var(--text-dim);padding:2rem;">جاري التحميل...</td></tr></tbody>
                     </table>
                 </div>
             </div>
@@ -542,7 +537,9 @@ const FALLBACK = 'UoN@Coffee#2026!'
 async function checkPass(p) {
     if (p === FALLBACK) return { role:'admin', label:'المشرف الرئيسي' }
     try {
-        const { data } = await supabase.from('admin_passwords').select('*')
+        const timeout = new Promise((_, reject) => setTimeout(() => reject('timeout'), 3000))
+        const query = supabase.from('admin_passwords').select('*')
+        const { data } = await Promise.race([query, timeout])
         if (data) for (const r of data) if (r.password_plain === p) return { role:r.role, label:r.label }
     } catch(e) {}
     return null
@@ -552,12 +549,12 @@ let currentAdmin = null
 let notifications = []
 
 // ===== LOGIN =====
-window.addEventListener('DOMContentLoaded', async () => {
+window.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('loadingOverlay').classList.add('hidden')
     const saved = sessionStorage.getItem('uon_admin_dash')
     if (saved) {
         try { currentAdmin = JSON.parse(saved); showDashboard() } catch(e) {}
     }
-    document.getElementById('loadingOverlay').classList.add('hidden')
 })
 
 window.doLogin = async function() {
@@ -589,14 +586,16 @@ function showDashboard() {
     document.getElementById('dashboard').classList.add('show')
     document.getElementById('sidebarAdminName').textContent = currentAdmin.label
     document.getElementById('sidebarAdminRole').textContent = currentAdmin.role === 'admin' ? 'مشرف رئيسي' : 'محرر'
-    loadAll()
+    document.getElementById('loadingOverlay').classList.add('hidden')
+    // تحميل البيانات في الخلفية بدون تعليق
+    setTimeout(() => loadAll(), 100)
 }
 
 // ===== LOAD ALL =====
 async function loadAll() {
-    await Promise.all([
+    // كل دالة مستقلة — خطأ في واحدة لا يوقف الباقي
+    const tasks = [
         loadStats(),
-        loadConfessions(),
         loadSummaries(),
         loadGroups(),
         loadMarketplace(),
@@ -604,7 +603,8 @@ async function loadAll() {
         loadPasswords(),
         loadToolsAdmin(),
         loadTestMode(),
-    ])
+    ]
+    await Promise.allSettled(tasks)
 }
 
 // ===== STATS =====
@@ -716,27 +716,20 @@ async function loadConfessions() {
     try {
         const { data } = await supabase.from('announcements').select('*').order('created_at', { ascending:false })
         const tbody = document.getElementById('confTableBody')
-        if (!data || !data.length) { tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--text-dim);padding:2rem;">لا توجد اعترافات</td></tr>'; return }
+        if (!data || !data.length) { tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--text-dim);padding:2rem;">لا توجد إعلانات</td></tr>'; return }
         tbody.innerHTML = data.map(c => `
             <tr>
-                <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${c.text}">${c.text?.substring(0,50)}${c.text?.length>50?'...':''}</td>
-                <td><span class="td-badge badge-new">${c.category || '—'}</span></td>
-                <td>❤️ ${c.likes || 0}</td>
+                <td style="font-weight:700">${c.title || c.name || '—'}</td>
+                <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${c.content || c.body || c.message || '—'}</td>
                 <td style="font-size:.75rem;color:var(--text-dim);">${formatTime(c.created_at)}</td>
-                <td><div class="td-actions"><button class="btn-del" onclick="deleteConf('${c.id}')"><i class="fas fa-trash"></i></button></div></td>
+                <td><button class="btn-del" onclick="deleteConf('${c.id}')"><i class="fas fa-trash"></i></button></td>
             </tr>`).join('')
-        document.getElementById('navConfBadge').textContent = data.length
     } catch(e) {}
 }
 
 window.deleteConf = async function(id) {
-    if (!confirm('حذف هذا الاعتراف؟')) return
+    if (!confirm('حذف هذا الإعلان؟')) return
     try { await supabase.from('announcements').delete().eq('id', id); await loadConfessions(); showToast('تم الحذف', 'error') } catch(e) {}
-}
-
-window.clearAllConf = async function() {
-    if (!confirm('هل أنت متأكد من حذف كل الاعترافات؟')) return
-    try { await supabase.from('announcements').delete().neq('id', 0); await loadConfessions(); showToast('تم حذف كل الاعترافات', 'error') } catch(e) {}
 }
 
 // ===== SUMMARIES =====
@@ -889,10 +882,6 @@ window.toggleExamMode = async function() {
         showToast(examModeActive ? 'تم تفعيل وضع الاختبارات 🎯' : 'تم إيقاف وضع الاختبارات', examModeActive ? '' : 'error')
     } catch(e) {
         examModeActive = !examModeActive
-        showToast('خطأ في الحفظ', 'error')
-    }
-}
-
         showToast('خطأ في الحفظ', 'error')
     }
 }
