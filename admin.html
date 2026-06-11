@@ -952,14 +952,22 @@ window.deleteProject = async (id) => { if(!confirm('حذف؟')) return; try { aw
 async function loadToolsAdmin() {
     try {
         const el = document.getElementById('toolsAdminList')
-        // Load categories
+        el.innerHTML = '<div style="color:var(--text-dim);font-size:.85rem;text-align:center;padding:1rem;">جارٍ التحميل...</div>'
+        
         const { data: cats, error: catErr } = await supabase.from('tools_categories').select('*').order('sort_order')
+        console.log('cats:', cats, 'err:', catErr)
+        
         if (catErr || !cats || !cats.length) {
-            el.innerHTML = '<div style="color:var(--text-dim);font-size:.85rem;text-align:center;padding:1.5rem;">لا توجد أدوات. افتح <a href="tools.html" target="_blank" style="color:var(--primary);">صفحة الأدوات</a> لإضافتها.</div>'
+            el.innerHTML = `<div style="color:var(--text-dim);font-size:.85rem;text-align:center;padding:1.5rem;">
+                ${catErr ? 'خطأ: ' + catErr.message : 'لا توجد تصنيفات'}
+                <br><a href="tools.html" target="_blank" style="color:var(--primary);">افتح صفحة الأدوات</a>
+            </div>`
             return
         }
-        // Load items
-        const { data: items } = await supabase.from('tools_items').select('*')
+        
+        const { data: items, error: itemErr } = await supabase.from('tools_items').select('*')
+        console.log('items:', items, 'err:', itemErr)
+        
         const toolsMap = {}
         if (items) items.forEach(t => { if (!toolsMap[t.category_id]) toolsMap[t.category_id] = []; toolsMap[t.category_id].push(t) })
 
@@ -984,7 +992,8 @@ async function loadToolsAdmin() {
                 </div>`).join('')}
             </div>`).join('')
     } catch(e) {
-        document.getElementById('toolsAdminList').innerHTML = '<div style="color:var(--text-dim);font-size:.85rem;">تعذّر تحميل الأدوات</div>'
+        console.error('loadToolsAdmin error:', e)
+        document.getElementById('toolsAdminList').innerHTML = '<div style="color:var(--text-dim);font-size:.85rem;">خطأ: ' + e.message + '</div>'
     }
 }
 
