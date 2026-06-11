@@ -182,21 +182,21 @@
         .panel-header h2 i { color: var(--warning); }
         .close-panel { width: 40px; height: 40px; border-radius: 12px; background: var(--dark); border: 1px solid rgba(255,255,255,0.1); color: var(--text-muted); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.3s; }
         .close-panel:hover { background: var(--secondary); color: white; }
-        .panel-section { margin-bottom: 2rem; padding-bottom: 2rem; border-bottom: 1px solid rgba(255,255,255,0.05); }
-        .panel-section:last-child { border-bottom: none; }
-        .panel-section h3 { font-size: 1.1rem; font-weight: 700; margin-bottom: 1rem; color: var(--primary); display: flex; align-items: center; gap: 8px; }
-        .form-group { margin-bottom: 1.2rem; }
-        .form-group label { display: block; font-size: 0.9rem; color: var(--text-muted); margin-bottom: 0.5rem; font-weight: 500; }
-        .form-group input, .form-group textarea, .form-group select { width: 100%; padding: 0.8rem 1rem; background: var(--dark); border: 2px solid rgba(255,255,255,0.1); border-radius: 10px; color: white; font-family: 'Tajawal', sans-serif; font-size: 0.95rem; transition: all 0.3s; }
+        
+        
+        
+        
+        
+        .form-group input, .form-group textarea, 
         .form-group input:focus, .form-group textarea:focus, .form-group select:focus { outline: none; border-color: var(--primary); }
-        .form-group textarea { min-height: 80px; resize: vertical; }
+        
         .form-group small { color: var(--text-dim); font-size: 0.8rem; margin-top: 0.3rem; display: block; }
         .color-picker-wrapper { display: flex; gap: 10px; flex-wrap: wrap; }
-        .color-option { width: 40px; height: 40px; border-radius: 10px; cursor: pointer; border: 3px solid transparent; transition: all 0.3s; }
+        
         .color-option:hover { transform: scale(1.1); }
-        .color-option.selected { border-color: white; box-shadow: 0 0 15px rgba(255,255,255,0.3); }
-        .btn-save { width: 100%; padding: 1rem; background: var(--success); border: none; border-radius: 12px; color: white; font-weight: 800; font-size: 1rem; font-family: 'Tajawal', sans-serif; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; justify-content: center; gap: 8px; }
-        .btn-save:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(107,203,119,0.3); }
+        
+        
+        
         .btn-danger { width: 100%; padding: 0.8rem; background: transparent; border: 2px solid var(--danger); border-radius: 12px; color: var(--danger); font-weight: 700; font-size: 0.9rem; font-family: 'Tajawal', sans-serif; cursor: pointer; transition: all 0.3s; margin-top: 0.5rem; }
         .btn-danger:hover { background: var(--danger); color: white; }
         .passwords-list { display: flex; flex-direction: column; gap: 0.5rem; }
@@ -274,7 +274,7 @@ body.has-exam-banner .navbar{top:40px!important}
 
 <!-- Loading -->
 <div class="loading-overlay" id="loadingOverlay"><div class="loading-spinner"></div>
-<div class="exam-banner" id="examBanner"></div></div>
+</div>
 
 <!-- Toast -->
 <div class="toast" id="toast"><i class="fas fa-check-circle"></i><span id="toastMsg"></span></div>
@@ -288,84 +288,7 @@ body.has-exam-banner .navbar{top:40px!important}
         </div>
         <button class="login-btn" onclick="login()"><i class="fas fa-sign-in-alt"></i> دخول المشرف</button>
         <div class="login-error" id="loginError"><i class="fas fa-exclamation-triangle"></i> كلمة المرور غير صحيحة!</div>
-    </div>
-</div>
-
-<div class="admin-badge" id="adminBadge"><i class="fas fa-crown"></i> <span id="adminRoleLabel">وضع المشرف</span></div>
-
-
-    <!-- Edit Tool -->
-            <div class="form-group"><label>الوصف</label><textarea id="editDesc"></textarea></div>
-        <div class="form-group"><label>الأيقونة</label><input type="text" id="editIcon" placeholder="fa-robot"><small>Font Awesome icon name</small></div>
-        <div class="form-group">
-            <label>لون الأداة</label>
-            <div class="color-picker-wrapper">
-                <div class="color-option selected" style="background:#00d4ff" data-color="#00d4ff" onclick="selectColor(this)"></div>
-                <div class="color-option" style="background:#ff6b6b" data-color="#ff6b6b" onclick="selectColor(this)"></div>
-                <div class="color-option" style="background:#ffd93d" data-color="#ffd93d" onclick="selectColor(this)"></div>
-                <div class="color-option" style="background:#6bcb77" data-color="#6bcb77" onclick="selectColor(this)"></div>
-                <div class="color-option" style="background:#a78bfa" data-color="#a78bfa" onclick="selectColor(this)"></div>
-                <div class="color-option" style="background:#fb923c" data-color="#fb923c" onclick="selectColor(this)"></div>
-                <div class="color-option" style="background:#38bdf8" data-color="#38bdf8" onclick="selectColor(this)"></div>
-                <div class="color-option" style="background:#f472b6" data-color="#f472b6" onclick="selectColor(this)"></div>
-            </div>
-        </div>
-        <div class="form-group"><label>نص الزر</label><input type="text" id="editBtnText"></div>
-        <button class="btn-save" onclick="saveToolHandler()"><i class="fas fa-save"></i> حفظ التغييرات</button>
-        <button class="btn-danger" onclick="deleteToolHandler()"><i class="fas fa-trash"></i> حذف الأداة</button>
-    </div>
-
-    <!-- Add Tool -->
-    <div class="panel-section">
-        <h3><i class="fas fa-plus-circle"></i> إضافة أداة جديدة</h3>
-        <div class="form-group"><label>اسم الأداة</label><input type="text" id="newTitle" placeholder="مثال: دليل التخصصات"></div>
-        <div class="form-group"><label>الوصف</label><textarea id="newDesc" placeholder="وصف مختصر للأداة..."></textarea></div>
-        <div class="form-group"><label>الأيقونة</label><input type="text" id="newIcon" placeholder="fa-graduation-cap"></div>
-        <div class="form-group">
-            <label>لون الأداة</label>
-            <div class="color-picker-wrapper">
-                <div class="color-option selected" style="background:#00d4ff" data-color="#00d4ff" onclick="selectNewColor(this)"></div>
-                <div class="color-option" style="background:#ff6b6b" data-color="#ff6b6b" onclick="selectNewColor(this)"></div>
-                <div class="color-option" style="background:#ffd93d" data-color="#ffd93d" onclick="selectNewColor(this)"></div>
-                <div class="color-option" style="background:#6bcb77" data-color="#6bcb77" onclick="selectNewColor(this)"></div>
-                <div class="color-option" style="background:#a78bfa" data-color="#a78bfa" onclick="selectNewColor(this)"></div>
-                <div class="color-option" style="background:#fb923c" data-color="#fb923c" onclick="selectNewColor(this)"></div>
-            </div>
-        </div>
-        <div class="form-group"><label>نص الزر</label><input type="text" id="newBtnText" placeholder="مثال: اكتشف التخصصات"></div>
-        <button class="btn-save" onclick="addToolHandler()"><i class="fas fa-plus"></i> إضافة الأداة</button>
-    </div>
-
-    <!-- Bus Schedule Admin -->
-    <!-- Passwords -->
-    <div class="panel-section">
-        <h3><i class="fas fa-key"></i> إدارة كلمات المرور</h3>
-        <div class="passwords-list" id="passwordsList"></div>
-        <div class="form-group" style="margin-top:1rem;"><label>إضافة كلمة مرور جديدة</label><input type="text" id="newPassword" placeholder="كلمة المرور الجديدة"></div>
-        <div class="form-group">
-            <label>الصلاحية</label>
-            <select id="newRole">
-                <option value="admin">مشرف رئيسي (كل الصلاحيات)</option>
-                <option value="editor">محرر (تعديل المحتوى فقط)</option>
-                <option value="viewer">مشاهد (عرض فقط)</option>
-            </select>
-        </div>
-        <button class="btn-save" onclick="addPassword()"><i class="fas fa-key"></i> إضافة كلمة المرور</button>
-    </div>
-
-    <!-- Site Settings -->
-    <div class="panel-section">
-        <h3><i class="fas fa-sliders-h"></i> إعدادات الموقع</h3>
-        <div class="form-group"><label>عنوان الموقع</label><input type="text" id="siteTitle" value="جامعة نزوى - منصة الطالب"></div>
-        <div class="form-group"><label>الشعار الرئيسي</label><input type="text" id="siteHeadline" value="منصتك الشاملة للحياة الأكاديمية"></div>
-        <div class="form-group"><label>الوصف</label><textarea id="siteDesc">أدوات ذكية، ملخصات، جداول دراسية، وكل ما تحتاجه للنجاح</textarea></div>
-        <button class="btn-save" onclick="saveSettings()"><i class="fas fa-save"></i> حفظ الإعدادات</button>
-        <button class="btn-save" id="examModeBtn" onclick="toggleExamMode(localStorage.getItem('uon_exam_mode')!=='true')" style="margin-top:8px;background:linear-gradient(135deg,var(--danger),#dc2626);">
-            <i class="fas fa-graduation-cap"></i> <span id="examBtnText">تفعيل وضع الاختبارات</span>
-        </button>
-    </div>
-</div>
-
+    
 <!-- Navbar -->
 <nav class="navbar" id="navbar">
     <a href="javascript:void(0)" class="logo">
@@ -390,14 +313,6 @@ body.has-exam-banner .navbar{top:40px!important}
     <div class="mobile-menu" onclick="toggleMenu()"><i class="fas fa-bars"></i></div>
 </nav>
 
-<!-- Exam Mode Banner -->
-
-    <div style="display:flex;gap:.6rem;align-items:center;">
-        <a href="summaries.html" style="padding:.4rem .9rem;background:rgba(255,255,255,.2);border-radius:8px;color:#fff;text-decoration:none;font-size:.8rem;font-weight:700;">📚 الملخصات</a>
-        <a href="tools.html" style="padding:.4rem .9rem;background:rgba(255,255,255,.2);border-radius:8px;color:#fff;text-decoration:none;font-size:.8rem;font-weight:700;">🛠️ الأدوات</a>
-        <button onclick="toggleExamMode(false)" style="background:rgba(255,255,255,.15);border:none;border-radius:8px;color:#fff;padding:.4rem .7rem;cursor:pointer;font-size:.8rem;">✕ إخفاء</button>
-    </div>
-</div>
 
 <!-- Global Search -->
 <div id="globalSearchWrap" style="position:fixed;top:65px;width:100%;z-index:998;background:rgba(10,14,39,.95);backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,255,255,.05);padding:.8rem 5%;display:none;align-items:center;gap:10px;">
@@ -678,42 +593,11 @@ window.selectColor = function(el) {
 
 
 window.selectNewColor = function(el) {
-    document.querySelectorAll('.panel-section:not(#editSection) .color-option').forEach(opt => opt.classList.remove('selected'))
     el.classList.add('selected'); selectedNewColor = el.dataset.color
 }
 
 
-window.saveSettings = async function() {
-    if (currentAdmin?.role !== 'admin') { showToast('فقط المشرف الرئيسي', 'error'); return }
-    const title = document.getElementById('siteTitle').value
-    const headline = document.getElementById('siteHeadline').value
-    const desc = document.getElementById('siteDesc').value
-    document.getElementById('heroTitle').innerHTML = headline.replace(/\n/g, '<br>')
-    document.getElementById('heroDesc').textContent = desc
-    document.title = title
-    await dbSaveSettings('title', title)
-    await dbSaveSettings('headline', headline)
-    await dbSaveSettings('desc', desc)
-    showToast('تم حفظ الإعدادات!')
-}
 
-async function loadSettings() {
-    const settings = await dbGetSettings()
-    if (settings.title) { if(document.getElementById('siteTitle')) document.getElementById('siteTitle').value = settings.title; document.title = settings.title }
-    if (settings.headline) { if(document.getElementById('siteHeadline')) document.getElementById('siteHeadline').value = settings.headline; document.getElementById('heroTitle').innerHTML = settings.headline.replace(/\n/g, '<br>') }
-    if (settings.desc) { if(document.getElementById('siteDesc')) document.getElementById('siteDesc').value = settings.desc; document.getElementById('heroDesc').textContent = settings.desc }
-}
-
-// ===== BOT (Claude API) =====
-let botHistory = []
-
-const BOT_SYSTEM = `أنت مساعد ذكي لجامعة نزوى في سلطنة عُمان. اسمك "مساعد UoN Coffee".
-معلوماتك عن الجامعة:
-- الكليات: الاقتصاد ونظم المعلومات، الهندسة والعمارة، العلوم والآداب، العلوم الصحية، معهد التأسيس
-- نظام التقديرات: A=4.0، A-=3.7، B+=3.3، B=3.0، B-=2.7، C+=2.3، C=2.0، D=1.0، F=0
-- الروابط: portal.unizwa.edu.om | moodle.unizwa.edu.om | elearning.unizwa.edu.om | library.unizwa.edu.om
-- أرقام: المالية 92596648 | التسجيل 25446234 | الرعاية 91313951
-تحدث بالعربية الخليجية البسيطة. كن مختصراً وودوداً. استخدم إيموجي بشكل معتدل.`
 
 async function callClaudeAPI(userMessage) {
     botHistory.push({ role: 'user', content: userMessage })
@@ -856,9 +740,7 @@ window.toggleMenu = function() {
 }
 
 // ===== EXAM MODE (handled by Supabase in DOMContentLoaded) =====
-function checkExamMode() {} // legacy stub - do nothing
 
-// ===== GLOBAL SEARCH =====
 window.openGlobalSearch = function() {
     document.getElementById('globalSearchWrap').style.display = 'flex'
     document.getElementById('globalSearchInp').focus()
