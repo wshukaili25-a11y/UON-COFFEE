@@ -50,19 +50,19 @@
         .toast.error { background: var(--danger); box-shadow: 0 10px 40px rgba(239,68,68,0.3); }
 
         /* ===== LOGIN ===== */
-        .login-overlay { position: fixed; inset: 0; background: rgba(10,14,39,0.98); backdrop-filter: blur(20px); z-index: 9999; display: flex; align-items: center; justify-content: center; transition: all 0.5s ease; opacity: 0; pointer-events: none; transform: scale(1.1); }
+        
         .login-overlay.active { opacity: 1; pointer-events: all; transform: scale(1); }
         .login-box { background: var(--dark-light); border: 1px solid rgba(255,255,255,0.1); border-radius: 24px; padding: 3rem; width: 100%; max-width: 420px; text-align: center; box-shadow: 0 25px 80px rgba(0,0,0,0.5); }
         .login-icon { width: 80px; height: 80px; background: linear-gradient(135deg,#00d4ff,#0099cc); border-radius: 24px; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; font-size: 2rem; color: var(--dark); }
         .login-box h2 { font-size: 1.8rem; font-weight: 900; margin-bottom: 0.5rem; }
         .login-box p { color: var(--text-dim); margin-bottom: 2rem; }
-        .input-group { position: relative; margin-bottom: 1.5rem; }
-        .input-group i { position: absolute; right: 1rem; top: 50%; transform: translateY(-50%); color: var(--text-dim); }
-        .input-group input { width: 100%; padding: 1rem 3rem 1rem 1rem; background: var(--dark); border: 2px solid rgba(255,255,255,0.1); border-radius: 14px; color: white; font-family: 'Tajawal', sans-serif; font-size: 1rem; transition: all 0.3s; }
+        
+        
+        
         .input-group input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 20px rgba(0,212,255,0.1); }
-        .login-btn { width: 100%; padding: 1rem; background: linear-gradient(135deg,#00d4ff,#0099cc); border: none; border-radius: 14px; color: var(--dark); font-weight: 800; font-size: 1.1rem; font-family: 'Tajawal', sans-serif; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; justify-content: center; gap: 8px; }
-        .login-btn:hover { transform: translateY(-2px); box-shadow: 0 15px 40px rgba(0,212,255,0.4); }
-        .login-error { color: var(--danger); font-size: 0.9rem; margin-top: 1rem; display: none; }
+        
+        
+        
         .login-error.show { display: block; }
 
         /* ===== ADMIN BADGE ===== */
@@ -279,16 +279,6 @@ body.has-exam-banner .navbar{top:40px!important}
 <!-- Toast -->
 <div class="toast" id="toast"><i class="fas fa-check-circle"></i><span id="toastMsg"></span></div>
 
-<!-- Login Overlay -->
-        <h2>لوحة التحكم</h2>
-        <p>هذه المنطقة مخصصة للمشرفين فقط</p>
-        <div class="input-group">
-            <input type="password" id="adminPassword" placeholder="أدخل كلمة المرور" onkeypress="if(event.key==='Enter')login()">
-            <i class="fas fa-key"></i>
-        </div>
-        <button class="login-btn" onclick="login()"><i class="fas fa-sign-in-alt"></i> دخول المشرف</button>
-        <div class="login-error" id="loginError"><i class="fas fa-exclamation-triangle"></i> كلمة المرور غير صحيحة!</div>
-    
 <!-- Navbar -->
 <nav class="navbar" id="navbar">
     <a href="javascript:void(0)" class="logo">
