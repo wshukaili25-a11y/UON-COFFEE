@@ -461,6 +461,19 @@ const supabase = createClient(
 // ===== PASSWORD CHECK =====
 const FALLBACK_PASS = 'UoN@Coffee#2026!'
 
+// ===== DEFAULT TOOLS =====
+const defaultTools = [
+    { id: 1, title: "مساعد AI ذكي", description: "بوت ذكي يجيب عن كل شيء يخص جامعة نزوى — متاح 24/7", icon: "fa-robot", color: "#00d4ff", btn_text: "جرب الآن" },
+    { id: 2, title: "حاسبة المعدل", description: "احسب معدلك الفصلي بسهولة — أضف موادك وساعاتها وتقديراتها", icon: "fa-calculator", color: "#ff6b6b", btn_text: "احسب معدلك" },
+    { id: 4, title: "اعترافات الطلاب", description: "شارك اعترافك الجامعي بشكل مجهول — كلنا في نفس الوضع 😅", icon: "fa-comments", color: "#6bcb77", btn_text: "اعترف الحين" },
+    { id: 5, title: "مكتبة الملخصات", description: "ملخصات وشروحات من طلاب نزوى لجميع الكليات والمواد", icon: "fa-book-open", color: "#a78bfa", btn_text: "تصفح الملخصات" },
+    { id: 6, title: "دليل المطاعم", description: "أقرب المطاعم والكافيهات حول جامعة نزوى مع التقييمات", icon: "fa-utensils", color: "#fb923c", btn_text: "شوف المطاعم" },
+    { id: 7, title: "مكتبة الأدوات", description: "أدوات أكاديمية وتقنية مفيدة لكل طالب في جامعة نزوى", icon: "fa-tools", color: "#38bdf8", btn_text: "افتح الأدوات" },
+    { id: 9, title: "الجدول الدراسي", description: "أنشئ جدولك الدراسي الأسبوعي بسهولة واطبعه", icon: "fa-calendar-alt", color: "#a78bfa", btn_text: "أنشئ جدولك" },
+    { id: 10, title: "مجموعات الواتساب", description: "ابحث عن مجموعة مادتك أو أضف مجموعتك لمساعدة زملائك", icon: "fa-whatsapp", color: "#25d366", btn_text: "ابحث عن مجموعة" },
+    { id: 11, title: "سوق الطلاب", description: "بيع وشراء وتبادل الكتب والأدوات الدراسية بين طلاب الجامعة", icon: "fa-store", color: "#ffd93d", btn_text: "تسوّق الآن" }
+]
+
 async function loadTools() {
     // Show default tools immediately
     tools = defaultTools.map(t => ({...t, desc: t.description, btnText: t.btn_text}))
