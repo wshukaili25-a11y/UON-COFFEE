@@ -820,8 +820,12 @@ document.addEventListener('keydown', e => {
 // ===== END NEW FEATURES =====
 
 // ===== PWA =====
+// Unregister all old service workers
 if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sw.js').catch(() => {})
+    navigator.serviceWorker.getRegistrations().then(regs => {
+        regs.forEach(r => r.unregister())
+    })
+    caches.keys().then(keys => keys.forEach(k => caches.delete(k)))
 }
 
 let deferredInstall = null
