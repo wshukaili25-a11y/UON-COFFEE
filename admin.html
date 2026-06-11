@@ -951,18 +951,24 @@ window.deleteProject = async (id) => { if(!confirm('حذف؟')) return; try { aw
 // ===== TOOLS ADMIN =====
 async function loadToolsAdmin() {
     try {
-        const { data, error } = await supabase.from('tools_categories').select('*, tools_items(*)').order('sort_order')
         const el = document.getElementById('toolsAdminList')
-        if (error || !data || !data.length) {
+        // Load categories
+        const { data: cats, error: catErr } = await supabase.from('tools_categories').select('*').order('sort_order')
+        if (catErr || !cats || !cats.length) {
             el.innerHTML = '<div style="color:var(--text-dim);font-size:.85rem;text-align:center;padding:1.5rem;">لا توجد أدوات. افتح <a href="tools.html" target="_blank" style="color:var(--primary);">صفحة الأدوات</a> لإضافتها.</div>'
             return
         }
-        el.innerHTML = data.map(cat => `
+        // Load items
+        const { data: items } = await supabase.from('tools_items').select('*')
+        const toolsMap = {}
+        if (items) items.forEach(t => { if (!toolsMap[t.category_id]) toolsMap[t.category_id] = []; toolsMap[t.category_id].push(t) })
+
+        el.innerHTML = cats.map(cat => `
             <div style="margin-bottom:1.2rem;">
                 <div style="font-size:.82rem;font-weight:800;color:${cat.color || 'var(--primary)'};margin-bottom:.5rem;padding:.3rem 0;border-bottom:1px solid rgba(255,255,255,.06);">
-                    ${cat.emoji || '🛠️'} ${cat.name} <span style="font-weight:400;color:var(--text-dim);font-size:.75rem;">(${(cat.tools_items||[]).length} أداة)</span>
+                    ${cat.emoji || '🛠️'} ${cat.name} <span style="font-weight:400;color:var(--text-dim);font-size:.75rem;">(${(toolsMap[cat.id]||[]).length} أداة)</span>
                 </div>
-                ${(cat.tools_items || []).map(t => `
+                ${(toolsMap[cat.id] || []).map(t => `
                 <div style="display:flex;align-items:center;justify-content:space-between;padding:.55rem .4rem;border-bottom:1px solid rgba(255,255,255,.04);">
                     <div style="display:flex;align-items:center;gap:10px;">
                         <span style="font-size:1.1rem;">${t.emoji || '🔗'}</span>
