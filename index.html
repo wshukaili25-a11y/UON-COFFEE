@@ -50,19 +50,19 @@
         .toast.error { background: var(--danger); box-shadow: 0 10px 40px rgba(239,68,68,0.3); }
 
         /* ===== LOGIN ===== */
-        
+        .login-overlay { position: fixed; inset: 0; background: rgba(10,14,39,0.98); backdrop-filter: blur(20px); z-index: 9999; display: flex; align-items: center; justify-content: center; transition: all 0.5s ease; opacity: 0; pointer-events: none; transform: scale(1.1); }
         .login-overlay.active { opacity: 1; pointer-events: all; transform: scale(1); }
         .login-box { background: var(--dark-light); border: 1px solid rgba(255,255,255,0.1); border-radius: 24px; padding: 3rem; width: 100%; max-width: 420px; text-align: center; box-shadow: 0 25px 80px rgba(0,0,0,0.5); }
         .login-icon { width: 80px; height: 80px; background: linear-gradient(135deg,#00d4ff,#0099cc); border-radius: 24px; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; font-size: 2rem; color: var(--dark); }
         .login-box h2 { font-size: 1.8rem; font-weight: 900; margin-bottom: 0.5rem; }
         .login-box p { color: var(--text-dim); margin-bottom: 2rem; }
-        
-        
-        
+        .input-group { position: relative; margin-bottom: 1.5rem; }
+        .input-group i { position: absolute; right: 1rem; top: 50%; transform: translateY(-50%); color: var(--text-dim); }
+        .input-group input { width: 100%; padding: 1rem 3rem 1rem 1rem; background: var(--dark); border: 2px solid rgba(255,255,255,0.1); border-radius: 14px; color: white; font-family: 'Tajawal', sans-serif; font-size: 1rem; transition: all 0.3s; }
         .input-group input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 20px rgba(0,212,255,0.1); }
-        
-        
-        
+        .login-btn { width: 100%; padding: 1rem; background: linear-gradient(135deg,#00d4ff,#0099cc); border: none; border-radius: 14px; color: var(--dark); font-weight: 800; font-size: 1.1rem; font-family: 'Tajawal', sans-serif; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .login-btn:hover { transform: translateY(-2px); box-shadow: 0 15px 40px rgba(0,212,255,0.4); }
+        .login-error { color: var(--danger); font-size: 0.9rem; margin-top: 1rem; display: none; }
         .login-error.show { display: block; }
 
         /* ===== ADMIN BADGE ===== */
@@ -145,6 +145,8 @@
         .bus-tab:hover { border-color: var(--primary); color: var(--primary); }
         .bus-panel { display: none; }
         .bus-panel.active { display: block; animation: slideInUp 0.4s ease; }
+        .bus-table-wrap { background: var(--dark-light); border: 1px solid rgba(255,255,255,0.08); border-radius: 20px; overflow: hidden; }
+        .bus-table-head { padding: 1.2rem 2rem; background: rgba(0,212,255,0.08); border-bottom: 1px solid rgba(0,212,255,0.1); display: flex; align-items: center; justify-content: space-between; }
         .bus-table-head h3 { font-size: 1.1rem; font-weight: 800; display: flex; align-items: center; gap: 8px; }
         .bus-badge { font-size: 0.75rem; padding: 0.3rem 0.8rem; border-radius: 50px; font-weight: 700; }
         .bus-badge.boys { background: rgba(0,212,255,0.15); color: var(--primary); border: 1px solid rgba(0,212,255,0.3); }
@@ -177,26 +179,30 @@
         .summaries-cta p { color: var(--text-dim); margin-bottom: 1rem; }
 
         /* ===== ADMIN PANEL ===== */
+        .admin-panel { position: fixed; top: 0; right: -500px; width: 500px; max-width: 100%; height: 100vh; background: var(--dark-light); border-left: 1px solid rgba(255,255,255,0.1); z-index: 9998; transition: right 0.4s; overflow-y: auto; padding: 2rem; }
+        .admin-panel.open { right: 0; }
+        .admin-panel-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 9997; display: none; opacity: 0; transition: opacity 0.3s; }
+        .admin-panel-overlay.show { display: block; opacity: 1; }
         .panel-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; padding-bottom: 1.5rem; border-bottom: 1px solid rgba(255,255,255,0.1); }
         .panel-header h2 { font-size: 1.5rem; font-weight: 900; display: flex; align-items: center; gap: 10px; }
         .panel-header h2 i { color: var(--warning); }
         .close-panel { width: 40px; height: 40px; border-radius: 12px; background: var(--dark); border: 1px solid rgba(255,255,255,0.1); color: var(--text-muted); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.3s; }
         .close-panel:hover { background: var(--secondary); color: white; }
-        
-        
-        
-        
-        
-        .form-group input, .form-group textarea, 
+        .panel-section { margin-bottom: 2rem; padding-bottom: 2rem; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .panel-section:last-child { border-bottom: none; }
+        .panel-section h3 { font-size: 1.1rem; font-weight: 700; margin-bottom: 1rem; color: var(--primary); display: flex; align-items: center; gap: 8px; }
+        .form-group { margin-bottom: 1.2rem; }
+        .form-group label { display: block; font-size: 0.9rem; color: var(--text-muted); margin-bottom: 0.5rem; font-weight: 500; }
+        .form-group input, .form-group textarea, .form-group select { width: 100%; padding: 0.8rem 1rem; background: var(--dark); border: 2px solid rgba(255,255,255,0.1); border-radius: 10px; color: white; font-family: 'Tajawal', sans-serif; font-size: 0.95rem; transition: all 0.3s; }
         .form-group input:focus, .form-group textarea:focus, .form-group select:focus { outline: none; border-color: var(--primary); }
-        
+        .form-group textarea { min-height: 80px; resize: vertical; }
         .form-group small { color: var(--text-dim); font-size: 0.8rem; margin-top: 0.3rem; display: block; }
         .color-picker-wrapper { display: flex; gap: 10px; flex-wrap: wrap; }
-        
+        .color-option { width: 40px; height: 40px; border-radius: 10px; cursor: pointer; border: 3px solid transparent; transition: all 0.3s; }
         .color-option:hover { transform: scale(1.1); }
-        
-        
-        
+        .color-option.selected { border-color: white; box-shadow: 0 0 15px rgba(255,255,255,0.3); }
+        .btn-save { width: 100%; padding: 1rem; background: var(--success); border: none; border-radius: 12px; color: white; font-weight: 800; font-size: 1rem; font-family: 'Tajawal', sans-serif; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .btn-save:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(107,203,119,0.3); }
         .btn-danger { width: 100%; padding: 0.8rem; background: transparent; border: 2px solid var(--danger); border-radius: 12px; color: var(--danger); font-weight: 700; font-size: 0.9rem; font-family: 'Tajawal', sans-serif; cursor: pointer; transition: all 0.3s; margin-top: 0.5rem; }
         .btn-danger:hover { background: var(--danger); color: white; }
         .passwords-list { display: flex; flex-direction: column; gap: 0.5rem; }
@@ -253,31 +259,146 @@
             .tools-grid { grid-template-columns: 1fr; }
             .hero-buttons { flex-direction: column; align-items: center; }
             .btn-primary, .btn-secondary { width: 100%; max-width: 280px; justify-content: center; }
+            .admin-panel { width: 100%; right: -100%; }
             .bus-route { grid-template-columns: 1fr 1fr; gap: 0.5rem; }
             .bus-book-banner { flex-direction: column; text-align: center; }
             .summaries-grid { grid-template-columns: 1fr 1fr; }
         }
     
 
-
- 50%{opacity:.88} }
-
-
-.exam-banner{display:none;width:100%;background:linear-gradient(90deg,#b91c1c,#dc2626,#b91c1c);color:#fff;text-align:center;padding:.65rem 1rem;font-size:.88rem;font-weight:800;font-family:'Tajawal',sans-serif;position:fixed;top:0;left:0;right:0;z-index:99999;box-shadow:0 2px 12px rgba(185,28,28,.5);letter-spacing:.3px;animation:examPulse 3s ease-in-out infinite}
-.exam-banner.show{display:block}
-@keyframes examPulse{0%,100%{opacity:1}50%{opacity:.88}}
-body.has-exam-banner{padding-top:40px!important}
-body.has-exam-banner .navbar{top:40px!important}
+.exam-banner { display:none; width:100%; background:linear-gradient(90deg,#b91c1c,#dc2626,#b91c1c); color:#fff; text-align:center; padding:.65rem 1rem; font-size:.88rem; font-weight:800; font-family:'Tajawal',sans-serif; position:fixed; top:0; left:0; right:0; z-index:99999; box-shadow:0 2px 12px rgba(185,28,28,.5); letter-spacing:.3px; animation:examPulse 3s ease-in-out infinite; }
+.exam-banner.show { display:block; }
+@keyframes examPulse { 0%,100%{opacity:1} 50%{opacity:.88} }
+body.has-exam-banner { padding-top: 40px !important; }
+body.has-exam-banner .navbar { top: 40px !important; }
 </style>
 </head>
 <body>
 
 <!-- Loading -->
-<div class="loading-overlay" id="loadingOverlay"><div class="loading-spinner"></div>
-</div>
+<div class="loading-overlay" id="loadingOverlay"><div class="loading-spinner"></div></div>
 
 <!-- Toast -->
 <div class="toast" id="toast"><i class="fas fa-check-circle"></i><span id="toastMsg"></span></div>
+
+<!-- Login Overlay -->
+<div class="login-overlay" id="loginOverlay">
+    <div class="login-box">
+        <div class="login-icon"><i class="fas fa-lock"></i></div>
+        <h2>لوحة التحكم</h2>
+        <p>هذه المنطقة مخصصة للمشرفين فقط</p>
+        <div class="input-group">
+            <input type="password" id="adminPassword" placeholder="أدخل كلمة المرور" onkeypress="if(event.key==='Enter')login()">
+            <i class="fas fa-key"></i>
+        </div>
+        <button class="login-btn" onclick="login()"><i class="fas fa-sign-in-alt"></i> دخول المشرف</button>
+        <div class="login-error" id="loginError"><i class="fas fa-exclamation-triangle"></i> كلمة المرور غير صحيحة!</div>
+    </div>
+</div>
+
+<div class="admin-badge" id="adminBadge"><i class="fas fa-crown"></i> <span id="adminRoleLabel">وضع المشرف</span></div>
+<div class="admin-panel-overlay" id="panelOverlay" onclick="closePanel()"></div>
+
+<!-- Admin Panel -->
+<div class="admin-panel" id="adminPanel">
+    <div class="panel-header">
+        <h2><i class="fas fa-cog"></i> لوحة التحكم</h2>
+        <button class="close-panel" onclick="closePanel()"><i class="fas fa-times"></i></button>
+    </div>
+
+    <!-- Edit Tool -->
+    <div class="panel-section" id="editSection" style="display:none;">
+        <h3><i class="fas fa-edit"></i> تعديل الأداة</h3>
+        <div class="form-group"><label>اسم الأداة</label><input type="text" id="editTitle"></div>
+        <div class="form-group"><label>الوصف</label><textarea id="editDesc"></textarea></div>
+        <div class="form-group"><label>الأيقونة</label><input type="text" id="editIcon" placeholder="fa-robot"><small>Font Awesome icon name</small></div>
+        <div class="form-group">
+            <label>لون الأداة</label>
+            <div class="color-picker-wrapper">
+                <div class="color-option selected" style="background:#00d4ff" data-color="#00d4ff" onclick="selectColor(this)"></div>
+                <div class="color-option" style="background:#ff6b6b" data-color="#ff6b6b" onclick="selectColor(this)"></div>
+                <div class="color-option" style="background:#ffd93d" data-color="#ffd93d" onclick="selectColor(this)"></div>
+                <div class="color-option" style="background:#6bcb77" data-color="#6bcb77" onclick="selectColor(this)"></div>
+                <div class="color-option" style="background:#a78bfa" data-color="#a78bfa" onclick="selectColor(this)"></div>
+                <div class="color-option" style="background:#fb923c" data-color="#fb923c" onclick="selectColor(this)"></div>
+                <div class="color-option" style="background:#38bdf8" data-color="#38bdf8" onclick="selectColor(this)"></div>
+                <div class="color-option" style="background:#f472b6" data-color="#f472b6" onclick="selectColor(this)"></div>
+            </div>
+        </div>
+        <div class="form-group"><label>نص الزر</label><input type="text" id="editBtnText"></div>
+        <button class="btn-save" onclick="saveToolHandler()"><i class="fas fa-save"></i> حفظ التغييرات</button>
+        <button class="btn-danger" onclick="deleteToolHandler()"><i class="fas fa-trash"></i> حذف الأداة</button>
+    </div>
+
+    <!-- Add Tool -->
+    <div class="panel-section">
+        <h3><i class="fas fa-plus-circle"></i> إضافة أداة جديدة</h3>
+        <div class="form-group"><label>اسم الأداة</label><input type="text" id="newTitle" placeholder="مثال: دليل التخصصات"></div>
+        <div class="form-group"><label>الوصف</label><textarea id="newDesc" placeholder="وصف مختصر للأداة..."></textarea></div>
+        <div class="form-group"><label>الأيقونة</label><input type="text" id="newIcon" placeholder="fa-graduation-cap"></div>
+        <div class="form-group">
+            <label>لون الأداة</label>
+            <div class="color-picker-wrapper">
+                <div class="color-option selected" style="background:#00d4ff" data-color="#00d4ff" onclick="selectNewColor(this)"></div>
+                <div class="color-option" style="background:#ff6b6b" data-color="#ff6b6b" onclick="selectNewColor(this)"></div>
+                <div class="color-option" style="background:#ffd93d" data-color="#ffd93d" onclick="selectNewColor(this)"></div>
+                <div class="color-option" style="background:#6bcb77" data-color="#6bcb77" onclick="selectNewColor(this)"></div>
+                <div class="color-option" style="background:#a78bfa" data-color="#a78bfa" onclick="selectNewColor(this)"></div>
+                <div class="color-option" style="background:#fb923c" data-color="#fb923c" onclick="selectNewColor(this)"></div>
+            </div>
+        </div>
+        <div class="form-group"><label>نص الزر</label><input type="text" id="newBtnText" placeholder="مثال: اكتشف التخصصات"></div>
+        <button class="btn-save" onclick="addToolHandler()"><i class="fas fa-plus"></i> إضافة الأداة</button>
+    </div>
+
+    <!-- Bus Schedule Admin -->
+    <div class="panel-section" id="busAdminSection">
+        <h3><i class="fas fa-bus"></i> إدارة مواعيد الباصات</h3>
+        <div style="margin-bottom:1rem;">
+            <label style="font-size:0.9rem;color:var(--text-muted);font-weight:600;display:block;margin-bottom:0.5rem;">باص الأولاد 🚌</label>
+            <div id="busBoysAdmin"></div>
+            <button onclick="addBusRow('boys')" style="width:100%;padding:0.6rem;background:rgba(0,212,255,0.05);border:1px dashed rgba(0,212,255,0.2);border-radius:8px;color:rgba(0,212,255,0.5);font-size:0.85rem;cursor:pointer;font-family:'Tajawal',sans-serif;margin-top:6px;">+ إضافة رحلة</button>
+        </div>
+        <div style="margin-bottom:1rem;">
+            <label style="font-size:0.9rem;color:var(--text-muted);font-weight:600;display:block;margin-bottom:0.5rem;">باص البنات 🚌</label>
+            <div id="busGirlsAdmin"></div>
+            <button onclick="addBusRow('girls')" style="width:100%;padding:0.6rem;background:rgba(255,107,107,0.05);border:1px dashed rgba(255,107,107,0.2);border-radius:8px;color:rgba(255,107,107,0.5);font-size:0.85rem;cursor:pointer;font-family:'Tajawal',sans-serif;margin-top:6px;">+ إضافة رحلة</button>
+        </div>
+        <div class="form-group">
+            <label>رابط حجز الباص</label>
+            <input type="text" id="busBookingUrl" placeholder="https://...">
+        </div>
+        <button class="btn-save" onclick="saveBusSchedule()"><i class="fas fa-save"></i> حفظ الجداول</button>
+    </div>
+
+    <!-- Passwords -->
+    <div class="panel-section">
+        <h3><i class="fas fa-key"></i> إدارة كلمات المرور</h3>
+        <div class="passwords-list" id="passwordsList"></div>
+        <div class="form-group" style="margin-top:1rem;"><label>إضافة كلمة مرور جديدة</label><input type="text" id="newPassword" placeholder="كلمة المرور الجديدة"></div>
+        <div class="form-group">
+            <label>الصلاحية</label>
+            <select id="newRole">
+                <option value="admin">مشرف رئيسي (كل الصلاحيات)</option>
+                <option value="editor">محرر (تعديل المحتوى فقط)</option>
+                <option value="viewer">مشاهد (عرض فقط)</option>
+            </select>
+        </div>
+        <button class="btn-save" onclick="addPassword()"><i class="fas fa-key"></i> إضافة كلمة المرور</button>
+    </div>
+
+    <!-- Site Settings -->
+    <div class="panel-section">
+        <h3><i class="fas fa-sliders-h"></i> إعدادات الموقع</h3>
+        <div class="form-group"><label>عنوان الموقع</label><input type="text" id="siteTitle" value="جامعة نزوى - منصة الطالب"></div>
+        <div class="form-group"><label>الشعار الرئيسي</label><input type="text" id="siteHeadline" value="منصتك الشاملة للحياة الأكاديمية"></div>
+        <div class="form-group"><label>الوصف</label><textarea id="siteDesc">أدوات ذكية، ملخصات، جداول دراسية، وكل ما تحتاجه للنجاح</textarea></div>
+        <button class="btn-save" onclick="saveSettings()"><i class="fas fa-save"></i> حفظ الإعدادات</button>
+        <button class="btn-save" id="examModeBtn" onclick="toggleExamMode(localStorage.getItem('uon_exam_mode')!=='true')" style="margin-top:8px;background:linear-gradient(135deg,var(--danger),#dc2626);">
+            <i class="fas fa-graduation-cap"></i> <span id="examBtnText">تفعيل وضع الاختبارات</span>
+        </button>
+    </div>
+</div>
 
 <!-- Navbar -->
 <nav class="navbar" id="navbar">
@@ -295,14 +416,26 @@ body.has-exam-banner .navbar{top:40px!important}
         <li><a href="features.html" target="_blank" style="color:var(--warning)!important;">🔥 الميزات</a></li>
     </ul>
     <div class="nav-actions">
-        <button class="admin-nav-btn" id="adminBtn" onclick="window.location.href='admin.html'"><i class="fas fa-cog"></i> لوحة التحكم</button>
-        
+        <button class="admin-nav-btn" id="adminBtn" onclick="openPanel()"><i class="fas fa-cog"></i> لوحة التحكم</button>
+        <button class="logout-btn" id="logoutBtn" onclick="logout()"><i class="fas fa-sign-out-alt"></i> خروج</button>
         <button onclick="openGlobalSearch()" style="width:36px;height:36px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:10px;color:var(--text-muted);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .3s;" title="بحث"><i class="fas fa-search"></i></button>
-        <button class="nav-btn" id="loginBtn" onclick="window.location.href='admin.html'"><i class="fas fa-user-shield"></i> أدمن</button>
+        <button class="nav-btn" id="loginBtn" onclick="showLogin()"><i class="fas fa-user-shield"></i> أدمن</button>
     </div>
     <div class="mobile-menu" onclick="toggleMenu()"><i class="fas fa-bars"></i></div>
 </nav>
 
+<!-- Exam Mode Banner -->
+<div id="examBanner" style="display:none;position:fixed;top:65px;width:100%;z-index:999;background:linear-gradient(135deg,rgba(239,68,68,.95),rgba(220,38,38,.95));backdrop-filter:blur(10px);padding:.7rem 5%;display:none;align-items:center;justify-content:space-between;gap:1rem;border-bottom:1px solid rgba(255,255,255,.1);">
+    <div style="display:flex;align-items:center;gap:10px;font-size:.9rem;font-weight:700;">
+        <span style="font-size:1.2rem;">📚</span>
+        <span>وضع الاختبارات مفعّل — بالتوفيق لجميع الطلاب! 🎯</span>
+    </div>
+    <div style="display:flex;gap:.6rem;align-items:center;">
+        <a href="summaries.html" style="padding:.4rem .9rem;background:rgba(255,255,255,.2);border-radius:8px;color:#fff;text-decoration:none;font-size:.8rem;font-weight:700;">📚 الملخصات</a>
+        <a href="tools.html" style="padding:.4rem .9rem;background:rgba(255,255,255,.2);border-radius:8px;color:#fff;text-decoration:none;font-size:.8rem;font-weight:700;">🛠️ الأدوات</a>
+        <button onclick="toggleExamMode(false)" style="background:rgba(255,255,255,.15);border:none;border-radius:8px;color:#fff;padding:.4rem .7rem;cursor:pointer;font-size:.8rem;">✕ إخفاء</button>
+    </div>
+</div>
 
 <!-- Global Search -->
 <div id="globalSearchWrap" style="position:fixed;top:65px;width:100%;z-index:998;background:rgba(10,14,39,.95);backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,255,255,.05);padding:.8rem 5%;display:none;align-items:center;gap:10px;">
@@ -460,20 +593,60 @@ const supabase = createClient(
 
 // ===== PASSWORD CHECK =====
 const FALLBACK_PASS = 'UoN@Coffee#2026!'
+async function checkPassword(password) {
+    if (password === FALLBACK_PASS) return { role: 'admin', label: 'المشرف الرئيسي' }
+    try {
+        // timeout 5 ثواني — بدل ما يعلق إلى الأبد
+        const timeout = new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 5000))
+        const query = supabase.from('admin_passwords').select('*')
+        const { data } = await Promise.race([query, timeout])
+        if (data) {
+            for (const row of data) {
+                if (row.password_plain === password) return { role: row.role, label: row.label }
+            }
+        }
+    } catch(e) {}
+    return null
+}
 
-// ===== DEFAULT TOOLS =====
+// ===== DEFAULT DATA =====
 const defaultTools = [
     { id: 1, title: "مساعد AI ذكي", description: "بوت ذكي يجيب عن كل شيء يخص جامعة نزوى — متاح 24/7", icon: "fa-robot", color: "#00d4ff", btn_text: "جرب الآن" },
     { id: 2, title: "حاسبة المعدل", description: "احسب معدلك الفصلي بسهولة — أضف موادك وساعاتها وتقديراتها", icon: "fa-calculator", color: "#ff6b6b", btn_text: "احسب معدلك" },
     { id: 4, title: "اعترافات الطلاب", description: "شارك اعترافك الجامعي بشكل مجهول — كلنا في نفس الوضع 😅", icon: "fa-comments", color: "#6bcb77", btn_text: "اعترف الحين" },
     { id: 5, title: "مكتبة الملخصات", description: "ملخصات وشروحات من طلاب نزوى لجميع الكليات والمواد", icon: "fa-book-open", color: "#a78bfa", btn_text: "تصفح الملخصات" },
     { id: 6, title: "دليل المطاعم", description: "أقرب المطاعم والكافيهات حول جامعة نزوى مع التقييمات", icon: "fa-utensils", color: "#fb923c", btn_text: "شوف المطاعم" },
-    { id: 7, title: "مكتبة الأدوات", description: "أدوات أكاديمية وتقنية مفيدة لكل طالب في جامعة نزوى", icon: "fa-tools", color: "#38bdf8", btn_text: "افتح الأدوات" },
-    { id: 9, title: "الجدول الدراسي", description: "أنشئ جدولك الدراسي الأسبوعي بسهولة واطبعه", icon: "fa-calendar-alt", color: "#a78bfa", btn_text: "أنشئ جدولك" },
+    { id: 7, title: "خريطة الجامعة", description: "خريطة تفاعلية لمواقع الكليات والمرافق داخل الحرم الجامعي", icon: "fa-map-marked-alt", color: "#38bdf8", btn_text: "افتح الخريطة" },
     { id: 10, title: "مجموعات الواتساب", description: "ابحث عن مجموعة مادتك أو أضف مجموعتك لمساعدة زملائك", icon: "fa-whatsapp", color: "#25d366", btn_text: "ابحث عن مجموعة" },
     { id: 11, title: "سوق الطلاب", description: "بيع وشراء وتبادل الكتب والأدوات الدراسية بين طلاب الجامعة", icon: "fa-store", color: "#ffd93d", btn_text: "تسوّق الآن" }
 ]
 
+const defaultBoys = [
+    { route: "نزوى المدينة", departure: "07:00 ص", returnTime: "04:00 م", status: "active" },
+    { route: "بهلاء", departure: "06:45 ص", returnTime: "04:00 م", status: "active" },
+    { route: "عبري", departure: "06:30 ص", returnTime: "04:00 م", status: "active" },
+    { route: "الحمراء", departure: "06:50 ص", returnTime: "04:00 م", status: "full" },
+    { route: "إزكي", departure: "07:10 ص", returnTime: "04:00 م", status: "active" },
+    { route: "سمائل", departure: "06:40 ص", returnTime: "04:00 م", status: "active" },
+]
+const defaultGirls = [
+    { route: "نزوى المدينة", departure: "07:00 ص", returnTime: "04:00 م", status: "active" },
+    { route: "بهلاء", departure: "06:45 ص", returnTime: "04:00 م", status: "active" },
+    { route: "عبري", departure: "06:30 ص", returnTime: "04:00 م", status: "active" },
+    { route: "الحمراء", departure: "06:50 ص", returnTime: "04:00 م", status: "active" },
+    { route: "إزكي", departure: "07:10 ص", returnTime: "04:00 م", status: "full" },
+    { route: "سمائل", departure: "06:40 ص", returnTime: "04:00 م", status: "active" },
+]
+
+// ===== STATE =====
+let tools = []
+let currentAdmin = null
+let editingToolId = null
+let selectedColor = "#00d4ff"
+let selectedNewColor = "#00d4ff"
+let busData = { boys: [], girls: [], bookingUrl: '#' }
+
+// ===== SUPABASE =====
 async function loadTools() {
     // Show default tools immediately
     tools = defaultTools.map(t => ({...t, desc: t.description, btnText: t.btn_text}))
@@ -518,6 +691,38 @@ async function dbGetSettings() {
 }
 
 // ===== BUS DATA =====
+async function loadBusData() {
+    try {
+        const settings = await dbGetSettings()
+        busData.boys = settings.bus_boys ? JSON.parse(settings.bus_boys) : defaultBoys
+        busData.girls = settings.bus_girls ? JSON.parse(settings.bus_girls) : defaultGirls
+        busData.bookingUrl = settings.bus_booking_url || '#'
+    } catch(e) {
+        busData.boys = defaultBoys
+        busData.girls = defaultGirls
+    }
+    renderBusTables()
+}
+
+function renderBusTables() {
+    renderBusTable('boys', busData.boys)
+    renderBusTable('girls', busData.girls)
+    const link = document.getElementById('busBookingLink')
+    if (link) link.href = busData.bookingUrl || '#'
+}
+
+function renderBusTable(gender, routes) {
+    const el = document.getElementById(`bus${gender.charAt(0).toUpperCase() + gender.slice(1)}Table`)
+    if (!el) return
+    el.innerHTML = routes.map(r => `
+        <div class="bus-route">
+            <span class="route-name">📍 ${r.route}</span>
+            <span class="route-time">🕖 ${r.departure}</span>
+            <span class="route-return">↩️ ${r.returnTime}</span>
+            <span class="route-status ${r.status === 'active' ? 'status-active' : 'status-full'}">${r.status === 'active' ? 'متاح' : 'مكتمل'}</span>
+        </div>`).join('')
+}
+
 window.switchBusTab = function(tab, btn) {
     document.querySelectorAll('.bus-tab').forEach(b => b.classList.remove('active'))
     document.querySelectorAll('.bus-panel').forEach(p => p.classList.remove('active'))
@@ -525,31 +730,82 @@ window.switchBusTab = function(tab, btn) {
     document.getElementById('busPanel-' + tab).classList.add('active')
 }
 
-// Admin state
-let currentAdmin = null
+// Bus admin rows
+function renderBusAdminRows() {
+    renderBusAdminSection('boys', busData.boys)
+    renderBusAdminSection('girls', busData.girls)
+    const urlInput = document.getElementById('busBookingUrl')
+    if (urlInput) urlInput.value = busData.bookingUrl || ''
+}
 
-window.addEventListener('DOMContentLoaded', () => {
-    // إخفاء الـ loading فوراً بعد رسم الصفحة
-    document.getElementById('loadingOverlay').classList.add('hidden')
+function renderBusAdminSection(gender, routes) {
+    const el = document.getElementById(`bus${gender.charAt(0).toUpperCase() + gender.slice(1)}Admin`)
+    if (!el) return
+    el.innerHTML = routes.map((r, i) => `
+        <div class="bus-admin-row">
+            <input type="text" value="${r.route}" onchange="updateBusRow('${gender}',${i},'route',this.value)">
+            <input type="text" value="${r.departure}" onchange="updateBusRow('${gender}',${i},'departure',this.value)">
+            <input type="text" value="${r.returnTime}" onchange="updateBusRow('${gender}',${i},'returnTime',this.value)">
+            <button onclick="removeBusRow('${gender}',${i})">×</button>
+        </div>`).join('')
+}
 
-    // تحميل الأدوات فوراً من القيم الافتراضية
-    loadTools()
+window.updateBusRow = function(gender, index, field, value) {
+    busData[gender][index][field] = value
+}
 
-    // باقي التهيئة
+window.addBusRow = function(gender) {
+    busData[gender].push({ route: 'منطقة جديدة', departure: '07:00 ص', returnTime: '04:00 م', status: 'active' })
+    renderBusAdminSection(gender, busData[gender])
+}
+
+window.removeBusRow = function(gender, index) {
+    busData[gender].splice(index, 1)
+    renderBusAdminSection(gender, busData[gender])
+}
+
+window.saveBusSchedule = async function() {
+    if (currentAdmin?.role !== 'admin') { showToast('فقط المشرف الرئيسي يمكنه التعديل', 'error'); return }
+    const url = document.getElementById('busBookingUrl').value
+    busData.bookingUrl = url
+    await dbSaveSettings('bus_boys', JSON.stringify(busData.boys))
+    await dbSaveSettings('bus_girls', JSON.stringify(busData.girls))
+    await dbSaveSettings('bus_booking_url', url)
+    renderBusTables()
+    showToast('تم حفظ جداول الباصات!')
+}
+
+// ===== INIT =====
+window.addEventListener('DOMContentLoaded', async () => {
+    const hideLoading = () => document.getElementById('loadingOverlay').classList.add('hidden')
+    // إخفاء الـ loading بعد 2.5 ثانية على أي حال
+    const loadingTimeout = setTimeout(hideLoading, 2500)
+
+    // ===== EXAM BANNER =====
+    try {
+        const { data: _ebData } = await supabase.from('settings').select('*').in('key',['exam_mode','exam_title','exam_msg','exam_emoji'])
+        if (_ebData) {
+            const _ebMap = {}
+            _ebData.forEach(r => _ebMap[r.key] = r.value)
+            if (_ebMap.exam_mode === 'true') {
+                const _icon = _ebMap.exam_emoji || '🎯'
+                const _title = _ebMap.exam_title || 'فترة الاختبارات النهائية'
+                const _msg = _ebMap.exam_msg || 'بالتوفيق لجميع الطلاب!'
+                const _el = document.getElementById('examBanner')
+                if (_el) { _el.textContent = _icon + ' ' + _title + ' — ' + _msg; _el.classList.add('show'); document.body.classList.add('has-exam-banner') }
+            }
+        }
+    } catch(e) {}
+    // allSettled بدل all — لو طلب واحد فشل ما يوقف الباقي
+    await Promise.allSettled([loadTools(), loadSettings(), loadBusData()])
+    clearTimeout(loadingTimeout)
     updateUI()
     initScrollReveal()
     initCounters()
     initParallax()
-    botAddMsg('bot', 'مرحباً بك في UoN Coffee! 👋\n\nأنا مساعدك الذكي لجامعة نزوى 🎓\nاسألني عن الكليات، الروابط، أو أي شيء!')
-
-    // Supabase في الخلفية
-    setTimeout(async () => {
-        try {
-            const {data:_eb} = await supabase.from('settings').select('*').in('key',['exam_mode','exam_title','exam_msg','exam_emoji'])
-            if(_eb){const _m={};_eb.forEach(r=>_m[r.key]=r.value);if(_m.exam_mode==='true'){const _el=document.getElementById('examBanner');if(_el){_el.textContent=(_m.exam_emoji||'🎯')+' '+(_m.exam_title||'فترة الاختبارات')+' — '+(_m.exam_msg||'بالتوفيق!');_el.classList.add('show');document.body.classList.add('has-exam-banner')}}}
-        } catch(e) {}
-        try { await loadSettings() } catch(e) {}
-    }, 500)
+    botAddMsg('bot', 'مرحباً بك في UoN Coffee! 👋\n\nأنا مساعدك الذكي لجامعة نزوى 🎓\nاسألني عن الكليات، الروابط، مواعيد الباصات، أو أي شيء!')
+    checkExamMode()
+    hideLoading()
 })
 
 // ===== RENDER TOOLS =====
@@ -574,7 +830,6 @@ window.openTool = function(id) {
         5: () => window.location.href = 'summaries.html',
         6: () => window.location.href = 'features.html#rest',
         7: () => window.location.href = 'tools.html',
-        9: () => window.location.href = 'schedule.html',
         10: () => window.location.href = 'groups.html',
         11: () => window.location.href = 'marketplace.html',
     }
@@ -583,46 +838,227 @@ window.openTool = function(id) {
 }
 
 // ===== LOGIN (SECURE) =====
-window.showLogin = function() { window.location.href = 'admin.html' }
+window.showLogin = function() {
+    document.getElementById('loginOverlay').classList.add('active')
+    document.getElementById('adminPassword').focus()
+}
 
+window.login = async function() {
+    const input = document.getElementById('adminPassword').value
+    const error = document.getElementById('loginError')
+    if (!input) return
 
+    const matched = await checkPassword(input)
 
+    if (matched) {
+        currentAdmin = matched
+        sessionStorage.setItem('nu_admin', JSON.stringify(matched))
+        document.getElementById('loginOverlay').classList.remove('active')
+        document.getElementById('adminPassword').value = ''
+        error.classList.remove('show')
+        updateUI()
+        showToast(`مرحباً ${matched.label}! ✅`)
+    } else {
+        error.classList.add('show')
+        document.querySelector('.login-box').style.animation = 'shake 0.5s ease'
+        setTimeout(() => document.querySelector('.login-box').style.animation = '', 500)
+    }
+}
 
-window.openPanel = function() { window.location.href = 'admin.html' }
+window.logout = function() {
+    currentAdmin = null
+    sessionStorage.removeItem('nu_admin')
+    updateUI()
+    showToast('تم تسجيل الخروج', 'error')
+}
+
+function updateUI() {
+    // Try restore session
+    if (!currentAdmin) {
+        const saved = sessionStorage.getItem('nu_admin')
+        if (saved) try { currentAdmin = JSON.parse(saved) } catch(e) {}
+    }
+    const isAdmin = currentAdmin !== null
+    const isMainAdmin = isAdmin && currentAdmin.role === 'admin'
+    const isEditor = isAdmin && (currentAdmin.role === 'admin' || currentAdmin.role === 'editor')
+
+    document.getElementById('adminBadge').classList.toggle('show', isAdmin)
+    if (isAdmin) document.getElementById('adminRoleLabel').textContent = currentAdmin.label || 'مشرف'
+    document.getElementById('adminBtn').classList.toggle('show', isAdmin)
+    document.getElementById('logoutBtn').classList.toggle('show', isAdmin)
+    document.getElementById('loginBtn').classList.toggle('show', !isAdmin)
+    document.body.classList.toggle('admin-mode', isEditor)
+
+    // Hide passwords & settings sections from non-main-admins
+    const pwSection = document.querySelector('#adminPanel .panel-section:nth-child(5)')
+    const settingsSection = document.querySelector('#adminPanel .panel-section:last-child')
+    if (pwSection) pwSection.style.display = isMainAdmin ? 'block' : 'none'
+    if (settingsSection) settingsSection.style.display = isMainAdmin ? 'block' : 'none'
+}
+
+// ===== ADMIN PANEL =====
+window.openPanel = function() {
+    if (!currentAdmin) return
+    document.getElementById('adminPanel').classList.add('open')
+    document.getElementById('panelOverlay').classList.add('show')
+    document.getElementById('editSection').style.display = 'none'
+    renderPasswordsList()
+    renderBusAdminRows()
+}
+window.closePanel = function() {
+    document.getElementById('adminPanel').classList.remove('open')
+    document.getElementById('panelOverlay').classList.remove('show')
+    editingToolId = null
+}
+
+window.editTool = function(id) {
+    if (currentAdmin?.role !== 'admin' && currentAdmin?.role !== 'editor') { showToast('ليس لديك صلاحية التعديل', 'error'); return }
+    const tool = tools.find(t => t.id === id)
+    if (!tool) return
+    editingToolId = id
+    document.getElementById('editTitle').value = tool.title
+    document.getElementById('editDesc').value = tool.desc
+    document.getElementById('editIcon').value = tool.icon
+    document.getElementById('editBtnText').value = tool.btnText
+    selectedColor = tool.color
+    document.querySelectorAll('#editSection .color-option').forEach(opt => opt.classList.toggle('selected', opt.dataset.color === tool.color))
+    document.getElementById('editSection').style.display = 'block'
+    openPanel()
+}
 
 window.selectColor = function(el) {
     document.querySelectorAll('#editSection .color-option').forEach(opt => opt.classList.remove('selected'))
     el.classList.add('selected'); selectedColor = el.dataset.color
 }
 
+window.saveToolHandler = async function() {
+    if (!editingToolId) return
+    if (currentAdmin?.role !== 'admin' && currentAdmin?.role !== 'editor') { showToast('ليس لديك صلاحية', 'error'); return }
+    const tool = tools.find(t => t.id === editingToolId)
+    if (tool) {
+        tool.title = document.getElementById('editTitle').value
+        tool.desc = document.getElementById('editDesc').value
+        tool.icon = document.getElementById('editIcon').value
+        tool.color = selectedColor
+        tool.btnText = document.getElementById('editBtnText').value
+        await dbSaveTool(tool)
+        renderTools()
+        closePanel()
+        showToast('تم حفظ التغييرات!')
+    }
+}
 
+window.deleteToolHandler = async function() {
+    if (!editingToolId) return
+    if (currentAdmin?.role !== 'admin') { showToast('فقط المشرف الرئيسي يمكنه الحذف', 'error'); return }
+    if (!confirm('هل أنت متأكد من حذف هذه الأداة؟')) return
+    await dbDeleteTool(editingToolId)
+    tools = tools.filter(t => t.id !== editingToolId)
+    renderTools()
+    closePanel()
+    showToast('تم حذف الأداة', 'error')
+}
 
 window.selectNewColor = function(el) {
+    document.querySelectorAll('.panel-section:not(#editSection) .color-option').forEach(opt => opt.classList.remove('selected'))
     el.classList.add('selected'); selectedNewColor = el.dataset.color
 }
 
+window.addToolHandler = async function() {
+    if (currentAdmin?.role !== 'admin') { showToast('فقط المشرف الرئيسي يمكنه إضافة أدوات', 'error'); return }
+    const title = document.getElementById('newTitle').value
+    const desc = document.getElementById('newDesc').value
+    if (!title || !desc) { showToast('يرجى ملء جميع الحقول', 'error'); return }
+    const newTool = { title, desc, icon: document.getElementById('newIcon').value || 'fa-tools', color: selectedNewColor, btnText: document.getElementById('newBtnText').value || 'جرب الآن' }
+    await dbSaveTool(newTool)
+    await loadTools()
+    document.getElementById('newTitle').value = ''
+    document.getElementById('newDesc').value = ''
+    document.getElementById('newIcon').value = ''
+    document.getElementById('newBtnText').value = ''
+    showToast('تم إضافة الأداة!')
+}
 
+// ===== PASSWORDS (ADMIN ONLY) =====
+function renderPasswordsList() {
+    if (currentAdmin?.role !== 'admin') { document.getElementById('passwordsList').innerHTML = '<p style="color:var(--text-dim);font-size:0.85rem;">فقط المشرف الرئيسي يمكنه إدارة كلمات المرور</p>'; return }
+    document.getElementById('passwordsList').innerHTML = `
+        <div class="password-item"><div><span>••••••••••••••</span><span class="role">المشرف الرئيسي</span></div></div>
+        <p style="font-size:0.8rem;color:var(--text-dim);margin-top:0.5rem;">كلمة المرور الرئيسية محمية ولا تظهر</p>`
+}
 
+window.addPassword = async function() {
+    if (currentAdmin?.role !== 'admin') { showToast('فقط المشرف الرئيسي', 'error'); return }
+    const pass = document.getElementById('newPassword').value
+    const role = document.getElementById('newRole').value
+    const labels = { admin: 'مشرف رئيسي', editor: 'محرر', viewer: 'مشاهد' }
+    if (!pass) { showToast('أدخل كلمة المرور', 'error'); return }
+    try {
+        await supabase.from('admin_passwords').insert({ password_plain: pass, role, label: labels[role] })
+        document.getElementById('newPassword').value = ''
+        showToast('تم إضافة كلمة المرور!')
+    } catch(e) { showToast('خطأ في الحفظ', 'error') }
+}
+
+// ===== SETTINGS =====
+window.saveSettings = async function() {
+    if (currentAdmin?.role !== 'admin') { showToast('فقط المشرف الرئيسي', 'error'); return }
+    const title = document.getElementById('siteTitle').value
+    const headline = document.getElementById('siteHeadline').value
+    const desc = document.getElementById('siteDesc').value
+    document.getElementById('heroTitle').innerHTML = headline.replace(/\n/g, '<br>')
+    document.getElementById('heroDesc').textContent = desc
+    document.title = title
+    await dbSaveSettings('title', title)
+    await dbSaveSettings('headline', headline)
+    await dbSaveSettings('desc', desc)
+    showToast('تم حفظ الإعدادات!')
+}
+
+async function loadSettings() {
+    const settings = await dbGetSettings()
+    if (settings.title) { if(document.getElementById('siteTitle')) document.getElementById('siteTitle').value = settings.title; document.title = settings.title }
+    if (settings.headline) { if(document.getElementById('siteHeadline')) document.getElementById('siteHeadline').value = settings.headline; document.getElementById('heroTitle').innerHTML = settings.headline.replace(/\n/g, '<br>') }
+    if (settings.desc) { if(document.getElementById('siteDesc')) document.getElementById('siteDesc').value = settings.desc; document.getElementById('heroDesc').textContent = settings.desc }
+}
+
+// ===== BOT (Claude API) =====
+let botHistory = []
+
+const BOT_SYSTEM = `أنت مساعد ذكي لجامعة نزوى في سلطنة عُمان. اسمك "مساعد UoN Coffee".
+معلوماتك عن الجامعة:
+- الكليات: الاقتصاد ونظم المعلومات، الهندسة والعمارة، العلوم والآداب، العلوم الصحية، معهد التأسيس
+- نظام التقديرات: A=4.0، A-=3.7، B+=3.3، B=3.0، B-=2.7، C+=2.3، C=2.0، D=1.0، F=0
+- الروابط: portal.unizwa.edu.om | moodle.unizwa.edu.om | elearning.unizwa.edu.om | library.unizwa.edu.om
+- أرقام: المالية 92596648 | التسجيل 25446234 | الرعاية 91313951
+تحدث بالعربية الخليجية البسيطة. كن مختصراً وودوداً. استخدم إيموجي بشكل معتدل.`
 
 async function callClaudeAPI(userMessage) {
     botHistory.push({ role: 'user', content: userMessage })
+    // timeout 15 ثانية — لو ما رد يرجع رسالة خطأ بدل تعليق
+    const controller = new AbortController()
+    const timeoutId = setTimeout(() => controller.abort(), 15000)
     try {
         const response = await fetch('https://api.anthropic.com/v1/messages', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
+            signal: controller.signal,
             body: JSON.stringify({
-                model: 'claude-sonnet-4-20250514',
+                model: 'claude-sonnet-4-6',
                 max_tokens: 1000,
                 system: BOT_SYSTEM,
                 messages: botHistory.slice(-10)
             })
         })
+        clearTimeout(timeoutId)
         const data = await response.json()
         const reply = data.content?.[0]?.text || 'عذراً، حدث خطأ. جرب مرة ثانية!'
         botHistory.push({ role: 'assistant', content: reply })
         return reply
     } catch(e) {
+        clearTimeout(timeoutId)
         botHistory.pop()
+        if (e.name === 'AbortError') return 'انتهت مهلة الاتصال. تواصل مع الجامعة مباشرة: 25446234'
         return 'تعذّر الاتصال. تواصل مع الجامعة مباشرة: 25446234'
     }
 }
@@ -654,7 +1090,12 @@ window.botSend = async function() {
     botAddMsg('user', text)
     const loadingId = botAddMsg('bot', '', true)
 
-    const reply = await callClaudeAPI(text)
+    let reply
+    try {
+        reply = await callClaudeAPI(text)
+    } catch(e) {
+        reply = 'تعذّر الاتصال. تواصل مع الجامعة مباشرة: 25446234'
+    }
 
     const loadingEl = document.getElementById(loadingId)
     if (loadingEl) loadingEl.querySelector('div:last-child').innerHTML = reply.replace(/\n/g,'<br>')
@@ -744,8 +1185,35 @@ window.toggleMenu = function() {
     else nl.style.cssText='display:flex;position:absolute;top:100%;left:0;right:0;flex-direction:column;background:var(--dark-light);padding:2rem;gap:1.5rem;z-index:999;'
 }
 
-// ===== EXAM MODE (handled by Supabase in DOMContentLoaded) =====
+// ===== EXAM MODE =====
+function checkExamMode() {
+    const examMode = localStorage.getItem('uon_exam_mode') === 'true'
+    const banner = document.getElementById('examBanner')
+    if (banner) banner.style.display = examMode ? 'flex' : 'none'
+}
 
+window.toggleExamMode = function(state) {
+    localStorage.setItem('uon_exam_mode', state)
+    checkExamMode()
+    if (state) showToast('تم تفعيل وضع الاختبارات! 📚 بالتوفيق')
+}
+
+// Admin exam mode toggle in panel
+async function addExamToggle() {
+    const settingsSection = document.querySelector('#adminPanel .panel-section:last-child')
+    if (settingsSection && !document.getElementById('examToggleBtn')) {
+        const btn = document.createElement('button')
+        btn.id = 'examToggleBtn'
+        btn.className = 'btn-save'
+        btn.style.marginTop = '10px'
+        btn.style.background = 'linear-gradient(135deg,var(--danger),#dc2626)'
+        btn.innerHTML = '<i class="fas fa-graduation-cap"></i> تفعيل وضع الاختبارات'
+        btn.onclick = () => toggleExamMode(localStorage.getItem('uon_exam_mode') !== 'true')
+        settingsSection.appendChild(btn)
+    }
+}
+
+// ===== GLOBAL SEARCH =====
 window.openGlobalSearch = function() {
     document.getElementById('globalSearchWrap').style.display = 'flex'
     document.getElementById('globalSearchInp').focus()
@@ -820,12 +1288,8 @@ document.addEventListener('keydown', e => {
 // ===== END NEW FEATURES =====
 
 // ===== PWA =====
-// Unregister all old service workers
 if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.getRegistrations().then(regs => {
-        regs.forEach(r => r.unregister())
-    })
-    caches.keys().then(keys => keys.forEach(k => caches.delete(k)))
+    navigator.serviceWorker.register('/sw.js').catch(() => {})
 }
 
 let deferredInstall = null
