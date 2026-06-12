@@ -528,13 +528,28 @@ body { font-family:'Tajawal',sans-serif; background:var(--dark); color:var(--tex
     </main>
 </div>
 
+<script>
+// إخفاء اللودينق إجبارياً بعد 3 ثواني مهما حصل
+setTimeout(function() {
+    var ov = document.getElementById('loadingOverlay')
+    if (ov) ov.classList.add('hidden')
+}, 3000)
+</script>
 <script type="module">
-import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
-
-const supabase = createClient(
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm'
+window.supabaseClient = createClient(
     'https://fjkxahhoacqlpiafmfyd.supabase.co',
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZqa3hhaGhvYWNxbHBpYWZtZnlkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgzMTkwMjQsImV4cCI6MjA5Mzg5NTAyNH0.Ls3gaXRso3BgcDAByoYeQQot_KbAOfREvxyW8u4vkGA'
 )
+// شغّل الكود الرئيسي بعد ما Supabase جاهز
+window.dispatchEvent(new Event('supabase-ready'))
+</script>
+<script>
+const supabase = new Proxy({}, {
+    get(_, prop) {
+        return window.supabaseClient ? window.supabaseClient[prop] : (() => Promise.resolve({ data: null, error: null, count: 0 }))
+    }
+})
 
 const FALLBACK = 'UoN@Coffee#2026!'
 async function checkPass(p) {
