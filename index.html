@@ -458,8 +458,18 @@ const supabase = createClient(
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZqa3hhaGhvYWNxbHBpYWZtZnlkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgzMTkwMjQsImV4cCI6MjA5Mzg5NTAyNH0.Ls3gaXRso3BgcDAByoYeQQot_KbAOfREvxyW8u4vkGA'
 )
 
-// ===== PASSWORD CHECK =====
+// ===== VARIABLES =====
+let tools = []
+let botHistory = []
 const FALLBACK_PASS = 'UoN@Coffee#2026!'
+
+const BOT_SYSTEM = `أنت مساعد ذكي لجامعة نزوى في سلطنة عُمان. اسمك "مساعد UoN Coffee".
+معلوماتك عن الجامعة:
+- الكليات: الاقتصاد ونظم المعلومات، الهندسة والعمارة، العلوم والآداب، العلوم الصحية، معهد التأسيس
+- نظام التقديرات: A=4.0، A-=3.7، B+=3.3، B=3.0، B-=2.7، C+=2.3، C=2.0، D=1.0، F=0
+- الروابط: portal.unizwa.edu.om | moodle.unizwa.edu.om | elearning.unizwa.edu.om | library.unizwa.edu.om
+- أرقام: المالية 92596648 | التسجيل 25446234 | الرعاية 91313951
+تحدث بالعربية الخليجية البسيطة. كن مختصراً وودوداً. استخدم إيموجي بشكل معتدل.`
 
 // ===== DEFAULT TOOLS =====
 const defaultTools = [
@@ -474,6 +484,16 @@ const defaultTools = [
     { id: 11, title: "سوق الطلاب", description: "بيع وشراء وتبادل الكتب والأدوات الدراسية بين طلاب الجامعة", icon: "fa-store", color: "#ffd93d", btn_text: "تسوّق الآن" }
 ]
 
+// ===== UI UPDATE =====
+function updateUI() {
+    const isAdmin = currentAdmin !== null
+    const adminBtn = document.getElementById('adminBtn')
+    const loginBtn = document.getElementById('loginBtn')
+    if (adminBtn) adminBtn.classList.toggle('show', isAdmin)
+    if (loginBtn) loginBtn.style.display = isAdmin ? 'none' : ''
+}
+
+// ===== TOOLS LOAD =====
 async function loadTools() {
     // Show default tools immediately
     tools = defaultTools.map(t => ({...t, desc: t.description, btnText: t.btn_text}))
@@ -528,6 +548,12 @@ window.switchBusTab = function(tab, btn) {
 // Admin state
 let currentAdmin = null
 
+// Restore session on load
+;(function() {
+    const saved = sessionStorage.getItem('nu_admin')
+    if (saved) try { currentAdmin = JSON.parse(saved) } catch(e) {}
+})()
+
 window.addEventListener('DOMContentLoaded', () => {
     // إخفاء الـ loading فوراً بعد رسم الصفحة
     document.getElementById('loadingOverlay').classList.add('hidden')
@@ -545,18 +571,8 @@ window.addEventListener('DOMContentLoaded', () => {
     // Supabase في الخلفية
     setTimeout(async () => {
         try {
-            const {data:_eb} = await supabase.from('settings').select('*').in('key',['exam_mode','exam_title','exam_msg','exam_emoji','ai_enabled'])
-            if(_eb){
-                const _m={};_eb.forEach(r=>_m[r.key]=r.value)
-                if(_m.exam_mode==='true'){const _el=document.getElementById('examBanner');if(_el){_el.textContent=(_m.exam_emoji||'🎯')+' '+(_m.exam_title||'فترة الاختبارات')+' — '+(_m.exam_msg||'بالتوفيق!');_el.classList.add('show');document.body.classList.add('has-exam-banner')}}
-                // إخفاء المساعد AI إذا أوقفه الأدمن
-                if(_m.ai_enabled === 'false'){
-                    const _botEl = document.getElementById('botSection')
-                    if(_botEl) _botEl.style.display = 'none'
-                    const _botNav = document.querySelector('a[href="#botSection"]')
-                    if(_botNav) _botNav.closest('li').style.display = 'none'
-                }
-            }
+            const {data:_eb} = await supabase.from('settings').select('*').in('key',['exam_mode','exam_title','exam_msg','exam_emoji'])
+            if(_eb){const _m={};_eb.forEach(r=>_m[r.key]=r.value);if(_m.exam_mode==='true'){const _el=document.getElementById('examBanner');if(_el){_el.textContent=(_m.exam_emoji||'🎯')+' '+(_m.exam_title||'فترة الاختبارات')+' — '+(_m.exam_msg||'بالتوفيق!');_el.classList.add('show');document.body.classList.add('has-exam-banner')}}}
         } catch(e) {}
         try { await loadSettings() } catch(e) {}
     }, 500)
@@ -616,29 +632,23 @@ window.selectNewColor = function(el) {
 
 async function callClaudeAPI(userMessage) {
     botHistory.push({ role: 'user', content: userMessage })
-    const controller = new AbortController()
-    const timeoutId = setTimeout(() => controller.abort(), 15000)
     try {
         const response = await fetch('https://api.anthropic.com/v1/messages', {
             method: 'POST',
-            signal: controller.signal,
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                model: 'claude-sonnet-4-6',
+                model: 'claude-sonnet-4-20250514',
                 max_tokens: 1000,
                 system: BOT_SYSTEM,
                 messages: botHistory.slice(-10)
             })
         })
-        clearTimeout(timeoutId)
         const data = await response.json()
         const reply = data.content?.[0]?.text || 'عذراً، حدث خطأ. جرب مرة ثانية!'
         botHistory.push({ role: 'assistant', content: reply })
         return reply
     } catch(e) {
-        clearTimeout(timeoutId)
         botHistory.pop()
-        if (e.name === 'AbortError') return '⏱️ انتهت مهلة الاتصال. تواصل مع الجامعة: 25446234'
         return 'تعذّر الاتصال. تواصل مع الجامعة مباشرة: 25446234'
     }
 }
@@ -862,12 +872,6 @@ window.addEventListener('beforeinstallprompt', e => {
     document.body.appendChild(btn)
     setTimeout(() => btn?.remove(), 30000)
 })
-
-// Restore session on load
-;(function() {
-    const saved = sessionStorage.getItem('nu_admin')
-    if (saved) try { currentAdmin = JSON.parse(saved) } catch(e) {}
-})()
 </script>
 </body>
 </html>
