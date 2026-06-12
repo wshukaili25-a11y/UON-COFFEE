@@ -241,12 +241,48 @@ body.has-exam-banner .navbar{top:40px!important}
     </div>
 </main>
 
-<script type="module">
-import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
-const supabase = createClient(
-    'https://fjkxahhoacqlpiafmfyd.supabase.co',
-    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZqa3hhaGhvYWNxbHBpYWZtZnlkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgzMTkwMjQsImV4cCI6MjA5Mzg5NTAyNH0.Ls3gaXRso3BgcDAByoYeQQot_KbAOfREvxyW8u4vkGA'
-)
+<script>
+window._sbURL = 'https://fjkxahhoacqlpiafmfyd.supabase.co'
+window._sbKEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZqa3hhaGhvYWNxbHBpYWZtZnlkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgzMTkwMjQsImV4cCI6MjA5Mzg5NTAyNH0.Ls3gaXRso3BgcDAByoYeQQot_KbAOfREvxyW8u4vkGA'
+
+// Supabase بدون CDN — REST API مباشرة
+const supabase = {
+    from: function(table) {
+        const base = window._sbURL + '/rest/v1/' + table
+        const headers = {
+            'apikey': window._sbKEY,
+            'Authorization': 'Bearer ' + window._sbKEY,
+            'Content-Type': 'application/json',
+            'Prefer': 'return=representation'
+        }
+        return {
+            select: function(cols, opts) {
+                let url = base + '?select=' + (cols||'*')
+                if (opts && opts.count === 'exact') url += '&select=' + (cols||'*')
+                return {
+                    order: function(col, o) { url += '&order=' + col + (o&&o.ascending===false?'.desc':''); return this },
+                    limit: function(n) { url += '&limit=' + n; return this },
+                    in: function(col, vals) { url += '&' + col + '=in.(' + vals.join(',') + ')'; return this },
+                    eq: function(col, val) { url += '&' + col + '=eq.' + val; return this },
+                    single: function() { return fetch(url, {headers}).then(r=>r.json()).then(d=>({data:Array.isArray(d)?d[0]:d,error:null})).catch(e=>({data:null,error:e})) },
+                    then: function(cb) { return fetch(url, {headers:{...headers,'Prefer':'count=exact'}}).then(r=>{const c=r.headers.get('content-range');const count=c?parseInt(c.split('/')[1]):0;return r.json().then(d=>({data:d,count,error:null}))}).catch(e=>({data:null,count:0,error:e})).then(cb) }
+                }
+            },
+            insert: function(data) {
+                return fetch(base, {method:'POST',headers,body:JSON.stringify(data)}).then(r=>r.json()).then(d=>({data:d,error:null})).catch(e=>({data:null,error:e}))
+            },
+            update: function(data) {
+                return { eq: function(col,val) { return fetch(base+'?'+col+'=eq.'+val, {method:'PATCH',headers,body:JSON.stringify(data)}).then(r=>r.json()).then(d=>({data:d,error:null})).catch(e=>({data:null,error:e})) } }
+            },
+            delete: function() {
+                return { eq: function(col,val) { return fetch(base+'?'+col+'=eq.'+val, {method:'DELETE',headers}).then(r=>({data:null,error:null})).catch(e=>({data:null,error:e})) } }
+            },
+            upsert: function(data) {
+                return fetch(base, {method:'POST',headers:{...headers,'Prefer':'resolution=merge-duplicates,return=representation'},body:JSON.stringify(data)}).then(r=>r.json()).then(d=>({data:d,error:null})).catch(e=>({data:null,error:e}))
+            }
+        }
+    }
+}
 
 const FALLBACK = 'UoN@Coffee#2026!'
 async function checkPass(p) {
