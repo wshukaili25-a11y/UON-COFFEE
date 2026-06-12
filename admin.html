@@ -437,22 +437,6 @@ body { font-family:'Tajawal',sans-serif; background:var(--dark); color:var(--tex
                 <h1>الأدوات 🛠️</h1>
                 <p>إدارة تصنيفات وأدوات الطلاب — تشغيل وإيقاف الأدوات مباشرة</p>
             </div>
-            <!-- AI TOGGLE -->
-            <div class="content-card" style="margin-bottom:1.2rem;">
-                <div class="card-header">
-                    <div class="card-title"><i class="fas fa-robot" style="color:var(--primary)"></i> المساعد الذكي AI</div>
-                </div>
-                <div style="display:flex;align-items:center;justify-content:space-between;background:var(--dark);border-radius:12px;padding:.9rem 1.2rem;border:1px solid rgba(255,255,255,.07);">
-                    <div style="display:flex;align-items:center;gap:12px;">
-                        <span style="font-size:1.5rem;">🤖</span>
-                        <div>
-                            <div style="font-size:.9rem;font-weight:700;" id="aiToggleLabel">جارٍ التحميل...</div>
-                            <div style="font-size:.75rem;color:var(--text-dim);margin-top:2px;">يظهر في الصفحة الرئيسية</div>
-                        </div>
-                    </div>
-                    <button id="aiToggleBtn" onclick="toggleAI()" style="padding:.5rem 1.2rem;border-radius:10px;border:none;font-size:.85rem;font-weight:800;font-family:Tajawal,sans-serif;cursor:pointer;transition:all .25s;">...</button>
-                </div>
-            </div>
             <div class="content-card" id="toolsAdminCard">
                 <div class="card-header">
                     <div class="card-title"><i class="fas fa-tools" style="color:var(--primary)"></i> التصنيفات والأدوات</div>
@@ -578,7 +562,12 @@ window.addEventListener('DOMContentLoaded', () => {
 window.doLogin = async function() {
     const pass = document.getElementById('loginPass').value
     if (!pass) return
+    const btn = document.querySelector('.login-btn')
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جارٍ التحقق...'
+    btn.disabled = true
     const matched = await checkPass(pass)
+    btn.innerHTML = '<i class="fas fa-sign-in-alt"></i> دخول'
+    btn.disabled = false
     if (matched) {
         currentAdmin = matched
         sessionStorage.setItem('uon_admin_dash', JSON.stringify(matched))
@@ -620,7 +609,6 @@ async function loadAll() {
         loadProjects(),
         loadPasswords(),
         loadToolsAdmin(),
-        loadAISetting(),
         loadTestMode(),
     ]
     await Promise.allSettled(tasks)
@@ -966,46 +954,6 @@ async function loadProjects() {
 window.deleteProject = async (id) => { if(!confirm('حذف؟')) return; try { await supabase.from('projects').delete().eq('id',id); loadProjects(); loadStats(); showToast('تم الحذف','error') } catch(e){} }
 
 // ===== TOOLS ADMIN =====
-// ===== AI TOGGLE =====
-let aiEnabled = true
-
-async function loadAISetting() {
-    try {
-        const { data } = await supabase.from('settings').select('value').eq('key','ai_enabled').single()
-        aiEnabled = data ? data.value !== 'false' : true
-    } catch(e) { aiEnabled = true }
-    renderAIToggle()
-}
-
-function renderAIToggle() {
-    const label = document.getElementById('aiToggleLabel')
-    const btn = document.getElementById('aiToggleBtn')
-    if (!label || !btn) return
-    if (aiEnabled) {
-        label.textContent = '✅ المساعد الذكي مفعّل'
-        label.style.color = 'var(--success)'
-        btn.textContent = '⏸ إيقاف'
-        btn.style.cssText = 'padding:.5rem 1.2rem;border-radius:10px;border:1px solid rgba(239,68,68,.25);background:rgba(239,68,68,.1);color:#ef4444;font-size:.85rem;font-weight:800;font-family:Tajawal,sans-serif;cursor:pointer;'
-    } else {
-        label.textContent = '⛔ المساعد الذكي موقوف'
-        label.style.color = 'var(--danger)'
-        btn.textContent = '▶ تشغيل'
-        btn.style.cssText = 'padding:.5rem 1.2rem;border-radius:10px;border:1px solid rgba(107,203,119,.25);background:rgba(107,203,119,.1);color:#6bcb77;font-size:.85rem;font-weight:800;font-family:Tajawal,sans-serif;cursor:pointer;'
-    }
-}
-
-window.toggleAI = async function() {
-    aiEnabled = !aiEnabled
-    try {
-        await supabase.from('settings').upsert({ key:'ai_enabled', value: String(aiEnabled) })
-        renderAIToggle()
-        showToast(aiEnabled ? 'تم تشغيل المساعد الذكي ✅' : 'تم إيقاف المساعد الذكي', aiEnabled ? '' : 'error')
-    } catch(e) {
-        aiEnabled = !aiEnabled
-        showToast('خطأ في الحفظ', 'error')
-    }
-}
-
 async function loadToolsAdmin() {
     try {
         const el = document.getElementById('toolsAdminList')
