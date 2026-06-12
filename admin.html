@@ -13,207 +13,211 @@
     --dark:#0a0e27; --dark-light:#1a1f3d; --dark-lighter:#2d3561;
     --text:#e2e8f0; --text-muted:#a0aec0; --text-dim:#718096;
 }
-* { margin:0; padding:0; box-sizing:border-box; }
-body { font-family:'Tajawal',sans-serif; background:var(--dark); color:var(--text); min-height:100vh; }
-::-webkit-scrollbar { width:5px; } ::-webkit-scrollbar-track { background:var(--dark); } ::-webkit-scrollbar-thumb { background:var(--dark-lighter); border-radius:3px; }
-@keyframes spin { to{transform:rotate(360deg)} }
-@keyframes slideIn { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
-@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.5} }
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Tajawal',sans-serif;background:var(--dark);color:var(--text);min-height:100vh;}
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:var(--dark)}::-webkit-scrollbar-thumb{background:var(--dark-lighter);border-radius:3px}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes slideIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
 
-.loading-overlay { position:fixed; inset:0; background:var(--dark); z-index:99999; display:flex; align-items:center; justify-content:center; }
-.loading-overlay.hidden { display:none; }
-.spinner { width:44px; height:44px; border:3px solid rgba(0,212,255,.1); border-top-color:var(--primary); border-radius:50%; animation:spin .8s linear infinite; }
-.toast { position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(80px); background:var(--success); color:#fff; padding:.8rem 1.8rem; border-radius:12px; font-weight:700; z-index:10000; opacity:0; transition:all .4s; display:flex; align-items:center; gap:8px; white-space:nowrap; }
-.toast.show { transform:translateX(-50%) translateY(0); opacity:1; }
-.toast.error { background:var(--danger); }
+/* LOADING */
+.loading-overlay{position:fixed;inset:0;background:var(--dark);z-index:99999;display:flex;align-items:center;justify-content:center;}
+.loading-overlay.hidden{display:none;}
+.spinner{width:44px;height:44px;border:3px solid rgba(0,212,255,.1);border-top-color:var(--primary);border-radius:50%;animation:spin .8s linear infinite;}
 
-/* LOGIN SCREEN */
-.login-screen { position:fixed; inset:0; background:var(--dark); z-index:9999; display:flex; align-items:center; justify-content:center; padding:20px; }
-.login-box { background:var(--dark-light); border:1px solid rgba(255,255,255,.08); border-radius:24px; padding:3rem 2.5rem; width:100%; max-width:400px; text-align:center; }
-.login-logo { width:70px; height:70px; background:linear-gradient(135deg,#00d4ff,#0099cc); border-radius:20px; display:flex; align-items:center; justify-content:center; margin:0 auto 1.5rem; font-size:2rem; color:var(--dark); }
-.login-box h1 { font-size:1.6rem; font-weight:900; margin-bottom:.4rem; }
-.login-box p { color:var(--text-dim); font-size:.9rem; margin-bottom:2rem; }
-.login-inp { width:100%; padding:1rem 1.2rem; background:var(--dark); border:2px solid rgba(255,255,255,.1); border-radius:14px; color:var(--text); font-family:'Tajawal',sans-serif; font-size:1rem; outline:none; margin-bottom:1rem; transition:border-color .3s; text-align:center; letter-spacing:2px; }
-.login-inp:focus { border-color:var(--primary); }
-.login-btn { width:100%; padding:1rem; background:linear-gradient(135deg,#00d4ff,#0099cc); border:none; border-radius:14px; color:var(--dark); font-weight:800; font-size:1rem; font-family:'Tajawal',sans-serif; cursor:pointer; transition:all .3s; }
-.login-btn:hover { transform:translateY(-2px); box-shadow:0 12px 32px rgba(0,212,255,.4); }
-.login-error { color:var(--danger); font-size:.85rem; margin-top:.8rem; display:none; }
-.login-error.show { display:block; }
-.login-back { margin-top:1.5rem; }
-.login-back a { color:var(--text-dim); font-size:.85rem; text-decoration:none; }
-.login-back a:hover { color:var(--primary); }
+/* TOAST */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--success);color:#fff;padding:.8rem 1.8rem;border-radius:12px;font-weight:700;z-index:10000;opacity:0;transition:all .4s;display:flex;align-items:center;gap:8px;white-space:nowrap;}
+.toast.show{transform:translateX(-50%) translateY(0);opacity:1;}
+.toast.error{background:var(--danger);}
+
+/* LOGIN */
+.login-screen{position:fixed;inset:0;background:var(--dark);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;}
+.login-box{background:var(--dark-light);border:1px solid rgba(255,255,255,.08);border-radius:24px;padding:3rem 2.5rem;width:100%;max-width:400px;text-align:center;}
+.login-logo{width:70px;height:70px;background:linear-gradient(135deg,#00d4ff,#0099cc);border-radius:20px;display:flex;align-items:center;justify-content:center;margin:0 auto 1.5rem;font-size:2rem;color:var(--dark);}
+.login-box h1{font-size:1.6rem;font-weight:900;margin-bottom:.4rem;}
+.login-box p{color:var(--text-dim);font-size:.9rem;margin-bottom:2rem;}
+.login-inp{width:100%;padding:1rem 1.2rem;background:var(--dark);border:2px solid rgba(255,255,255,.1);border-radius:14px;color:var(--text);font-family:'Tajawal',sans-serif;font-size:1rem;outline:none;margin-bottom:1rem;transition:border-color .3s;text-align:center;letter-spacing:2px;}
+.login-inp:focus{border-color:var(--primary);}
+.login-btn{width:100%;padding:1rem;background:linear-gradient(135deg,#00d4ff,#0099cc);border:none;border-radius:14px;color:var(--dark);font-weight:800;font-size:1rem;font-family:'Tajawal',sans-serif;cursor:pointer;transition:all .3s;}
+.login-btn:hover{transform:translateY(-2px);box-shadow:0 12px 32px rgba(0,212,255,.4);}
+.login-error{color:var(--danger);font-size:.85rem;margin-top:.8rem;display:none;}
+.login-error.show{display:block;}
+.login-back{margin-top:1.5rem;}
+.login-back a{color:var(--text-dim);font-size:.85rem;text-decoration:none;}
+.login-back a:hover{color:var(--primary);}
 
 /* LAYOUT */
-.dashboard { display:none; min-height:100vh; }
-.dashboard.show { display:flex; }
+.dashboard{display:none;min-height:100vh;}
+.dashboard.show{display:flex;}
 
 /* SIDEBAR */
-.sidebar { width:260px; background:var(--dark-light); border-left:1px solid rgba(255,255,255,.06); min-height:100vh; padding:1.5rem 1rem; display:flex; flex-direction:column; flex-shrink:0; }
-.sidebar-logo { display:flex; align-items:center; gap:10px; padding:.5rem; margin-bottom:2rem; }
-.sidebar-logo-icon { width:40px; height:40px; background:linear-gradient(135deg,#00d4ff,#0099cc); border-radius:10px; display:flex; align-items:center; justify-content:center; font-weight:900; color:var(--dark); font-size:1rem; }
-.sidebar-logo-text { font-size:1rem; font-weight:800; }
-.sidebar-logo-text span { color:var(--primary); }
-.sidebar-admin { background:rgba(0,212,255,.06); border:1px solid rgba(0,212,255,.12); border-radius:12px; padding:.8rem 1rem; margin-bottom:1.5rem; display:flex; align-items:center; gap:10px; }
-.admin-avatar { width:36px; height:36px; background:linear-gradient(135deg,var(--secondary),#ee5a5a); border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:1rem; flex-shrink:0; }
-.admin-name { font-size:.85rem; font-weight:700; }
-.admin-role { font-size:.72rem; color:var(--primary); }
-.nav-section { margin-bottom:1.5rem; }
-.nav-label { font-size:.72rem; color:var(--text-dim); font-weight:700; letter-spacing:1px; text-transform:uppercase; padding:0 .5rem; margin-bottom:.5rem; }
-.nav-item { display:flex; align-items:center; gap:10px; padding:.75rem 1rem; border-radius:12px; cursor:pointer; transition:all .3s; color:var(--text-muted); font-size:.9rem; font-weight:600; margin-bottom:2px; border:1px solid transparent; text-decoration:none; }
-.nav-item:hover { background:rgba(255,255,255,.05); color:var(--text); }
-.nav-item.active { background:rgba(0,212,255,.1); border-color:rgba(0,212,255,.2); color:var(--primary); }
-.nav-item i { width:18px; text-align:center; }
-.nav-badge { margin-right:auto; background:var(--danger); color:#fff; font-size:.65rem; font-weight:700; padding:.15rem .5rem; border-radius:50px; min-width:18px; text-align:center; }
-.sidebar-footer { margin-top:auto; }
-.logout-item { display:flex; align-items:center; gap:10px; padding:.75rem 1rem; border-radius:12px; cursor:pointer; transition:all .3s; color:var(--text-dim); font-size:.9rem; border:1px solid transparent; }
-.logout-item:hover { background:rgba(239,68,68,.08); color:var(--danger); border-color:rgba(239,68,68,.15); }
+.sidebar{width:260px;background:var(--dark-light);border-left:1px solid rgba(255,255,255,.06);min-height:100vh;padding:1.5rem 1rem;display:flex;flex-direction:column;flex-shrink:0;position:relative;z-index:100;}
+.sidebar-logo{display:flex;align-items:center;gap:10px;padding:.5rem;margin-bottom:2rem;}
+.sidebar-logo-icon{width:40px;height:40px;background:linear-gradient(135deg,#00d4ff,#0099cc);border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:900;color:var(--dark);font-size:1rem;}
+.sidebar-logo-text{font-size:1rem;font-weight:800;}
+.sidebar-logo-text span{color:var(--primary);}
+.sidebar-admin{background:rgba(0,212,255,.06);border:1px solid rgba(0,212,255,.12);border-radius:12px;padding:.8rem 1rem;margin-bottom:1.5rem;display:flex;align-items:center;gap:10px;}
+.admin-avatar{width:36px;height:36px;background:linear-gradient(135deg,var(--secondary),#ee5a5a);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0;}
+.admin-name{font-size:.85rem;font-weight:700;}
+.admin-role{font-size:.72rem;color:var(--primary);}
+.nav-section{margin-bottom:1.5rem;}
+.nav-label{font-size:.72rem;color:var(--text-dim);font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:0 .5rem;margin-bottom:.5rem;}
+.nav-item{display:flex;align-items:center;gap:10px;padding:.75rem 1rem;border-radius:12px;cursor:pointer;transition:all .3s;color:var(--text-muted);font-size:.9rem;font-weight:600;margin-bottom:2px;border:1px solid transparent;text-decoration:none;}
+.nav-item:hover{background:rgba(255,255,255,.05);color:var(--text);}
+.nav-item.active{background:rgba(0,212,255,.1);border-color:rgba(0,212,255,.2);color:var(--primary);}
+.nav-item i{width:18px;text-align:center;}
+.nav-badge{margin-right:auto;background:var(--danger);color:#fff;font-size:.65rem;font-weight:700;padding:.15rem .5rem;border-radius:50px;min-width:18px;text-align:center;}
+.sidebar-footer{margin-top:auto;}
+.logout-item{display:flex;align-items:center;gap:10px;padding:.75rem 1rem;border-radius:12px;cursor:pointer;transition:all .3s;color:var(--text-dim);font-size:.9rem;border:1px solid transparent;}
+.logout-item:hover{background:rgba(239,68,68,.08);color:var(--danger);border-color:rgba(239,68,68,.15);}
 
-/* MAIN CONTENT */
-.main { flex:1; overflow-y:auto; padding:2rem; }
-.page-header { margin-bottom:2rem; }
-.page-header h1 { font-size:1.6rem; font-weight:900; margin-bottom:.3rem; }
-.page-header p { color:var(--text-dim); font-size:.9rem; }
+/* MAIN */
+.main{flex:1;overflow-y:auto;padding:2rem;}
+.page-header{margin-bottom:2rem;}
+.page-header h1{font-size:1.6rem;font-weight:900;margin-bottom:.3rem;}
+.page-header p{color:var(--text-dim);font-size:.9rem;}
 
 /* STATS */
-.stats-row { display:grid; grid-template-columns:repeat(auto-fill,minmax(180px,1fr)); gap:1rem; margin-bottom:2rem; }
-.stat-card { background:var(--dark-light); border:1px solid rgba(255,255,255,.06); border-radius:16px; padding:1.3rem; transition:all .3s; }
-.stat-card:hover { transform:translateY(-3px); border-color:rgba(0,212,255,.2); }
-.stat-top { display:flex; align-items:center; justify-content:space-between; margin-bottom:.8rem; }
-.stat-icon { width:40px; height:40px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:1.1rem; }
-.stat-change { font-size:.72rem; padding:.2rem .5rem; border-radius:50px; font-weight:700; }
-.stat-change.up { background:rgba(107,203,119,.12); color:var(--success); }
-.stat-change.neutral { background:rgba(255,255,255,.06); color:var(--text-dim); }
-.stat-value { font-size:1.8rem; font-weight:900; color:var(--text); }
-.stat-label { font-size:.8rem; color:var(--text-dim); margin-top:2px; }
+.stats-row{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:1rem;margin-bottom:2rem;}
+.stat-card{background:var(--dark-light);border:1px solid rgba(255,255,255,.06);border-radius:16px;padding:1.3rem;transition:all .3s;}
+.stat-card:hover{transform:translateY(-3px);border-color:rgba(0,212,255,.2);}
+.stat-icon{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;margin-bottom:.8rem;}
+.stat-val{font-size:1.8rem;font-weight:900;line-height:1;}
+.stat-label{font-size:.78rem;color:var(--text-dim);margin-top:.3rem;}
 
-/* SECTIONS */
-.section { display:none; animation:slideIn .4s ease; }
-.section.active { display:block; }
+/* CONTENT CARD */
+.content-card{background:var(--dark-light);border:1px solid rgba(255,255,255,.06);border-radius:16px;padding:1.5rem;margin-bottom:1.5rem;}
+.card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.2rem;flex-wrap:wrap;gap:.5rem;}
+.card-title{font-size:1rem;font-weight:800;display:flex;align-items:center;gap:8px;}
+.card-action{font-size:.8rem;color:var(--primary);text-decoration:none;display:flex;align-items:center;gap:5px;padding:.4rem .8rem;border-radius:8px;border:1px solid rgba(0,212,255,.2);transition:all .2s;}
+.card-action:hover{background:rgba(0,212,255,.1);}
 
-/* CARDS */
-.content-card { background:var(--dark-light); border:1px solid rgba(255,255,255,.06); border-radius:18px; padding:1.5rem; margin-bottom:1.5rem; }
-.card-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:1.2rem; }
-.card-title { font-size:1rem; font-weight:800; display:flex; align-items:center; gap:8px; }
-.card-action { padding:.45rem 1rem; background:rgba(0,212,255,.08); border:1px solid rgba(0,212,255,.2); border-radius:8px; color:var(--primary); font-size:.8rem; font-weight:700; cursor:pointer; font-family:'Tajawal',sans-serif; transition:all .3s; text-decoration:none; display:inline-flex; align-items:center; gap:5px; }
-.card-action:hover { background:rgba(0,212,255,.16); }
-
-/* TABLES */
-.data-table { width:100%; border-collapse:collapse; }
-.data-table th { text-align:right; padding:.7rem 1rem; font-size:.78rem; color:var(--text-dim); font-weight:600; border-bottom:1px solid rgba(255,255,255,.06); }
-.data-table td { padding:.8rem 1rem; font-size:.85rem; border-bottom:1px solid rgba(255,255,255,.04); }
-.data-table tr:last-child td { border-bottom:none; }
-.data-table tr:hover td { background:rgba(255,255,255,.02); }
-.td-badge { font-size:.72rem; padding:.2rem .6rem; border-radius:50px; font-weight:700; white-space:nowrap; }
-.badge-pending { background:rgba(251,146,60,.12); color:var(--warning); border:1px solid rgba(251,146,60,.25); }
-.badge-approved { background:rgba(107,203,119,.12); color:var(--success); border:1px solid rgba(107,203,119,.25); }
-.badge-new { background:rgba(0,212,255,.12); color:var(--primary); border:1px solid rgba(0,212,255,.25); }
-.td-actions { display:flex; gap:5px; }
-.btn-approve { padding:.3rem .7rem; background:rgba(107,203,119,.1); border:1px solid rgba(107,203,119,.2); color:var(--success); font-size:.75rem; font-weight:700; border-radius:7px; cursor:pointer; font-family:'Tajawal',sans-serif; }
-.btn-reject { padding:.3rem .7rem; background:rgba(239,68,68,.08); border:1px solid rgba(239,68,68,.18); color:var(--danger); font-size:.75rem; font-weight:700; border-radius:7px; cursor:pointer; font-family:'Tajawal',sans-serif; }
-.btn-edit { padding:.3rem .7rem; background:rgba(251,146,60,.08); border:1px solid rgba(251,146,60,.18); color:var(--warning); font-size:.75rem; font-weight:700; border-radius:7px; cursor:pointer; font-family:'Tajawal',sans-serif; }
-.btn-del { padding:.3rem .7rem; background:rgba(239,68,68,.06); border:1px solid rgba(239,68,68,.15); color:var(--danger); font-size:.75rem; border-radius:7px; cursor:pointer; }
+/* TABLE */
+.data-table{width:100%;border-collapse:collapse;}
+.data-table th{text-align:right;padding:.7rem 1rem;font-size:.78rem;color:var(--text-dim);font-weight:600;border-bottom:1px solid rgba(255,255,255,.06);}
+.data-table td{padding:.8rem 1rem;font-size:.85rem;border-bottom:1px solid rgba(255,255,255,.04);}
+.data-table tr:last-child td{border-bottom:none;}
+.data-table tr:hover td{background:rgba(255,255,255,.02);}
+.td-badge{padding:.2rem .6rem;border-radius:50px;font-size:.72rem;font-weight:700;}
+.badge-new{background:rgba(0,212,255,.1);color:var(--primary);}
+.badge-approved{background:rgba(107,203,119,.1);color:var(--success);}
+.badge-pending{background:rgba(251,146,60,.1);color:var(--warning);}
+.td-actions{display:flex;gap:6px;}
+.btn-del{padding:.35rem .7rem;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.15);border-radius:8px;color:var(--danger);cursor:pointer;font-size:.8rem;transition:all .2s;}
+.btn-del:hover{background:rgba(239,68,68,.2);}
+.btn-approve{padding:.35rem .7rem;background:rgba(107,203,119,.08);border:1px solid rgba(107,203,119,.15);border-radius:8px;color:var(--success);cursor:pointer;font-size:.8rem;}
+.btn-reject{padding:.35rem .7rem;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.15);border-radius:8px;color:var(--danger);cursor:pointer;font-size:.8rem;}
 
 /* FORM */
-.form-grid { display:grid; grid-template-columns:1fr 1fr; gap:1rem; }
-.form-full { grid-column:1/-1; }
-.finp { width:100%; padding:.8rem 1rem; background:var(--dark); border:1px solid rgba(255,255,255,.1); border-radius:10px; color:var(--text); font-family:'Tajawal',sans-serif; font-size:.88rem; outline:none; transition:border-color .3s; }
-.finp:focus { border-color:var(--primary); }
-.finp::placeholder { color:var(--text-dim); }
-.flabel { font-size:.8rem; color:var(--text-muted); font-weight:600; margin-bottom:4px; display:block; }
-.fgroup { margin-bottom:.8rem; }
-.fbtn { padding:.8rem 1.5rem; background:linear-gradient(135deg,#00d4ff,#0099cc); border:none; border-radius:10px; color:var(--dark); font-weight:800; font-size:.9rem; font-family:'Tajawal',sans-serif; cursor:pointer; transition:all .3s; }
-.fbtn:hover { transform:translateY(-1px); box-shadow:0 8px 24px rgba(0,212,255,.3); }
-.fbtn-danger { background:linear-gradient(135deg,var(--danger),#dc2626); color:#fff; }
-.exam-emoji-opt { cursor:pointer; font-size:1.3rem; padding:4px 6px; border-radius:8px; border:2px solid transparent; transition:all .2s; }
-.exam-emoji-opt.sel { border-color:var(--primary); background:rgba(0,212,255,.1); }
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem;}
+.fgroup{display:flex;flex-direction:column;gap:.4rem;}
+.flabel{font-size:.8rem;color:var(--text-muted);font-weight:600;}
+.finp{padding:.75rem 1rem;background:var(--dark);border:1px solid rgba(255,255,255,.1);border-radius:10px;color:var(--text);font-family:'Tajawal',sans-serif;font-size:.9rem;outline:none;transition:border-color .2s;}
+.finp:focus{border-color:var(--primary);}
+.fsel{padding:.75rem 1rem;background:var(--dark);border:1px solid rgba(255,255,255,.1);border-radius:10px;color:var(--text);font-family:'Tajawal',sans-serif;font-size:.9rem;outline:none;}
+.submit-btn{padding:.75rem 2rem;background:linear-gradient(135deg,#00d4ff,#0099cc);border:none;border-radius:10px;color:var(--dark);font-weight:800;font-family:'Tajawal',sans-serif;cursor:pointer;font-size:.9rem;transition:all .3s;}
+.submit-btn:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,212,255,.35);}
 
-/* NOTIFICATIONS */
-.notif-item { display:flex; gap:12px; padding:1rem 0; border-bottom:1px solid rgba(255,255,255,.05); align-items:flex-start; }
-.notif-item:last-child { border-bottom:none; }
-.notif-icon { width:38px; height:38px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:1.1rem; flex-shrink:0; }
-.notif-body { flex:1; }
-.notif-title { font-size:.88rem; font-weight:700; margin-bottom:2px; }
-.notif-desc { font-size:.78rem; color:var(--text-muted); }
-.notif-time { font-size:.72rem; color:var(--text-dim); margin-top:3px; }
-.notif-unread { width:8px; height:8px; background:var(--primary); border-radius:50%; flex-shrink:0; margin-top:5px; }
+/* SECTION */
+.section{display:none;animation:slideIn .4s ease;}
+.section.active{display:block;}
 
-/* QUICK LINKS */
-.quick-links { display:grid; grid-template-columns:repeat(auto-fill,minmax(140px,1fr)); gap:.8rem; }
-.quick-link { background:rgba(255,255,255,.03); border:1px solid rgba(255,255,255,.07); border-radius:14px; padding:1.2rem 1rem; text-align:center; cursor:pointer; transition:all .3s; text-decoration:none; display:block; }
-.quick-link:hover { background:rgba(0,212,255,.06); border-color:rgba(0,212,255,.2); transform:translateY(-2px); }
-.quick-link-icon { font-size:1.6rem; margin-bottom:.5rem; }
-.quick-link-text { font-size:.8rem; font-weight:700; color:var(--text-muted); }
-.quick-link:hover .quick-link-text { color:var(--primary); }
+/* NOTIF ITEM */
+.notif-item{display:flex;gap:12px;padding:.8rem 0;border-bottom:1px solid rgba(255,255,255,.04);align-items:flex-start;}
+.notif-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0;}
+.notif-body{flex:1;}
+.notif-title{font-size:.88rem;font-weight:700;}
+.notif-desc{font-size:.78rem;color:var(--text-muted);margin-top:2px;}
+.notif-time{font-size:.72rem;color:var(--text-dim);margin-top:3px;}
+.notif-unread{width:8px;height:8px;background:var(--primary);border-radius:50%;margin-top:6px;flex-shrink:0;}
+
+/* TOOLS TOGGLE */
+.tool-toggle-row{display:flex;align-items:center;justify-content:space-between;padding:.65rem .8rem;border-radius:12px;border:1px solid rgba(255,255,255,.05);margin-bottom:.5rem;background:rgba(255,255,255,.02);transition:all .2s;}
+.tool-toggle-row:hover{background:rgba(255,255,255,.04);}
+.tool-toggle-info{display:flex;align-items:center;gap:10px;}
+.tool-toggle-name{font-size:.88rem;font-weight:700;}
+.tool-toggle-cat{font-size:.72rem;color:var(--text-dim);margin-top:1px;}
+.toggle-switch{position:relative;width:44px;height:24px;flex-shrink:0;}
+.toggle-switch input{opacity:0;width:0;height:0;}
+.toggle-slider{position:absolute;cursor:pointer;inset:0;background:rgba(255,255,255,.1);border-radius:50px;transition:.3s;}
+.toggle-slider:before{content:'';position:absolute;height:18px;width:18px;right:3px;bottom:3px;background:var(--text-dim);border-radius:50%;transition:.3s;}
+.toggle-switch input:checked + .toggle-slider{background:rgba(0,212,255,.3);}
+.toggle-switch input:checked + .toggle-slider:before{transform:translateX(-20px);background:var(--primary);}
+
+/* SITE CONTROLS */
+.site-control-row{display:flex;align-items:center;justify-content:space-between;background:var(--dark);border-radius:14px;padding:1rem 1.2rem;border:1px solid rgba(255,255,255,.07);margin-bottom:.8rem;}
+.site-ctrl-info{}
+.site-ctrl-label{font-weight:700;font-size:.95rem;}
+.site-ctrl-desc{font-size:.78rem;color:var(--text-dim);margin-top:3px;}
+.ctrl-btn{padding:.55rem 1.4rem;border-radius:10px;border:none;font-size:.88rem;font-weight:800;font-family:Tajawal,sans-serif;cursor:pointer;transition:all .25s;}
+.ctrl-on{background:rgba(239,68,68,.1);color:#ef4444;border:1px solid rgba(239,68,68,.25)!important;}
+.ctrl-off{background:rgba(107,203,119,.1);color:#6bcb77;border:1px solid rgba(107,203,119,.25)!important;}
+
+/* EXAM EMOJI */
+.exam-emoji-opt{width:36px;height:36px;display:inline-flex;align-items:center;justify-content:center;border-radius:8px;cursor:pointer;font-size:1.1rem;border:2px solid transparent;transition:all .2s;}
+.exam-emoji-opt.sel{border-color:var(--primary);background:rgba(0,212,255,.1);}
 
 /* MOBILE TOGGLE */
-.mobile-sidebar-btn { display:none; position:fixed; top:16px; right:16px; z-index:9998; width:44px; height:44px; background:var(--dark-light); border:1px solid rgba(255,255,255,.1); border-radius:12px; align-items:center; justify-content:center; cursor:pointer; font-size:1.1rem; }
-.sidebar-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.5); z-index:9997; }
+.mobile-toggle{display:none;position:fixed;top:16px;right:16px;z-index:200;width:42px;height:42px;background:var(--dark-light);border:1px solid rgba(255,255,255,.1);border-radius:10px;align-items:center;justify-content:center;cursor:pointer;color:var(--text);font-size:1.1rem;}
+.sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:99;}
+.sidebar-overlay.show{display:block;}
 
-.bus-del { width:30px; height:30px; background:rgba(239,68,68,.08); border:1px solid rgba(239,68,68,.15); border-radius:8px; color:var(--danger); cursor:pointer; display:flex; align-items:center; justify-content:center; }
-
-@media(max-width:768px) {
-    .sidebar { position:fixed; right:-100%; top:0; z-index:9998; transition:right .3s; height:100vh; overflow-y:auto; width:280px; }
-    .sidebar.open { right:0; }
-    .sidebar-overlay.show { display:block; }
-    .mobile-sidebar-btn { display:flex; }
-    #sidebarCloseBtn { display:flex !important; }
-    .main { padding:1rem; padding-top:70px; }
-    .stats-row { grid-template-columns:1fr 1fr; }
-    .form-grid { grid-template-columns:1fr; }    .bus-row .bus-sel { display:none; }
+@media(max-width:768px){
+    .mobile-toggle{display:flex;}
+    .sidebar{position:fixed;right:-280px;top:0;height:100%;z-index:150;transition:right .3s;box-shadow:none;}
+    .sidebar.open{right:0;box-shadow:-10px 0 40px rgba(0,0,0,.5);}
+    .form-grid{grid-template-columns:1fr;}
+    .main{padding:1rem;padding-top:4rem;}
+    .stats-row{grid-template-columns:repeat(2,1fr);}
 }
-</style>
-<style>
 </style>
 </head>
 <body>
 
 <div class="loading-overlay" id="loadingOverlay"><div class="spinner"></div></div>
+
 <div class="toast" id="toast"><i class="fas fa-check-circle"></i><span id="toastMsg"></span></div>
 
 <!-- LOGIN -->
 <div class="login-screen" id="loginScreen">
     <div class="login-box">
-        <div class="login-logo"><i class="fas fa-crown"></i></div>
-        <h1>لوحة التحكم 👑</h1>
-        <p>UoN Coffee — Admin Dashboard</p>
-        <input type="password" class="login-inp" id="loginPass" placeholder="••••••••••••" onkeydown="if(event.key==='Enter')doLogin()">
-        <button class="login-btn" onclick="doLogin()"><i class="fas fa-sign-in-alt"></i> دخول</button>
-        <div class="login-error" id="loginError">كلمة المرور غير صحيحة!</div>
-        <div class="login-back"><a href="index.html"><i class="fas fa-arrow-right"></i> الرئيسية</a></div>
+        <div class="login-logo">☕</div>
+        <h1>لوحة التحكم</h1>
+        <p>أدخل كلمة المرور للدخول</p>
+        <input type="password" class="login-inp" id="loginPass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()">
+        <button class="login-btn" onclick="doLogin()"><i class="fas fa-unlock-alt"></i> دخول</button>
+        <div class="login-error" id="loginError">كلمة المرور غير صحيحة ❌</div>
+        <div class="login-back"><a href="index.html">← العودة للموقع</a></div>
     </div>
 </div>
 
-<!-- MOBILE BTN -->
-<button class="mobile-sidebar-btn" id="mobileSidebarBtn" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
-<div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
-
 <!-- DASHBOARD -->
 <div class="dashboard" id="dashboard">
-    <!-- SIDEBAR -->
-    <aside class="sidebar" id="sidebar">
-        <div class="sidebar-logo">
-            <div class="sidebar-logo-icon">NU</div>
-            <div><div class="sidebar-logo-text">UoN <span>Coffee</span></div><div style="font-size:.7rem;color:var(--text-dim);">Admin Dashboard</div></div>
-            <button onclick="toggleSidebar()" style="margin-right:auto;background:none;border:none;color:var(--text-dim);font-size:1.2rem;cursor:pointer;padding:4px;display:none;" id="sidebarCloseBtn"><i class="fas fa-times"></i></button>
-        </div>
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+    <button class="mobile-toggle" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
 
+    <!-- SIDEBAR -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-logo">
+            <div class="sidebar-logo-icon">☕</div>
+            <div class="sidebar-logo-text">UoN <span>Coffee</span></div>
+        </div>
         <div class="sidebar-admin">
-            <div class="admin-avatar">👑</div>
+            <div class="admin-avatar">👤</div>
             <div>
-                <div class="admin-name" id="sidebarAdminName">المشرف</div>
-                <div class="admin-role" id="sidebarAdminRole">مشرف رئيسي</div>
+                <div class="admin-name" id="adminNameLabel">المشرف</div>
+                <div class="admin-role" id="adminRoleLabel">admin</div>
             </div>
         </div>
 
         <div class="nav-section">
-            <div class="nav-label">الرئيسية</div>
+            <div class="nav-label">الرئيسي</div>
             <div class="nav-item active" onclick="showSection('overview',this)"><i class="fas fa-chart-pie"></i> نظرة عامة</div>
             <div class="nav-item" onclick="showSection('notifications',this)"><i class="fas fa-bell"></i> الإشعارات <span class="nav-badge" id="navNotifBadge" style="display:none">0</span></div>
         </div>
 
         <div class="nav-section">
             <div class="nav-label">المحتوى</div>
-            <div class="nav-item" onclick="showSection('confessions',this)"><i class="fas fa-bullhorn"></i> الإعلانات <span class="nav-badge" id="navConfBadge" style="display:none">0</span></div>
+            <div class="nav-item" onclick="showSection('confessions',this)"><i class="fas fa-comments"></i> الاعترافات <span class="nav-badge" id="navConfBadge" style="display:none">0</span></div>
             <div class="nav-item" onclick="showSection('summaries',this)"><i class="fas fa-book"></i> الملخصات <span class="nav-badge" id="navSumBadge" style="display:none">0</span></div>
             <div class="nav-item" onclick="showSection('restaurants',this)"><i class="fas fa-utensils"></i> المطاعم</div>
             <div class="nav-item" onclick="showSection('groups',this)"><i class="fab fa-whatsapp"></i> مجموعات الواتساب <span class="nav-badge" id="navGroupBadge" style="display:none">0</span></div>
@@ -223,223 +227,226 @@ body { font-family:'Tajawal',sans-serif; background:var(--dark); color:var(--tex
 
         <div class="nav-section">
             <div class="nav-label">الإعدادات</div>
-            <div class="nav-item" onclick="showSection('tools',this)"><i class="fas fa-tools"></i> الأدوات</div>
+            <div class="nav-item" onclick="showSection('tools',this)"><i class="fas fa-toggle-on"></i> تشغيل/إيقاف الأدوات</div>
             <div class="nav-item" onclick="showSection('passwords',this)"><i class="fas fa-key"></i> كلمات المرور</div>
             <div class="nav-item" onclick="showSection('sitesettings',this)"><i class="fas fa-sliders-h"></i> إعدادات الموقع</div>
         </div>
 
+        <div class="nav-section">
+            <div class="nav-label">روابط سريعة</div>
+            <a href="index.html" target="_blank" class="nav-item"><i class="fas fa-home"></i> الرئيسية</a>
+            <a href="tools.html" target="_blank" class="nav-item"><i class="fas fa-wrench"></i> الأدوات</a>
+            <a href="summaries.html" target="_blank" class="nav-item"><i class="fas fa-book-open"></i> الملخصات</a>
+        </div>
+
         <div class="sidebar-footer">
-            <div class="nav-section">
-                <div class="nav-label">روابط سريعة</div>
-                <a href="index.html" target="_blank" class="nav-item"><i class="fas fa-home"></i> الرئيسية</a>
-                <a href="features.html" target="_blank" class="nav-item"><i class="fas fa-star"></i> الميزات</a>
-                <a href="tools.html" target="_blank" class="nav-item"><i class="fas fa-wrench"></i> الأدوات</a>
-                <a href="summaries.html" target="_blank" class="nav-item"><i class="fas fa-book-open"></i> الملخصات</a>
-            </div>
             <div class="logout-item" onclick="doLogout()"><i class="fas fa-sign-out-alt"></i> تسجيل الخروج</div>
         </div>
-    </aside>
+    </div>
 
-    <!-- MAIN -->
-    <main class="main">
+    <!-- MAIN CONTENT -->
+    <div class="main">
 
         <!-- OVERVIEW -->
         <div class="section active" id="section-overview">
             <div class="page-header">
                 <h1>نظرة عامة 📊</h1>
-                <p>مرحباً! إليك ملخص نشاط الموقع</p>
+                <p>ملخص نشاط المنصة</p>
             </div>
-            <div class="stats-row" id="statsRow">
-                <div class="stat-card"><div class="stat-top"><div class="stat-icon" style="background:rgba(0,212,255,.1);color:var(--primary)"><i class="fas fa-bullhorn"></i></div><span class="stat-change neutral">إعلانات</span></div><div class="stat-value" id="statConfessions">—</div><div class="stat-label">الاعترافات</div></div>
-                <div class="stat-card"><div class="stat-top"><div class="stat-icon" style="background:rgba(107,203,119,.1);color:var(--success)"><i class="fas fa-book"></i></div><span class="stat-change neutral">ملخصات</span></div><div class="stat-value" id="statSummaries">—</div><div class="stat-label">الملخصات</div></div>
-                <div class="stat-card"><div class="stat-top"><div class="stat-icon" style="background:rgba(251,146,60,.1);color:var(--warning)"><i class="fas fa-clock"></i></div><span class="stat-change up">جديد</span></div><div class="stat-value" id="statPending">—</div><div class="stat-label">بانتظار الموافقة</div></div>
-                <div class="stat-card"><div class="stat-top"><div class="stat-icon" style="background:rgba(37,211,102,.1);color:#25d366"><i class="fab fa-whatsapp"></i></div><span class="stat-change neutral">مجموعات</span></div><div class="stat-value" id="statGroups">—</div><div class="stat-label">مجموعات الواتساب</div></div>
-                <div class="stat-card"><div class="stat-top"><div class="stat-icon" style="background:rgba(255,209,61,.1);color:var(--warning)"><i class="fas fa-store"></i></div><span class="stat-change neutral">سوق</span></div><div class="stat-value" id="statMkt">—</div><div class="stat-label">إعلانات السوق</div></div>
-                <div class="stat-card"><div class="stat-top"><div class="stat-icon" style="background:rgba(164,139,250,.1);color:#a78bfa"><i class="fas fa-code"></i></div><span class="stat-change neutral">مشاريع</span></div><div class="stat-value" id="statProj">—</div><div class="stat-label">المشاريع</div></div>
-                <div class="stat-card"><div class="stat-top"><div class="stat-icon" style="background:rgba(255,107,107,.1);color:var(--secondary)"><i class="fas fa-tools"></i></div><span class="stat-change neutral">أدوات</span></div><div class="stat-value" id="statRestaurants">—</div><div class="stat-label">الأدوات</div></div>
-            </div>
-
-            <div class="content-card">
-                <div class="card-header"><div class="card-title"><i class="fas fa-bolt" style="color:var(--primary)"></i> روابط سريعة</div></div>
-                <div class="quick-links">
-                    <a href="index.html" target="_blank" class="quick-link"><div class="quick-link-icon">🏠</div><div class="quick-link-text">الرئيسية</div></a>
-                    <a href="features.html" target="_blank" class="quick-link"><div class="quick-link-icon">⭐</div><div class="quick-link-text">الميزات</div></a>
-                    <a href="tools.html" target="_blank" class="quick-link"><div class="quick-link-icon">🛠️</div><div class="quick-link-text">الأدوات</div></a>
-                    <a href="summaries.html" target="_blank" class="quick-link"><div class="quick-link-icon">📚</div><div class="quick-link-text">الملخصات</div></a>
-                    <div class="quick-link" onclick="showSection('confessions',document.querySelector('[onclick*=confessions]'))"><div class="quick-link-icon">💬</div><div class="quick-link-text">الاعترافات</div></div>
+            <div class="stats-row">
+                <div class="stat-card">
+                    <div class="stat-icon" style="background:rgba(0,212,255,.1);color:var(--primary);">💬</div>
+                    <div class="stat-val" id="statConfessions">—</div>
+                    <div class="stat-label">اعتراف</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon" style="background:rgba(107,203,119,.1);color:var(--success);">📚</div>
+                    <div class="stat-val" id="statSummaries">—</div>
+                    <div class="stat-label">ملخص</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon" style="background:rgba(251,146,60,.1);color:var(--warning);">⏳</div>
+                    <div class="stat-val" id="statPending">—</div>
+                    <div class="stat-label">بانتظار الموافقة</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon" style="background:rgba(255,107,107,.1);color:var(--secondary);">🔔</div>
+                    <div class="stat-val" id="statNotifs">—</div>
+                    <div class="stat-label">إشعار غير مقروء</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon" style="background:rgba(37,211,102,.1);color:#25d366;">💬</div>
+                    <div class="stat-val" id="statGroups">—</div>
+                    <div class="stat-label">مجموعة واتساب</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon" style="background:rgba(255,217,61,.1);color:var(--accent);">🛒</div>
+                    <div class="stat-val" id="statMkt">—</div>
+                    <div class="stat-label">إعلان سوق</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon" style="background:rgba(139,92,246,.1);color:#a78bfa;">💻</div>
+                    <div class="stat-val" id="statProj">—</div>
+                    <div class="stat-label">مشروع</div>
                 </div>
             </div>
-
             <div class="content-card">
-                <div class="card-header"><div class="card-title"><i class="fas fa-clock" style="color:var(--warning)"></i> آخر النشاطات</div></div>
-                <div id="recentActivity"><div style="color:var(--text-dim);font-size:.85rem;text-align:center;padding:1rem;">جاري التحميل...</div></div>
+                <div class="card-header">
+                    <div class="card-title"><i class="fas fa-history" style="color:var(--primary)"></i> النشاط الأخير</div>
+                    <button onclick="loadAll()" style="background:none;border:none;color:var(--primary);cursor:pointer;font-size:.85rem;"><i class="fas fa-sync-alt"></i> تحديث</button>
+                </div>
+                <div id="recentActivity"><div style="color:var(--text-dim);text-align:center;padding:2rem;font-size:.85rem;">جارٍ التحميل...</div></div>
             </div>
         </div>
 
         <!-- NOTIFICATIONS -->
         <div class="section" id="section-notifications">
-            <div class="page-header">
-                <h1>الإشعارات 🔔</h1>
-                <p>جميع الإشعارات والتنبيهات</p>
-            </div>
+            <div class="page-header"><h1>الإشعارات 🔔</h1><p>جميع الإشعارات الواردة</p></div>
             <div class="content-card">
                 <div class="card-header">
                     <div class="card-title"><i class="fas fa-bell" style="color:var(--warning)"></i> الإشعارات</div>
-                    <button class="card-action" onclick="markAllRead()"><i class="fas fa-check-double"></i> تحديد الكل كمقروء</button>
+                    <button onclick="markAllRead()" class="card-action"><i class="fas fa-check-double"></i> تحديد الكل كمقروء</button>
                 </div>
-                <div id="notifsList"><div style="color:var(--text-dim);text-align:center;padding:2rem;font-size:.85rem;">جاري التحميل...</div></div>
+                <div id="notifsList"><div style="color:var(--text-dim);text-align:center;padding:2rem;font-size:.85rem;">جارٍ التحميل...</div></div>
             </div>
         </div>
 
-        <!-- ANNOUNCEMENTS -->
+        <!-- CONFESSIONS -->
         <div class="section" id="section-confessions">
-            <div class="page-header">
-                <h1>الإعلانات 📢</h1>
-                <p>إدارة إعلانات الجامعة</p>
-            </div>
+            <div class="page-header"><h1>الاعترافات 💬</h1><p>إدارة اعترافات الطلاب</p></div>
             <div class="content-card">
                 <div class="card-header">
-                    <div class="card-title"><i class="fas fa-bullhorn" style="color:var(--primary)"></i> جميع الإعلانات</div>
+                    <div class="card-title"><i class="fas fa-comments" style="color:var(--primary)"></i> الاعترافات</div>
+                    <button onclick="clearAllConf()" class="card-action" style="color:var(--danger);border-color:rgba(239,68,68,.2);"><i class="fas fa-trash"></i> حذف الكل</button>
                 </div>
                 <div style="overflow-x:auto;">
-                    <table class="data-table" id="confTable">
-                        <thead><tr><th>العنوان</th><th>المحتوى</th><th>الوقت</th><th>إجراء</th></tr></thead>
-                        <tbody id="confTableBody"><tr><td colspan="4" style="text-align:center;color:var(--text-dim);padding:2rem;">جاري التحميل...</td></tr></tbody>
-                    </table>
+                <table class="data-table">
+                    <thead><tr><th>النص</th><th>الفئة</th><th>الإعجابات</th><th>الوقت</th><th></th></tr></thead>
+                    <tbody id="confTableBody"><tr><td colspan="5" style="text-align:center;color:var(--text-dim);padding:2rem;">جارٍ التحميل...</td></tr></tbody>
+                </table>
                 </div>
             </div>
         </div>
 
         <!-- SUMMARIES -->
         <div class="section" id="section-summaries">
-            <div class="page-header">
-                <h1>الملخصات 📚</h1>
-                <p>مراجعة وموافقة طلبات الملخصات</p>
-            </div>
+            <div class="page-header"><h1>الملخصات 📚</h1><p>قبول ورفض الملخصات المرسلة</p></div>
             <div class="content-card">
-                <div class="card-header">
-                    <div class="card-title"><i class="fas fa-clock" style="color:var(--warning)"></i> بانتظار الموافقة</div>
-                </div>
+                <div class="card-header"><div class="card-title"><i class="fas fa-clock" style="color:var(--warning)"></i> بانتظار الموافقة</div></div>
                 <div style="overflow-x:auto;">
-                    <table class="data-table">
-                        <thead><tr><th>المادة</th><th>الكلية</th><th>المرسل</th><th>الرابط</th><th>إجراء</th></tr></thead>
-                        <tbody id="sumPendingBody"><tr><td colspan="5" style="text-align:center;color:var(--text-dim);padding:2rem;">جاري التحميل...</td></tr></tbody>
-                    </table>
+                <table class="data-table">
+                    <thead><tr><th>المادة</th><th>الكلية</th><th>المرسل</th><th>الرابط</th><th>إجراء</th></tr></thead>
+                    <tbody id="sumPendingBody"></tbody>
+                </table>
                 </div>
             </div>
             <div class="content-card">
-                <div class="card-header">
-                    <div class="card-title"><i class="fas fa-check-circle" style="color:var(--success)"></i> الملخصات المعتمدة</div>
-                </div>
+                <div class="card-header"><div class="card-title"><i class="fas fa-check-circle" style="color:var(--success)"></i> الملخصات المعتمدة</div></div>
                 <div style="overflow-x:auto;">
-                    <table class="data-table">
-                        <thead><tr><th>المادة</th><th>الكلية</th><th>الرابط</th><th>إجراء</th></tr></thead>
-                        <tbody id="sumApprovedBody"><tr><td colspan="4" style="text-align:center;color:var(--text-dim);padding:2rem;">جاري التحميل...</td></tr></tbody>
-                    </table>
+                <table class="data-table">
+                    <thead><tr><th>المادة</th><th>الكلية</th><th>الرابط</th><th></th></tr></thead>
+                    <tbody id="sumApprovedBody"></tbody>
+                </table>
                 </div>
             </div>
         </div>
 
         <!-- RESTAURANTS -->
         <div class="section" id="section-restaurants">
-            <div class="page-header">
-                <h1>المطاعم 🍕</h1>
-                <p>إدارة قائمة المطاعم والكافيهات</p>
-            </div>
+            <div class="page-header"><h1>المطاعم 🍽️</h1><p>إدارة مطاعم الحرم الجامعي</p></div>
             <div class="content-card">
-                <div class="card-header">
-                    <div class="card-title"><i class="fas fa-utensils" style="color:var(--secondary)"></i> المطاعم</div>
-                    <a href="features.html#rest" target="_blank" class="card-action"><i class="fas fa-external-link-alt"></i> فتح الصفحة</a>
-                </div>
+                <div class="card-header"><div class="card-title"><i class="fas fa-utensils" style="color:var(--warning)"></i> قائمة المطاعم</div></div>
                 <div style="overflow-x:auto;">
-                    <table class="data-table">
-                        <thead><tr><th>المطعم</th><th>النوع</th><th>التقييم</th><th>الحالة</th><th>إجراء</th></tr></thead>
-                        <tbody id="restTableBody"><tr><td colspan="5" style="text-align:center;color:var(--text-dim);padding:2rem;">جاري التحميل...</td></tr></tbody>
-                    </table>
+                <table class="data-table">
+                    <thead><tr><th>الاسم</th><th>النوع</th><th>التقييم</th><th>الحالة</th><th></th></tr></thead>
+                    <tbody id="restTableBody"></tbody>
+                </table>
                 </div>
             </div>
         </div>
 
         <!-- GROUPS -->
         <div class="section" id="section-groups">
-            <div class="page-header">
-                <h1>مجموعات الواتساب 💬</h1>
-                <p>مراجعة وموافقة المجموعات المضافة من الطلاب</p>
-            </div>
+            <div class="page-header"><h1>مجموعات الواتساب 💬</h1><p>قبول ورفض مجموعات الطلاب</p></div>
             <div class="content-card">
-                <div class="card-header">
-                    <div class="card-title"><i class="fab fa-whatsapp" style="color:#25d366"></i> بانتظار الموافقة</div>
-                    <a href="groups.html" target="_blank" class="card-action"><i class="fas fa-external-link-alt"></i> فتح الصفحة</a>
-                </div>
+                <div class="card-header"><div class="card-title"><i class="fab fa-whatsapp" style="color:#25d366"></i> بانتظار الموافقة</div></div>
                 <div style="overflow-x:auto;">
-                    <table class="data-table">
-                        <thead><tr><th>المادة</th><th>الكلية</th><th>المضيف</th><th>الرابط</th><th>إجراء</th></tr></thead>
-                        <tbody id="groupPendingBody"><tr><td colspan="5" style="text-align:center;color:var(--text-dim);padding:2rem;">جاري التحميل...</td></tr></tbody>
-                    </table>
+                <table class="data-table">
+                    <thead><tr><th>المادة</th><th>الكلية</th><th>المضيف</th><th>الرابط</th><th>إجراء</th></tr></thead>
+                    <tbody id="groupPendingBody"></tbody>
+                </table>
                 </div>
             </div>
             <div class="content-card">
-                <div class="card-header">
-                    <div class="card-title"><i class="fas fa-check-circle" style="color:var(--success)"></i> المجموعات المعتمدة</div>
-                </div>
+                <div class="card-header"><div class="card-title"><i class="fas fa-check-circle" style="color:var(--success)"></i> المجموعات المعتمدة</div></div>
                 <div style="overflow-x:auto;">
-                    <table class="data-table">
-                        <thead><tr><th>المادة</th><th>الكلية</th><th>الرابط</th><th>إجراء</th></tr></thead>
-                        <tbody id="groupApprovedBody"><tr><td colspan="4" style="text-align:center;color:var(--text-dim);padding:2rem;">جاري التحميل...</td></tr></tbody>
-                    </table>
+                <table class="data-table">
+                    <thead><tr><th>المادة</th><th>الكلية</th><th>الرابط</th><th></th></tr></thead>
+                    <tbody id="groupApprovedBody"></tbody>
+                </table>
                 </div>
             </div>
         </div>
 
         <!-- MARKETPLACE -->
         <div class="section" id="section-marketplace">
-            <div class="page-header">
-                <h1>سوق الطلاب 🛍️</h1>
-                <p>إدارة إعلانات البيع والشراء</p>
-            </div>
+            <div class="page-header"><h1>سوق الطلاب 🛒</h1><p>إدارة إعلانات البيع والشراء</p></div>
             <div class="content-card">
-                <div class="card-header">
-                    <div class="card-title"><i class="fas fa-store" style="color:var(--warning)"></i> جميع الإعلانات</div>
-                    <a href="marketplace.html" target="_blank" class="card-action"><i class="fas fa-external-link-alt"></i> فتح الصفحة</a>
-                </div>
+                <div class="card-header"><div class="card-title"><i class="fas fa-store" style="color:var(--accent)"></i> الإعلانات</div></div>
                 <div style="overflow-x:auto;">
-                    <table class="data-table">
-                        <thead><tr><th>العنوان</th><th>النوع</th><th>السعر</th><th>البائع</th><th>إجراء</th></tr></thead>
-                        <tbody id="mktTableBody"><tr><td colspan="5" style="text-align:center;color:var(--text-dim);padding:2rem;">جاري التحميل...</td></tr></tbody>
-                    </table>
+                <table class="data-table">
+                    <thead><tr><th>العنوان</th><th>النوع</th><th>السعر</th><th>البائع</th><th></th></tr></thead>
+                    <tbody id="mktTableBody"></tbody>
+                </table>
                 </div>
             </div>
         </div>
 
         <!-- PROJECTS -->
         <div class="section" id="section-projects">
-            <div class="page-header">
-                <h1>المشاريع 💻</h1>
-                <p>إدارة مشاريع الطلاب المعروضة</p>
-            </div>
+            <div class="page-header"><h1>المشاريع 💻</h1><p>مشاريع الطلاب</p></div>
             <div class="content-card">
-                <div class="card-header">
-                    <div class="card-title"><i class="fas fa-code" style="color:var(--primary)"></i> جميع المشاريع</div>
-                    <a href="projects.html" target="_blank" class="card-action"><i class="fas fa-external-link-alt"></i> فتح الصفحة</a>
-                </div>
+                <div class="card-header"><div class="card-title"><i class="fas fa-code" style="color:#a78bfa"></i> المشاريع</div></div>
                 <div style="overflow-x:auto;">
-                    <table class="data-table">
-                        <thead><tr><th>المشروع</th><th>التصنيف</th><th>صاحبه</th><th>GitHub</th><th>إجراء</th></tr></thead>
-                        <tbody id="projTableBody"><tr><td colspan="5" style="text-align:center;color:var(--text-dim);padding:2rem;">جاري التحميل...</td></tr></tbody>
-                    </table>
+                <table class="data-table">
+                    <thead><tr><th>الاسم</th><th>التصنيف</th><th>المطور</th><th>GitHub</th><th></th></tr></thead>
+                    <tbody id="projTableBody"></tbody>
+                </table>
                 </div>
             </div>
         </div>
 
-        <!-- TOOLS -->
+        <!-- TOOLS TOGGLE -->
         <div class="section" id="section-tools">
             <div class="page-header">
-                <h1>الأدوات 🛠️</h1>
-                <p>إدارة تصنيفات وأدوات الطلاب — تشغيل وإيقاف الأدوات مباشرة</p>
+                <h1>تشغيل / إيقاف الأدوات 🔧</h1>
+                <p>تحكم في جميع أدوات الموقع — بما فيها المساعد الذكي</p>
             </div>
-            <div class="content-card" id="toolsAdminCard">
+
+            <!-- Special: AI Assistant -->
+            <div class="content-card">
                 <div class="card-header">
-                    <div class="card-title"><i class="fas fa-tools" style="color:var(--primary)"></i> التصنيفات والأدوات</div>
+                    <div class="card-title"><i class="fas fa-robot" style="color:var(--primary)"></i> المساعد الذكي AI</div>
+                </div>
+                <div class="tool-toggle-row" id="aiToggleRow">
+                    <div class="tool-toggle-info">
+                        <span style="font-size:1.4rem;">🤖</span>
+                        <div>
+                            <div class="tool-toggle-name">المساعد الذكي</div>
+                            <div class="tool-toggle-cat">يظهر في الصفحة الرئيسية</div>
+                        </div>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="aiToggle" onchange="toggleAI(this.checked)" checked>
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Tools by category -->
+            <div class="content-card">
+                <div class="card-header">
+                    <div class="card-title"><i class="fas fa-tools" style="color:var(--warning)"></i> أدوات الطلاب</div>
                     <a href="tools.html" target="_blank" class="card-action"><i class="fas fa-external-link-alt"></i> فتح الصفحة</a>
                 </div>
                 <div id="toolsAdminList"><div style="color:var(--text-dim);font-size:.85rem;text-align:center;padding:2rem;">جارٍ التحميل...</div></div>
@@ -448,30 +455,23 @@ body { font-family:'Tajawal',sans-serif; background:var(--dark); color:var(--tex
 
         <!-- SITE SETTINGS -->
         <div class="section" id="section-sitesettings">
-            <div class="page-header">
-                <h1>إعدادات الموقع ⚙️</h1>
-                <p>تحكم في حالة الموقع وأوضاعه</p>
-            </div>
-            <div class="content-card">
-                <div class="card-header">
-                    <div class="card-title"><i class="fas fa-graduation-cap" style="color:#ef4444"></i> وضع الاختبارات</div>
-                </div>
-                <p style="color:var(--text-dim);font-size:.85rem;margin-bottom:1.2rem;">عند التفعيل يظهر شريط أحمر في أعلى جميع صفحات الموقع يُنبّه الطلاب بوجود اختبارات.</p>
+            <div class="page-header"><h1>إعدادات الموقع ⚙️</h1><p>تحكم في حالة الموقع وأوضاعه</p></div>
 
-                <!-- Preview -->
-                <div id="examBannerPreview" style="display:none;background:#c0392b;color:#fff;text-align:center;padding:.6rem 1rem;border-radius:10px;font-size:.85rem;font-weight:700;margin-bottom:1rem;direction:rtl;">
+            <!-- EXAM MODE -->
+            <div class="content-card">
+                <div class="card-header"><div class="card-title"><i class="fas fa-graduation-cap" style="color:#ef4444"></i> وضع الاختبارات</div></div>
+                <p style="color:var(--text-dim);font-size:.85rem;margin-bottom:1.2rem;">عند التفعيل يظهر شريط أحمر في أعلى جميع الصفحات.</p>
+                <div id="examBannerPreview" style="display:none;background:#c0392b;color:#fff;text-align:center;padding:.6rem 1rem;border-radius:10px;font-size:.85rem;font-weight:700;margin-bottom:1rem;">
                     <span id="previewIcon">🎯</span> <span id="previewTitle">فترة الاختبارات النهائية</span> — <span id="previewMsg">بالتوفيق لجميع الطلاب!</span>
                 </div>
-
-                <!-- Fields -->
                 <div class="form-grid" style="margin-bottom:1rem;">
                     <div class="fgroup">
                         <span class="flabel">عنوان الشريط</span>
-                        <input type="text" class="finp" id="examBannerTitle" placeholder="مثال: فترة الاختبارات النهائية" oninput="updateExamPreview()">
+                        <input type="text" class="finp" id="examBannerTitle" placeholder="فترة الاختبارات النهائية" oninput="updateExamPreview()">
                     </div>
                     <div class="fgroup">
                         <span class="flabel">الرسالة</span>
-                        <input type="text" class="finp" id="examBannerMsg" placeholder="مثال: بالتوفيق لجميع الطلاب! 🎯" oninput="updateExamPreview()">
+                        <input type="text" class="finp" id="examBannerMsg" placeholder="بالتوفيق لجميع الطلاب! 🎯" oninput="updateExamPreview()">
                     </div>
                     <div class="fgroup">
                         <span class="flabel">الأيقونة</span>
@@ -486,172 +486,173 @@ body { font-family:'Tajawal',sans-serif; background:var(--dark); color:var(--tex
                         </div>
                     </div>
                 </div>
-
-                <!-- Toggle row -->
-                <div style="display:flex;align-items:center;justify-content:space-between;background:var(--dark);border-radius:14px;padding:1rem 1.2rem;border:1px solid rgba(255,255,255,.07);">
-                    <div>
-                        <div style="font-weight:700;font-size:.95rem;" id="examModeLabel">جارٍ التحميل...</div>
-                        <div style="font-size:.78rem;color:var(--text-dim);margin-top:3px;" id="examModeDesc"></div>
+                <div class="site-control-row">
+                    <div class="site-ctrl-info">
+                        <div class="site-ctrl-label" id="examModeLabel">جارٍ التحميل...</div>
+                        <div class="site-ctrl-desc" id="examModeDesc"></div>
                     </div>
-                    <button id="examModeBtn" onclick="toggleExamMode()" style="padding:.55rem 1.4rem;border-radius:10px;border:none;font-size:.88rem;font-weight:800;font-family:Tajawal,sans-serif;cursor:pointer;transition:all .25s;">...</button>
+                    <button id="examModeBtn" onclick="toggleExamMode()" class="ctrl-btn ctrl-on">...</button>
                 </div>
             </div>
         </div>
 
         <!-- PASSWORDS -->
         <div class="section" id="section-passwords">
-            <div class="page-header">
-                <h1>كلمات المرور 🔑</h1>
-                <p>إدارة صلاحيات المشرفين</p>
-            </div>
+            <div class="page-header"><h1>كلمات المرور 🔑</h1><p>إدارة صلاحيات المشرفين</p></div>
             <div class="content-card">
-                <div class="card-header"><div class="card-title"><i class="fas fa-key" style="color:var(--warning)"></i> المشرفون</div></div>
+                <div class="card-header"><div class="card-title"><i class="fas fa-users" style="color:var(--primary)"></i> المشرفون الحاليون</div></div>
                 <div id="passwordsList"></div>
             </div>
             <div class="content-card">
-                <div class="card-header"><div class="card-title"><i class="fas fa-plus" style="color:var(--success)"></i> إضافة مشرف جديد</div></div>
+                <div class="card-header"><div class="card-title"><i class="fas fa-user-plus" style="color:var(--success)"></i> إضافة مشرف جديد</div></div>
                 <div class="form-grid">
-                    <div class="fgroup"><span class="flabel">كلمة المرور</span><input type="text" class="finp" id="newPass" placeholder="كلمة مرور قوية"></div>
+                    <div class="fgroup">
+                        <span class="flabel">الاسم / الوصف</span>
+                        <input type="text" class="finp" id="newLabel" placeholder="مثال: مشرف الكلية">
+                    </div>
+                    <div class="fgroup">
+                        <span class="flabel">كلمة المرور</span>
+                        <input type="text" class="finp" id="newPass" placeholder="أدخل كلمة مرور قوية">
+                    </div>
                     <div class="fgroup">
                         <span class="flabel">الصلاحية</span>
-                        <select class="finp" id="newRole">
-                            <option value="admin">مشرف رئيسي (كل الصلاحيات)</option>
-                            <option value="editor">محرر (تعديل المحتوى)</option>
+                        <select class="fsel" id="newRole">
+                            <option value="admin">مشرف</option>
+                            <option value="moderator">مشرف محتوى</option>
                         </select>
                     </div>
-                    <div class="fgroup form-full"><span class="flabel">الاسم/الوصف</span><input type="text" class="finp" id="newLabel" placeholder="مثال: مشرف المحتوى"></div>
                 </div>
-                <button class="fbtn" onclick="addPassword()"><i class="fas fa-plus"></i> إضافة المشرف</button>
+                <button class="submit-btn" onclick="addPassword()"><i class="fas fa-plus"></i> إضافة مشرف</button>
             </div>
         </div>
 
-    </main>
-</div>
+    </div><!-- /main -->
+</div><!-- /dashboard -->
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
-<script>
-const supabase = window.supabase.createClient(
-    'https://fjkxahhoacqlpiafmfyd.supabase.co',
-    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZqa3hhaGhvYWNxbHBpYWZtZnlkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgzMTkwMjQsImV4cCI6MjA5Mzg5NTAyNH0.Ls3gaXRso3BgcDAByoYeQQot_KbAOfREvxyW8u4vkGA'
-)
+<script type="module">
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
 
-const FALLBACK = 'UoN@Coffee#2026!'
-async function checkPass(p) {
-    if (p === FALLBACK) return { role:'admin', label:'المشرف الرئيسي' }
-    try {
-        const timeout = new Promise((_, reject) => setTimeout(() => reject('timeout'), 3000))
-        const query = supabase.from('admin_passwords').select('*')
-        const { data } = await Promise.race([query, timeout])
-        if (data) for (const r of data) if (r.password_plain === p) return { role:r.role, label:r.label }
-    } catch(e) {}
-    return null
-}
+const SUPABASE_URL = 'https://fjkxahhoacqlpiafmfyd.supabase.co'
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZqa3hhaGhvYWNxbHBpYWZtZnlkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgzMTkwMjQsImV4cCI6MjA5Mzg5NTAyNH0.Ls3gaXRso3BgcDAByoYeQQot_KbAOfREvxyW8u4vkGA'
+const supabase = createClient(SUPABASE_URL, SUPABASE_KEY)
 
-let currentAdmin = null
+const ADMIN_PASS = 'uoncoffee2025'
 let notifications = []
+let examModeActive = false
+let selectedExamEmoji = '🎯'
+let currentAdmin = null
 
-// ===== LOGIN =====
-window.addEventListener('DOMContentLoaded', () => {
-    document.getElementById('loadingOverlay').classList.add('hidden')
-    const saved = sessionStorage.getItem('uon_admin_dash')
-    if (saved) {
-        try { currentAdmin = JSON.parse(saved); showDashboard() } catch(e) {}
-    }
-})
-
+// ===== AUTH =====
 window.doLogin = async function() {
-    const pass = document.getElementById('loginPass').value
+    const pass = document.getElementById('loginPass').value.trim()
     if (!pass) return
-    const matched = await checkPass(pass)
-    if (matched) {
-        currentAdmin = matched
-        sessionStorage.setItem('uon_admin_dash', JSON.stringify(matched))
-        document.getElementById('loginError').classList.remove('show')
-        showDashboard()
-    } else {
-        document.getElementById('loginError').classList.add('show')
-        document.getElementById('loginPass').style.borderColor = 'var(--danger)'
-        setTimeout(() => document.getElementById('loginPass').style.borderColor = '', 1000)
+    try {
+        const { data } = await supabase.from('admin_passwords').select('*').eq('password_plain', pass)
+        let matched = null
+        if (pass === ADMIN_PASS) {
+            matched = { role: 'admin', label: 'المشرف الرئيسي' }
+        } else if (data && data.length) {
+            matched = data[0]
+        }
+        if (matched) {
+            currentAdmin = matched
+            document.getElementById('adminNameLabel').textContent = matched.label || 'المشرف'
+            document.getElementById('adminRoleLabel').textContent = matched.role || 'admin'
+            document.getElementById('loginScreen').style.display = 'none'
+            document.getElementById('dashboard').classList.add('show')
+            loadAll()
+        } else {
+            document.getElementById('loginError').classList.add('show')
+            document.getElementById('loginPass').style.borderColor = 'var(--danger)'
+        }
+    } catch(e) {
+        // fallback: local check only
+        if (pass === ADMIN_PASS) {
+            currentAdmin = { role: 'admin', label: 'المشرف الرئيسي' }
+            document.getElementById('adminNameLabel').textContent = 'المشرف الرئيسي'
+            document.getElementById('loginScreen').style.display = 'none'
+            document.getElementById('dashboard').classList.add('show')
+            loadAll()
+        } else {
+            document.getElementById('loginError').classList.add('show')
+        }
     }
+    document.getElementById('loadingOverlay').classList.add('hidden')
 }
 
 window.doLogout = function() {
     currentAdmin = null
-    sessionStorage.removeItem('uon_admin_dash')
-    document.getElementById('dashboard').classList.remove('show')
     document.getElementById('loginScreen').style.display = 'flex'
-    showToast('تم تسجيل الخروج', 'error')
+    document.getElementById('dashboard').classList.remove('show')
+    document.getElementById('loginPass').value = ''
+    document.getElementById('loginError').classList.remove('show')
 }
 
-function showDashboard() {
-    document.getElementById('loginScreen').style.display = 'none'
-    document.getElementById('dashboard').classList.add('show')
-    document.getElementById('sidebarAdminName').textContent = currentAdmin.label
-    document.getElementById('sidebarAdminRole').textContent = currentAdmin.role === 'admin' ? 'مشرف رئيسي' : 'محرر'
-    document.getElementById('loadingOverlay').classList.add('hidden')
-    // تحميل البيانات في الخلفية بدون تعليق
-    setTimeout(() => loadAll(), 100)
-}
-
-// ===== LOAD ALL =====
+// ===== INIT =====
 async function loadAll() {
-    // كل دالة مستقلة — خطأ في واحدة لا يوقف الباقي
-    const tasks = [
+    await Promise.allSettled([
         loadStats(),
+        loadNotifications(),
+        loadConfessions(),
         loadSummaries(),
+        loadRestaurants(),
         loadGroups(),
         loadMarketplace(),
         loadProjects(),
         loadPasswords(),
         loadToolsAdmin(),
+        loadAISetting(),
         loadTestMode(),
-    ]
-    await Promise.allSettled(tasks)
+    ])
 }
 
 // ===== STATS =====
 async function loadStats() {
     try {
-        const [ann, sum, tools, grp, mkt, proj] = await Promise.all([
-            supabase.from('announcements').select('id', { count:'exact' }),
+        const [conf, sum, notif, grp, mkt, proj] = await Promise.allSettled([
+            supabase.from('confessions').select('id', { count:'exact' }),
             supabase.from('summaries').select('id,approved', { count:'exact' }),
-            supabase.from('tools_items').select('id', { count:'exact' }),
+            supabase.from('notifications').select('id,is_read'),
             supabase.from('whatsapp_groups').select('id,approved', { count:'exact' }),
-            supabase.from('marketplace').select('id', { count:'exact' }),
+            supabase.from('marketplace_items').select('id', { count:'exact' }),
             supabase.from('projects').select('id', { count:'exact' }),
         ])
-        document.getElementById('statConfessions').textContent = ann.count || 0
-        document.getElementById('statSummaries').textContent = sum.count || 0
-        const pending = sum.data ? sum.data.filter(s => !s.approved).length : 0
-        document.getElementById('statPending').textContent = pending
-        document.getElementById('statRestaurants').textContent = tools.count || 0
-        if (pending > 0) { document.getElementById('navSumBadge').textContent = pending; document.getElementById('navSumBadge').style.display = 'inline-block' }
-        const grpPending = grp.data ? grp.data.filter(g => !g.approved).length : 0
-        if (grpPending > 0) { document.getElementById('navGroupBadge').textContent = grpPending; document.getElementById('navGroupBadge').style.display = 'inline-block' }
-        document.getElementById('statGroups').textContent = grp.count || 0
-        document.getElementById('statMkt').textContent = mkt.count || 0
-        document.getElementById('statProj').textContent = proj.count || 0
+        if (conf.status==='fulfilled') document.getElementById('statConfessions').textContent = conf.value.count || 0
+        if (sum.status==='fulfilled') {
+            document.getElementById('statSummaries').textContent = sum.value.count || 0
+            const pending = (sum.value.data||[]).filter(s => !s.approved).length
+            document.getElementById('statPending').textContent = pending
+            if (pending > 0) { document.getElementById('navSumBadge').textContent = pending; document.getElementById('navSumBadge').style.display = 'inline-block' }
+        }
+        if (notif.status==='fulfilled') {
+            const unread = (notif.value.data||[]).filter(n => !n.is_read).length
+            document.getElementById('statNotifs').textContent = unread
+            if (unread > 0) { document.getElementById('navNotifBadge').textContent = unread; document.getElementById('navNotifBadge').style.display = 'inline-block' }
+        }
+        if (grp.status==='fulfilled') {
+            document.getElementById('statGroups').textContent = grp.value.count || 0
+            const grpPending = (grp.value.data||[]).filter(g => !g.approved).length
+            if (grpPending > 0) { document.getElementById('navGroupBadge').textContent = grpPending; document.getElementById('navGroupBadge').style.display = 'inline-block' }
+        }
+        if (mkt.status==='fulfilled') document.getElementById('statMkt').textContent = mkt.value.count || 0
+        if (proj.status==='fulfilled') document.getElementById('statProj').textContent = proj.value.count || 0
     } catch(e) {}
     loadRecentActivity()
 }
 
-// ===== RECENT ACTIVITY =====
 async function loadRecentActivity() {
     try {
-        const { data: confs } = await supabase.from('announcements').select('*').order('created_at', { ascending:false }).limit(3)
+        const { data: confs } = await supabase.from('confessions').select('*').order('created_at', { ascending:false }).limit(3)
         const { data: sums } = await supabase.from('summaries').select('*').order('created_at', { ascending:false }).limit(3)
         const activities = [
             ...(confs||[]).map(c => ({ type:'conf', text:c.text?.substring(0,60)+'...', time:c.created_at })),
             ...(sums||[]).map(s => ({ type:'sum', text:`طلب ملخص: ${s.subject}`, time:s.created_at })),
-        ].sort((a,b) => new Date(b.time) - new Date(a.time)).slice(0,5)
-
+        ].sort((a,b) => new Date(b.time) - new Date(a.time)).slice(0,6)
         const el = document.getElementById('recentActivity')
         if (!activities.length) { el.innerHTML = '<div style="color:var(--text-dim);font-size:.85rem;text-align:center;padding:1rem;">لا يوجد نشاط حديث</div>'; return }
         el.innerHTML = activities.map(a => `
             <div style="display:flex;gap:12px;padding:.8rem 0;border-bottom:1px solid rgba(255,255,255,.04);align-items:flex-start;">
-                <div style="width:34px;height:34px;border-radius:10px;background:${a.type==='conf'?'rgba(0,212,255,.1)':'rgba(107,203,119,.1)'};display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-                    ${a.type==='conf'?'💬':'📚'}
-                </div>
+                <div style="width:34px;height:34px;border-radius:10px;background:${a.type==='conf'?'rgba(0,212,255,.1)':'rgba(107,203,119,.1)'};display:flex;align-items:center;justify-content:center;flex-shrink:0;">${a.type==='conf'?'💬':'📚'}</div>
                 <div>
                     <div style="font-size:.85rem;font-weight:600;">${a.text}</div>
                     <div style="font-size:.75rem;color:var(--text-dim);margin-top:2px;">${formatTime(a.time)}</div>
@@ -662,8 +663,7 @@ async function loadRecentActivity() {
 
 function formatTime(ts) {
     if (!ts) return ''
-    const d = new Date(ts), now = new Date()
-    const diff = Math.floor((now - d) / 1000)
+    const diff = Math.floor((new Date() - new Date(ts)) / 1000)
     if (diff < 60) return 'الآن'
     if (diff < 3600) return 'منذ ' + Math.floor(diff/60) + ' دقيقة'
     if (diff < 86400) return 'منذ ' + Math.floor(diff/3600) + ' ساعة'
@@ -673,7 +673,7 @@ function formatTime(ts) {
 // ===== NOTIFICATIONS =====
 async function loadNotifications() {
     try {
-        const { data } = await supabase.from('announcements').select('*').order('created_at', { ascending:false }).limit(30)
+        const { data } = await supabase.from('notifications').select('*').order('created_at', { ascending:false }).limit(30)
         notifications = data || []
         renderNotifications()
     } catch(e) {}
@@ -683,7 +683,7 @@ function renderNotifications() {
     const el = document.getElementById('notifsList')
     if (!notifications.length) { el.innerHTML = '<div style="color:var(--text-dim);text-align:center;padding:2rem;font-size:.85rem;">لا توجد إشعارات</div>'; return }
     el.innerHTML = notifications.map(n => `
-        <div class="notif-item" style="opacity:${n.is_read ? '.6' : '1'}">
+        <div class="notif-item" style="opacity:${n.is_read?.6:'1'}">
             <div class="notif-icon" style="background:${n.type==='summary'?'rgba(107,203,119,.1)':n.type==='confession'?'rgba(0,212,255,.1)':'rgba(251,146,60,.1)'}">
                 ${n.type==='summary'?'📚':n.type==='confession'?'💬':'🔔'}
             </div>
@@ -698,40 +698,42 @@ function renderNotifications() {
 }
 
 window.markOneRead = async function(id) {
-    try { await supabase.from('announcements').update({ is_read:true }).eq('id', id) } catch(e) {}
+    try { await supabase.from('notifications').update({ is_read:true }).eq('id', id) } catch(e) {}
     const n = notifications.find(n => n.id == id)
     if (n) n.is_read = true
-    renderNotifications()
-    loadStats()
+    renderNotifications(); loadStats()
 }
 
 window.markAllRead = async function() {
-    try { await supabase.from('announcements').update({ is_read:true }).eq('is_read', false) } catch(e) {}
+    try { await supabase.from('notifications').update({ is_read:true }).eq('is_read', false) } catch(e) {}
     notifications.forEach(n => n.is_read = true)
-    renderNotifications()
-    loadStats()
+    renderNotifications(); loadStats()
     showToast('تم تحديد الكل كمقروء!')
 }
 
 // ===== CONFESSIONS =====
 async function loadConfessions() {
     try {
-        const { data } = await supabase.from('announcements').select('*').order('created_at', { ascending:false })
+        const { data } = await supabase.from('confessions').select('*').order('created_at', { ascending:false })
         const tbody = document.getElementById('confTableBody')
-        if (!data || !data.length) { tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--text-dim);padding:2rem;">لا توجد إعلانات</td></tr>'; return }
-        tbody.innerHTML = data.map(c => `
-            <tr>
-                <td style="font-weight:700">${c.title || c.name || '—'}</td>
-                <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${c.content || c.body || c.message || '—'}</td>
-                <td style="font-size:.75rem;color:var(--text-dim);">${formatTime(c.created_at)}</td>
-                <td><button class="btn-del" onclick="deleteConf('${c.id}')"><i class="fas fa-trash"></i></button></td>
-            </tr>`).join('')
+        if (!data || !data.length) { tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--text-dim);padding:2rem;">لا توجد اعترافات</td></tr>'; return }
+        tbody.innerHTML = data.map(c => `<tr>
+            <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${c.text}">${c.text?.substring(0,50)}${c.text?.length>50?'...':''}</td>
+            <td><span class="td-badge badge-new">${c.category || '—'}</span></td>
+            <td>❤️ ${c.likes || 0}</td>
+            <td style="font-size:.75rem;color:var(--text-dim);">${formatTime(c.created_at)}</td>
+            <td><button class="btn-del" onclick="deleteConf('${c.id}')"><i class="fas fa-trash"></i></button></td>
+        </tr>`).join('')
+        document.getElementById('navConfBadge').textContent = data.length
     } catch(e) {}
 }
-
 window.deleteConf = async function(id) {
-    if (!confirm('حذف هذا الإعلان؟')) return
-    try { await supabase.from('announcements').delete().eq('id', id); await loadConfessions(); showToast('تم الحذف', 'error') } catch(e) {}
+    if (!confirm('حذف هذا الاعتراف؟')) return
+    try { await supabase.from('confessions').delete().eq('id', id); loadConfessions(); showToast('تم الحذف', 'error') } catch(e) {}
+}
+window.clearAllConf = async function() {
+    if (!confirm('هل أنت متأكد من حذف كل الاعترافات؟')) return
+    try { await supabase.from('confessions').delete().neq('id', 0); loadConfessions(); showToast('تم حذف كل الاعترافات', 'error') } catch(e) {}
 }
 
 // ===== SUMMARIES =====
@@ -741,160 +743,51 @@ async function loadSummaries() {
         if (!data) return
         const pending = data.filter(s => !s.approved)
         const approved = data.filter(s => s.approved)
-
         document.getElementById('sumPendingBody').innerHTML = pending.length
-            ? pending.map(s => `
-                <tr>
-                    <td style="font-weight:700">${s.subject}</td>
-                    <td>${s.college}</td>
-                    <td style="color:var(--text-dim);font-size:.8rem;">${s.submitter_name || 'مجهول'}</td>
-                    <td><a href="${s.link}" target="_blank" style="color:var(--primary);font-size:.8rem;">🔗 الرابط</a></td>
-                    <td><div class="td-actions">
-                        <button class="btn-approve" onclick="approveSum('${s.id}')">✅ قبول</button>
-                        <button class="btn-reject" onclick="rejectSum('${s.id}')">❌ رفض</button>
-                    </div></td>
-                </tr>`).join('')
+            ? pending.map(s => `<tr>
+                <td style="font-weight:700">${s.subject}</td><td>${s.college}</td>
+                <td style="color:var(--text-dim);font-size:.8rem;">${s.submitter_name || 'مجهول'}</td>
+                <td><a href="${s.link}" target="_blank" style="color:var(--primary);font-size:.8rem;">🔗 الرابط</a></td>
+                <td><div class="td-actions">
+                    <button class="btn-approve" onclick="approveSum('${s.id}')">✅ قبول</button>
+                    <button class="btn-reject" onclick="rejectSum('${s.id}')">❌ رفض</button>
+                </div></td></tr>`).join('')
             : '<tr><td colspan="5" style="text-align:center;color:var(--text-dim);padding:1.5rem;">لا توجد طلبات معلقة ✅</td></tr>'
-
         document.getElementById('sumApprovedBody').innerHTML = approved.length
-            ? approved.map(s => `
-                <tr>
-                    <td style="font-weight:700">${s.subject}</td>
-                    <td>${s.college}</td>
-                    <td><a href="${s.link}" target="_blank" style="color:var(--primary);font-size:.8rem;">🔗 الرابط</a></td>
-                    <td><button class="btn-del" onclick="deleteSum('${s.id}')"><i class="fas fa-trash"></i></button></td>
-                </tr>`).join('')
+            ? approved.map(s => `<tr>
+                <td style="font-weight:700">${s.subject}</td><td>${s.college}</td>
+                <td><a href="${s.link}" target="_blank" style="color:var(--primary);font-size:.8rem;">🔗 الرابط</a></td>
+                <td><button class="btn-del" onclick="deleteSum('${s.id}')"><i class="fas fa-trash"></i></button></td></tr>`).join('')
             : '<tr><td colspan="4" style="text-align:center;color:var(--text-dim);padding:1.5rem;">لا توجد ملخصات معتمدة بعد</td></tr>'
-
-        if (pending.length > 0) {
-            document.getElementById('navSumBadge').textContent = pending.length
-            document.getElementById('navSumBadge').style.display = 'inline-block'
-        }
+        if (pending.length > 0) { document.getElementById('navSumBadge').textContent = pending.length; document.getElementById('navSumBadge').style.display = 'inline-block' }
     } catch(e) {}
 }
-
-window.approveSum = async function(id) {
-    try { await supabase.from('summaries').update({ approved:true }).eq('id', id); await loadSummaries(); showToast('تم قبول الملخص! ✅') } catch(e) {}
-}
-window.rejectSum = async function(id) {
-    if (!confirm('رفض وحذف هذا الملخص؟')) return
-    try { await supabase.from('summaries').delete().eq('id', id); await loadSummaries(); showToast('تم الرفض', 'error') } catch(e) {}
-}
-window.deleteSum = async function(id) {
-    if (!confirm('حذف هذا الملخص؟')) return
-    try { await supabase.from('summaries').delete().eq('id', id); await loadSummaries(); showToast('تم الحذف', 'error') } catch(e) {}
-}
+window.approveSum = async (id) => { try { await supabase.from('summaries').update({approved:true}).eq('id',id); loadSummaries(); showToast('تم قبول الملخص! ✅') } catch(e){} }
+window.rejectSum = async (id) => { if(!confirm('رفض وحذف هذا الملخص؟')) return; try { await supabase.from('summaries').delete().eq('id',id); loadSummaries(); showToast('تم الرفض','error') } catch(e){} }
+window.deleteSum = async (id) => { if(!confirm('حذف هذا الملخص؟')) return; try { await supabase.from('summaries').delete().eq('id',id); loadSummaries(); showToast('تم الحذف','error') } catch(e){} }
 
 // ===== RESTAURANTS =====
 async function loadRestaurants() {
     try {
-        const { data } = await supabase.from('announcements').select('*').order('created_at', { ascending:false })
+        const { data } = await supabase.from('restaurants').select('*').order('created_at', { ascending:false })
         const tbody = document.getElementById('restTableBody')
         if (!data || !data.length) { tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--text-dim);padding:2rem;">لا توجد مطاعم</td></tr>'; return }
-        tbody.innerHTML = data.map(r => `
-            <tr>
-                <td><span style="font-size:1.2rem">${r.emoji}</span> ${r.name}</td>
-                <td style="color:var(--text-dim);font-size:.82rem;">${r.type}</td>
-                <td style="color:var(--accent);">${'⭐'.repeat(r.stars || 0)}</td>
-                <td><span class="td-badge ${r.status==='open'?'badge-approved':'badge-pending'}">${r.status==='open'?'مفتوح':'مغلق'}</span></td>
-                <td><button class="btn-del" onclick="deleteRest('${r.id}')"><i class="fas fa-trash"></i></button></td>
-            </tr>`).join('')
+        tbody.innerHTML = data.map(r => `<tr>
+            <td><span style="font-size:1.2rem">${r.emoji}</span> ${r.name}</td>
+            <td style="color:var(--text-dim);font-size:.82rem;">${r.type}</td>
+            <td style="color:var(--accent);">${'⭐'.repeat(r.stars || 0)}</td>
+            <td><span class="td-badge ${r.status==='open'?'badge-approved':'badge-pending'}">${r.status==='open'?'مفتوح':'مغلق'}</span></td>
+            <td><button class="btn-del" onclick="deleteRest('${r.id}')"><i class="fas fa-trash"></i></button></td></tr>`).join('')
     } catch(e) {}
 }
-
-window.deleteRest = async function(id) {
-    if (!confirm('حذف هذا المطعم؟')) return
-    try { await supabase.from('announcements').delete().eq('id', id); await loadRestaurants(); showToast('تم الحذف', 'error') } catch(e) {}
-}
-
-// ===== EXAM MODE =====// ===== EXAM MODE =====
-let examModeActive = false
-let selectedExamEmoji = '🎯'
-
-async function loadTestMode() {
-    try {
-        const { data } = await supabase.from('settings').select('*').in('key', ['exam_mode','exam_title','exam_msg','exam_emoji'])
-        if (data) {
-            const map = {}
-            data.forEach(r => map[r.key] = r.value)
-            examModeActive = map.exam_mode === 'true'
-            document.getElementById('examBannerTitle').value = map.exam_title || 'فترة الاختبارات النهائية'
-            document.getElementById('examBannerMsg').value = map.exam_msg || 'بالتوفيق لجميع الطلاب!'
-            selectedExamEmoji = map.exam_emoji || '🎯'
-            document.querySelectorAll('.exam-emoji-opt').forEach(e => e.classList.toggle('sel', e.textContent.trim() === selectedExamEmoji))
-        }
-    } catch(e) { examModeActive = false }
-    renderExamModeUI()
-    updateExamPreview()
-}
-
-function renderExamModeUI() {
-    const label = document.getElementById('examModeLabel')
-    const desc = document.getElementById('examModeDesc')
-    const btn = document.getElementById('examModeBtn')
-    const preview = document.getElementById('examBannerPreview')
-    if (!label) return
-    if (examModeActive) {
-        label.textContent = '🔴 وضع الاختبارات مفعّل'
-        label.style.color = '#ef4444'
-        desc.textContent = 'الشريط الأحمر يظهر الآن لجميع الطلاب'
-        btn.textContent = '⏸ إيقاف'
-        btn.style.background = 'rgba(239,68,68,.15)'
-        btn.style.color = '#ef4444'
-        btn.style.border = '1px solid rgba(239,68,68,.3)'
-        preview.style.display = 'block'
-    } else {
-        label.textContent = '⚪ وضع الاختبارات موقوف'
-        label.style.color = 'var(--text)'
-        desc.textContent = 'الموقع يعمل بشكل طبيعي'
-        btn.textContent = '▶ تفعيل'
-        btn.style.background = 'rgba(239,68,68,.1)'
-        btn.style.color = '#ef4444'
-        btn.style.border = '1px solid rgba(239,68,68,.2)'
-        if (preview) preview.style.display = 'none'
-    }
-}
-
-window.updateExamPreview = function() {
-    const title = document.getElementById('examBannerTitle').value || 'فترة الاختبارات النهائية'
-    const msg = document.getElementById('examBannerMsg').value || 'بالتوفيق لجميع الطلاب!'
-    document.getElementById('previewIcon').textContent = selectedExamEmoji
-    document.getElementById('previewTitle').textContent = title
-    document.getElementById('previewMsg').textContent = msg
-    if (examModeActive) document.getElementById('examBannerPreview').style.display = 'block'
-}
-
-window.selectExamEmoji = function(el, emoji) {
-    document.querySelectorAll('.exam-emoji-opt').forEach(e => e.classList.remove('sel'))
-    el.classList.add('sel')
-    selectedExamEmoji = emoji
-    updateExamPreview()
-}
-
-window.toggleExamMode = async function() {
-    examModeActive = !examModeActive
-    const title = document.getElementById('examBannerTitle').value.trim() || 'فترة الاختبارات النهائية'
-    const msg = document.getElementById('examBannerMsg').value.trim() || 'بالتوفيق لجميع الطلاب!'
-    try {
-        await supabase.from('settings').upsert({ key:'exam_mode', value: String(examModeActive) })
-        await supabase.from('settings').upsert({ key:'exam_title', value: title })
-        await supabase.from('settings').upsert({ key:'exam_msg', value: msg })
-        await supabase.from('settings').upsert({ key:'exam_emoji', value: selectedExamEmoji })
-        renderExamModeUI()
-        showToast(examModeActive ? 'تم تفعيل وضع الاختبارات 🎯' : 'تم إيقاف وضع الاختبارات', examModeActive ? '' : 'error')
-    } catch(e) {
-        examModeActive = !examModeActive
-        showToast('خطأ في الحفظ', 'error')
-    }
-}
+window.deleteRest = async (id) => { if(!confirm('حذف؟')) return; try { await supabase.from('restaurants').delete().eq('id',id); loadRestaurants(); showToast('تم الحذف','error') } catch(e){} }
 
 // ===== GROUPS =====
 async function loadGroups() {
     try {
         const { data } = await supabase.from('whatsapp_groups').select('*').order('created_at', { ascending:false })
         if (!data) return
-        const pending = data.filter(g => !g.approved)
-        const approved = data.filter(g => g.approved)
+        const pending = data.filter(g => !g.approved), approved = data.filter(g => g.approved)
         document.getElementById('groupPendingBody').innerHTML = pending.length
             ? pending.map(g => `<tr>
                 <td style="font-weight:700">${g.subject||'—'}</td><td>${g.college||'—'}</td>
@@ -919,7 +812,7 @@ window.deleteGroup = async (id) => { if(!confirm('حذف؟')) return; try { awai
 // ===== MARKETPLACE =====
 async function loadMarketplace() {
     try {
-        const { data } = await supabase.from('marketplace').select('*').order('created_at', { ascending:false })
+        const { data } = await supabase.from('marketplace_items').select('*').order('created_at', { ascending:false })
         const tbody = document.getElementById('mktTableBody')
         if (!data || !data.length) { tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--text-dim);padding:2rem;">لا توجد إعلانات</td></tr>'; return }
         tbody.innerHTML = data.map(m => `<tr>
@@ -930,7 +823,7 @@ async function loadMarketplace() {
             <td><button class="btn-del" onclick="deleteMkt('${m.id}')"><i class="fas fa-trash"></i></button></td></tr>`).join('')
     } catch(e) {}
 }
-window.deleteMkt = async (id) => { if(!confirm('حذف؟')) return; try { await supabase.from('marketplace').delete().eq('id',id); loadMarketplace(); loadStats(); showToast('تم الحذف','error') } catch(e){} }
+window.deleteMkt = async (id) => { if(!confirm('حذف؟')) return; try { await supabase.from('marketplace_items').delete().eq('id',id); loadMarketplace(); loadStats(); showToast('تم الحذف','error') } catch(e){} }
 
 // ===== PROJECTS =====
 async function loadProjects() {
@@ -948,69 +841,123 @@ async function loadProjects() {
 }
 window.deleteProject = async (id) => { if(!confirm('حذف؟')) return; try { await supabase.from('projects').delete().eq('id',id); loadProjects(); loadStats(); showToast('تم الحذف','error') } catch(e){} }
 
+// ===== AI TOGGLE =====
+async function loadAISetting() {
+    try {
+        const { data } = await supabase.from('settings').select('value').eq('key','ai_enabled').single()
+        const enabled = data ? data.value !== 'false' : true
+        document.getElementById('aiToggle').checked = enabled
+    } catch(e) {}
+}
+
+window.toggleAI = async function(enabled) {
+    try {
+        await supabase.from('settings').upsert({ key:'ai_enabled', value: String(enabled) })
+        showToast(enabled ? 'تم تشغيل المساعد الذكي ✅' : 'تم إيقاف المساعد الذكي', enabled ? '' : 'error')
+    } catch(e) { showToast('خطأ في الحفظ', 'error') }
+}
+
 // ===== TOOLS ADMIN =====
 async function loadToolsAdmin() {
+    const el = document.getElementById('toolsAdminList')
     try {
-        const el = document.getElementById('toolsAdminList')
-        el.innerHTML = '<div style="color:var(--text-dim);font-size:.85rem;text-align:center;padding:1rem;">جارٍ التحميل...</div>'
-        
-        const { data: cats, error: catErr } = await supabase.from('tools_categories').select('*').order('sort_order')
-        console.log('cats:', cats, 'err:', catErr)
-        
-        if (catErr || !cats || !cats.length) {
-            el.innerHTML = `<div style="color:var(--text-dim);font-size:.85rem;text-align:center;padding:1.5rem;">
-                ${catErr ? 'خطأ: ' + catErr.message : 'لا توجد تصنيفات'}
-                <br><a href="tools.html" target="_blank" style="color:var(--primary);">افتح صفحة الأدوات</a>
-            </div>`
+        const { data, error } = await supabase.from('tools_categories').select('*, tools_items(*)').order('sort_order')
+        if (error || !data || !data.length) {
+            el.innerHTML = '<div style="color:var(--text-dim);font-size:.85rem;text-align:center;padding:1.5rem;">لا توجد أدوات. افتح <a href="tools.html" target="_blank" style="color:var(--primary);">صفحة الأدوات</a> لإضافتها.</div>'
             return
         }
-        
-        const { data: items, error: itemErr } = await supabase.from('tools_items').select('*')
-        console.log('items:', items, 'err:', itemErr)
-        
-        const toolsMap = {}
-        if (items) items.forEach(t => { if (!toolsMap[t.category_id]) toolsMap[t.category_id] = []; toolsMap[t.category_id].push(t) })
-
-        el.innerHTML = cats.map(cat => `
-            <div style="margin-bottom:1.2rem;">
-                <div style="font-size:.82rem;font-weight:800;color:${cat.color || 'var(--primary)'};margin-bottom:.5rem;padding:.3rem 0;border-bottom:1px solid rgba(255,255,255,.06);">
-                    ${cat.emoji || '🛠️'} ${cat.name} <span style="font-weight:400;color:var(--text-dim);font-size:.75rem;">(${(toolsMap[cat.id]||[]).length} أداة)</span>
+        el.innerHTML = data.map(cat => `
+            <div style="margin-bottom:1.5rem;">
+                <div style="font-size:.8rem;font-weight:800;color:${cat.color||'var(--primary)'};margin-bottom:.6rem;padding:.4rem 0;border-bottom:1px solid rgba(255,255,255,.06);display:flex;align-items:center;gap:6px;">
+                    ${cat.emoji||'🛠️'} ${cat.name}
+                    <span style="font-weight:400;color:var(--text-dim);font-size:.72rem;">(${(cat.tools_items||[]).length} أداة)</span>
                 </div>
-                ${(toolsMap[cat.id] || []).map(t => `
-                <div style="display:flex;align-items:center;justify-content:space-between;padding:.55rem .4rem;border-bottom:1px solid rgba(255,255,255,.04);">
-                    <div style="display:flex;align-items:center;gap:10px;">
-                        <span style="font-size:1.1rem;">${t.emoji || '🔗'}</span>
+                ${(cat.tools_items||[]).map(t => `
+                <div class="tool-toggle-row">
+                    <div class="tool-toggle-info">
+                        <span style="font-size:1.2rem;">${t.emoji||'🔗'}</span>
                         <div>
-                            <div style="font-size:.85rem;font-weight:700;${t.disabled?'color:var(--text-dim);text-decoration:line-through;':''}">${t.name}</div>
-                            ${t.coming_soon ? '<span style="font-size:.7rem;color:var(--warning);">قريباً</span>' : ''}
+                            <div class="tool-toggle-name" style="${t.disabled?'color:var(--text-dim);':''}">
+                                ${t.name}
+                                ${t.coming_soon?'<span style="font-size:.7rem;color:var(--warning);margin-right:4px;">قريباً</span>':''}
+                            </div>
+                            <div class="tool-toggle-cat">${t.disabled?'⛔ موقوف':'✅ نشط'}</div>
                         </div>
                     </div>
-                    <button onclick="toggleAdminTool('${t.id}', ${!!t.disabled})" 
-                        style="padding:.3rem .75rem;border-radius:8px;border:1px solid ${t.disabled?'rgba(107,203,119,.3)':'rgba(239,68,68,.3)'};background:${t.disabled?'rgba(107,203,119,.1)':'rgba(239,68,68,.1)'};color:${t.disabled?'#6bcb77':'#ef4444'};cursor:pointer;font-size:.78rem;font-weight:700;font-family:Tajawal,sans-serif;transition:all .2s;">
-                        ${t.disabled ? '▶ تشغيل' : '⏸ إيقاف'}
-                    </button>
+                    <label class="toggle-switch">
+                        <input type="checkbox" ${t.disabled?'':'checked'} onchange="toggleAdminTool('${t.id}', !this.checked)">
+                        <span class="toggle-slider"></span>
+                    </label>
                 </div>`).join('')}
             </div>`).join('')
     } catch(e) {
-        console.error('loadToolsAdmin error:', e)
-        document.getElementById('toolsAdminList').innerHTML = '<div style="color:var(--text-dim);font-size:.85rem;">خطأ: ' + e.message + '</div>'
+        el.innerHTML = '<div style="color:var(--text-dim);font-size:.85rem;">تعذّر تحميل الأدوات</div>'
     }
 }
 
-window.toggleAdminTool = async function(toolId, currentDisabled) {
-    const btn = event.target
-    btn.disabled = true
-    btn.textContent = '...'
+window.toggleAdminTool = async function(toolId, disable) {
     try {
-        const { error } = await supabase.from('tools_items').update({ disabled: !currentDisabled }).eq('id', toolId)
-        if (error) throw error
+        await supabase.from('tools_items').update({ disabled: disable }).eq('id', toolId)
         await loadToolsAdmin()
-        showToast(currentDisabled ? 'تم تشغيل الأداة ✅' : 'تم إيقاف الأداة ⏸', currentDisabled ? '' : 'error')
-    } catch(e) {
-        showToast('خطأ: تأكد من صلاحيات Supabase — شغّل SQL المطلوب', 'error')
-        btn.disabled = false
-        await loadToolsAdmin()
+        showToast(disable ? 'تم إيقاف الأداة' : 'تم تشغيل الأداة ✅', disable ? 'error' : '')
+    } catch(e) { showToast('خطأ في التحديث', 'error') }
+}
+
+// ===== EXAM MODE =====
+async function loadTestMode() {
+    try {
+        const { data } = await supabase.from('settings').select('*').in('key',['exam_mode','exam_title','exam_msg','exam_emoji'])
+        if (data) {
+            const map = {}; data.forEach(r => map[r.key] = r.value)
+            examModeActive = map.exam_mode === 'true'
+            document.getElementById('examBannerTitle').value = map.exam_title || 'فترة الاختبارات النهائية'
+            document.getElementById('examBannerMsg').value = map.exam_msg || 'بالتوفيق لجميع الطلاب!'
+            selectedExamEmoji = map.exam_emoji || '🎯'
+            document.querySelectorAll('.exam-emoji-opt').forEach(e => e.classList.toggle('sel', e.textContent.trim() === selectedExamEmoji))
+        }
+    } catch(e) {}
+    renderExamModeUI(); updateExamPreview()
+}
+
+function renderExamModeUI() {
+    const label = document.getElementById('examModeLabel'), desc = document.getElementById('examModeDesc'), btn = document.getElementById('examModeBtn')
+    if (examModeActive) {
+        label.textContent = '🔴 وضع الاختبارات مفعّل'; label.style.color = '#ef4444'
+        desc.textContent = 'الشريط الأحمر يظهر الآن لجميع الطلاب'
+        btn.textContent = '⏸ إيقاف'; btn.className = 'ctrl-btn ctrl-on'
+        document.getElementById('examBannerPreview').style.display = 'block'
+    } else {
+        label.textContent = '⚪ وضع الاختبارات موقوف'; label.style.color = 'var(--text)'
+        desc.textContent = 'الموقع يعمل بشكل طبيعي'
+        btn.textContent = '▶ تفعيل'; btn.className = 'ctrl-btn ctrl-off'
+        document.getElementById('examBannerPreview').style.display = 'none'
     }
+}
+
+window.updateExamPreview = function() {
+    document.getElementById('previewIcon').textContent = selectedExamEmoji
+    document.getElementById('previewTitle').textContent = document.getElementById('examBannerTitle').value || 'فترة الاختبارات النهائية'
+    document.getElementById('previewMsg').textContent = document.getElementById('examBannerMsg').value || 'بالتوفيق لجميع الطلاب!'
+    if (examModeActive) document.getElementById('examBannerPreview').style.display = 'block'
+}
+
+window.selectExamEmoji = function(el, emoji) {
+    document.querySelectorAll('.exam-emoji-opt').forEach(e => e.classList.remove('sel'))
+    el.classList.add('sel'); selectedExamEmoji = emoji; updateExamPreview()
+}
+
+window.toggleExamMode = async function() {
+    examModeActive = !examModeActive
+    const title = document.getElementById('examBannerTitle').value.trim() || 'فترة الاختبارات النهائية'
+    const msg = document.getElementById('examBannerMsg').value.trim() || 'بالتوفيق لجميع الطلاب!'
+    try {
+        await supabase.from('settings').upsert({ key:'exam_mode', value: String(examModeActive) })
+        await supabase.from('settings').upsert({ key:'exam_title', value: title })
+        await supabase.from('settings').upsert({ key:'exam_msg', value: msg })
+        await supabase.from('settings').upsert({ key:'exam_emoji', value: selectedExamEmoji })
+        renderExamModeUI()
+        showToast(examModeActive ? 'تم تفعيل وضع الاختبارات 🎯' : 'تم إيقاف وضع الاختبارات', examModeActive ? '' : 'error')
+    } catch(e) { examModeActive = !examModeActive; showToast('خطأ في الحفظ', 'error') }
 }
 
 // ===== PASSWORDS =====
@@ -1037,23 +984,21 @@ window.addPassword = async function() {
     if (!pass || !label) { showToast('أدخل كلمة المرور والاسم', 'error'); return }
     try {
         await supabase.from('admin_passwords').insert({ password_plain:pass, role, label })
-        document.getElementById('newPass').value = ''
-        document.getElementById('newLabel').value = ''
-        await loadPasswords()
-        showToast('تم إضافة المشرف! ✅')
+        document.getElementById('newPass').value = ''; document.getElementById('newLabel').value = ''
+        loadPasswords(); showToast('تم إضافة المشرف! ✅')
     } catch(e) { showToast('خطأ في الإضافة', 'error') }
 }
 
 window.deletePassword = async function(id) {
     if (!confirm('حذف هذا المشرف؟')) return
-    try { await supabase.from('admin_passwords').delete().eq('id', id); await loadPasswords(); showToast('تم الحذف', 'error') } catch(e) {}
+    try { await supabase.from('admin_passwords').delete().eq('id', id); loadPasswords(); showToast('تم الحذف', 'error') } catch(e) {}
 }
 
 // ===== NAVIGATION =====
 window.showSection = function(id, el) {
     document.querySelectorAll('.section').forEach(s => s.classList.remove('active'))
     document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'))
-    document.getElementById('section-'+id).classList.add('active')
+    document.getElementById('section-'+id)?.classList.add('active')
     if (el) el.classList.add('active')
     if (window.innerWidth <= 768) toggleSidebar()
 }
@@ -1067,19 +1012,18 @@ window.toggleSidebar = function() {
 window.showToast = function(msg, type) {
     const t = document.getElementById('toast')
     document.getElementById('toastMsg').textContent = msg
-    t.className = 'toast show'+(type==='error'?' error':'')
-    t.querySelector('i').className = type==='error'?'fas fa-exclamation-circle':'fas fa-check-circle'
+    t.className = 'toast show' + (type==='error' ? ' error' : '')
+    t.querySelector('i').className = type==='error' ? 'fas fa-exclamation-circle' : 'fas fa-check-circle'
     setTimeout(() => t.classList.remove('show'), 3000)
 }
 
-// Auto refresh every minute
-setInterval(loadAll, 60000)
+// ===== BOOT =====
+window.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('loadingOverlay').classList.add('hidden')
+})
 
-// Unregister all old service workers
-if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.getRegistrations().then(regs => regs.forEach(r => r.unregister()))
-    caches.keys().then(keys => keys.forEach(k => caches.delete(k)))
-}
+window.loadAll = loadAll
+setInterval(loadAll, 60000)
 </script>
 </body>
 </html>
