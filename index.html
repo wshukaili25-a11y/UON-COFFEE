@@ -454,48 +454,99 @@ body.has-exam-banner .navbar{top:40px!important}
 // إخفاء اللودينق إجبارياً بعد 2 ثانية
 setTimeout(function(){ var o=document.getElementById('loadingOverlay'); if(o) o.classList.add('hidden') }, 2000)
 
-// تهيئة Supabase
+// تهيئة Supabase — REST API wrapper مُصحَّح، بدون أي CDN خارجي
 window._sbURL = 'https://fjkxahhoacqlpiafmfyd.supabase.co'
 window._sbKEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZqa3hhaGhvYWNxbHBpYWZtZnlkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgzMTkwMjQsImV4cCI6MjA5Mzg5NTAyNH0.Ls3gaXRso3BgcDAByoYeQQot_KbAOfREvxyW8u4vkGA'
 
-// Supabase بدون CDN — REST API مباشرة
-const supabase = {
-    from: function(table) {
-        const base = window._sbURL + '/rest/v1/' + table
+const supabase = (function() {
+    function buildQuery(table) {
         const headers = {
             'apikey': window._sbKEY,
             'Authorization': 'Bearer ' + window._sbKEY,
-            'Content-Type': 'application/json',
-            'Prefer': 'return=representation'
+            'Content-Type': 'application/json'
         }
-        return {
+        const base = window._sbURL + '/rest/v1/' + table
+        let params = []
+        let countMode = false
+
+        function exec(method, opts) {
+            opts = opts || {}
+            const url = base + (params.length ? '?' + params.join('&') : '')
+            const h = Object.assign({}, headers, opts.headers || {})
+            if (countMode) h['Prefer'] = (h['Prefer'] ? h['Prefer'] + ',' : '') + 'count=exact'
+            return fetch(url, { method: method, headers: h, body: opts.body })
+                .then(function(r) {
+                    const range = r.headers.get('content-range')
+                    const count = range ? parseInt(range.split('/')[1]) || 0 : 0
+                    if (r.status === 204) return { data: null, error: null, count: count }
+                    return r.json().then(function(d) {
+                        if (!r.ok) return { data: null, error: d, count: 0 }
+                        return { data: d, error: null, count: count }
+                    })
+                })
+                .catch(function(e) { return { data: null, error: e, count: 0 } })
+        }
+
+        const builder = {
             select: function(cols, opts) {
-                let url = base + '?select=' + (cols||'*')
-                if (opts && opts.count === 'exact') url += '&select=' + (cols||'*')
-                return {
-                    order: function(col, o) { url += '&order=' + col + (o&&o.ascending===false?'.desc':''); return this },
-                    limit: function(n) { url += '&limit=' + n; return this },
-                    in: function(col, vals) { url += '&' + col + '=in.(' + vals.join(',') + ')'; return this },
-                    eq: function(col, val) { url += '&' + col + '=eq.' + val; return this },
-                    single: function() { return fetch(url, {headers}).then(r=>r.json()).then(d=>({data:Array.isArray(d)?d[0]:d,error:null})).catch(e=>({data:null,error:e})) },
-                    then: function(cb) { return fetch(url, {headers:{...headers,'Prefer':'count=exact'}}).then(r=>{const c=r.headers.get('content-range');const count=c?parseInt(c.split('/')[1]):0;return r.json().then(d=>({data:d,count,error:null}))}).catch(e=>({data:null,count:0,error:e})).then(cb) }
-                }
+                // ترجمة صيغة join مثل '*, tools_items(*)' لصيغة PostgREST 'select=*,tools_items(*)'
+                params.push('select=' + encodeURIComponent(cols || '*'))
+                if (opts && opts.count === 'exact') countMode = true
+                return builder
+            },
+            order: function(col, o) {
+                params.push('order=' + col + (o && o.ascending === false ? '.desc' : '.asc'))
+                return builder
+            },
+            limit: function(n) { params.push('limit=' + n); return builder },
+            in: function(col, vals) { params.push(col + '=in.(' + vals.join(',') + ')'); return builder },
+            eq: function(col, val) { params.push(col + '=eq.' + encodeURIComponent(val)); return builder },
+            neq: function(col, val) { params.push(col + '=neq.' + encodeURIComponent(val)); return builder },
+            single: function() {
+                params.push('limit=1')
+                return exec('GET').then(function(res) {
+                    if (res.error) return res
+                    const row = Array.isArray(res.data) ? res.data[0] : res.data
+                    return { data: row || null, error: row ? null : { message: 'No rows' }, count: res.count }
+                })
             },
             insert: function(data) {
-                return fetch(base, {method:'POST',headers,body:JSON.stringify(data)}).then(r=>r.json()).then(d=>({data:d,error:null})).catch(e=>({data:null,error:e}))
+                return exec('POST', { headers: { Prefer: 'return=representation' }, body: JSON.stringify(data) })
             },
             update: function(data) {
-                return { eq: function(col,val) { return fetch(base+'?'+col+'=eq.'+val, {method:'PATCH',headers,body:JSON.stringify(data)}).then(r=>r.json()).then(d=>({data:d,error:null})).catch(e=>({data:null,error:e})) } }
+                builder._updateData = data
+                builder.eq = function(col, val) {
+                    params.push(col + '=eq.' + encodeURIComponent(val))
+                    return exec('PATCH', { headers: { Prefer: 'return=representation' }, body: JSON.stringify(data) })
+                }
+                return builder
             },
             delete: function() {
-                return { eq: function(col,val) { return fetch(base+'?'+col+'=eq.'+val, {method:'DELETE',headers}).then(r=>({data:null,error:null})).catch(e=>({data:null,error:e})) } }
+                builder.eq = function(col, val) {
+                    params.push(col + '=eq.' + encodeURIComponent(val))
+                    return exec('DELETE', {})
+                }
+                builder.neq = function(col, val) {
+                    params.push(col + '=neq.' + encodeURIComponent(val))
+                    return exec('DELETE', {})
+                }
+                return builder
             },
-            upsert: function(data) {
-                return fetch(base, {method:'POST',headers:{...headers,'Prefer':'resolution=merge-duplicates,return=representation'},body:JSON.stringify(data)}).then(r=>r.json()).then(d=>({data:d,error:null})).catch(e=>({data:null,error:e}))
+            upsert: function(data, opts) {
+                const pref = 'resolution=merge-duplicates,return=representation'
+                return exec('POST', { headers: { Prefer: pref }, body: JSON.stringify(data) })
+            },
+            then: function(resolve, reject) {
+                return exec('GET').then(resolve, reject)
+            },
+            catch: function(reject) {
+                return exec('GET').catch(reject)
             }
         }
+        return builder
     }
-}
+    return { from: buildQuery }
+})()
 
 // ===== VARIABLES =====
 let tools = []
@@ -535,13 +586,19 @@ function updateUI() {
 // ===== TOOLS LOAD =====
 async function loadTools() {
     // Show default tools immediately
-    tools = defaultTools.map(t => ({...t, desc: t.description, btnText: t.btn_text}))
+    tools = defaultTools.map(t => ({...t, desc: t.description, btnText: t.btn_text, disabled: false}))
     renderTools()
-    // Try to load from Supabase in background
+    // Load enabled/disabled state from settings table
     try {
-        const { data, error } = await supabase.from('tools').select('*').order('id')
-        if (!error && data && data.length > 0) {
-            tools = data.map(t => ({ id: t.id, title: t.title, desc: t.description, icon: t.icon, color: t.color, btnText: t.btn_text }))
+        const keys = defaultTools.map(t => 'tool_' + t.id + '_enabled')
+        const { data, error } = await supabase.from('settings').select('*').in('key', keys)
+        if (!error && data) {
+            const map = {}
+            data.forEach(r => map[r.key] = r.value)
+            tools = defaultTools.map(t => ({
+                ...t, desc: t.description, btnText: t.btn_text,
+                disabled: map['tool_' + t.id + '_enabled'] === 'false'
+            })).filter(t => !t.disabled)
             renderTools()
         }
     } catch(e) {}
