@@ -435,11 +435,21 @@ body { font-family:'Tajawal',sans-serif; background:var(--dark); color:var(--tex
         <div class="section" id="section-tools">
             <div class="page-header">
                 <h1>الأدوات 🛠️</h1>
-                <p>إدارة تصنيفات وأدوات الطلاب — تشغيل وإيقاف الأدوات مباشرة</p>
+                <p>تحكم في أدوات الصفحة الرئيسية ومكتبة الأدوات</p>
             </div>
+
+            <!-- HOMEPAGE TOOLS -->
+            <div class="content-card">
+                <div class="card-header">
+                    <div class="card-title"><i class="fas fa-home" style="color:var(--primary)"></i> أدوات الصفحة الرئيسية</div>
+                    <a href="index.html" target="_blank" class="card-action"><i class="fas fa-external-link-alt"></i> فتح الصفحة</a>
+                </div>
+                <div id="homeToolsList"><div style="color:var(--text-dim);font-size:.85rem;text-align:center;padding:2rem;">جارٍ التحميل...</div></div>
+            </div>
+
             <div class="content-card" id="toolsAdminCard">
                 <div class="card-header">
-                    <div class="card-title"><i class="fas fa-tools" style="color:var(--primary)"></i> التصنيفات والأدوات</div>
+                    <div class="card-title"><i class="fas fa-tools" style="color:var(--primary)"></i> مكتبة الأدوات (التصنيفات)</div>
                     <a href="tools.html" target="_blank" class="card-action"><i class="fas fa-external-link-alt"></i> فتح الصفحة</a>
                 </div>
                 <div id="toolsAdminList"><div style="color:var(--text-dim);font-size:.85rem;text-align:center;padding:2rem;">جارٍ التحميل...</div></div>
@@ -532,48 +542,99 @@ body { font-family:'Tajawal',sans-serif; background:var(--dark); color:var(--tex
 // إخفاء اللودينق إجبارياً بعد 2 ثانية
 setTimeout(function(){ var o=document.getElementById('loadingOverlay'); if(o) o.classList.add('hidden') }, 2000)
 
-// تهيئة Supabase
+// تهيئة Supabase — REST API wrapper مُصحَّح، بدون أي CDN خارجي
 window._sbURL = 'https://fjkxahhoacqlpiafmfyd.supabase.co'
 window._sbKEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZqa3hhaGhvYWNxbHBpYWZtZnlkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgzMTkwMjQsImV4cCI6MjA5Mzg5NTAyNH0.Ls3gaXRso3BgcDAByoYeQQot_KbAOfREvxyW8u4vkGA'
 
-// Supabase بدون CDN — REST API مباشرة
-const supabase = {
-    from: function(table) {
-        const base = window._sbURL + '/rest/v1/' + table
+const supabase = (function() {
+    function buildQuery(table) {
         const headers = {
             'apikey': window._sbKEY,
             'Authorization': 'Bearer ' + window._sbKEY,
-            'Content-Type': 'application/json',
-            'Prefer': 'return=representation'
+            'Content-Type': 'application/json'
         }
-        return {
+        const base = window._sbURL + '/rest/v1/' + table
+        let params = []
+        let countMode = false
+
+        function exec(method, opts) {
+            opts = opts || {}
+            const url = base + (params.length ? '?' + params.join('&') : '')
+            const h = Object.assign({}, headers, opts.headers || {})
+            if (countMode) h['Prefer'] = (h['Prefer'] ? h['Prefer'] + ',' : '') + 'count=exact'
+            return fetch(url, { method: method, headers: h, body: opts.body })
+                .then(function(r) {
+                    const range = r.headers.get('content-range')
+                    const count = range ? parseInt(range.split('/')[1]) || 0 : 0
+                    if (r.status === 204) return { data: null, error: null, count: count }
+                    return r.json().then(function(d) {
+                        if (!r.ok) return { data: null, error: d, count: 0 }
+                        return { data: d, error: null, count: count }
+                    })
+                })
+                .catch(function(e) { return { data: null, error: e, count: 0 } })
+        }
+
+        const builder = {
             select: function(cols, opts) {
-                let url = base + '?select=' + (cols||'*')
-                if (opts && opts.count === 'exact') url += '&select=' + (cols||'*')
-                return {
-                    order: function(col, o) { url += '&order=' + col + (o&&o.ascending===false?'.desc':''); return this },
-                    limit: function(n) { url += '&limit=' + n; return this },
-                    in: function(col, vals) { url += '&' + col + '=in.(' + vals.join(',') + ')'; return this },
-                    eq: function(col, val) { url += '&' + col + '=eq.' + val; return this },
-                    single: function() { return fetch(url, {headers}).then(r=>r.json()).then(d=>({data:Array.isArray(d)?d[0]:d,error:null})).catch(e=>({data:null,error:e})) },
-                    then: function(cb) { return fetch(url, {headers:{...headers,'Prefer':'count=exact'}}).then(r=>{const c=r.headers.get('content-range');const count=c?parseInt(c.split('/')[1]):0;return r.json().then(d=>({data:d,count,error:null}))}).catch(e=>({data:null,count:0,error:e})).then(cb) }
-                }
+                // ترجمة صيغة join مثل '*, tools_items(*)' لصيغة PostgREST 'select=*,tools_items(*)'
+                params.push('select=' + encodeURIComponent(cols || '*'))
+                if (opts && opts.count === 'exact') countMode = true
+                return builder
+            },
+            order: function(col, o) {
+                params.push('order=' + col + (o && o.ascending === false ? '.desc' : '.asc'))
+                return builder
+            },
+            limit: function(n) { params.push('limit=' + n); return builder },
+            in: function(col, vals) { params.push(col + '=in.(' + vals.join(',') + ')'); return builder },
+            eq: function(col, val) { params.push(col + '=eq.' + encodeURIComponent(val)); return builder },
+            neq: function(col, val) { params.push(col + '=neq.' + encodeURIComponent(val)); return builder },
+            single: function() {
+                params.push('limit=1')
+                return exec('GET').then(function(res) {
+                    if (res.error) return res
+                    const row = Array.isArray(res.data) ? res.data[0] : res.data
+                    return { data: row || null, error: row ? null : { message: 'No rows' }, count: res.count }
+                })
             },
             insert: function(data) {
-                return fetch(base, {method:'POST',headers,body:JSON.stringify(data)}).then(r=>r.json()).then(d=>({data:d,error:null})).catch(e=>({data:null,error:e}))
+                return exec('POST', { headers: { Prefer: 'return=representation' }, body: JSON.stringify(data) })
             },
             update: function(data) {
-                return { eq: function(col,val) { return fetch(base+'?'+col+'=eq.'+val, {method:'PATCH',headers,body:JSON.stringify(data)}).then(r=>r.json()).then(d=>({data:d,error:null})).catch(e=>({data:null,error:e})) } }
+                builder._updateData = data
+                builder.eq = function(col, val) {
+                    params.push(col + '=eq.' + encodeURIComponent(val))
+                    return exec('PATCH', { headers: { Prefer: 'return=representation' }, body: JSON.stringify(data) })
+                }
+                return builder
             },
             delete: function() {
-                return { eq: function(col,val) { return fetch(base+'?'+col+'=eq.'+val, {method:'DELETE',headers}).then(r=>({data:null,error:null})).catch(e=>({data:null,error:e})) } }
+                builder.eq = function(col, val) {
+                    params.push(col + '=eq.' + encodeURIComponent(val))
+                    return exec('DELETE', {})
+                }
+                builder.neq = function(col, val) {
+                    params.push(col + '=neq.' + encodeURIComponent(val))
+                    return exec('DELETE', {})
+                }
+                return builder
             },
-            upsert: function(data) {
-                return fetch(base, {method:'POST',headers:{...headers,'Prefer':'resolution=merge-duplicates,return=representation'},body:JSON.stringify(data)}).then(r=>r.json()).then(d=>({data:d,error:null})).catch(e=>({data:null,error:e}))
+            upsert: function(data, opts) {
+                const pref = 'resolution=merge-duplicates,return=representation'
+                return exec('POST', { headers: { Prefer: pref }, body: JSON.stringify(data) })
+            },
+            then: function(resolve, reject) {
+                return exec('GET').then(resolve, reject)
+            },
+            catch: function(reject) {
+                return exec('GET').catch(reject)
             }
         }
+        return builder
     }
-}
+    return { from: buildQuery }
+})()
 
 
 const FALLBACK = 'UoN@Coffee#2026!'
@@ -645,6 +706,7 @@ async function loadAll() {
         loadProjects(),
         loadPasswords(),
         loadToolsAdmin(),
+        loadHomeTools(),
         loadTestMode(),
     ]
     await Promise.allSettled(tasks)
@@ -990,7 +1052,53 @@ async function loadProjects() {
 window.deleteProject = async (id) => { if(!confirm('حذف؟')) return; try { await supabase.from('projects').delete().eq('id',id); loadProjects(); loadStats(); showToast('تم الحذف','error') } catch(e){} }
 
 // ===== TOOLS ADMIN =====
-async function loadToolsAdmin() {
+// ===== HOMEPAGE TOOLS (index.html) =====
+const homeToolsList = [
+    { id: 1, title: "مساعد AI ذكي", icon: "fa-robot", color: "#00d4ff" },
+    { id: 2, title: "حاسبة المعدل", icon: "fa-calculator", color: "#ff6b6b" },
+    { id: 4, title: "اعترافات الطلاب", icon: "fa-comments", color: "#6bcb77" },
+    { id: 5, title: "مكتبة الملخصات", icon: "fa-book-open", color: "#a78bfa" },
+    { id: 6, title: "دليل المطاعم", icon: "fa-utensils", color: "#fb923c" },
+    { id: 7, title: "مكتبة الأدوات", icon: "fa-tools", color: "#38bdf8" },
+    { id: 9, title: "الجدول الدراسي", icon: "fa-calendar-alt", color: "#a78bfa" },
+    { id: 10, title: "مجموعات الواتساب", icon: "fa-whatsapp", color: "#25d366" },
+    { id: 11, title: "سوق الطلاب", icon: "fa-store", color: "#ffd93d" },
+]
+
+async function loadHomeTools() {
+    const el = document.getElementById('homeToolsList')
+    try {
+        const keys = homeToolsList.map(t => 'tool_' + t.id + '_enabled')
+        const { data } = await supabase.from('settings').select('*').in('key', keys)
+        const map = {}
+        if (data) data.forEach(r => map[r.key] = r.value)
+        el.innerHTML = homeToolsList.map(t => {
+            const enabled = map['tool_' + t.id + '_enabled'] !== 'false'
+            return `
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:.65rem .8rem;border-radius:12px;border:1px solid rgba(255,255,255,.05);margin-bottom:.5rem;background:rgba(255,255,255,.02);">
+                <div style="display:flex;align-items:center;gap:10px;">
+                    <span style="width:36px;height:36px;border-radius:10px;background:${t.color}20;color:${t.color};display:flex;align-items:center;justify-content:center;"><i class="fas ${t.icon}"></i></span>
+                    <div style="font-size:.88rem;font-weight:700;${enabled?'':'color:var(--text-dim);text-decoration:line-through;'}">${t.title}</div>
+                </div>
+                <button onclick="toggleHomeTool(${t.id}, ${enabled})" style="padding:.4rem 1rem;border-radius:8px;border:1px solid ${enabled?'rgba(239,68,68,.25)':'rgba(107,203,119,.25)'};background:${enabled?'rgba(239,68,68,.1)':'rgba(107,203,119,.1)'};color:${enabled?'#ef4444':'#6bcb77'};cursor:pointer;font-size:.78rem;font-weight:700;font-family:Tajawal,sans-serif;">
+                    ${enabled ? '⏸ إيقاف' : '▶ تشغيل'}
+                </button>
+            </div>`
+        }).join('')
+    } catch(e) {
+        el.innerHTML = '<div style="color:var(--text-dim);font-size:.85rem;text-align:center;padding:1rem;">تعذّر التحميل</div>'
+    }
+}
+
+window.toggleHomeTool = async function(toolId, currentlyEnabled) {
+    try {
+        await supabase.from('settings').upsert({ key: 'tool_' + toolId + '_enabled', value: String(!currentlyEnabled) })
+        await loadHomeTools()
+        showToast(currentlyEnabled ? 'تم إيقاف الأداة' : 'تم تشغيل الأداة ✅', currentlyEnabled ? 'error' : '')
+    } catch(e) { showToast('خطأ في الحفظ', 'error') }
+}
+
+async function loadToolsAdmin(isRetry) {
     try {
         const el = document.getElementById('toolsAdminList')
         el.innerHTML = '<div style="color:var(--text-dim);font-size:.85rem;text-align:center;padding:1rem;">جارٍ التحميل...</div>'
@@ -999,6 +1107,7 @@ async function loadToolsAdmin() {
         console.log('cats:', cats, 'err:', catErr)
         
         if (catErr || !cats || !cats.length) {
+            if (!isRetry) { setTimeout(() => loadToolsAdmin(true), 2000); return }
             el.innerHTML = `<div style="color:var(--text-dim);font-size:.85rem;text-align:center;padding:1.5rem;">
                 ${catErr ? 'خطأ: ' + catErr.message : 'لا توجد تصنيفات'}
                 <br><a href="tools.html" target="_blank" style="color:var(--primary);">افتح صفحة الأدوات</a>
@@ -1034,7 +1143,11 @@ async function loadToolsAdmin() {
             </div>`).join('')
     } catch(e) {
         console.error('loadToolsAdmin error:', e)
-        document.getElementById('toolsAdminList').innerHTML = '<div style="color:var(--text-dim);font-size:.85rem;">خطأ: ' + e.message + '</div>'
+        if (!isRetry) { setTimeout(() => loadToolsAdmin(true), 2000); return }
+        document.getElementById('toolsAdminList').innerHTML = `<div style="color:var(--text-dim);font-size:.85rem;text-align:center;padding:1.5rem;">
+            خطأ: ${e.message}
+            <br><button onclick="loadToolsAdmin()" style="margin-top:.6rem;padding:.4rem 1rem;background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.25);color:var(--primary);border-radius:8px;cursor:pointer;font-family:Tajawal,sans-serif;font-size:.8rem;">🔄 إعادة المحاولة</button>
+        </div>`
     }
 }
 
