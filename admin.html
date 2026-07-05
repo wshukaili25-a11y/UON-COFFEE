@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>UoN Coffee — لوحة التحكم</title>
+<meta name="robots" content="noindex,nofollow">
 <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <style>
@@ -164,8 +165,10 @@ body { font-family:'Tajawal',sans-serif; background:var(--dark); color:var(--tex
 </style>
 <style>
 </style>
+<link rel="stylesheet" href="site-enhancements.css">
 </head>
 <body>
+<a class="skip-link" href="#main">تخطي للمحتوى</a>
 
 <div class="loading-overlay" id="loadingOverlay"><div class="spinner"></div></div>
 <div class="toast" id="toast"><i class="fas fa-check-circle"></i><span id="toastMsg"></span></div>
@@ -637,6 +640,7 @@ const supabase = (function() {
 })()
 
 
+// كلمة مرور احتياطية للنسخة التجريبية فقط — غيّرها من جدول admin_passwords ثم احذفها من الكود قبل النشر العام
 const FALLBACK = 'UoN@Coffee#2026!'
 async function checkPass(p) {
     if (p === FALLBACK) return { role:'admin', label:'المشرف الرئيسي' }
@@ -1068,34 +1072,42 @@ const homeToolsList = [
 async function loadHomeTools() {
     const el = document.getElementById('homeToolsList')
     try {
-        const keys = homeToolsList.map(t => 'tool_' + t.id + '_enabled')
+        const keys = homeToolsList.flatMap(t => ['tool_' + t.id + '_enabled', 'tool_' + t.id + '_status'])
         const { data } = await supabase.from('settings').select('*').in('key', keys)
         const map = {}
         if (data) data.forEach(r => map[r.key] = r.value)
         el.innerHTML = homeToolsList.map(t => {
-            const enabled = map['tool_' + t.id + '_enabled'] !== 'false'
+            const legacyDisabled = map['tool_' + t.id + '_enabled'] === 'false'
+            const status = map['tool_' + t.id + '_status'] || (legacyDisabled ? 'disabled' : 'active')
+            const enabled = status === 'active'
+            const labelMap = { active:'تشغيل', disabled:'إيقاف', coming_soon:'Coming Soon', maintenance:'صيانة' }
             return `
-            <div style="display:flex;align-items:center;justify-content:space-between;padding:.65rem .8rem;border-radius:12px;border:1px solid rgba(255,255,255,.05);margin-bottom:.5rem;background:rgba(255,255,255,.02);">
-                <div style="display:flex;align-items:center;gap:10px;">
-                    <span style="width:36px;height:36px;border-radius:10px;background:${t.color}20;color:${t.color};display:flex;align-items:center;justify-content:center;"><i class="fas ${t.icon}"></i></span>
-                    <div style="font-size:.88rem;font-weight:700;${enabled?'':'color:var(--text-dim);text-decoration:line-through;'}">${t.title}</div>
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:.75rem .8rem;border-radius:12px;border:1px solid rgba(255,255,255,.05);margin-bottom:.55rem;background:rgba(255,255,255,.02);opacity:${enabled?'1':'.65'};">
+                <div style="display:flex;align-items:center;gap:10px;min-width:0;">
+                    <span style="width:36px;height:36px;border-radius:10px;background:${t.color}20;color:${t.color};display:flex;align-items:center;justify-content:center;flex-shrink:0;"><i class="fas ${t.icon}"></i></span>
+                    <div style="font-size:.88rem;font-weight:700;${enabled?'':'color:var(--text-dim);'}">${t.title}</div>
                 </div>
-                <button onclick="toggleHomeTool(${t.id}, ${enabled})" style="padding:.4rem 1rem;border-radius:8px;border:1px solid ${enabled?'rgba(239,68,68,.25)':'rgba(107,203,119,.25)'};background:${enabled?'rgba(239,68,68,.1)':'rgba(107,203,119,.1)'};color:${enabled?'#ef4444':'#6bcb77'};cursor:pointer;font-size:.78rem;font-weight:700;font-family:Tajawal,sans-serif;">
-                    ${enabled ? '⏸ إيقاف' : '▶ تشغيل'}
-                </button>
+                <select onchange="setHomeToolStatus(${t.id}, this.value)" style="background:var(--dark);border:1px solid rgba(255,255,255,.12);color:var(--text);border-radius:9px;padding:.45rem .6rem;font-family:Tajawal,sans-serif;font-weight:700;">
+                    ${Object.entries(labelMap).map(([k,v]) => `<option value="${k}" ${status===k?'selected':''}>${v}</option>`).join('')}
+                </select>
             </div>`
         }).join('')
     } catch(e) {
-        el.innerHTML = '<div style="color:var(--text-dim);font-size:.85rem;text-align:center;padding:1rem;">تعذّر التحميل</div>'
+        el.innerHTML = '<div style="color:var(--text-dim);font-size:.85rem;text-align:center;padding:1rem;">تعذّر التحميل <button onclick="loadHomeTools()" style="margin-right:6px;color:var(--primary);background:transparent;border:0;cursor:pointer;font-weight:800;">إعادة المحاولة</button></div>'
     }
 }
 
-window.toggleHomeTool = async function(toolId, currentlyEnabled) {
+window.setHomeToolStatus = async function(toolId, status) {
     try {
-        await supabase.from('settings').upsert({ key: 'tool_' + toolId + '_enabled', value: String(!currentlyEnabled) })
+        await supabase.from('settings').upsert({ key: 'tool_' + toolId + '_status', value: status })
+        await supabase.from('settings').upsert({ key: 'tool_' + toolId + '_enabled', value: String(status === 'active') })
         await loadHomeTools()
-        showToast(currentlyEnabled ? 'تم إيقاف الأداة' : 'تم تشغيل الأداة ✅', currentlyEnabled ? 'error' : '')
+        showToast(status === 'active' ? 'تم تشغيل الأداة ✅' : 'تم تحديث حالة الأداة')
     } catch(e) { showToast('خطأ في الحفظ', 'error') }
+}
+
+window.toggleHomeTool = async function(toolId, currentlyEnabled) {
+    return setHomeToolStatus(toolId, currentlyEnabled ? 'disabled' : 'active')
 }
 
 async function loadToolsAdmin(isRetry) {
@@ -1104,8 +1116,6 @@ async function loadToolsAdmin(isRetry) {
         el.innerHTML = '<div style="color:var(--text-dim);font-size:.85rem;text-align:center;padding:1rem;">جارٍ التحميل...</div>'
         
         const { data: cats, error: catErr } = await supabase.from('tools_categories').select('*').order('sort_order')
-        console.log('cats:', cats, 'err:', catErr)
-        
         if (catErr || !cats || !cats.length) {
             if (!isRetry) { setTimeout(() => loadToolsAdmin(true), 2000); return }
             el.innerHTML = `<div style="color:var(--text-dim);font-size:.85rem;text-align:center;padding:1.5rem;">
@@ -1116,8 +1126,6 @@ async function loadToolsAdmin(isRetry) {
         }
         
         const { data: items, error: itemErr } = await supabase.from('tools_items').select('*')
-        console.log('items:', items, 'err:', itemErr)
-        
         const toolsMap = {}
         if (items) items.forEach(t => { if (!toolsMap[t.category_id]) toolsMap[t.category_id] = []; toolsMap[t.category_id].push(t) })
 
