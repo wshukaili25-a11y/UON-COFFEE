@@ -1,8 +1,8 @@
-self.addEventListener('install', () => self.skipWaiting())
-self.addEventListener('activate', e => {
-    e.waitUntil(
-        caches.keys().then(keys => Promise.all(keys.map(k => caches.delete(k))))
-        .then(() => self.clients.claim())
-    )
-})
-// لا تعترض أي طلب — اتركه يمر طبيعي
+const CACHE_NAME = 'uon-coffee-v2';
+const ASSETS = ['/', '/index.html', '/site-enhancements.css', '/coming-soon.html', '/404.html', '/manifest.json'];
+self.addEventListener('install', event => { event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(ASSETS)).catch(()=>null)); self.skipWaiting(); });
+self.addEventListener('activate', event => { event.waitUntil(caches.keys().then(keys => Promise.all(keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k))))); self.clients.claim(); });
+self.addEventListener('fetch', event => {
+  if (event.request.method !== 'GET') return;
+  event.respondWith(fetch(event.request).then(res => { const copy=res.clone(); caches.open(CACHE_NAME).then(c=>c.put(event.request,copy)).catch(()=>null); return res; }).catch(() => caches.match(event.request).then(cached => cached || caches.match('/coming-soon.html'))));
+});
