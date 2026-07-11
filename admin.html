@@ -1086,7 +1086,7 @@ async function loadHomeTools() {
                     <span style="width:36px;height:36px;border-radius:10px;background:${t.color}20;color:${t.color};display:flex;align-items:center;justify-content:center;flex-shrink:0;"><i class="fas ${t.icon}"></i></span>
                     <div style="font-size:.88rem;font-weight:700;${enabled?'':'color:var(--text-dim);'}">${t.title}</div>
                 </div>
-                <select onchange="setHomeToolStatus(${t.id}, this.value)" style="background:var(--dark);border:1px solid rgba(255,255,255,.12);color:var(--text);border-radius:9px;padding:.45rem .6rem;font-family:Tajawal,sans-serif;font-weight:700;">
+                <select onchange="setHomeToolStatus(${t.id}, this.value, this)" style="background:var(--dark);border:1px solid rgba(255,255,255,.12);color:var(--text);border-radius:9px;padding:.45rem .6rem;font-family:Tajawal,sans-serif;font-weight:700;">
                     ${Object.entries(labelMap).map(([k,v]) => `<option value="${k}" ${status===k?'selected':''}>${v}</option>`).join('')}
                 </select>
             </div>`
@@ -1096,13 +1096,41 @@ async function loadHomeTools() {
     }
 }
 
-window.setHomeToolStatus = async function(toolId, status) {
+async function saveSettingRow(key, value) {
+    // نحدّث الصف الموجود أولاً. هذا يتجنب مشكلة upsert بدون on_conflict
+    // ويصلح أيضاً أي صفوف مكررة قديمة تحمل نفس المفتاح.
+    const updated = await supabase.from('settings').update({ value: String(value) }).eq('key', key)
+    if (updated.error) throw updated.error
+
+    // إذا لم يوجد الصف، ننشئه للمرة الأولى.
+    if (!Array.isArray(updated.data) || updated.data.length === 0) {
+        const inserted = await supabase.from('settings').insert({ key, value: String(value) })
+        if (inserted.error) throw inserted.error
+    }
+}
+
+window.setHomeToolStatus = async function(toolId, status, selectEl) {
+    const previousValue = selectEl ? selectEl.dataset.previousValue || 'active' : null
+    if (selectEl) {
+        selectEl.disabled = true
+        selectEl.dataset.previousValue = previousValue
+    }
+
     try {
-        await supabase.from('settings').upsert({ key: 'tool_' + toolId + '_status', value: status })
-        await supabase.from('settings').upsert({ key: 'tool_' + toolId + '_enabled', value: String(status === 'active') })
+        await saveSettingRow('tool_' + toolId + '_status', status)
+        await saveSettingRow('tool_' + toolId + '_enabled', status === 'active')
+
+        if (selectEl) selectEl.dataset.previousValue = status
         await loadHomeTools()
-        showToast(status === 'active' ? 'تم تشغيل الأداة ✅' : 'تم تحديث حالة الأداة')
-    } catch(e) { showToast('خطأ في الحفظ', 'error') }
+        showToast(status === 'active' ? 'تم تشغيل الأداة ✅' : 'تم تحديث حالة الأداة ✅')
+    } catch(e) {
+        console.error('تعذر تحديث حالة الأداة:', e)
+        if (selectEl) {
+            selectEl.value = previousValue
+            selectEl.disabled = false
+        }
+        showToast('فشل حفظ الحالة في قاعدة البيانات', 'error')
+    }
 }
 
 window.toggleHomeTool = async function(toolId, currentlyEnabled) {
