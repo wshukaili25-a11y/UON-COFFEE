@@ -269,6 +269,7 @@
 body.has-exam-banner{padding-top:40px!important}
 body.has-exam-banner .navbar{top:40px!important}
 </style>
+<link rel="stylesheet" href="site-enhancements.css">
 </head>
 <body>
 
@@ -298,7 +299,7 @@ body.has-exam-banner .navbar{top:40px!important}
         <button class="admin-nav-btn" id="adminBtn" onclick="window.location.href='admin.html'"><i class="fas fa-cog"></i> لوحة التحكم</button>
         
         <button onclick="openGlobalSearch()" style="width:36px;height:36px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:10px;color:var(--text-muted);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .3s;" title="بحث"><i class="fas fa-search"></i></button>
-        <button class="nav-btn" id="loginBtn" onclick="window.location.href='admin.html'"><i class="fas fa-user-shield"></i> أدمن</button>
+        <button class="nav-btn" id="loginBtn" onclick="window.location.href='admin.html'" style="display:none"><i class="fas fa-user-shield"></i> أدمن</button>
     </div>
     <div class="mobile-menu" onclick="toggleMenu()"><i class="fas fa-bars"></i></div>
 </nav>
@@ -580,28 +581,40 @@ function updateUI() {
     const adminBtn = document.getElementById('adminBtn')
     const loginBtn = document.getElementById('loginBtn')
     if (adminBtn) adminBtn.classList.toggle('show', isAdmin)
-    if (loginBtn) loginBtn.style.display = isAdmin ? 'none' : ''
+    if (loginBtn) loginBtn.style.display = 'none' // لا نعرض رابط الأدمن للزوار
 }
 
 // ===== TOOLS LOAD =====
 async function loadTools() {
-    // Show default tools immediately
-    tools = defaultTools.map(t => ({...t, desc: t.description, btnText: t.btn_text, disabled: false}))
+    // اعرض الأدوات فوراً حتى لا تتوقف الصفحة عند ضعف الاتصال
+    tools = defaultTools.map(t => ({...t, desc: t.description, btnText: t.btn_text, status: 'active', disabled: false}))
     renderTools()
-    // Load enabled/disabled state from settings table
+
     try {
-        const keys = defaultTools.map(t => 'tool_' + t.id + '_enabled')
-        const { data, error } = await supabase.from('settings').select('*').in('key', keys)
-        if (!error && data) {
-            const map = {}
-            data.forEach(r => map[r.key] = r.value)
-            tools = defaultTools.map(t => ({
-                ...t, desc: t.description, btnText: t.btn_text,
-                disabled: map['tool_' + t.id + '_enabled'] === 'false'
-            })).filter(t => !t.disabled)
-            renderTools()
-        }
-    } catch(e) {}
+        const keys = defaultTools.flatMap(t => ['tool_' + t.id + '_enabled', 'tool_' + t.id + '_status'])
+        const timeout = new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 5500))
+        const query = supabase.from('settings').select('*').in('key', keys)
+        const { data, error } = await Promise.race([query, timeout])
+        if (error) throw error
+
+        const map = {}
+        ;(data || []).forEach(r => map[r.key] = r.value)
+        tools = defaultTools.map(t => {
+            const legacyDisabled = map['tool_' + t.id + '_enabled'] === 'false'
+            const status = map['tool_' + t.id + '_status'] || (legacyDisabled ? 'disabled' : 'active')
+            return {
+                ...t,
+                desc: t.description,
+                btnText: t.btn_text,
+                status,
+                disabled: status !== 'active'
+            }
+        })
+        renderTools()
+    } catch(e) {
+        const grid = document.getElementById('toolsGrid')
+        if (grid) grid.insertAdjacentHTML('afterbegin', '<div style="grid-column:1/-1;margin-bottom:1rem;padding:.9rem 1rem;border-radius:14px;background:rgba(251,146,60,.1);border:1px solid rgba(251,146,60,.25);color:var(--warning);font-size:.9rem;text-align:center;">تعذّر تحديث حالة الأدوات من قاعدة البيانات، وتم عرض النسخة الافتراضية. <button onclick="loadTools()" style="margin-right:8px;background:transparent;border:0;color:var(--primary);font-weight:800;cursor:pointer;">إعادة المحاولة</button></div>')
+    }
 }
 
 async function seedTools() {
@@ -678,17 +691,27 @@ window.addEventListener('DOMContentLoaded', () => {
 function renderTools() {
     const grid = document.getElementById('toolsGrid')
     if (!tools.length) { grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:3rem;color:var(--text-dim);">لا توجد أدوات بعد</div>'; return }
-    grid.innerHTML = tools.map(tool => `
-        <div class="tool-card" data-id="${tool.id}" style="--card-color:${tool.color};">
+    grid.innerHTML = tools.map(tool => {
+        const inactive = tool.disabled || tool.status !== 'active'
+        const label = tool.status === 'maintenance' ? 'صيانة' : (tool.status === 'coming_soon' ? 'قريباً' : 'Coming Soon')
+        return `
+        <div class="tool-card ${inactive ? 'tool-card-disabled' : ''}" data-id="${tool.id}" style="--card-color:${tool.color};${inactive ? 'opacity:.58;filter:grayscale(.35);' : ''}">
             <button class="admin-edit-btn" onclick="event.stopPropagation();editTool(${tool.id})" title="تعديل"><i class="fas fa-pen"></i></button>
+            ${inactive ? `<span style="position:absolute;top:12px;right:12px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);color:var(--text);padding:.25rem .7rem;border-radius:50px;font-size:.75rem;font-weight:800;">${label}</span>` : ''}
             <div class="tool-icon" style="background:${tool.color}20;color:${tool.color};"><i class="fas ${tool.icon}"></i></div>
             <h3>${tool.title}</h3>
             <p>${tool.desc}</p>
-            <button class="tool-link" style="color:${tool.color};" onclick="openTool(${tool.id})">${tool.btnText} <i class="fas fa-arrow-left"></i></button>
-        </div>`).join('')
+            <button class="tool-link" style="color:${tool.color};" onclick="openTool(${tool.id})">${inactive ? 'Coming Soon' : tool.btnText} <i class="fas fa-arrow-left"></i></button>
+        </div>`
+    }).join('')
 }
 
 window.openTool = function(id) {
+    const tool = tools.find(t => Number(t.id) === Number(id))
+    if (tool && (tool.disabled || tool.status !== 'active')) {
+        showToast('الأداة غير متاحة حالياً — Coming Soon 🔜', 'error')
+        return
+    }
     const actions = {
         1: () => document.getElementById('botSection').scrollIntoView({behavior:'smooth'}),
         2: () => document.getElementById('calcSection').scrollIntoView({behavior:'smooth'}),
@@ -892,7 +915,6 @@ window.globalSearch = function(q) {
         { name:'دليل المطاعم', url:'features.html', icon:'🍕', desc:'مطاعم وكافيهات قريبة' },
         { name:'اعترافات الطلاب', url:'features.html', icon:'💬', desc:'اعترافات مجهولة' },
         { name:'بنك الأسئلة', url:'questions.html', icon:'❓', desc:'أسئلة اختبارات سابقة' },
-        { name:'لوحة التحكم', url:'admin.html', icon:'👑', desc:'إدارة الموقع الكاملة' },
     ]
 
     const toolMatches = tools.filter(t => t.title && (t.title.includes(q) || (t.desc && t.desc.includes(q))))
@@ -969,5 +991,6 @@ window.addEventListener('beforeinstallprompt', e => {
     setTimeout(() => btn?.remove(), 30000)
 })
 </script>
+<script src="app-status.js"></script>
 </body>
 </html>
