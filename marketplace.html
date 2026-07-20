@@ -338,7 +338,7 @@ async function loadItems() {
     try {
         const { data, error } = await supabase.from('marketplace').select('*').order('created_at', { ascending:false })
         if (error) throw error
-        items = data || []
+        items = (data || []).filter(i => i.approved === true)
     } catch(e) { items = [] }
     renderItems()
     updateStats()
@@ -421,20 +421,24 @@ window.submitItem = async function() {
     if (!title || !phone) { showToast('أدخل العنوان ورقم الواتساب', 'error'); return }
     const price = parseFloat(document.getElementById('mPrice').value) || 0
     try {
-        await supabase.from('marketplace').insert({
+        const result = await supabase.from('marketplace').insert({
             title,
             description: document.getElementById('mDesc').value.trim(),
             type: selectedType,
             emoji: selectedEmoji,
             price,
             condition: document.getElementById('mCondition').value,
-            phone: phone.replace(/\D/g, '')
+            phone: phone.replace(/\D/g, ''),
+            approved: false
         })
+        if (result && result.error) throw result.error
         closeAddModal()
         ;['mTitle','mDesc','mPrice','mPhone'].forEach(id => document.getElementById(id).value = '')
-        await loadItems()
-        showToast('تم نشر إعلانك! 🎉')
-    } catch(e) { showToast('خطأ في النشر', 'error') }
+        showToast('تم إرسال إعلانك للمراجعة وسيظهر بعد موافقة المشرف ✅')
+    } catch(e) {
+        console.error('Marketplace submit failed:', e)
+        showToast('تعذر إرسال الإعلان، تأكد من البيانات وحاول مرة ثانية', 'error')
+    }
 }
 
 window.deleteItem = async function(id) {
