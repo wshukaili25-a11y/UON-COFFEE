@@ -640,9 +640,7 @@ const supabase = (function() {
 
 
 // كلمة مرور احتياطية للنسخة التجريبية فقط — غيّرها من جدول admin_passwords ثم احذفها من الكود قبل النشر العام
-const FALLBACK = 'UoN@Coffee#2026!'
 async function checkPass(p) {
-    if (p === FALLBACK) return { role:'admin', label:'المشرف الرئيسي' }
     try {
         const timeout = new Promise((_, reject) => setTimeout(() => reject('timeout'), 3000))
         const query = supabase.from('admin_passwords').select('*')
@@ -671,6 +669,7 @@ window.doLogin = async function() {
     if (matched) {
         currentAdmin = matched
         sessionStorage.setItem('uon_admin_dash', JSON.stringify(matched))
+        sessionStorage.setItem('uon_admin_password', pass)
         document.getElementById('loginError').classList.remove('show')
         showDashboard()
     } else {
@@ -683,6 +682,7 @@ window.doLogin = async function() {
 window.doLogout = function() {
     currentAdmin = null
     sessionStorage.removeItem('uon_admin_dash')
+    sessionStorage.removeItem('uon_admin_password')
     document.getElementById('dashboard').classList.remove('show')
     document.getElementById('loginScreen').style.display = 'flex'
     showToast('تم تسجيل الخروج', 'error')
@@ -1086,7 +1086,7 @@ async function loadHomeTools() {
                     <span style="width:36px;height:36px;border-radius:10px;background:${t.color}20;color:${t.color};display:flex;align-items:center;justify-content:center;flex-shrink:0;"><i class="fas ${t.icon}"></i></span>
                     <div style="font-size:.88rem;font-weight:700;${enabled?'':'color:var(--text-dim);'}">${t.title}</div>
                 </div>
-                <select onchange="setHomeToolStatus(${t.id}, this.value, this)" style="background:var(--dark);border:1px solid rgba(255,255,255,.12);color:var(--text);border-radius:9px;padding:.45rem .6rem;font-family:Tajawal,sans-serif;font-weight:700;">
+                <select onfocus="this.dataset.previousValue=this.value" onchange="setHomeToolStatus(${t.id}, this.value, this)" style="background:var(--dark);border:1px solid rgba(255,255,255,.12);color:var(--text);border-radius:9px;padding:.45rem .6rem;font-family:Tajawal,sans-serif;font-weight:700;">
                     ${Object.entries(labelMap).map(([k,v]) => `<option value="${k}" ${status===k?'selected':''}>${v}</option>`).join('')}
                 </select>
             </div>`
@@ -1096,40 +1096,49 @@ async function loadHomeTools() {
     }
 }
 
-async function saveSettingRow(key, value) {
-    // نحدّث الصف الموجود أولاً. هذا يتجنب مشكلة upsert بدون on_conflict
-    // ويصلح أيضاً أي صفوف مكررة قديمة تحمل نفس المفتاح.
-    const updated = await supabase.from('settings').update({ value: String(value) }).eq('key', key)
-    if (updated.error) throw updated.error
+async function saveToolStatusSecure(toolId, status) {
+    const password = sessionStorage.getItem('uon_admin_password')
+    if (!password) throw new Error('انتهت جلسة الأدمن. سجل الدخول مرة ثانية.')
 
-    // إذا لم يوجد الصف، ننشئه للمرة الأولى.
-    if (!Array.isArray(updated.data) || updated.data.length === 0) {
-        const inserted = await supabase.from('settings').insert({ key, value: String(value) })
-        if (inserted.error) throw inserted.error
+    const response = await fetch(window._sbURL + '/rest/v1/rpc/set_tool_status', {
+        method: 'POST',
+        headers: {
+            'apikey': window._sbKEY,
+            'Authorization': 'Bearer ' + window._sbKEY,
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            p_password: password,
+            p_tool_id: Number(toolId),
+            p_status: status
+        })
+    })
+
+    let payload = null
+    try { payload = await response.json() } catch (_) {}
+    if (!response.ok) {
+        const message = payload?.message || payload?.hint || 'رفضت قاعدة البيانات حفظ الحالة'
+        throw new Error(message)
     }
+    return payload
 }
 
 window.setHomeToolStatus = async function(toolId, status, selectEl) {
-    const previousValue = selectEl ? selectEl.dataset.previousValue || 'active' : null
-    if (selectEl) {
-        selectEl.disabled = true
-        selectEl.dataset.previousValue = previousValue
-    }
+    const previousValue = selectEl ? (selectEl.dataset.previousValue || selectEl.value || 'active') : 'active'
+    if (selectEl) selectEl.disabled = true
 
     try {
-        await saveSettingRow('tool_' + toolId + '_status', status)
-        await saveSettingRow('tool_' + toolId + '_enabled', status === 'active')
-
-        if (selectEl) selectEl.dataset.previousValue = status
+        await saveToolStatusSecure(toolId, status)
         await loadHomeTools()
-        showToast(status === 'active' ? 'تم تشغيل الأداة ✅' : 'تم تحديث حالة الأداة ✅')
+        showToast(status === 'active' ? 'تم تشغيل الأداة ✅' : 'تم حفظ حالة الأداة ✅')
     } catch(e) {
         console.error('تعذر تحديث حالة الأداة:', e)
         if (selectEl) {
             selectEl.value = previousValue
             selectEl.disabled = false
         }
-        showToast('فشل حفظ الحالة في قاعدة البيانات', 'error')
+        showToast(e.message || 'فشل حفظ الحالة في قاعدة البيانات', 'error')
+        if ((e.message || '').includes('جلسة')) setTimeout(doLogout, 900)
     }
 }
 
