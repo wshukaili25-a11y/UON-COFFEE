@@ -1038,36 +1038,107 @@ window.deleteGroup = async (id) => { if(!confirm('حذف؟')) return; try { awai
 
 // ===== MARKETPLACE =====
 async function loadMarketplace() {
+    const pendingBody = document.getElementById('mktPendingBody')
+    const approvedBody = document.getElementById('mktApprovedBody')
+
     try {
-        const { data, error } = await supabase.from('marketplace').select('*').order('created_at', { ascending:false })
+        const { data, error } = await supabase
+            .from('marketplace')
+            .select('*')
+            .order('created_at', { ascending:false })
+
         if (error) throw error
-        const pending=(data||[]).filter(m=>m.approved!==true)
-        const approved=(data||[]).filter(m=>m.approved===true)
+
+        const records = Array.isArray(data) ? data : []
+        const pending = records.filter(m => m.approved !== true)
+        const approved = records.filter(m => m.approved === true)
+
         const row = (m, isPending) => `<tr>
-            <td><div style="font-weight:700">${m.title||'—'}</div><div style="font-size:.72rem;color:var(--text-dim);max-width:260px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${m.description||''}</div></td>
-            <td><span class="td-badge ${m.type==='sell'?'badge-approved':'badge-pending'}">${m.type==='sell'?'بيع':m.type==='buy'?'شراء':'تبادل'}</span></td>
-            <td style="color:var(--success)">${m.price?m.price+' ر.ع':'مجاني'}</td>
-            <td><a href="https://wa.me/${m.phone||''}" target="_blank" style="color:#25d366">واتساب</a></td>
-            <td><div class="td-actions">${isPending?`<button class="btn-approve" onclick="approveMkt('${m.id}')">✅ قبول</button>`:''}<button class="btn-reject" onclick="deleteMkt('${m.id}')">🗑 حذف</button></div></td></tr>`
-        document.getElementById('mktPendingBody').innerHTML=pending.length?pending.map(m=>row(m,true)).join(''):'<tr><td colspan="5" style="text-align:center;color:var(--text-dim);padding:1.5rem;">لا توجد طلبات معلقة ✅</td></tr>'
-        document.getElementById('mktApprovedBody').innerHTML=approved.length?approved.map(m=>row(m,false)).join(''):'<tr><td colspan="5" style="text-align:center;color:var(--text-dim);padding:1.5rem;">لا توجد إعلانات معتمدة</td></tr>'
-        const badge=document.getElementById('navMktBadge'); if(pending.length){badge.textContent=pending.length;badge.style.display='inline-block'}else badge.style.display='none'
-    } catch(e) { console.error('Marketplace admin load failed:',e) }
+            <td>
+                <div style="font-weight:700">${m.title || '—'}</div>
+                <div style="font-size:.72rem;color:var(--text-dim);max-width:280px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${m.description || ''}</div>
+            </td>
+            <td><span class="td-badge ${m.type === 'sell' ? 'badge-approved' : 'badge-pending'}">${m.type === 'sell' ? 'بيع' : m.type === 'buy' ? 'شراء' : 'تبادل'}</span></td>
+            <td style="color:var(--success)">${Number(m.price || 0) ? Number(m.price).toFixed(3) + ' ر.ع' : 'مجاني'}</td>
+            <td>${m.phone ? `<a href="https://wa.me/${String(m.phone).replace(/\D/g,'')}" target="_blank" style="color:#25d366">واتساب</a>` : '—'}</td>
+            <td><div class="td-actions">
+                ${isPending ? `<button class="btn-approve" onclick="approveMkt('${m.id}')">✅ قبول</button>` : ''}
+                <button class="btn-reject" onclick="deleteMkt('${m.id}')">🗑 حذف</button>
+            </div></td>
+        </tr>`
+
+        pendingBody.innerHTML = pending.length
+            ? pending.map(m => row(m, true)).join('')
+            : '<tr><td colspan="5" style="text-align:center;color:var(--text-dim);padding:1.5rem;">لا توجد طلبات معلقة ✅</td></tr>'
+
+        approvedBody.innerHTML = approved.length
+            ? approved.map(m => row(m, false)).join('')
+            : '<tr><td colspan="5" style="text-align:center;color:var(--text-dim);padding:1.5rem;">لا توجد إعلانات معتمدة</td></tr>'
+
+        const badge = document.getElementById('navMktBadge')
+        if (pending.length) {
+            badge.textContent = pending.length
+            badge.style.display = 'inline-block'
+        } else {
+            badge.style.display = 'none'
+        }
+    } catch (e) {
+        console.error('Marketplace admin load failed:', e)
+        const message = e?.message || e?.details || 'تعذر تحميل إعلانات السوق'
+        pendingBody.innerHTML = `<tr><td colspan="5" style="text-align:center;color:var(--danger);padding:1.5rem;">${message}</td></tr>`
+        approvedBody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--text-dim);padding:1.5rem;">—</td></tr>'
+    }
 }
-async function moderateMarketplace(id, action) {
+
+async function moderateMarketplaceSecure(id, action) {
     const password = sessionStorage.getItem('uon_admin_password')
-    if (!password) throw new Error('انتهت جلسة المشرف، سجل الدخول مرة ثانية')
+    if (!password) throw new Error('انتهت جلسة المشرف، سجل الدخول مرة أخرى')
+
     const response = await fetch(window._sbURL + '/rest/v1/rpc/moderate_marketplace', {
         method: 'POST',
-        headers: { 'apikey':window._sbKEY, 'Authorization':'Bearer '+window._sbKEY, 'Content-Type':'application/json' },
-        body: JSON.stringify({ p_password:password, p_item_id:id, p_action:action })
+        headers: {
+            'apikey': window._sbKEY,
+            'Authorization': 'Bearer ' + window._sbKEY,
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            p_password: password,
+            p_item_id: id,
+            p_action: action
+        })
     })
-    const body = await response.json().catch(()=>null)
-    if (!response.ok || !body?.ok) throw new Error(body?.message || body?.error || 'فشل تنفيذ العملية')
-    return body
+
+    const result = await response.json()
+    if (!response.ok || !result?.ok) {
+        throw new Error(result?.message || result?.error || 'تعذر تنفيذ العملية')
+    }
+    return result
 }
-window.approveMkt = async (id) => { try { await moderateMarketplace(id,'approve'); await loadMarketplace(); loadStats(); showToast('تم قبول الإعلان ✅') } catch(e){ console.error(e); showToast(e.message||'فشل قبول الإعلان','error') } }
-window.deleteMkt = async (id) => { if(!confirm('حذف الإعلان؟')) return; try { await moderateMarketplace(id,'delete'); await loadMarketplace(); loadStats(); showToast('تم الحذف','error') } catch(e){showToast(e.message||'فشل الحذف','error')} }
+
+window.approveMkt = async function(id) {
+    try {
+        await moderateMarketplaceSecure(id, 'approve')
+        await loadMarketplace()
+        loadStats()
+        showToast('تم قبول الإعلان ✅')
+    } catch (e) {
+        console.error('Marketplace approve failed:', e)
+        showToast(e.message || 'فشل قبول الإعلان', 'error')
+    }
+}
+
+window.deleteMkt = async function(id) {
+    if (!confirm('حذف الإعلان؟')) return
+    try {
+        await moderateMarketplaceSecure(id, 'delete')
+        await loadMarketplace()
+        loadStats()
+        showToast('تم الحذف', 'error')
+    } catch (e) {
+        console.error('Marketplace delete failed:', e)
+        showToast(e.message || 'فشل الحذف', 'error')
+    }
+}
 
 // ===== PROJECTS =====
 async function loadProjects() {
