@@ -642,11 +642,32 @@ const supabase = (function() {
 // كلمة مرور احتياطية للنسخة التجريبية فقط — غيّرها من جدول admin_passwords ثم احذفها من الكود قبل النشر العام
 async function checkPass(p) {
     try {
-        const timeout = new Promise((_, reject) => setTimeout(() => reject('timeout'), 3000))
-        const query = supabase.from('admin_passwords').select('*')
-        const { data } = await Promise.race([query, timeout])
-        if (data) for (const r of data) if (r.password_plain === p) return { role:r.role, label:r.label }
-    } catch(e) {}
+        const controller = new AbortController()
+        const timer = setTimeout(() => controller.abort(), 8000)
+        const response = await fetch(window._sbURL + '/rest/v1/rpc/check_admin_password', {
+            method: 'POST',
+            headers: {
+                'apikey': window._sbKEY,
+                'Authorization': 'Bearer ' + window._sbKEY,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ submitted_password: p }),
+            signal: controller.signal
+        })
+        clearTimeout(timer)
+        if (!response.ok) {
+            const details = await response.text()
+            console.error('Admin login RPC failed:', response.status, details)
+            return null
+        }
+        const result = await response.json()
+        const row = Array.isArray(result) ? result[0] : result
+        if (row && row.is_valid) {
+            return { role: row.admin_role || 'admin', label: row.admin_label || 'المشرف' }
+        }
+    } catch(e) {
+        console.error('Admin login error:', e)
+    }
     return null
 }
 
