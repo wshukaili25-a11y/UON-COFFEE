@@ -284,8 +284,8 @@ body.has-exam-banner .navbar{top:40px!important}
 <script type="module">
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
 const supabase = createClient(
-    'https://fjkxahhoacqlpiafmfyd.supabase.co',
-    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZqa3hhaGhvYWNxbHBpYWZtZnlkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgzMTkwMjQsImV4cCI6MjA5Mzg5NTAyNH0.Ls3gaXRso3BgcDAByoYeQQot_KbAOfREvxyW8u4vkGA'
+    'https://irkhvydgxpseflggbeqq.supabase.co',
+    'sb_publishable_gZ9tyM1udrkuQIXHqDtToQ_FyFmePgH'
 )
 
 const FALLBACK_PASS = 'UoN@Coffee#2026!'
@@ -611,8 +611,8 @@ window.submitRating = async function() {
     try {
         const { createClient } = await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm')
         const sb = createClient(
-            'https://fjkxahhoacqlpiafmfyd.supabase.co',
-            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZqa3hhaGhvYWNxbHBpYWZtZnlkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgzMTkwMjQsImV4cCI6MjA5Mzg5NTAyNH0.Ls3gaXRso3BgcDAByoYeQQot_KbAOfREvxyW8u4vkGA'
+            'https://irkhvydgxpseflggbeqq.supabase.co',
+            'sb_publishable_gZ9tyM1udrkuQIXHqDtToQ_FyFmePgH'
         )
         await sb.from('summary_ratings').insert({ subject: currentRatingSubject, rating: currentRating })
     } catch(e) {}
