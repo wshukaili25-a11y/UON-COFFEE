@@ -415,7 +415,7 @@ body.has-exam-banner .navbar{top:40px!important}
                 <button class="cf-cat" onclick="selCat(this,'🚗 باركينج')">🚗 باركينج</button>
             </div>
             <textarea class="cf-ta" id="confText" placeholder="اكتب اعترافك هنا... كلنا في نفس الوضع 😅" minlength="20" maxlength="300" oninput="updateConfCounter()"></textarea>
-            <div id="confCounter" style="font-size:.78rem;color:var(--text-dim);text-align:left;margin-top:6px;">0 / 300 — الحد الأدنى 20 حرفًا و3 كلمات</div>
+            <div id="confCounter" style="font-size:.78rem;color:var(--text-dim);text-align:left;margin-top:6px;">0 / 300 — يسمح بأي نص حتى لو حرف واحد</div>
             <div class="cf-row">
                 <label class="cf-anon"><input type="checkbox" id="anonCheck" checked> نشر بشكل مجهول 👤</label>
                 <button class="cf-send" onclick="submitConf()">نشر 🚀</button>
@@ -629,7 +629,7 @@ window.updateConfCounter = function() {
     if (!el || !counter) return
     const text = el.value.trim()
     const words = text ? text.split(/\s+/).filter(Boolean).length : 0
-    counter.textContent = `${el.value.length} / 300 — ${words} كلمة (الحد الأدنى 20 حرفًا و3 كلمات)`
+    counter.textContent = `${el.value.length} / 300 — ${words} كلمة (يسمح بأي نص حتى لو حرف واحد)`
     counter.style.color = (text.length >= 20 && words >= 3) ? 'var(--success)' : 'var(--text-dim)'
 }
 
@@ -637,8 +637,8 @@ window.submitConf = async function() {
     const input = document.getElementById('confText')
     const text = input.value.trim()
     const words = text ? text.split(/\s+/).filter(Boolean) : []
-    if (text.length < 20 || words.length < 3) {
-        showToast('اكتب اعترافًا أوضح: 20 حرفًا و3 كلمات على الأقل 😅', 'error')
+    if (text.trim().length < 1) {
+        showToast('اكتب اعترافك أولًا 😅', 'error')
         input.focus()
         return
     }
