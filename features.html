@@ -414,7 +414,8 @@ body.has-exam-banner .navbar{top:40px!important}
                 <button class="cf-cat" onclick="selCat(this,'📚 دراسي')">📚 دراسي</button>
                 <button class="cf-cat" onclick="selCat(this,'🚗 باركينج')">🚗 باركينج</button>
             </div>
-            <textarea class="cf-ta" id="confText" placeholder="اكتب اعترافك هنا... كلنا في نفس الوضع 😅" maxlength="300"></textarea>
+            <textarea class="cf-ta" id="confText" placeholder="اكتب اعترافك هنا... كلنا في نفس الوضع 😅" minlength="20" maxlength="300" oninput="updateConfCounter()"></textarea>
+            <div id="confCounter" style="font-size:.78rem;color:var(--text-dim);text-align:left;margin-top:6px;">0 / 300 — الحد الأدنى 20 حرفًا و3 كلمات</div>
             <div class="cf-row">
                 <label class="cf-anon"><input type="checkbox" id="anonCheck" checked> نشر بشكل مجهول 👤</label>
                 <button class="cf-send" onclick="submitConf()">نشر 🚀</button>
@@ -622,21 +623,39 @@ window.selCat = function(btn, cat) {
     selectedCat = cat
 }
 
+window.updateConfCounter = function() {
+    const el = document.getElementById('confText')
+    const counter = document.getElementById('confCounter')
+    if (!el || !counter) return
+    const text = el.value.trim()
+    const words = text ? text.split(/\s+/).filter(Boolean).length : 0
+    counter.textContent = `${el.value.length} / 300 — ${words} كلمة (الحد الأدنى 20 حرفًا و3 كلمات)`
+    counter.style.color = (text.length >= 20 && words >= 3) ? 'var(--success)' : 'var(--text-dim)'
+}
+
 window.submitConf = async function() {
-    const text = document.getElementById('confText').value.trim()
-    if (!text || text.length < 10) { showToast('الاعتراف قصير جداً! 😅', 'error'); return }
+    const input = document.getElementById('confText')
+    const text = input.value.trim()
+    const words = text ? text.split(/\s+/).filter(Boolean) : []
+    if (text.length < 20 || words.length < 3) {
+        showToast('اكتب اعترافًا أوضح: 20 حرفًا و3 كلمات على الأقل 😅', 'error')
+        input.focus()
+        return
+    }
     const anon = document.getElementById('anonCheck').checked
     try {
-        const { data, error } = await supabase.from('confessions').insert({
+        // REST wrapper في هذه الصفحة ينفذ insert مباشرة؛ لا نستخدم .select() بعده.
+        const result = await supabase.from('confessions').insert({
             text, category: selectedCat, is_anon: anon, likes: 0
-        }).select()
-        if (error) throw error
-        document.getElementById('confText').value = ''
-        confessions.unshift({ id: data[0].id, text, cat: selectedCat, anon, likes: 0, time: 'الآن' })
+        })
+        if (result && result.error) throw result.error
+        const inserted = Array.isArray(result && result.data) ? result.data[0] : null
+        input.value = ''
+        updateConfCounter()
+        confessions.unshift({ id: inserted?.id || ('local-' + Date.now()), text, cat: selectedCat, anon, likes: 0, time: 'الآن' })
         document.getElementById('confCount').textContent = confessions.length
         renderConfs()
         showToast('تم نشر اعترافك! 🚀')
-        // إشعار للأدمن
         try {
             await supabase.from('notifications').insert({
                 type: 'confession', title: 'اعتراف جديد 💬',
@@ -644,7 +663,11 @@ window.submitConf = async function() {
                 is_read: false
             })
         } catch(e) {}
-    } catch(e) { showToast('خطأ في النشر، جرب مرة ثانية', 'error') }
+    } catch(e) {
+        console.error('Confession insert failed:', e)
+        const msg = e?.message || e?.details || ''
+        showToast(msg ? 'تعذر النشر: ' + msg : 'خطأ في النشر، حاول مرة ثانية', 'error')
+    }
 }
 
 window.filterConf = function(cat, btn) {
