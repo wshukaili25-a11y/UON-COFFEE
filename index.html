@@ -65,6 +65,10 @@
         
         .login-error.show { display: block; }
 
+        /* ===== ADMIN BADGE ===== */
+        .admin-badge { position: fixed; top: 80px; left: 20px; z-index: 999; background: linear-gradient(135deg,var(--secondary),#ee5a5a); padding: 0.5rem 1rem; border-radius: 50px; font-size: 0.8rem; font-weight: 700; display: none; align-items: center; gap: 6px; box-shadow: 0 5px 20px rgba(255,107,107,0.3); animation: pulse 2s infinite; }
+        .admin-badge.show { display: flex; }
+
         /* ===== NAVBAR ===== */
         .navbar { position: fixed; top: 0; width: 100%; padding: 1rem 5%; display: flex; justify-content: space-between; align-items: center; z-index: 1000; background: rgba(10,14,39,0.9); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(255,255,255,0.05); transition: all 0.3s ease; }
         .navbar.scrolled { padding: 0.7rem 5%; background: rgba(10,14,39,0.98); }
@@ -80,6 +84,9 @@
         .nav-actions { display: flex; gap: 0.8rem; align-items: center; }
         .nav-btn { padding: 0.6rem 1.5rem; background: linear-gradient(135deg,#00d4ff,#0099cc); border: none; border-radius: 10px; color: var(--dark); font-weight: 700; font-family: 'Tajawal', sans-serif; cursor: pointer; transition: all 0.3s; font-size: 0.9rem; }
         .nav-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(0,212,255,0.3); }
+        .admin-nav-btn { padding: 0.6rem 1.2rem; background: transparent; border: 2px solid var(--warning); border-radius: 10px; color: var(--warning); font-weight: 700; font-family: 'Tajawal', sans-serif; cursor: pointer; transition: all 0.3s; display: none; align-items: center; gap: 6px; font-size: 0.85rem; }
+        .admin-nav-btn.show { display: flex; }
+        .admin-nav-btn:hover { background: var(--warning); color: var(--dark); }
         .logout-btn { padding: 0.6rem 1.2rem; background: transparent; border: 2px solid var(--text-dim); border-radius: 10px; color: var(--text-dim); font-weight: 700; font-family: 'Tajawal', sans-serif; cursor: pointer; transition: all 0.3s; display: none; align-items: center; gap: 6px; font-size: 0.85rem; }
         .logout-btn.show { display: flex; }
         .logout-btn:hover { border-color: var(--danger); color: var(--danger); }
@@ -126,6 +133,9 @@
         .tool-card p { color: var(--text-dim); font-size: 0.95rem; margin-bottom: 1.5rem; line-height: 1.7; }
         .tool-link { color: var(--card-color,var(--primary)); text-decoration: none; font-weight: 700; display: inline-flex; align-items: center; gap: 5px; transition: gap 0.3s; cursor: pointer; background: none; border: none; font-family: 'Tajawal', sans-serif; font-size: 1rem; }
         .tool-link:hover { gap: 10px; }
+        .admin-edit-btn { position: absolute; top: 10px; left: 10px; width: 36px; height: 36px; border-radius: 10px; background: var(--warning); border: none; color: var(--dark); cursor: pointer; display: none; align-items: center; justify-content: center; font-size: 0.9rem; transition: all 0.3s; z-index: 10; }
+        .admin-edit-btn:hover { transform: scale(1.1); }
+        .admin-mode .admin-edit-btn { display: flex; }
 
         /* ===== BUS SECTION ===== */
         .bus-section { padding: 5rem 5%; max-width: 1000px; margin: 0 auto; }
@@ -249,8 +259,6 @@
         }
     
 
-
- 50%{opacity:.88} }
 
 
 .exam-banner{display:none;width:100%;background:linear-gradient(90deg,#b91c1c,#dc2626,#b91c1c);color:#fff;text-align:center;padding:.65rem 1rem;font-size:.88rem;font-weight:800;font-family:'Tajawal',sans-serif;position:fixed;top:0;left:0;right:0;z-index:99999;box-shadow:0 2px 12px rgba(185,28,28,.5);letter-spacing:.3px;animation:examPulse 3s ease-in-out infinite}
@@ -539,7 +547,6 @@ const supabase = (function() {
 // ===== VARIABLES =====
 let tools = []
 let botHistory = []
-
 const BOT_SYSTEM = `أنت مساعد ذكي لجامعة نزوى في سلطنة عُمان. اسمك "مساعد UoN Coffee".
 معلوماتك عن الجامعة:
 - الكليات: الاقتصاد ونظم المعلومات، الهندسة والعمارة، العلوم والآداب، العلوم الصحية، معهد التأسيس
@@ -645,6 +652,7 @@ window.addEventListener('DOMContentLoaded', () => {
             const {data:_eb} = await supabase.from('settings').select('*').in('key',['exam_mode','exam_title','exam_msg','exam_emoji'])
             if(_eb){const _m={};_eb.forEach(r=>_m[r.key]=r.value);if(_m.exam_mode==='true'){const _el=document.getElementById('examBanner');if(_el){_el.textContent=(_m.exam_emoji||'🎯')+' '+(_m.exam_title||'فترة الاختبارات')+' — '+(_m.exam_msg||'بالتوفيق!');_el.classList.add('show');document.body.classList.add('has-exam-banner')}}}
         } catch(e) {}
+        try { await loadSettings() } catch(e) {}
     }, 500)
 })
 
@@ -695,11 +703,6 @@ window.openTool = function(id) {
     if (actions[id]) actions[id]()
     else showToast('قريباً! 🔜')
 }
-
-// ===== LOGIN (SECURE) =====
-
-
-
 
 
 window.selectColor = function(el) {
