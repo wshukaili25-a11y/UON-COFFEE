@@ -651,7 +651,7 @@ async function checkPass(p) {
                 'Authorization': 'Bearer ' + window._sbKEY,
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ submitted_password: p }),
+            body: JSON.stringify({ p_password: p }),
             signal: controller.signal
         })
         clearTimeout(timer)
@@ -662,8 +662,8 @@ async function checkPass(p) {
         }
         const result = await response.json()
         const row = Array.isArray(result) ? result[0] : result
-        if (row && row.is_valid) {
-            return { role: row.admin_role || 'admin', label: row.admin_label || 'المشرف' }
+        if (row && row.valid === true) {
+            return { role: row.role || 'admin', label: row.label || 'المشرف' }
         }
     } catch(e) {
         console.error('Admin login error:', e)
