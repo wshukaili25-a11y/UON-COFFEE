@@ -269,6 +269,99 @@
 @keyframes examPulse{0%,100%{opacity:1}50%{opacity:.88}}
 body.has-exam-banner{padding-top:40px!important}
 body.has-exam-banner .navbar{top:40px!important}
+
+/* ===== GPA CALCULATOR POLISH ===== */
+.gpa-card{
+    background:linear-gradient(145deg,rgba(26,31,61,.98),rgba(20,26,52,.98));
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:24px;
+    padding:28px;
+    box-shadow:0 22px 60px rgba(0,0,0,.22);
+}
+.gpa-summary-inputs{
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:14px;
+    margin-bottom:22px;
+}
+.gpa-field label{
+    display:block;
+    font-size:12px;
+    color:var(--text-muted);
+    margin-bottom:7px;
+    font-weight:700;
+}
+.gpa-input,.gpa-select{
+    width:100%;
+    min-width:0;
+    background:rgba(10,14,39,.72);
+    border:1px solid rgba(255,255,255,.1);
+    border-radius:12px;
+    padding:12px 13px;
+    color:#fff;
+    font-family:Tajawal,sans-serif;
+    outline:none;
+    transition:.2s;
+}
+.gpa-input:focus,.gpa-select:focus{
+    border-color:rgba(0,212,255,.75);
+    box-shadow:0 0 0 3px rgba(0,212,255,.08);
+}
+.gpa-table-wrap{overflow-x:auto;padding-bottom:4px}
+.gpa-head,.gpa-course-row{
+    display:grid;
+    grid-template-columns:minmax(150px,1.45fr) 92px 132px 86px 132px 42px;
+    gap:10px;
+    align-items:center;
+    min-width:760px;
+}
+.gpa-head{
+    font-size:11px;
+    color:var(--text-dim);
+    padding:0 5px 8px;
+}
+.gpa-course-row{
+    background:rgba(255,255,255,.025);
+    border:1px solid rgba(255,255,255,.055);
+    border-radius:14px;
+    padding:10px;
+}
+.gpa-repeat-box{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:7px;
+    font-size:12px;
+    color:var(--text-muted);
+}
+.gpa-delete{
+    width:38px;height:38px;border-radius:10px;
+    border:1px solid rgba(239,68,68,.25);
+    background:rgba(239,68,68,.08);
+    color:#ef4444;cursor:pointer;font-size:18px;
+}
+.gpa-add{
+    width:100%;margin-top:14px;margin-bottom:12px;
+    background:rgba(0,212,255,.055);
+    border:1px dashed rgba(0,212,255,.28);
+    border-radius:12px;padding:13px;color:#00d4ff;
+    font-weight:800;font-family:Tajawal,sans-serif;cursor:pointer;
+}
+.gpa-calc-btn{
+    width:100%;background:linear-gradient(135deg,#00d4ff,#0099cc);
+    color:var(--dark);font-size:15px;font-weight:900;padding:15px;
+    border-radius:12px;border:none;cursor:pointer;font-family:Tajawal,sans-serif;
+}
+.gpa-result{
+    display:none;margin-top:18px;background:rgba(0,212,255,.055);
+    border:1px solid rgba(0,212,255,.16);border-radius:16px;padding:20px;text-align:center;
+}
+@media(max-width:768px){
+    .gpa-card{padding:18px;border-radius:18px}
+    .gpa-summary-inputs{grid-template-columns:1fr}
+    .gpa-table-wrap{margin:0 -4px}
+}
+
 </style>
 </head>
 <body>
@@ -392,26 +485,55 @@ body.has-exam-banner .navbar{top:40px!important}
 
 <!-- Calculator -->
 <section class="calc-section" id="calcSection">
-    <div class="section-header reveal"><h2>حاسبة المعدل التراكمي 📊</h2><p>بنفس فكرة حاسبة جامعة نزوى: المعدل الحالي، الساعات السابقة، واحتساب المواد المعادة</p></div>
-    <div style="background:var(--dark-light);border:1px solid rgba(255,255,255,0.08);border-radius:20px;padding:28px;">
-        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;margin-bottom:20px;">
-            <div><label style="display:block;font-size:12px;color:var(--text-muted);margin-bottom:6px;">المعدل التراكمي الحالي</label><input id="currentCGPA" type="number" min="0" max="4" step="0.01" placeholder="مثال: 2.75" style="width:100%;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:12px;color:white;font-family:Tajawal,sans-serif;"></div>
-            <div><label style="display:block;font-size:12px;color:var(--text-muted);margin-bottom:6px;">مجموع الساعات السابقة</label><input id="completedHours" type="number" min="0" step="1" placeholder="بدون ساعات الفصل الحالي" style="width:100%;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:12px;color:white;font-family:Tajawal,sans-serif;"></div>
+    <div class="section-header reveal">
+        <h2>حاسبة المعدل التراكمي 📊</h2>
+        <p>احسب معدل الفصل والمعدل التراكمي المتوقع مع دعم المواد المعادة</p>
+    </div>
+
+    <div class="gpa-card">
+        <div class="gpa-summary-inputs">
+            <div class="gpa-field">
+                <label for="currentCGPA">المعدل التراكمي الحالي</label>
+                <input class="gpa-input" id="currentCGPA" type="number" min="0" max="4" step="0.01" placeholder="مثال: 2.75">
+            </div>
+            <div class="gpa-field">
+                <label for="completedHours">مجموع الساعات السابقة</label>
+                <input class="gpa-input" id="completedHours" type="number" min="0" step="1" placeholder="بدون ساعات الفصل الحالي">
+            </div>
         </div>
-        <div style="display:grid;grid-template-columns:minmax(140px,1.4fr) 90px 120px 90px 120px 34px;gap:8px;font-size:11px;color:var(--text-dim);padding:0 4px 8px;align-items:end;" class="gpa-head">
-            <span>المادة</span><span>الساعات</span><span>التقدير المتوقع</span><span>معادة؟</span><span>الدرجة السابقة*</span><span></span>
+
+        <div class="gpa-table-wrap">
+            <div class="gpa-head">
+                <span>المادة</span>
+                <span>الساعات</span>
+                <span>التقدير المتوقع</span>
+                <span>معادة؟</span>
+                <span>الدرجة السابقة</span>
+                <span></span>
+            </div>
+            <div id="calcRows" style="display:flex;flex-direction:column;gap:10px;margin-bottom:4px;"></div>
         </div>
-        <div id="calcRows" style="display:flex;flex-direction:column;gap:10px;margin-bottom:14px;"></div>
-        <button onclick="addCalcRow()" style="width:100%;background:rgba(0,212,255,0.05);border:1px dashed rgba(0,212,255,0.2);border-radius:10px;padding:11px;color:rgba(0,212,255,0.7);font-size:13px;font-weight:700;cursor:pointer;font-family:Tajawal,sans-serif;margin-bottom:14px;">+ إضافة مادة</button>
-        <button onclick="calcGPA()" style="width:100%;background:linear-gradient(135deg,#00d4ff,#0099cc);color:var(--dark);font-size:14px;font-weight:900;padding:14px;border-radius:10px;border:none;cursor:pointer;font-family:Tajawal,sans-serif;">احسب المعدل ⚡</button>
-        <div id="calcResult" style="display:none;margin-top:18px;background:rgba(0,212,255,0.06);border:1px solid rgba(0,212,255,0.15);border-radius:14px;padding:20px;text-align:center;">
+
+        <button class="gpa-add" onclick="addCalcRow()">+ إضافة مادة</button>
+        <button class="gpa-calc-btn" onclick="calcGPA()">احسب المعدل ⚡</button>
+
+        <div id="calcResult" class="gpa-result">
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
-                <div><div style="font-size:11px;color:var(--text-dim);">معدل الفصل</div><div id="semesterGPANum" style="font-family:monospace;font-size:38px;color:#ffd93d;font-weight:700;">0.00</div></div>
-                <div><div style="font-size:11px;color:var(--text-dim);">المعدل التراكمي المتوقع</div><div id="calcGPANum" style="font-family:monospace;font-size:38px;color:#00d4ff;font-weight:700;">0.00</div></div>
+                <div>
+                    <div style="font-size:11px;color:var(--text-dim);">معدل الفصل</div>
+                    <div id="semesterGPANum" style="font-family:monospace;font-size:38px;color:#ffd93d;font-weight:700;">0.00</div>
+                </div>
+                <div>
+                    <div style="font-size:11px;color:var(--text-dim);">المعدل التراكمي المتوقع</div>
+                    <div id="calcGPANum" style="font-family:monospace;font-size:38px;color:#00d4ff;font-weight:700;">0.00</div>
+                </div>
             </div>
             <div id="calcGPAGrade" style="font-size:14px;color:var(--text-muted);margin-top:10px;"></div>
         </div>
-        <p style="font-size:11px;color:var(--text-dim);margin-top:14px;line-height:1.7;">* في المادة المعادة اختر درجتك السابقة. الساعات السابقة تشمل الساعات المنجزة وساعات الرسوب، ولا تضاف ساعات المادة المعادة مرة ثانية إلى مجموع الساعات.</p>
+
+        <p style="font-size:11px;color:var(--text-dim);margin-top:14px;line-height:1.8;">
+            في المادة المعادة اختر الدرجة السابقة. لا تُضاف ساعات المادة المعادة مرة ثانية إلى مجموع الساعات التراكمية.
+        </p>
     </div>
 </section>
 
@@ -806,11 +928,11 @@ window.addCalcRow = function() {
     r.style.cssText = 'display:grid;grid-template-columns:minmax(140px,1.4fr) 90px 120px 90px 120px 34px;gap:8px;align-items:center;'
     r.innerHTML = `
         <input class="gpa-name" type="text" placeholder="اسم المادة">
-        <select class="gpa-hours"><option value="">الساعات</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option></select>
-        <select class="gpa-grade">${gradeOptions()}</select>
+        <select class="gpa-select gpa-hours"><option value="">الساعات</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option></select>
+        <select class="gpa-select gpa-grade">${gradeOptions()}</select>
         <label style="display:flex;align-items:center;justify-content:center;gap:4px;font-size:12px;color:var(--text-muted);"><input class="gpa-repeat" type="checkbox" onchange="togglePreviousGrade(this)"> نعم</label>
-        <select class="gpa-old-grade" disabled>${gradeOptions('الدرجة السابقة')}</select>
-        <button onclick="removeCalcRow(this)" style="width:34px;height:34px;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.15);border-radius:8px;color:#ef4444;cursor:pointer;font-size:16px;">×</button>`
+        <select class="gpa-select gpa-old-grade" disabled>${gradeOptions('الدرجة السابقة')}</select>
+        <button class="gpa-delete" onclick="removeCalcRow(this)" aria-label="حذف المادة">×</button>`
     r.querySelectorAll('input,select').forEach(el => { if(!el.style.cssText) el.style.cssText='width:100%;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:10px;color:white;font-family:Tajawal,sans-serif;font-size:12px;outline:none;' })
     document.getElementById('calcRows').appendChild(r)
 }
