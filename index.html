@@ -268,6 +268,34 @@
 @keyframes examPulse{0%,100%{opacity:1}50%{opacity:.88}}
 body.has-exam-banner{padding-top:40px!important}
 body.has-exam-banner .navbar{top:40px!important}
+
+        .tool-card.tool-unavailable {
+            opacity: .55;
+            filter: grayscale(.35);
+            cursor: not-allowed;
+        }
+        .tool-card.tool-unavailable:hover {
+            transform: none;
+            box-shadow: none;
+            border-color: rgba(255,255,255,.08);
+        }
+        .tool-status-badge {
+            position: absolute;
+            top: 14px;
+            left: 14px;
+            z-index: 3;
+            padding: .32rem .72rem;
+            border-radius: 999px;
+            font-size: .72rem;
+            font-weight: 800;
+            background: rgba(15,23,42,.88);
+            border: 1px solid rgba(255,255,255,.12);
+            color: #fff;
+        }
+        .tool-status-badge.coming_soon { color: #ffd93d; }
+        .tool-status-badge.maintenance { color: #fb923c; }
+        .tool-status-badge.disabled { color: #ff6b6b; }
+
 </style>
 </head>
 <body>
@@ -295,8 +323,10 @@ body.has-exam-banner .navbar{top:40px!important}
         <li><a href="features.html" target="_blank" style="color:var(--warning)!important;">🔥 الميزات</a></li>
     </ul>
     <div class="nav-actions">
+        <button class="admin-nav-btn" id="adminBtn" onclick="window.location.href='admin.html'"><i class="fas fa-cog"></i> لوحة التحكم</button>
         
         <button onclick="openGlobalSearch()" style="width:36px;height:36px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:10px;color:var(--text-muted);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .3s;" title="بحث"><i class="fas fa-search"></i></button>
+        <button class="nav-btn" id="loginBtn" onclick="window.location.href='admin.html'"><i class="fas fa-user-shield"></i> أدمن</button>
     </div>
     <div class="mobile-menu" onclick="toggleMenu()"><i class="fas fa-bars"></i></div>
 </nav>
@@ -453,8 +483,8 @@ body.has-exam-banner .navbar{top:40px!important}
 setTimeout(function(){ var o=document.getElementById('loadingOverlay'); if(o) o.classList.add('hidden') }, 2000)
 
 // تهيئة Supabase — REST API wrapper مُصحَّح، بدون أي CDN خارجي
-window._sbURL = 'https://fjkxahhoacqlpiafmfyd.supabase.co'
-window._sbKEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZqa3hhaGhvYWNxbHBpYWZtZnlkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgzMTkwMjQsImV4cCI6MjA5Mzg5NTAyNH0.Ls3gaXRso3BgcDAByoYeQQot_KbAOfREvxyW8u4vkGA'
+window._sbURL = 'https://irkhvydgxpseflggbeqq.supabase.co'
+window._sbKEY = 'sb_publishable_gZ9tyM1udrkuQIXHqDtToQ_FyFmePgH'
 
 const supabase = (function() {
     function buildQuery(table) {
@@ -573,28 +603,66 @@ const defaultTools = [
 ]
 
 // ===== UI UPDATE =====
-function updateUI() { /* لوحة الإدارة مخفية من الواجهة العامة */ }
+function updateUI() {
+    const isAdmin = currentAdmin !== null
+    const adminBtn = document.getElementById('adminBtn')
+    const loginBtn = document.getElementById('loginBtn')
+    if (adminBtn) adminBtn.classList.toggle('show', isAdmin)
+    if (loginBtn) loginBtn.style.display = isAdmin ? 'none' : ''
+}
 
 // ===== TOOLS LOAD =====
 async function loadTools() {
-    // اعرض الأدوات مباشرة حتى لا تتوقف الصفحة إذا تأخر الاتصال.
-    tools = defaultTools.map(t => ({...t, desc:t.description, btnText:t.btn_text, status:'active', disabled:false}))
+    // عرض الأدوات مباشرة، ثم تحديث حالاتها من Supabase
+    tools = defaultTools.map(t => ({
+        ...t,
+        desc: t.description,
+        btnText: t.btn_text,
+        status: 'active'
+    }))
     renderTools()
 
     try {
-        const keys = defaultTools.flatMap(t => ['tool_' + t.id + '_status', 'tool_' + t.id + '_enabled'])
-        const { data, error } = await supabase.from('settings').select('*').in('key', keys)
-        if (error) throw error
-        const map = {}
-        ;(data || []).forEach(r => map[r.key] = String(r.value))
-        tools = defaultTools.map(t => {
-            const legacyDisabled = map['tool_' + t.id + '_enabled'] === 'false'
-            const status = map['tool_' + t.id + '_status'] || (legacyDisabled ? 'disabled' : 'active')
-            return {...t, desc:t.description, btnText:t.btn_text, status, disabled:status !== 'active'}
+        const keys = []
+        defaultTools.forEach(t => {
+            keys.push('tool_' + t.id + '_status')
+            keys.push('tool_' + t.id + '_enabled')
         })
+
+        const { data, error } = await supabase
+            .from('settings')
+            .select('*')
+            .in('key', keys)
+
+        if (error) {
+            console.error('تعذر تحميل حالات الأدوات:', error)
+            return
+        }
+
+        const map = {}
+        ;(data || []).forEach(r => { map[r.key] = r.value })
+
+        tools = defaultTools.map(t => {
+            const statusKey = 'tool_' + t.id + '_status'
+            const enabledKey = 'tool_' + t.id + '_enabled'
+            let status = map[statusKey]
+
+            // توافق مع البيانات القديمة
+            if (!status) {
+                status = map[enabledKey] === 'false' ? 'disabled' : 'active'
+            }
+
+            return {
+                ...t,
+                desc: t.description,
+                btnText: t.btn_text,
+                status
+            }
+        })
+
         renderTools()
-    } catch(e) {
-        console.warn('تعذر تحميل حالات الأدوات:', e)
+    } catch (e) {
+        console.error('خطأ تحميل الأدوات:', e)
     }
 }
 
@@ -675,32 +743,50 @@ function renderTools() {
         grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:3rem;color:var(--text-dim);">لا توجد أدوات بعد</div>'
         return
     }
-    const labels = { disabled:'غير متاحة', coming_soon:'Coming Soon', maintenance:'صيانة' }
+
+    const labels = {
+        disabled: 'غير متاحة',
+        coming_soon: 'Coming Soon',
+        maintenance: 'صيانة'
+    }
+
     grid.innerHTML = tools.map(tool => {
-        const inactive = tool.status !== 'active'
-        const statusBadge = inactive ? `<span style="position:absolute;top:12px;right:12px;padding:.35rem .65rem;border-radius:999px;background:rgba(10,14,39,.88);border:1px solid rgba(255,255,255,.12);font-size:.72rem;font-weight:900;z-index:3;">${labels[tool.status] || 'غير متاحة'}</span>` : ''
+        const unavailable = tool.status !== 'active'
+        const label = labels[tool.status] || ''
+        const buttonText = unavailable ? label : tool.btnText
+
         return `
-        <div class="tool-card" data-id="${tool.id}" data-status="${tool.status}" style="--card-color:${tool.color};position:relative;${inactive?'opacity:.58;filter:grayscale(.25);':''}">
-            ${statusBadge}
+        <div class="tool-card ${unavailable ? 'tool-unavailable' : ''}"
+             data-id="${tool.id}"
+             data-status="${tool.status}"
+             style="--card-color:${tool.color};">
+            ${unavailable ? `<span class="tool-status-badge ${tool.status}">${label}</span>` : ''}
+            <button class="admin-edit-btn" onclick="event.stopPropagation();editTool(${tool.id})" title="تعديل"><i class="fas fa-pen"></i></button>
             <div class="tool-icon" style="background:${tool.color}20;color:${tool.color};"><i class="fas ${tool.icon}"></i></div>
             <h3>${tool.title}</h3>
             <p>${tool.desc}</p>
-            <button class="tool-link" style="color:${tool.color};" onclick="openTool(${tool.id})">${inactive ? (labels[tool.status] || 'غير متاحة') : tool.btnText} <i class="fas ${inactive?'fa-lock':'fa-arrow-left'}"></i></button>
+            <button class="tool-link"
+                    style="color:${tool.color};"
+                    onclick="openTool(${tool.id})"
+                    ${unavailable ? 'aria-disabled="true"' : ''}>
+                ${buttonText} <i class="fas fa-arrow-left"></i>
+            </button>
         </div>`
     }).join('')
 }
 
 window.openTool = function(id) {
-    const tool = tools.find(t => Number(t.id) === Number(id))
+    const tool = tools.find(t => t.id === id)
     if (tool && tool.status !== 'active') {
         const messages = {
-            disabled:'هذه الأداة موقوفة حالياً',
-            coming_soon:'هذه الأداة قادمة قريباً 🔜',
-            maintenance:'هذه الأداة تحت الصيانة حالياً 🛠️'
+            disabled: 'هذه الأداة غير متاحة حالياً',
+            coming_soon: 'هذه الأداة قادمة قريباً 🔜',
+            maintenance: 'الأداة تحت الصيانة حالياً 🛠️'
         }
         showToast(messages[tool.status] || 'الأداة غير متاحة حالياً')
         return
     }
+
     const actions = {
         1: () => document.getElementById('botSection').scrollIntoView({behavior:'smooth'}),
         2: () => document.getElementById('calcSection').scrollIntoView({behavior:'smooth'}),
@@ -904,6 +990,7 @@ window.globalSearch = function(q) {
         { name:'دليل المطاعم', url:'features.html', icon:'🍕', desc:'مطاعم وكافيهات قريبة' },
         { name:'اعترافات الطلاب', url:'features.html', icon:'💬', desc:'اعترافات مجهولة' },
         { name:'بنك الأسئلة', url:'questions.html', icon:'❓', desc:'أسئلة اختبارات سابقة' },
+        { name:'لوحة التحكم', url:'admin.html', icon:'👑', desc:'إدارة الموقع الكاملة' },
     ]
 
     const toolMatches = tools.filter(t => t.title && (t.title.includes(q) || (t.desc && t.desc.includes(q))))
