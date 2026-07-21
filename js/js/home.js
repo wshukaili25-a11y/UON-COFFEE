@@ -32,3 +32,65 @@ async function loadWhatsappChannel(){
  }catch{}
 }
 loadWhatsappChannel();
+
+
+const TOOL_STATUS_LABELS={
+ active:'',
+ disabled:'متوقفة',
+ coming_soon:'قريبًا',
+ maintenance:'صيانة'
+};
+
+function applyHomepageToolStatuses(rows){
+ const statusMap=Object.fromEntries((rows||[]).map(row=>[String(row.id),row.status||((row.disabled)?'disabled':'active')]));
+ document.querySelectorAll('.quick-card[data-tool-id]').forEach(card=>{
+   const id=card.dataset.toolId;
+   const status=statusMap[id]||'active';
+   card.dataset.toolStatus=status;
+   card.classList.toggle('tool-unavailable',status!=='active');
+
+   let badge=card.querySelector('.quick-status-badge');
+   if(status==='active'){
+     badge?.remove();
+     card.removeAttribute('aria-disabled');
+     card.title='';
+   }else{
+     if(!badge){
+       badge=document.createElement('span');
+       badge.className='quick-status-badge';
+       card.appendChild(badge);
+     }
+     badge.textContent=TOOL_STATUS_LABELS[status]||'غير متاحة';
+     card.setAttribute('aria-disabled','true');
+     card.title=`الأداة ${TOOL_STATUS_LABELS[status]||'غير متاحة'}`;
+   }
+ });
+}
+
+async function refreshHomepageToolStatuses(){
+ try{
+   const rows=await get(
+     'tools_items',
+     'select=id,status,disabled&id=in.(assistant,university-guide,gpa,schedule,confessions,tools-library,summaries,groups,projects,ratings)'
+   );
+   applyHomepageToolStatuses(rows);
+ }catch(error){
+   console.warn('Homepage tool statuses unavailable',error);
+ }
+}
+
+document.addEventListener('click',event=>{
+ const card=event.target.closest('.quick-card[data-tool-id]');
+ if(!card||card.dataset.toolStatus==='active')return;
+ event.preventDefault();
+ event.stopPropagation();
+ const label=TOOL_STATUS_LABELS[card.dataset.toolStatus]||'غير متاحة';
+ alert(`هذه الخدمة حاليًا: ${label}`);
+},true);
+
+refreshHomepageToolStatuses();
+setInterval(refreshHomepageToolStatuses,10000);
+document.addEventListener('visibilitychange',()=>{
+ if(!document.hidden)refreshHomepageToolStatuses();
+});
+window.addEventListener('focus',refreshHomepageToolStatuses);
