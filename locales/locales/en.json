@@ -1,0 +1,129 @@
+{
+  "meta": {
+    "lang": "en",
+    "dir": "ltr"
+  },
+  "nav": {
+    "home": "Home",
+    "tools": "Tools",
+    "ai": "AI Assistant",
+    "market": "Marketplace",
+    "about": "About",
+    "contact": "Contact",
+    "features": "🔥 Features"
+  },
+  "hero": {
+    "badge": "UON Hub — University of Nizwa Student Platform",
+    "title": "Your Complete Hub<br>for Academic Life",
+    "description": "Smart tools, summaries, study schedules, and everything you need to succeed",
+    "sub": "All your essential university tools in one place",
+    "explore": "Explore Tools",
+    "community": "Join the Community",
+    "free": "✓ Completely Free",
+    "built": "✓ Built for UON Students",
+    "mobile": "✓ Mobile Friendly"
+  },
+  "quick": {
+    "kicker": "Quick Access",
+    "title": "Start Here",
+    "description": "Your most-used services, instantly",
+    "gpa_title": "GPA Calculator",
+    "gpa_desc": "Semester, cumulative, and repeated courses",
+    "schedule_title": "Study Schedule",
+    "schedule_desc": "Plan and print your week",
+    "summaries_title": "Summary Library",
+    "summaries_desc": "Courses and student files",
+    "groups_title": "Course Groups",
+    "groups_desc": "Find your course group"
+  },
+  "sections": {
+    "tools_title": "Available Tools",
+    "tools_desc": "A complete set of tools designed for University of Nizwa students",
+    "features_title": "Why UON Hub?",
+    "features_desc": "A student-first experience created for University of Nizwa students",
+    "fast_title": "Fast and Free",
+    "fast_desc": "All tools are available with no fees or hidden subscriptions",
+    "safe_title": "Safe and Reliable",
+    "safe_desc": "Student-powered content with clear review and moderation",
+    "responsive_title": "Fully Responsive",
+    "responsive_desc": "Designed for phones, tablets, and desktop devices",
+    "ai_title": "AI Assistant 🤖",
+    "ai_desc": "Ask anything about the University of Nizwa",
+    "gpa_title": "GPA Calculator 📊",
+    "gpa_desc": "Calculate semester and expected cumulative GPA, including repeated courses",
+    "contacts_title": "University Contacts 📞",
+    "contacts_desc": "Tap a number to call",
+    "links_title": "Quick Links 🔗"
+  },
+  "tool_status": {
+    "disabled": "Unavailable",
+    "coming_soon": "Soon",
+    "maintenance": "Maintenance"
+  },
+  "tools": {
+    "1": {
+      "title": "Smart AI Assistant",
+      "description": "A smart assistant for University of Nizwa questions — available 24/7",
+      "button": "Try Now"
+    },
+    "2": {
+      "title": "GPA Calculator",
+      "description": "Calculate your semester and cumulative GPA with ease",
+      "button": "Calculate GPA"
+    },
+    "4": {
+      "title": "Student Confessions",
+      "description": "Share your campus confession anonymously and safely 😅",
+      "button": "Confess Now"
+    },
+    "5": {
+      "title": "Summary Library",
+      "description": "Summaries and explanations from UON students across all colleges",
+      "button": "Browse Summaries"
+    },
+    "6": {
+      "title": "Restaurant Guide",
+      "description": "Nearby restaurants and cafés around the University of Nizwa",
+      "button": "View Restaurants"
+    },
+    "7": {
+      "title": "Tools Library",
+      "description": "Useful academic and digital tools for every UON student",
+      "button": "Open Tools"
+    },
+    "9": {
+      "title": "Study Schedule",
+      "description": "Create and print your weekly study schedule",
+      "button": "Create Schedule"
+    },
+    "10": {
+      "title": "WhatsApp Groups",
+      "description": "Find or submit a course group to help your classmates",
+      "button": "Find a Group"
+    },
+    "11": {
+      "title": "Student Marketplace",
+      "description": "Buy, sell, and exchange books and study supplies with other students",
+      "button": "Open Marketplace"
+    },
+    "12": {
+      "title": "Official University Guide",
+      "description": "Explore colleges, programs, fees, and admission links from official sources",
+      "button": "Explore Programs"
+    }
+  },
+  "footer": {
+    "tagline": "Everything a University of Nizwa student needs in one place.",
+    "quick": "Quick Links",
+    "summaries": "Summaries",
+    "guide": "University Guide",
+    "university": "University",
+    "official": "Official Website",
+    "portal": "Student Portal",
+    "platform": "Platform",
+    "privacy": "Privacy",
+    "terms": "Terms",
+    "rights": "All rights reserved",
+    "made": "Made with care for University of Nizwa students"
+  }
+}
