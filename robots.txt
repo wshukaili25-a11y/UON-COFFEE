@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 Disallow: /admin.html
-Sitemap: https://uoncoffee.space/sitemap.xml
+Sitemap: https://www.uoncoffee.space/sitemap.xml
