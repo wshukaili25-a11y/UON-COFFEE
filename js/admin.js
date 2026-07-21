@@ -8,7 +8,19 @@ const defs={
  projects:{table:'student_projects',filter:'status=eq.pending',title:'المشاريع'},
  ratings:{table:'rating_submissions',filter:'status=eq.pending',title:'التقييمات'}
 };
-window.login=async()=>{try{const password=$('#adminPassword').value;const result=await rpc('check_admin_password',{p_password:password});if(result===true||result?.ok===true){sessionStorage.setItem('uon_admin_password',password);authenticated=true;$('#loginOverlay').style.display='none';loadDashboard()}else throw new Error('كلمة المرور غير صحيحة')}catch(e){toast(e.message,true)}};
+window.login=async()=>{
+ const password=$('#adminPassword').value.trim();
+ if(!password)return toast('أدخل كلمة المرور',true);
+ try{
+  const result=await rpc('check_admin_password',{p_password:password});
+  const ok=result===true||result==='true'||result?.ok===true;
+  if(!ok)throw new Error(result?.message||'كلمة المرور غير صحيحة');
+  sessionStorage.setItem('uon_admin_password',password);
+  authenticated=true;
+  $('#loginOverlay').style.display='none';
+  loadDashboard();
+ }catch(e){toast(e.message||'تعذر تسجيل الدخول',true)}
+};
 window.showSection=(name,btn)=>{$$('.admin-section').forEach(x=>x.classList.remove('active'));$(`#section-${name}`)?.classList.add('active');$$('.admin-nav button').forEach(x=>x.classList.remove('active'));btn?.classList.add('active');if(defs[name])loadList(name)};
 function row(name,x){const title=x.title||x.subject||x.target_name||x.name||'بدون عنوان';const desc=x.body||x.description||x.comment||x.college||'';let actions='';
  if(name==='announcements')actions=`<button onclick="toggleAnnouncement('${x.id}',${!x.active})">${x.active?'إيقاف':'تشغيل'}</button><button class="reject" onclick="deleteItem('${name}','${x.id}')">حذف</button>`;
