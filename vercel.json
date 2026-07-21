@@ -1,7 +1,7 @@
 {
   "headers": [
     {
-      "source": "/sw.js",
+      "source": "/(.*\\.html)",
       "headers": [
         {
           "key": "Cache-Control",
@@ -10,7 +10,7 @@
       ]
     },
     {
-      "source": "/(.*\\.html)",
+      "source": "/js/(.*)",
       "headers": [
         {
           "key": "Cache-Control",
@@ -23,34 +23,25 @@
       "headers": [
         {
           "key": "Cache-Control",
-          "value": "public, max-age=0, must-revalidate"
+          "value": "no-store, max-age=0, must-revalidate"
         }
       ]
     },
     {
-      "source": "/js/(.*)",
+      "source": "/assets/(.*)",
       "headers": [
         {
           "key": "Cache-Control",
-          "value": "public, max-age=0, must-revalidate"
+          "value": "public, max-age=300, must-revalidate"
         }
       ]
     },
     {
-      "source": "/assets/unizwa-new-gate-v52.jpg",
+      "source": "/sw.js",
       "headers": [
         {
           "key": "Cache-Control",
-          "value": "no-store, max-age=0"
-        }
-      ]
-    },
-    {
-      "source": "/(gpa|schedule|tools).html",
-      "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "no-store, max-age=0"
+          "value": "no-store"
         }
       ]
     }
