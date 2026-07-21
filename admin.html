@@ -266,6 +266,15 @@ body { font-family:'Tajawal',sans-serif; background:var(--dark); color:var(--tex
 .project-admin-actions{display:flex;gap:.45rem;flex-wrap:wrap;margin-top:.35rem}.project-admin-actions button{border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04);color:var(--text-muted);border-radius:9px;padding:.48rem .65rem;font-family:Tajawal,sans-serif;font-size:.72rem;font-weight:800;cursor:pointer}.project-admin-actions .approve{color:#4ade80;border-color:rgba(74,222,128,.25)}.project-admin-actions .reject{color:#f87171;border-color:rgba(248,113,113,.25)}.project-admin-actions .feature{color:#facc15;border-color:rgba(250,204,21,.25)}
 @media(max-width:650px){.projects-admin-grid{grid-template-columns:1fr}}
 
+
+/* ===== RATINGS ADMIN ===== */
+.ratings-admin-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(285px,1fr));gap:1rem}
+.rating-admin-card{background:linear-gradient(145deg,rgba(10,14,39,.82),rgba(18,23,48,.95));border:1px solid rgba(255,255,255,.07);border-radius:16px;padding:1rem;display:flex;flex-direction:column;gap:.7rem}
+.rating-admin-head{display:flex;justify-content:space-between;gap:.7rem}.rating-admin-kind{font-size:.65rem;padding:.23rem .5rem;border-radius:999px;background:rgba(250,204,21,.09);color:#facc15}
+.rating-admin-score{color:#facc15;font-weight:900}.rating-admin-comment{color:var(--text-dim);line-height:1.7;font-size:.8rem}
+.rating-admin-meta{display:flex;gap:.4rem;flex-wrap:wrap}.rating-admin-chip{font-size:.63rem;padding:.2rem .45rem;border-radius:999px;background:rgba(0,212,255,.07);color:var(--primary)}
+.rating-admin-actions{display:flex;gap:.45rem;margin-top:auto}.rating-admin-actions button{flex:1;border-radius:9px;padding:.48rem;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04);font-family:Tajawal,sans-serif;font-weight:800;cursor:pointer}.rating-admin-actions .approve{color:#4ade80;border-color:rgba(74,222,128,.25)}.rating-admin-actions .reject{color:#f87171;border-color:rgba(248,113,113,.25)}
+
 </style>
 <style>
 </style>
@@ -319,6 +328,7 @@ body { font-family:'Tajawal',sans-serif; background:var(--dark); color:var(--tex
 
         <div class="nav-section">
             <div class="nav-label">المحتوى</div>
+            <div class="nav-item" onclick="showSection('ratings',this)"><i class="fas fa-star"></i> التقييمات <span class="nav-badge" id="navRatingsBadge" style="display:none">0</span></div>
             <div class="nav-item" onclick="showSection('confessions',this)"><i class="fas fa-comments"></i> الاعترافات <span class="nav-badge" id="navConfBadge" style="display:none">0</span></div>
             <div class="nav-item" onclick="showSection('summaries',this)"><i class="fas fa-book"></i> الملخصات <span class="nav-badge" id="navSumBadge" style="display:none">0</span></div>
             <div class="nav-item" onclick="showSection('restaurants',this)"><i class="fas fa-utensils"></i> المطاعم</div>
@@ -394,6 +404,27 @@ body { font-family:'Tajawal',sans-serif; background:var(--dark); color:var(--tex
                     <button class="card-action" onclick="markAllRead()"><i class="fas fa-check-double"></i> تحديد الكل كمقروء</button>
                 </div>
                 <div id="notifsList"><div style="color:var(--text-dim);text-align:center;padding:2rem;font-size:.85rem;">جاري التحميل...</div></div>
+            </div>
+        </div>
+
+
+        <!-- RATINGS -->
+        <div class="section" id="section-ratings">
+            <div class="page-header">
+                <h1>تقييمات المواد والدكاترة ⭐</h1>
+                <p>راجع التقييمات قبل نشرها، واقبل المحتوى المفيد وارفض الإساءة أو المعلومات غير الدقيقة</p>
+            </div>
+            <div class="moderation-summary">
+                <div class="moderation-stat"><span>بانتظار المراجعة</span><strong id="ratingsPendingCount">0</strong></div>
+                <div class="moderation-stat"><span>المعتمدة</span><strong id="ratingsApprovedCount">0</strong></div>
+                <div class="moderation-stat"><span>المرفوضة</span><strong id="ratingsRejectedCount">0</strong></div>
+            </div>
+            <div class="content-card">
+                <div class="card-header">
+                    <div class="card-title"><i class="fas fa-clock" style="color:var(--warning)"></i> طلبات التقييم</div>
+                    <button class="card-action" onclick="loadRatingsAdmin()"><i class="fas fa-sync-alt"></i> تحديث</button>
+                </div>
+                <div id="ratingsAdminGrid" class="ratings-admin-grid"></div>
             </div>
         </div>
 
@@ -1041,6 +1072,48 @@ window.markAllRead = async function() {
     renderNotifications()
     loadStats()
     showToast('تم تحديد الكل كمقروء!')
+}
+
+
+// ===== RATINGS ADMIN =====
+let ratingSubmissionsAdmin=[]
+function ratingEscape(v){return String(v??'').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;')}
+function renderRatingsAdmin(rows){
+ const el=document.getElementById('ratingsAdminGrid');if(!el)return
+ if(!rows.length){el.innerHTML='<div class="admin-empty-state"><i class="fas fa-star"></i><span>لا توجد تقييمات بانتظار المراجعة</span></div>';return}
+ el.innerHTML=rows.map(r=>`
+ <article class="rating-admin-card">
+  <div class="rating-admin-head"><div><strong>${ratingEscape(r.target_name)}</strong><small style="display:block;color:var(--text-dim)">${ratingEscape(r.college||'')}</small></div><span class="rating-admin-kind">${r.kind==='course'?'مادة':'دكتور'}</span></div>
+  <div class="rating-admin-score">${'★'.repeat(Number(r.overall_rating||0))}${'☆'.repeat(5-Number(r.overall_rating||0))}</div>
+  <p class="rating-admin-comment">${ratingEscape(r.comment)}</p>
+  <div class="rating-admin-meta">
+   <span class="rating-admin-chip">عام ${r.overall_rating}/5</span>
+   ${r.difficulty_rating?`<span class="rating-admin-chip">سهولة ${r.difficulty_rating}/5</span>`:''}
+   ${r.clarity_rating?`<span class="rating-admin-chip">شرح ${r.clarity_rating}/5</span>`:''}
+   <span class="rating-admin-chip">اختبارات ${r.exams_rating}/5</span>
+  </div>
+  <div class="rating-admin-actions"><button class="approve" onclick="moderateRating('${r.id}','approved')"><i class="fas fa-check"></i> قبول</button><button class="reject" onclick="moderateRating('${r.id}','rejected')"><i class="fas fa-times"></i> رفض</button></div>
+ </article>`).join('')
+}
+async function loadRatingsAdmin(){
+ try{
+  const {data,error}=await supabase.from('rating_submissions').select('*').order('created_at',{ascending:false})
+  if(error)throw error
+  ratingSubmissionsAdmin=data||[]
+  const pending=ratingSubmissionsAdmin.filter(r=>r.status==='pending')
+  renderRatingsAdmin(pending)
+  document.getElementById('ratingsPendingCount').textContent=pending.length
+  document.getElementById('ratingsApprovedCount').textContent=ratingSubmissionsAdmin.filter(r=>r.status==='approved').length
+  document.getElementById('ratingsRejectedCount').textContent=ratingSubmissionsAdmin.filter(r=>r.status==='rejected').length
+  const badge=document.getElementById('navRatingsBadge');if(badge){badge.textContent=pending.length;badge.style.display=pending.length?'inline-block':'none'}
+ }catch(e){console.error(e)}
+}
+window.moderateRating=async function(id,status){
+ try{
+  const {error}=await supabase.from('rating_submissions').update({status,reviewed_at:new Date().toISOString()}).eq('id',id)
+  if(error)throw error
+  await loadRatingsAdmin();showToast(status==='approved'?'تم اعتماد التقييم':'تم رفض التقييم')
+ }catch(e){showToast(e.message||'فشل التحديث','error')}
 }
 
 // ===== CONFESSIONS =====
