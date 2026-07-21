@@ -10,8 +10,8 @@
     <meta property="og:title" content="UON Hub | منصة طلاب جامعة نزوى">
     <meta property="og:description" content="أدوات أكاديمية مجانية ومجتمع طلابي في مكان واحد.">
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://www.uoncoffee.space/">
-    <link rel="canonical" href="https://www.uoncoffee.space/">
+    <meta property="og:url" content="https://uon-coffee.vercel.app/">
+    <link rel="canonical" href="https://uon-coffee.vercel.app/">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
@@ -580,7 +580,7 @@ body.has-exam-banner .navbar{top:40px!important}
 
 <!-- Footer -->
 <footer class="footer">
-    <div class="footer-logo">UoN <span style="color:var(--primary)">Coffee</span></div>
+    <div class="footer-logo">UON <span style="color:var(--primary)">Hub</span></div>
     <p class="footer-tagline">كل ما يحتاجه طالب جامعة نزوى في مكان واحد.</p>
     <div class="social-links">
         <a href="https://instagram.com/uonhub" target="_blank"><i class="fab fa-instagram"></i></a>
@@ -1026,13 +1026,7 @@ function initCounters() {
     document.querySelectorAll('.stat-number').forEach(c => obs.observe(c))
 }
 function initParallax() {
-    document.addEventListener('mousemove', e => {
-        const x = e.clientX/window.innerWidth, y = e.clientY/window.innerHeight
-        document.querySelectorAll('.hero-bg .circle').forEach((c,i) => {
-            const speed = (i+1)*20
-            c.style.transform = `translate(${x*speed}px,${y*speed}px)`
-        })
-    })
+    // Disabled for stability and better performance on low-power devices.
 }
 window.addEventListener('scroll', () => document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 50))
 window.scrollToSection = function(id) { document.getElementById(id)?.scrollIntoView({behavior:'smooth'}) }
@@ -1130,9 +1124,16 @@ window.addEventListener('unhandledrejection', function(e){ console.error('UON Hu
 
 // ===== PWA =====
 if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/sw.js').catch(err => console.warn('Service worker:', err))
-    })
+    window.addEventListener('load', async () => {
+        try {
+            const registrations = await navigator.serviceWorker.getRegistrations()
+            await Promise.all(registrations.map(registration => registration.unregister()))
+            const cacheKeys = await caches.keys()
+            await Promise.all(cacheKeys.map(key => caches.delete(key)))
+        } catch (error) {
+            console.warn('Cache cleanup:', error)
+        }
+    }, { once: true })
 }
 
 let deferredInstall = null
@@ -1154,6 +1155,28 @@ window.addEventListener('beforeinstallprompt', e => {
     setTimeout(() => btn?.remove(), 30000)
 })
 </script>
-<script src="language.js" defer></script>
+
+<script>
+(function () {
+    function removeLoading() {
+        var overlay = document.getElementById('loadingOverlay');
+        if (!overlay) return;
+        overlay.classList.add('hidden');
+        setTimeout(function () {
+            overlay.style.display = 'none';
+        }, 450);
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', removeLoading, { once: true });
+    } else {
+        removeLoading();
+    }
+
+    // Absolute fallback: never leave visitors trapped on the spinner.
+    setTimeout(removeLoading, 1200);
+})();
+</script>
+
 </body>
 </html>
