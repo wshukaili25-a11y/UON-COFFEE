@@ -34,7 +34,7 @@ function row(name,x){
  if(name==='announcements'){
    actions=`<button onclick="toggleAnnouncement('${x.id}',${!x.active})">${x.active?'إيقاف':'تشغيل'}</button><button class="reject" onclick="deleteItem('${name}','${x.id}')">حذف</button>`;
  }else if(name==='tools'){
-   actions=`<select class="status-select" onchange="setToolStatus('${x.id}',this.value)"><option value="active" ${x.status==='active'?'selected':''}>تشغيل</option><option value="disabled" ${x.status==='disabled'?'selected':''}>إيقاف</option><option value="coming_soon" ${x.status==='coming_soon'?'selected':''}>قريبًا</option><option value="maintenance" ${x.status==='maintenance'?'selected':''}>صيانة</option></select><button class="feature" onclick="featureTool('${x.id}',${!x.featured})">${x.featured?'إلغاء التمييز':'تمييز'}</button><button class="reject" onclick="deleteItem('${name}','${x.id}')">حذف</button>`;
+   actions=`<select class="status-select" onchange="setToolStatus('${x.id}',this.value)"><option value="active" ${x.status==='active'?'selected':''}>تشغيل</option><option value="disabled" ${x.status==='disabled'?'selected':''}>إيقاف</option><option value="coming_soon" ${x.status==='coming_soon'?'selected':''}>قريبًا</option><option value="maintenance" ${x.status==='maintenance'?'selected':''}>صيانة</option></select><button onclick="editTool(\'${x.id}\')">تعديل</button><button class="feature" onclick="featureTool('${x.id}',${!x.featured})">${x.featured?'إلغاء التمييز':'تمييز'}</button><button class="reject" onclick="deleteItem('${name}','${x.id}')">حذف</button>`;
  }else{
    actions=`<button class="approve" onclick="approveItem('${name}','${x.id}')">قبول</button><button class="reject" onclick="rejectItem('${name}','${x.id}')">رفض</button>`;
  }
@@ -146,3 +146,24 @@ row=function(name,x){
  return originalRow(name,x);
 };
 loadSiteControls();
+
+window.editTool=async id=>{
+ try{
+  const rows=await get('tools_items',`select=*&id=eq.${encodeURIComponent(id)}`);
+  const t=rows?.[0];if(!t)return;
+  $('#toolEditId').value=t.id;$('#toolName').value=t.name||'';$('#toolCategoryId').value=t.category_id||'';$('#toolDescription').value=t.description||'';$('#toolUrl').value=t.url||'';$('#toolEmoji').value=t.emoji||'';
+  window.scrollTo({top:0,behavior:'smooth'});
+ }catch(e){toast(e.message,true)}
+};
+window.resetToolForm=()=>{$('#toolEditId').value='';['toolName','toolCategoryId','toolDescription','toolUrl','toolEmoji'].forEach(id=>$('#'+id).value='')};
+window.saveTool=async()=>{
+ const id=$('#toolEditId').value.trim();
+ const body={category_id:$('#toolCategoryId').value.trim()||'ai',name:$('#toolName').value.trim(),description:$('#toolDescription').value.trim(),url:$('#toolUrl').value.trim(),emoji:$('#toolEmoji').value.trim()||'🧰'};
+ if(!body.name||!body.url)return toast('أكمل اسم الأداة والرابط',true);
+ try{new URL(body.url)}catch{return toast('رابط الأداة غير صالح',true)}
+ try{
+  if(id)await update('tools_items',`id=eq.${encodeURIComponent(id)}`,body);
+  else await insert('tools_items',{id:`custom-${Date.now()}`,...body,featured:false,disabled:false,status:'active'});
+  resetToolForm();toast(id?'تم تعديل الأداة':'تمت إضافة الأداة');loadList('tools')
+ }catch(e){toast(e.message,true)}
+};

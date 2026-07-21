@@ -37,11 +37,11 @@ const fallbackTools=[
 function render(){
  const q=$('#toolSearch').value.toLowerCase();
  const cat=$('#toolCategory').value;
- const list=tools.filter(t=>(!cat||t.category_id===cat)&&`${t.name||''} ${t.description||''}`.toLowerCase().includes(q));
+ const list=tools.filter(t=>{try{new URL(t.url)}catch{return false}return (!cat||t.category_id===cat)&&`${t.name||''} ${t.description||''}`.toLowerCase().includes(q)});
  const categoryMap=Object.fromEntries(categories.map(c=>[c.id,c]));
  $('#toolsGrid').innerHTML=list.length?list.map(t=>{
    const c=categoryMap[t.category_id]||{};
-   return `<article class="card tool-app-card">
+   return `<article class="card tool-app-card" data-status="${esc(t.status||'active')}">
     <div class="tool-app-icon">${esc(t.emoji||c.emoji||'🧰')}</div>
     <span class="tool-category-label">${esc(c.name||'أداة')}</span>
     <h3>${esc(t.name)}</h3>
