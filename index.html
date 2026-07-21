@@ -419,6 +419,49 @@ html[dir="ltr"] .nav-links a::after{left:0;right:auto}
 html[dir="ltr"] .tool-status-badge{right:auto;left:14px}
 html[dir="ltr"] .tool-link i{transform:rotate(180deg)}
 
+
+/* ===== WhatsApp tool branding ===== */
+.whatsapp-tool-card{
+    border-color:rgba(37,211,102,.18)!important;
+    background:
+      radial-gradient(circle at 50% 0%,rgba(37,211,102,.10),transparent 36%),
+      linear-gradient(150deg,rgba(30,37,75,.98),rgba(20,26,55,.98))!important;
+}
+.whatsapp-tool-card .tool-icon{
+    background:rgba(37,211,102,.13)!important;
+    color:#25D366!important;
+    box-shadow:0 14px 30px rgba(37,211,102,.12);
+}
+.whatsapp-tool-card .tool-icon i{font-size:2.05rem}
+.whatsapp-tool-card .tool-link{
+    color:#25D366!important;
+    border-color:rgba(37,211,102,.28)!important;
+    background:rgba(37,211,102,.07)!important;
+}
+.whatsapp-tool-card .tool-link:hover{
+    background:rgba(37,211,102,.14)!important;
+    box-shadow:0 10px 28px rgba(37,211,102,.12);
+}
+.whatsapp-banner{
+    position:absolute;
+    top:14px;
+    left:14px;
+    z-index:4;
+    display:inline-flex;
+    align-items:center;
+    gap:.4rem;
+    padding:.35rem .65rem;
+    border-radius:999px;
+    background:linear-gradient(135deg,#25D366,#128C7E);
+    color:#fff;
+    font-size:.68rem;
+    font-weight:900;
+    box-shadow:0 8px 22px rgba(37,211,102,.22);
+}
+html[dir="rtl"] .whatsapp-banner{left:14px;right:auto}
+html[dir="ltr"] .whatsapp-banner{left:auto;right:14px}
+.whatsapp-banner i{font-size:.88rem}
+
 </style>
 <link rel="stylesheet" href="brand.css">
 </head>
@@ -929,11 +972,16 @@ function renderTools() {
             : ''
 
         return `
-        <article class="tool-card" data-id="${tool.id}" data-status="${tool.status}"
-            style="--card-color:${tool.color};position:relative;${inactive ? 'opacity:.58;filter:grayscale(.25);' : ''}">
+        <article class="tool-card ${String(tool.id) === '10' ? 'whatsapp-tool-card' : ''}" data-id="${tool.id}" data-status="${tool.status}"
+            style="--card-color:${String(tool.id) === '10' ? '#25D366' : tool.color};position:relative;${inactive ? 'opacity:.58;filter:grayscale(.25);' : ''}">
             ${statusBadge}
+            ${String(tool.id) === '10' ? `
+                <div class="whatsapp-banner">
+                    <i class="fab fa-whatsapp"></i>
+                    <span>${locale?.t('tools.10.banner', 'WhatsApp')}</span>
+                </div>` : ''}
             <div class="tool-icon" style="background:${tool.color}20;color:${tool.color};">
-                <i class="fas ${tool.icon}"></i>
+                <i class="${String(tool.id) === '10' ? 'fab fa-whatsapp' : 'fas ' + tool.icon}"></i>
             </div>
             <h3>${title}</h3>
             <p>${description}</p>
