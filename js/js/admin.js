@@ -167,16 +167,3 @@ window.saveTool=async()=>{
   resetToolForm();toast(id?'تم تعديل الأداة':'تمت إضافة الأداة');loadList('tools')
  }catch(e){toast(e.message,true)}
 };
-
-document.getElementById('adminPassword')?.addEventListener('keydown',event=>{
- if(event.key==='Enter'){
-  event.preventDefault();
-  window.login();
- }
-});
-
-window.logoutAdmin=()=>{
- sessionStorage.removeItem('uon_admin_password');
- sessionStorage.removeItem('uon_admin_entry');
- location.reload();
-};
