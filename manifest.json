@@ -1,17 +1,11 @@
 {
-  "name": "UoN Coffee",
-  "short_name": "UoN Coffee",
-  "description": "منصة طلاب جامعة نزوى للأدوات والملخصات والخدمات الطلابية.",
-  "start_url": "/index.html",
-  "scope": "/",
+  "name": "UON Hub - منصة طلاب جامعة نزوى",
+  "short_name": "UON Hub",
+  "start_url": "/",
   "display": "standalone",
   "background_color": "#0a0e27",
   "theme_color": "#00d4ff",
-  "orientation": "portrait",
-  "icons": [
-    { "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
-  ],
-  "categories": ["education", "productivity"],
   "lang": "ar",
-  "dir": "rtl"
+  "dir": "rtl",
+  "description": "كل ما يحتاجه طالب جامعة نزوى في مكان واحد."
 }
