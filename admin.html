@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>UON Hub — لوحة التحكم</title>
+<title>UoN Coffee — لوحة التحكم</title>
 <meta name="robots" content="noindex,nofollow">
 <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -150,6 +150,7 @@ body { font-family:'Tajawal',sans-serif; background:var(--dark); color:var(--tex
 .mobile-sidebar-btn { display:none; position:fixed; top:16px; right:16px; z-index:9998; width:44px; height:44px; background:var(--dark-light); border:1px solid rgba(255,255,255,.1); border-radius:12px; align-items:center; justify-content:center; cursor:pointer; font-size:1.1rem; }
 .sidebar-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.5); z-index:9997; }
 
+.bus-del { width:30px; height:30px; background:rgba(239,68,68,.08); border:1px solid rgba(239,68,68,.15); border-radius:8px; color:var(--danger); cursor:pointer; display:flex; align-items:center; justify-content:center; }
 
 @media(max-width:768px) {
     .sidebar { position:fixed; right:-100%; top:0; z-index:9998; transition:right .3s; height:100vh; overflow-y:auto; width:280px; }
@@ -159,13 +160,40 @@ body { font-family:'Tajawal',sans-serif; background:var(--dark); color:var(--tex
     #sidebarCloseBtn { display:flex !important; }
     .main { padding:1rem; padding-top:70px; }
     .stats-row { grid-template-columns:1fr 1fr; }
-    .form-grid { grid-template-columns:1fr; }
+    .form-grid { grid-template-columns:1fr; }    .bus-row .bus-sel { display:none; }
 }
+
+/* ===== ADMIN POLISH + CONFESSIONS ===== */
+.sidebar{background:linear-gradient(180deg,#111733,#0b1027);box-shadow:12px 0 40px rgba(0,0,0,.18)}
+.nav-item{border:1px solid transparent;margin:.28rem .55rem;border-radius:12px}
+.nav-item:hover{background:rgba(0,212,255,.07);border-color:rgba(0,212,255,.1)}
+.nav-item.active{background:linear-gradient(135deg,rgba(0,212,255,.16),rgba(0,153,204,.08));border-color:rgba(0,212,255,.2)}
+.main{background:radial-gradient(circle at 90% 5%,rgba(0,212,255,.055),transparent 25%),var(--dark)}
+.content-card,.stat-card{border-color:rgba(255,255,255,.075);box-shadow:0 14px 35px rgba(0,0,0,.12)}
+.moderation-summary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1rem;margin-bottom:1.2rem}
+.moderation-stat{background:linear-gradient(145deg,rgba(26,31,61,.96),rgba(18,23,48,.96));border:1px solid rgba(255,255,255,.07);border-radius:16px;padding:1.1rem 1.2rem;display:flex;align-items:center;justify-content:space-between}
+.moderation-stat span{color:var(--text-dim);font-size:.8rem}
+.moderation-stat strong{font-size:1.55rem;color:var(--primary)}
+.confession-toolbar{gap:1rem;flex-wrap:wrap}
+.confession-actions{display:flex;align-items:center;gap:.65rem;flex-wrap:wrap}
+.confession-actions input{width:min(330px,70vw);background:var(--dark);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:.68rem .85rem;color:#fff;font-family:Tajawal,sans-serif;outline:none}
+.confession-actions input:focus{border-color:rgba(0,212,255,.65);box-shadow:0 0 0 3px rgba(0,212,255,.07)}
+.confessions-admin-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1rem}
+.confession-admin-card{background:linear-gradient(145deg,rgba(10,14,39,.8),rgba(18,23,48,.9));border:1px solid rgba(255,255,255,.07);border-radius:16px;padding:1.15rem;display:flex;flex-direction:column;gap:.85rem;min-height:190px;transition:.22s}
+.confession-admin-card:hover{transform:translateY(-3px);border-color:rgba(0,212,255,.22)}
+.confession-admin-text{font-size:.94rem;line-height:1.9;white-space:pre-wrap;word-break:break-word;flex:1;color:#eef2ff}
+.confession-admin-meta{display:flex;justify-content:space-between;gap:.5rem;flex-wrap:wrap;color:var(--text-dim);font-size:.72rem}
+.confession-admin-footer{display:flex;align-items:center;justify-content:space-between;padding-top:.75rem;border-top:1px solid rgba(255,255,255,.055)}
+.confession-category{padding:.28rem .62rem;border-radius:999px;background:rgba(0,212,255,.08);color:var(--primary);font-size:.7rem;font-weight:800}
+.confession-delete-btn{border:1px solid rgba(239,68,68,.25);background:rgba(239,68,68,.08);color:#ff7a7a;border-radius:9px;padding:.48rem .72rem;cursor:pointer;font-family:Tajawal,sans-serif;font-weight:800}
+.confession-delete-btn:hover{background:#ef4444;color:#fff}
+.admin-empty-state{grid-column:1/-1;min-height:180px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.8rem;color:var(--text-dim);border:1px dashed rgba(255,255,255,.1);border-radius:16px}
+@media(max-width:760px){.moderation-summary{grid-template-columns:1fr}.confession-actions,.confession-actions input{width:100%}.confessions-admin-grid{grid-template-columns:1fr}}
+
 </style>
 <style>
 </style>
 <link rel="stylesheet" href="site-enhancements.css">
-<link rel="stylesheet" href="brand.css">
 </head>
 <body>
 
@@ -177,7 +205,7 @@ body { font-family:'Tajawal',sans-serif; background:var(--dark); color:var(--tex
     <div class="login-box">
         <div class="login-logo"><i class="fas fa-crown"></i></div>
         <h1>لوحة التحكم 👑</h1>
-        <p>UON Hub — Admin Dashboard</p>
+        <p>UoN Coffee — Admin Dashboard</p>
         <input type="password" class="login-inp" id="loginPass" placeholder="••••••••••••" onkeydown="if(event.key==='Enter')doLogin()">
         <button class="login-btn" onclick="doLogin()"><i class="fas fa-sign-in-alt"></i> دخول</button>
         <div class="login-error" id="loginError">كلمة المرور غير صحيحة!</div>
@@ -194,8 +222,8 @@ body { font-family:'Tajawal',sans-serif; background:var(--dark); color:var(--tex
     <!-- SIDEBAR -->
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-logo">
-            <div class="sidebar-logo-icon">UH</div>
-            <div><div class="sidebar-logo-text">UON <span>Hub</span></div><div style="font-size:.7rem;color:var(--text-dim);">Admin Dashboard</div></div>
+            <div class="sidebar-logo-icon">NU</div>
+            <div><div class="sidebar-logo-text">UoN <span>Coffee</span></div><div style="font-size:.7rem;color:var(--text-dim);">Admin Dashboard</div></div>
             <button onclick="toggleSidebar()" style="margin-right:auto;background:none;border:none;color:var(--text-dim);font-size:1.2rem;cursor:pointer;padding:4px;display:none;" id="sidebarCloseBtn"><i class="fas fa-times"></i></button>
         </div>
 
@@ -215,7 +243,7 @@ body { font-family:'Tajawal',sans-serif; background:var(--dark); color:var(--tex
 
         <div class="nav-section">
             <div class="nav-label">المحتوى</div>
-            <div class="nav-item" onclick="showSection('confessions',this)"><i class="fas fa-bullhorn"></i> الإعلانات <span class="nav-badge" id="navConfBadge" style="display:none">0</span></div>
+            <div class="nav-item" onclick="showSection('confessions',this)"><i class="fas fa-comments"></i> الاعترافات <span class="nav-badge" id="navConfBadge" style="display:none">0</span></div>
             <div class="nav-item" onclick="showSection('summaries',this)"><i class="fas fa-book"></i> الملخصات <span class="nav-badge" id="navSumBadge" style="display:none">0</span></div>
             <div class="nav-item" onclick="showSection('restaurants',this)"><i class="fas fa-utensils"></i> المطاعم</div>
             <div class="nav-item" onclick="showSection('groups',this)"><i class="fab fa-whatsapp"></i> مجموعات الواتساب <span class="nav-badge" id="navGroupBadge" style="display:none">0</span></div>
@@ -252,7 +280,7 @@ body { font-family:'Tajawal',sans-serif; background:var(--dark); color:var(--tex
                 <p>مرحباً! إليك ملخص نشاط الموقع</p>
             </div>
             <div class="stats-row" id="statsRow">
-                <div class="stat-card"><div class="stat-top"><div class="stat-icon" style="background:rgba(0,212,255,.1);color:var(--primary)"><i class="fas fa-bullhorn"></i></div><span class="stat-change neutral">إعلانات</span></div><div class="stat-value" id="statConfessions">—</div><div class="stat-label">الاعترافات</div></div>
+                <div class="stat-card"><div class="stat-top"><div class="stat-icon" style="background:rgba(0,212,255,.1);color:var(--primary)"><i class="fas fa-bullhorn"></i></div><span class="stat-change neutral">اعترافات</span></div><div class="stat-value" id="statConfessions">—</div><div class="stat-label">الاعترافات</div></div>
                 <div class="stat-card"><div class="stat-top"><div class="stat-icon" style="background:rgba(107,203,119,.1);color:var(--success)"><i class="fas fa-book"></i></div><span class="stat-change neutral">ملخصات</span></div><div class="stat-value" id="statSummaries">—</div><div class="stat-label">الملخصات</div></div>
                 <div class="stat-card"><div class="stat-top"><div class="stat-icon" style="background:rgba(251,146,60,.1);color:var(--warning)"><i class="fas fa-clock"></i></div><span class="stat-change up">جديد</span></div><div class="stat-value" id="statPending">—</div><div class="stat-label">بانتظار الموافقة</div></div>
                 <div class="stat-card"><div class="stat-top"><div class="stat-icon" style="background:rgba(37,211,102,.1);color:#25d366"><i class="fab fa-whatsapp"></i></div><span class="stat-change neutral">مجموعات</span></div><div class="stat-value" id="statGroups">—</div><div class="stat-label">مجموعات الواتساب</div></div>
@@ -293,21 +321,29 @@ body { font-family:'Tajawal',sans-serif; background:var(--dark); color:var(--tex
             </div>
         </div>
 
-        <!-- ANNOUNCEMENTS -->
+        <!-- CONFESSIONS -->
         <div class="section" id="section-confessions">
             <div class="page-header">
-                <h1>الإعلانات 📢</h1>
-                <p>إدارة إعلانات الجامعة</p>
+                <h1>إدارة الاعترافات 💬</h1>
+                <p>عرض الاعترافات المنشورة وحذف المحتوى المخالف</p>
             </div>
+
+            <div class="moderation-summary">
+                <div class="moderation-stat"><span>إجمالي الاعترافات</span><strong id="confessionTotalCount">0</strong></div>
+                <div class="moderation-stat"><span>اعترافات اليوم</span><strong id="confessionTodayCount">0</strong></div>
+                <div class="moderation-stat"><span>إجمالي الإعجابات</span><strong id="confessionLikesCount">0</strong></div>
+            </div>
+
             <div class="content-card">
-                <div class="card-header">
-                    <div class="card-title"><i class="fas fa-bullhorn" style="color:var(--primary)"></i> جميع الإعلانات</div>
+                <div class="card-header confession-toolbar">
+                    <div class="card-title"><i class="fas fa-comments" style="color:var(--primary)"></i> جميع الاعترافات</div>
+                    <div class="confession-actions">
+                        <input id="confessionAdminSearch" type="search" placeholder="ابحث داخل الاعترافات..." oninput="filterAdminConfessions(this.value)">
+                        <button class="card-action" onclick="loadConfessions()"><i class="fas fa-sync-alt"></i> تحديث</button>
+                    </div>
                 </div>
-                <div style="overflow-x:auto;">
-                    <table class="data-table" id="confTable">
-                        <thead><tr><th>العنوان</th><th>المحتوى</th><th>الوقت</th><th>إجراء</th></tr></thead>
-                        <tbody id="confTableBody"><tr><td colspan="4" style="text-align:center;color:var(--text-dim);padding:2rem;">جاري التحميل...</td></tr></tbody>
-                    </table>
+                <div id="confessionsAdminGrid" class="confessions-admin-grid">
+                    <div class="admin-empty-state"><i class="fas fa-spinner fa-spin"></i><span>جاري تحميل الاعترافات...</span></div>
                 </div>
             </div>
         </div>
@@ -734,9 +770,9 @@ async function loadStats() {
     try {
         const [ann, sum, tools, grp, mkt, proj] = await Promise.all([
             supabase.from('announcements').select('id', { count:'exact' }),
-            supabase.from('summaries').select('*', { count:'exact' }),
+            supabase.from('summaries').select('id,approved', { count:'exact' }),
             supabase.from('tools_items').select('id', { count:'exact' }),
-            supabase.from('whatsapp_groups').select('*', { count:'exact' }),
+            supabase.from('whatsapp_groups').select('id,approved', { count:'exact' }),
             supabase.from('marketplace').select('id', { count:'exact' }),
             supabase.from('projects').select('id', { count:'exact' }),
         ])
@@ -834,24 +870,117 @@ window.markAllRead = async function() {
 }
 
 // ===== CONFESSIONS =====
-async function loadConfessions() {
-    try {
-        const { data } = await supabase.from('announcements').select('*').order('created_at', { ascending:false })
-        const tbody = document.getElementById('confTableBody')
-        if (!data || !data.length) { tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--text-dim);padding:2rem;">لا توجد إعلانات</td></tr>'; return }
-        tbody.innerHTML = data.map(c => `
-            <tr>
-                <td style="font-weight:700">${c.title || c.name || '—'}</td>
-                <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${c.content || c.body || c.message || '—'}</td>
-                <td style="font-size:.75rem;color:var(--text-dim);">${formatTime(c.created_at)}</td>
-                <td><button class="btn-del" onclick="deleteConf('${c.id}')"><i class="fas fa-trash"></i></button></td>
-            </tr>`).join('')
-    } catch(e) {}
+let adminConfessions = []
+
+function escapeAdminHTML(value) {
+    return String(value ?? '')
+        .replaceAll('&','&amp;')
+        .replaceAll('<','&lt;')
+        .replaceAll('>','&gt;')
+        .replaceAll('"','&quot;')
+        .replaceAll("'","&#039;")
 }
 
-window.deleteConf = async function(id) {
-    if (!confirm('حذف هذا الإعلان؟')) return
-    try { await supabase.from('announcements').delete().eq('id', id); await loadConfessions(); showToast('تم الحذف', 'error') } catch(e) {}
+function renderAdminConfessions(records) {
+    const grid = document.getElementById('confessionsAdminGrid')
+    if (!grid) return
+
+    if (!records.length) {
+        grid.innerHTML = '<div class="admin-empty-state"><i class="fas fa-comment-slash"></i><span>لا توجد اعترافات</span></div>'
+        return
+    }
+
+    grid.innerHTML = records.map(c => {
+        const text = c.text || c.content || c.message || '—'
+        const words = String(text).trim() ? String(text).trim().split(/\s+/).length : 0
+        return `
+        <article class="confession-admin-card">
+            <div class="confession-admin-text">${escapeAdminHTML(text)}</div>
+            <div class="confession-admin-meta">
+                <span><i class="far fa-clock"></i> ${formatTime(c.created_at)}</span>
+                <span><i class="fas fa-font"></i> ${String(text).length} حرف · ${words} كلمة</span>
+                <span><i class="fas fa-heart"></i> ${Number(c.likes || 0)}</span>
+            </div>
+            <div class="confession-admin-footer">
+                <span class="confession-category">${escapeAdminHTML(c.category || 'عام')}</span>
+                <button class="confession-delete-btn" onclick="deleteConfessionAdmin('${c.id}')"><i class="fas fa-trash"></i> حذف</button>
+            </div>
+        </article>`
+    }).join('')
+}
+
+async function loadConfessions() {
+    const grid = document.getElementById('confessionsAdminGrid')
+    if (grid) grid.innerHTML = '<div class="admin-empty-state"><i class="fas fa-spinner fa-spin"></i><span>جاري تحميل الاعترافات...</span></div>'
+
+    try {
+        const { data, error } = await supabase.from('confessions').select('*').order('created_at', { ascending:false })
+        if (error) throw error
+
+        adminConfessions = Array.isArray(data) ? data : []
+        renderAdminConfessions(adminConfessions)
+
+        const todayString = new Date().toDateString()
+        const todayCount = adminConfessions.filter(c => new Date(c.created_at).toDateString() === todayString).length
+        const likes = adminConfessions.reduce((sum,c) => sum + Number(c.likes || 0), 0)
+
+        document.getElementById('confessionTotalCount').textContent = adminConfessions.length
+        document.getElementById('confessionTodayCount').textContent = todayCount
+        document.getElementById('confessionLikesCount').textContent = likes
+        document.getElementById('statConfessions').textContent = adminConfessions.length
+
+        const badge = document.getElementById('navConfBadge')
+        if (badge) {
+            badge.textContent = adminConfessions.length
+            badge.style.display = adminConfessions.length ? 'inline-block' : 'none'
+        }
+    } catch(e) {
+        console.error('Confessions admin load failed:', e)
+        if (grid) grid.innerHTML = `<div class="admin-empty-state" style="color:var(--danger)"><i class="fas fa-exclamation-triangle"></i><span>${escapeAdminHTML(e?.message || 'تعذر تحميل الاعترافات')}</span></div>`
+    }
+}
+
+window.filterAdminConfessions = function(query) {
+    const q = String(query || '').trim().toLowerCase()
+    renderAdminConfessions(!q ? adminConfessions : adminConfessions.filter(c =>
+        `${c.text || ''} ${c.category || ''}`.toLowerCase().includes(q)
+    ))
+}
+
+async function moderateConfessionSecure(id) {
+    const password = sessionStorage.getItem('uon_admin_password')
+    if (!password) throw new Error('انتهت جلسة المشرف، سجل الدخول مرة أخرى')
+
+    const response = await fetch(window._sbURL + '/rest/v1/rpc/moderate_confession', {
+        method: 'POST',
+        headers: {
+            apikey: window._sbKEY,
+            Authorization: 'Bearer ' + window._sbKEY,
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            p_password: password,
+            p_confession_id: String(id),
+            p_action: 'delete'
+        })
+    })
+
+    const result = await response.json()
+    if (!response.ok || result?.ok !== true) {
+        throw new Error(result?.message || result?.error || 'تعذر حذف الاعتراف')
+    }
+}
+
+window.deleteConfessionAdmin = async function(id) {
+    if (!confirm('هل تريد حذف هذا الاعتراف نهائيًا؟')) return
+    try {
+        await moderateConfessionSecure(id)
+        await loadConfessions()
+        showToast('تم حذف الاعتراف')
+    } catch(e) {
+        console.error('Delete confession failed:', e)
+        showToast(e.message || 'فشل حذف الاعتراف', 'error')
+    }
 }
 
 // ===== SUMMARIES =====
@@ -1381,6 +1510,5 @@ if ('serviceWorker' in navigator) {
     caches.keys().then(keys => keys.forEach(k => caches.delete(k)))
 }
 </script>
-<script src="language.js" defer></script>
 </body>
 </html>
