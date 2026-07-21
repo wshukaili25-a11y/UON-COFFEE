@@ -1,0 +1,7 @@
+UON Hub V5.3 — Tool Audit
+- GPA calculator: semester + cumulative + target GPA + local save.
+- Schedule: conflict detection, mobile cards, print, import/export, local save.
+- Tools: URL validation, status rendering, admin edit/add/delete/status/featured.
+- Telegram: stats, pending, maintenance, tools list, tool on/off, broadcast, moderation buttons.
+- JavaScript syntax validated with Node.
+- Bot token is intentionally not included.

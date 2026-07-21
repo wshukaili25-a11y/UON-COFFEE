@@ -44,6 +44,15 @@
           "value": "no-store, max-age=0"
         }
       ]
+    },
+    {
+      "source": "/(gpa|schedule|tools).html",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-store, max-age=0"
+        }
+      ]
     }
   ]
 }

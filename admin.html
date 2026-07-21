@@ -54,7 +54,7 @@ if(sessionStorage.getItem('uon_admin_entry')!=='granted'){
       <div class="field"><label>الرابط</label><input id="toolUrl"></div>
       <div class="field"><label>الإيموجي</label><input id="toolEmoji" placeholder="🧰"></div>
     </div>
-    <button class="primary-btn" style="margin-top:1rem" onclick="createTool()">إضافة الأداة</button>
+    <input type="hidden" id="toolEditId"><button class="primary-btn" style="margin-top:1rem" onclick="saveTool()">حفظ الأداة</button><button class="outline-btn" style="margin-top:1rem" onclick="resetToolForm()">إلغاء التعديل</button>
   </div>
   <div class="card admin-card"><div id="list-tools" class="admin-list"></div></div>
 </section>
