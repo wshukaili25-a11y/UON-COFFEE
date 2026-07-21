@@ -1,5 +1,5 @@
 
-import {$,$$,get,insert,update,remove,rpc,toast,esc} from './core.js';
+import {$,$$,get,insert,update,remove,rpc,toast,esc,edge} from './core.js';
 let authed=false;
 $('#loginForm').onsubmit=async e=>{e.preventDefault();try{const r=await rpc('check_admin_password',{p_password:$('#password').value});if(!(r?.ok??r===true))throw new Error('كلمة المرور غير صحيحة');authed=true;sessionStorage.setItem('uon_admin','1');$('#login').hidden=true;$('#dashboard').hidden=false;loadAll()}catch(err){toast(err.message,true)}};
 if(sessionStorage.getItem('uon_admin')==='1'){authed=true;$('#login').hidden=true;$('#dashboard').hidden=false;loadAll()}
@@ -21,3 +21,15 @@ async function tg(){const r=await get('telegram_admins','select=*&order=created_
 $('#addTg').onclick=async()=>{await insert('telegram_admins',{name:$('#tgName').value,chat_id:$('#tgChat').value,role:$('#tgRole').value,active:true,notifications_enabled:true});toast('تمت الإضافة');tg()}
 async function stats(){const names=['summaries','whatsapp_groups','student_projects','rating_submissions'];const counts=[];for(const t of names){const r=await get(t,'select=id');counts.push(r.length)}$('#stats').innerHTML=names.map((n,i)=>`<div class="card stat"><span>${n}</span><strong>${counts[i]}</strong></div>`).join('')}
 async function loadAll(){await Promise.allSettled([settings(),features(),loadPending(),ads(),tools(),programs(),tg(),stats()])}
+
+async function audit(action,entity,entityId=null,details={}){
+ try{await insert('admin_audit_log',{action,entity,entity_id:entityId,details})}catch{}
+}
+$('#testTelegram').onclick=async()=>{try{await edge({source:'admin-test',channel:'telegram'});toast('تم إرسال اختبار Telegram')}catch(e){toast(e.message,true)}};
+$('#testWhatsapp').onclick=async()=>{try{await fetch('https://irkhvydgxpseflggbeqq.supabase.co/functions/v1/whatsapp-notify',{method:'POST',headers:{apikey:'sb_publishable_gZ9tyM1udrkuQIXHqDtToQ_FyFmePgH','Content-Type':'application/json'},body:JSON.stringify({type:'test',to:$('#waTestPhone').value})}).then(async r=>{if(!r.ok)throw new Error(await r.text())});toast('تم إرسال طلب الاختبار')}catch(e){toast(e.message,true)}};
+$('#runDriveImport').onclick=async()=>{try{$('#importLog').textContent='جاري الاستيراد...';const r=await fetch('https://irkhvydgxpseflggbeqq.supabase.co/functions/v1/google-drive-import',{method:'POST',headers:{apikey:'sb_publishable_gZ9tyM1udrkuQIXHqDtToQ_FyFmePgH','Content-Type':'application/json'},body:JSON.stringify({folder_id:$('#driveFolderId').value,college:$('#driveCollege').value})});const text=await r.text();if(!r.ok)throw new Error(text);$('#importLog').textContent=text;toast('اكتمل الاستيراد')}catch(e){$('#importLog').textContent=e.message;toast(e.message,true)}};
+async function loadBackups(){try{const r=await get('backup_runs','select=*&order=created_at.desc&limit=20');$('#backupList').innerHTML=r.map(x=>`<div class="list-row"><div><strong>${esc(x.status)}</strong><small>${new Date(x.created_at).toLocaleString('ar')} • ${esc(x.file_path||'')}</small></div></div>`).join('')}catch{}}
+$('#runBackup').onclick=async()=>{try{const r=await fetch('https://irkhvydgxpseflggbeqq.supabase.co/functions/v1/database-backup',{method:'POST',headers:{apikey:'sb_publishable_gZ9tyM1udrkuQIXHqDtToQ_FyFmePgH','Content-Type':'application/json'},body:'{}'});const text=await r.text();if(!r.ok)throw new Error(text);toast('تم إنشاء النسخة الاحتياطية');loadBackups()}catch(e){toast(e.message,true)}};
+async function loadAudit(){try{const r=await get('admin_audit_log','select=*&order=created_at.desc&limit=100');$('#auditList').innerHTML=r.map(x=>`<div class="list-row"><div><strong>${esc(x.action)} — ${esc(x.entity)}</strong><small>${new Date(x.created_at).toLocaleString('ar')} • ${esc(JSON.stringify(x.details||{}))}</small></div></div>`).join('')}catch{}}
+document.querySelector('[data-section="backups"]')?.addEventListener('click',loadBackups);
+document.querySelector('[data-section="audit"]')?.addEventListener('click',loadAudit);
