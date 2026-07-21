@@ -9,13 +9,12 @@ const DATABASE_WEBHOOK_SECRET = Deno.env.get('DATABASE_WEBHOOK_SECRET')!;
 const SITE_URL = Deno.env.get('SITE_URL') || '';
 
 const corsHeaders={
-  'Access-Control-Allow-Origin':'*',
-  'Access-Control-Allow-Headers':'authorization, x-client-info, apikey, content-type, x-database-webhook-secret, x-telegram-bot-api-secret-token',
-  'Access-Control-Allow-Methods':'POST, OPTIONS'
+ 'Access-Control-Allow-Origin':'*',
+ 'Access-Control-Allow-Headers':'authorization, x-client-info, apikey, content-type, x-database-webhook-secret, x-telegram-bot-api-secret-token',
+ 'Access-Control-Allow-Methods':'POST, OPTIONS'
 };
-
-function corsResponse(body='ok',status=200){
-  return new Response(body,{status,headers:{...corsHeaders,'Content-Type':'text/plain; charset=utf-8'}});
+function response(body='ok',status=200){
+ return new Response(body,{status,headers:{...corsHeaders,'Content-Type':'text/plain; charset=utf-8'}});
 }
 
 const supabase = createClient(SUPABASE_URL, SERVICE_ROLE_KEY);
@@ -44,7 +43,7 @@ async function telegram(method:string, body:Record<string,unknown>){
 }
 
 async function activeAdmins(){
-  const {data,error}=await supabase.from('telegram_admins').select('*').eq('active',true);
+  const {data,error}=await supabase.from('telegram_admins').select('').eq('active',true);
   if(error) throw error;
   return data || [];
 }
@@ -52,7 +51,7 @@ async function activeAdmins(){
 async function findAdmin(chatId:string){
   const {data}=await supabase
     .from('telegram_admins')
-    .select('*')
+    .select('')
     .eq('chat_id',chatId)
     .eq('active',true)
     .maybeSingle();
@@ -122,7 +121,7 @@ async function statsText(){
 
   const values:number[]=[];
   for(const [table,filter] of queries){
-    let q=supabase.from(table).select('*',{count:'exact',head:true});
+    let q=supabase.from(table).select('',{count:'exact',head:true});
     for(const [k,v] of Object.entries(filter)) q=q.eq(k,v);
     const {count}=await q;
     values.push(count||0);
@@ -161,7 +160,7 @@ async function pendingItems(table:string,page=0){
   const def=moderationTables[table];
   if(!def) return {text:'نوع غير معروف',keyboard:{inline_keyboard:[]}};
 
-  let query=supabase.from(table).select('*').order('created_at',{ascending:false}).range(page*5,page*5+4);
+  let query=supabase.from(table).select('').order('created_at',{ascending:false}).range(page5,page5+4);
   query = def.statusColumn==='approved' ? query.eq('approved',false) : query.eq('status','pending');
   const {data,error}=await query;
   if(error) throw error;
@@ -174,7 +173,7 @@ async function pendingItems(table:string,page=0){
   }
 
   const rows:any[]=[];
-  let text=`🕓 *${def.label} — الطلبات المعلقة*\n\n`;
+  let text=`🕓 ${def.label} — الطلبات المعلقة\n\n`;
 
   data.forEach((item:any,index:number)=>{
     const title=preview(item[def.title]||item.title||item.content||'طلب',120);
@@ -195,27 +194,42 @@ async function pendingItems(table:string,page=0){
 }
 
 async function toolsMenu(){
-  const {data,error}=await supabase.from('tools_items').select('id,name,status').order('name');
-  if(error) throw error;
+  const {data,error}=await supabase
+    .from('tools_items')
+    .select('id,name,status,category_id')
+    .eq('category_id','platform')
+    .order('name');
+  if(error)throw error;
 
-  const rows=(data||[]).map((t:any)=>[
-    {text:`${t.status==='active'?'🟢':'🔴'} ${t.name}`,callback_data:`toolmenu|${t.id}`},
+  const unique=[];
+  const seen=new Set();
+  for(const tool of (data||[])){
+    const key=String(tool.id);
+    if(seen.has(key))continue;
+    seen.add(key);
+    unique.push(tool);
+  }
+
+  const rows=unique.map((t:any)=>[
+    {text:`${t.status==='active'?'🟢':'🔴'} ${t.name}`,callback_data:`toolmenu|${t.id}`}
   ]);
   rows.push([{text:'⬅️ الرئيسية',callback_data:'menu|home'}]);
 
   return {
-    text:'🛠 التحكم بالأدوات\n\nاختر أداة لتغيير حالتها:',
+    text:'🛠 التحكم بخدمات الموقع
+
+اختر الخدمة:',
     keyboard:{inline_keyboard:rows}
   };
 }
 
 async function toolActions(id:string){
-  const {data,error}=await supabase.from('tools_items').select('*').eq('id',id).maybeSingle();
+  const {data,error}=await supabase.from('tools_items').select('').eq('id',id).maybeSingle();
   if(error) throw error;
   if(!data) throw new Error('الأداة غير موجودة');
 
   return {
-    text:`🛠 *${data.name}*\nالحالة الحالية: ${data.status||'active'}`,
+    text:`🛠 ${data.name}\nالحالة الحالية: ${data.status||'active'}`,
     keyboard:{inline_keyboard:[
       [
         {text:'🟢 تشغيل',callback_data:`toolstatus|${id}|active`},
@@ -258,7 +272,7 @@ async function announcementsMenu(){
 }
 
 async function listAnnouncements(){
-  const {data,error}=await supabase.from('site_announcements').select('*').order('created_at',{ascending:false}).limit(8);
+  const {data,error}=await supabase.from('site_announcements').select('').order('created_at',{ascending:false}).limit(8);
   if(error) throw error;
 
   const rows=(data||[]).map((a:any)=>[
@@ -273,7 +287,7 @@ async function listAnnouncements(){
 }
 
 async function announcementActions(id:string){
-  const {data,error}=await supabase.from('site_announcements').select('*').eq('id',id).maybeSingle();
+  const {data,error}=await supabase.from('site_announcements').select('').eq('id',id).maybeSingle();
   if(error) throw error;
   if(!data) throw new Error('الإعلان غير موجود');
 
@@ -299,7 +313,7 @@ async function setConversation(chatId:string,state:string,data:any={}){
 }
 
 async function getConversation(chatId:string){
-  const {data}=await supabase.from('telegram_conversations').select('*').eq('chat_id',chatId).maybeSingle();
+  const {data}=await supabase.from('telegram_conversations').select('').eq('chat_id',chatId).maybeSingle();
   return data;
 }
 
@@ -316,35 +330,22 @@ async function notifyInsert(payload:any){
   const title=preview(record[def.title]||record.title||record.content||'طلب جديد',100);
   const text=`🔔 ${def.label} جديد بانتظار المراجعة\n\n${title}`;
 
-  let delivered=0;
-  const failures:string[]=[];
-
   for(const admin of await activeAdmins()){
     if(!admin.notifications_enabled || !has(admin,def.approvePermission)) continue;
 
-    try{
-      await telegram('sendMessage',{
-        chat_id:admin.chat_id,
-        text,
-        reply_markup:{
-          inline_keyboard:[
-            [
-              {text:'قبول ✅',callback_data:`approve|${table}|${record.id}`},
-              {text:'رفض ❌',callback_data:`reject|${table}|${record.id}`}
-            ],
-            [{text:'فتح لوحة الإدارة 🔗',url:`${SITE_URL}/admin.html`}]
-          ]
-        }
-      });
-      delivered++;
-    }catch(error){
-      failures.push(`${admin.chat_id}: ${String(error?.message||error)}`);
-      console.error('Telegram notification failed',admin.chat_id,error);
-    }
-  }
-
-  if(delivered===0){
-    throw new Error(`Telegram delivery failed: ${failures.join(' | ')||'no eligible active admins'}`);
+    await telegram('sendMessage',{
+      chat_id:admin.chat_id,
+      text,
+      reply_markup:{
+        inline_keyboard:[
+          [
+            {text:'قبول ✅',callback_data:`approve|${table}|${record.id}`},
+            {text:'رفض ❌',callback_data:`reject|${table}|${record.id}`}
+          ],
+          [{text:'فتح لوحة الإدارة 🔗',url:`${SITE_URL}/admin.html`}]
+        ]
+      }
+    });
   }
 }
 
@@ -393,7 +394,7 @@ async function handleCallback(callback:any,admin:any){
     }else if(section==='stats'){
       await editMessage(chatId,messageId,await statsText(),{inline_keyboard:[[{text:'⬅️ الرئيسية',callback_data:'menu|home'}]]});
     }else if(section==='pending'){
-      await editMessage(chatId,messageId,'🕓 *اختر قسم الطلبات المعلقة*',await pendingKeyboard(admin));
+      await editMessage(chatId,messageId,'🕓 اختر قسم الطلبات المعلقة',await pendingKeyboard(admin));
     }else if(section==='tools'){
       if(!has(admin,'tools')) throw new Error('ليس لديك صلاحية الأدوات');
       const menu=await toolsMenu();
@@ -556,6 +557,18 @@ async function handleMessage(message:any,admin:any){
     }
   }
 
+  if(text==='/notify_test'){
+    await telegram('sendMessage',{chat_id:chatId,text:'✅ إشعارات UON Hub تعمل بنجاح'});
+    return;
+  }
+
+  if(text==='/health'){
+    const {data:setting}=await supabase.from('site_settings').select('value').eq('key','maintenance_enabled').maybeSingle();
+    const {count}=await supabase.from('telegram_admins').select('*',{count:'exact',head:true}).eq('active',true);
+    await telegram('sendMessage',{chat_id:chatId,text:`حالة البوت: يعمل ✅\nالصيانة: ${setting?.value===true?'مفعلة':'متوقفة'}\nالمشرفون النشطون: ${count||0}`});
+    return;
+  }
+
   if(text==='/stats'){
     if(!has(admin,'stats')) throw new Error('ليس لديك صلاحية الإحصائيات');
     await telegram('sendMessage',{chat_id:chatId,text:await statsText()});
@@ -660,43 +673,33 @@ async function notifyWebSubmission(payload:any){
  const table=String(payload.table||'');
  const id=String(payload.id||'');
  const def=moderationTables[table];
-
  if(!def||!id)throw new Error('invalid submission');
 
- let q=supabase.from(table).select('*').eq('id',id);
- q=def.statusColumn==='approved'?q.eq('approved',false):q.eq('status','pending');
-
- const {data,error}=await q.maybeSingle();
+ let query=supabase.from(table).select('*').eq('id',id);
+ query=def.statusColumn==='approved'?query.eq('approved',false):query.eq('status','pending');
+ const {data,error}=await query.maybeSingle();
  if(error)throw error;
  if(!data)throw new Error('pending record not found');
 
- const {data:existing}=await supabase
-   .from('telegram_notification_log')
-   .select('record_id')
-   .eq('table_name',table)
-   .eq('record_id',id)
-   .maybeSingle();
-
- if(existing)return;
+ const {data:old}=await supabase.from('telegram_notification_log')
+   .select('record_id').eq('table_name',table).eq('record_id',id).maybeSingle();
+ if(old)return;
 
  await notifyInsert({table,record:data});
 
- const {error:logError}=await supabase
-   .from('telegram_notification_log')
+ const {error:logError}=await supabase.from('telegram_notification_log')
    .insert({table_name:table,record_id:id});
-
  if(logError&&logError.code!=='23505')throw logError;
 }
 
 Deno.serve(async(req)=>{
-  if(req.method==='OPTIONS')return corsResponse('',204);
-
+  if(req.method==='OPTIONS')return response('',204);
   try{
     const telegramSecret=req.headers.get('x-telegram-bot-api-secret-token');
     const databaseSecret=req.headers.get('x-database-webhook-secret');
     const payload=await req.json();
 
-    if(payload?.source==='web-submit'){await notifyWebSubmission(payload);return corsResponse('ok');}
+    if(payload?.source==='web-submit'){await notifyWebSubmission(payload);return response('ok');}
 
     if(telegramSecret===WEBHOOK_SECRET){
       return handleTelegram(payload);
@@ -707,9 +710,9 @@ Deno.serve(async(req)=>{
       return new Response('ok');
     }
 
-    return corsResponse('unauthorized',401);
+    return response('unauthorized',401);
   }catch(error){
     console.error(error);
-    return corsResponse(String(error.message||error),500);
+    return response(String(error.message||error),500);
   }
 });
