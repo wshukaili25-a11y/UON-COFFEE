@@ -5,7 +5,7 @@ export async function api(table,{method='GET',query='',body,prefer}={}){
  const controller=new AbortController();const timer=setTimeout(()=>controller.abort(),12000);
  try{
   const headers={...baseHeaders};if(prefer)headers.Prefer=prefer;
-  const res=await fetch(`${SUPABASE_URL}/rest/v1/${table}${query?`?${query}`:''}`,{method,headers,body:body===undefined?undefined:JSON.stringify(body),signal:controller.signal});
+  const res=await fetch(`${SUPABASE_URL}/rest/v1/${table}${query?`?${query}`:''}`,{method,headers,body:body===undefined?undefined:JSON.stringify(body),signal:controller.signal,cache:'no-store'});
   const text=await res.text();const data=text?JSON.parse(text):null;
   if(!res.ok)throw new Error(data?.message||data?.error||`HTTP ${res.status}`);return data;
  }finally{clearTimeout(timer)}
@@ -23,10 +23,15 @@ export async function rpc(name,body){
 }
 
 export async function notifyPending(table,id){
- try{
-  const res=await fetch(`${SUPABASE_URL}/functions/v1/telegram-admin`,{
-   method:'POST',headers:{...baseHeaders},body:JSON.stringify({source:'web-submit',table,id})
-  });
-  if(!res.ok)console.warn('Telegram notification failed',await res.text());
- }catch(error){console.warn('Telegram notification unavailable',error)}
+ if(!id)throw new Error('تعذر تحديد رقم الطلب لإرسال الإشعار');
+ const res=await fetch(`${SUPABASE_URL}/functions/v1/telegram-admin`,{
+  method:'POST',
+  mode:'cors',
+  cache:'no-store',
+  headers:{...baseHeaders},
+  body:JSON.stringify({source:'web-submit',table,id})
+ });
+ const text=await res.text();
+ if(!res.ok)throw new Error(text||'تعذر إرسال إشعار تلجرام');
+ return true;
 }

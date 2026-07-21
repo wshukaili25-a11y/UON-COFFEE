@@ -6,6 +6,6 @@ try{
   if(settings.maintenance_message){
     document.getElementById('maintenanceMessage').textContent=settings.maintenance_message;
   }
-  const on=settings.maintenance_enabled===true||settings.maintenance_enabled==='true';
+  const raw=settings.maintenance_enabled;const on=raw===true||raw===1||String(raw).toLowerCase()==='true';
   if(!on)location.replace('index.html');
 }catch{}
