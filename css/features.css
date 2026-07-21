@@ -1,0 +1,10 @@
+
+.feature-shell{padding:4rem 0}.feature-card{padding:1.2rem}.feature-grid{grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}
+.chat-shell{max-width:900px;margin:auto}.chat-window{min-height:480px;max-height:600px;overflow:auto;padding:1rem;display:flex;flex-direction:column;gap:.8rem}
+.msg{max-width:78%;padding:.8rem 1rem;border-radius:16px;line-height:1.7}.msg.bot{align-self:flex-start;background:var(--surface2)}.msg.user{align-self:flex-end;background:rgba(24,199,244,.16);border:1px solid rgba(24,199,244,.2)}
+.chat-form{display:flex;gap:.6rem;margin-top:.8rem}.chat-form input{flex:1;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:.8rem;color:white}
+.program-card{padding:1rem}.program-card h3{margin:.45rem 0}.program-details{display:grid;grid-template-columns:repeat(2,1fr);gap:.5rem;margin:.7rem 0}.program-detail{padding:.6rem;border-radius:10px;background:rgba(255,255,255,.03)}.program-detail span{display:block;color:var(--muted);font-size:.7rem}
+.gpa-table{width:100%;border-collapse:collapse}.gpa-table td,.gpa-table th{padding:.6rem;border-bottom:1px solid var(--line)}.gpa-table input,.gpa-table select{width:100%;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:.55rem;color:white}
+.schedule-grid{display:grid;grid-template-columns:90px repeat(5,minmax(130px,1fr));min-width:800px}.schedule-cell{border:1px solid var(--line);padding:.55rem;min-height:66px}.schedule-wrap{overflow:auto}.schedule-cell input{width:100%;background:transparent;border:0;color:white;outline:none}
+.status-select{background:var(--bg);border:1px solid var(--line);color:white;border-radius:8px;padding:.4rem}
+@media(max-width:650px){.msg{max-width:92%}.program-details{grid-template-columns:1fr}}
