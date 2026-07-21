@@ -8,6 +8,16 @@ const WEBHOOK_SECRET = Deno.env.get('TELEGRAM_WEBHOOK_SECRET')!;
 const DATABASE_WEBHOOK_SECRET = Deno.env.get('DATABASE_WEBHOOK_SECRET')!;
 const SITE_URL = Deno.env.get('SITE_URL') || '';
 
+const corsHeaders={
+  'Access-Control-Allow-Origin':'*',
+  'Access-Control-Allow-Headers':'authorization, x-client-info, apikey, content-type, x-database-webhook-secret, x-telegram-bot-api-secret-token',
+  'Access-Control-Allow-Methods':'POST, OPTIONS'
+};
+
+function corsResponse(body='ok',status=200){
+  return new Response(body,{status,headers:{...corsHeaders,'Content-Type':'text/plain; charset=utf-8'}});
+}
+
 const supabase = createClient(SUPABASE_URL, SERVICE_ROLE_KEY);
 
 const moderationTables: Record<string, {
@@ -96,8 +106,7 @@ function mainKeyboard(admin:any){
 async function sendMainMenu(chatId:string,admin:any,text='لوحة تحكم UON Hub'){
   await telegram('sendMessage',{
     chat_id:chatId,
-    text:`🏠 *${text}*\n\nمرحبًا ${admin.name} — الصلاحية: ${admin.role}`,
-    parse_mode:'Markdown',
+    text:`🏠 ${text}\n\nمرحبًا ${admin.name} — الصلاحية: ${admin.role}`,
     reply_markup:mainKeyboard(admin)
   });
 }
@@ -126,7 +135,7 @@ async function statsText(){
 
   const maintenance = settings?.find((x:any)=>x.key==='maintenance_enabled')?.value === true;
 
-  return `📊 *إحصائيات UON Hub*\n\n`+
+  return `📊 إحصائيات UON Hub\n\n`+
     `📚 ملخصات معلقة: ${values[0]}\n`+
     `💬 مجموعات معلقة: ${values[1]}\n`+
     `💻 مشاريع معلقة: ${values[2]}\n`+
@@ -195,7 +204,7 @@ async function toolsMenu(){
   rows.push([{text:'⬅️ الرئيسية',callback_data:'menu|home'}]);
 
   return {
-    text:'🛠 *التحكم بالأدوات*\n\nاختر أداة لتغيير حالتها:',
+    text:'🛠 التحكم بالأدوات\n\nاختر أداة لتغيير حالتها:',
     keyboard:{inline_keyboard:rows}
   };
 }
@@ -226,7 +235,7 @@ async function maintenanceMenu(){
   const on=data?.value===true;
 
   return {
-    text:`🔧 *وضع الصيانة*\n\nالحالة الحالية: ${on?'🔴 مفعّل':'🟢 متوقف'}`,
+    text:`🔧 وضع الصيانة\n\nالحالة الحالية: ${on?'🔴 مفعّل':'🟢 متوقف'}`,
     keyboard:{inline_keyboard:[
       [
         {text:'تشغيل الصيانة 🔴',callback_data:'maintenance|on'},
@@ -239,7 +248,7 @@ async function maintenanceMenu(){
 
 async function announcementsMenu(){
   return {
-    text:'📢 *إدارة الإعلانات*\n\nاختر الإجراء:',
+    text:'📢 إدارة الإعلانات\n\nاختر الإجراء:',
     keyboard:{inline_keyboard:[
       [{text:'➕ إعلان جديد',callback_data:'announcement|new'}],
       [{text:'📋 آخر الإعلانات',callback_data:'announcement|list'}],
@@ -258,7 +267,7 @@ async function listAnnouncements(){
   rows.push([{text:'⬅️ الإعلانات',callback_data:'menu|announcements'}]);
 
   return {
-    text:'📋 *آخر الإعلانات*',
+    text:'📋 آخر الإعلانات',
     keyboard:{inline_keyboard:rows}
   };
 }
@@ -269,7 +278,7 @@ async function announcementActions(id:string){
   if(!data) throw new Error('الإعلان غير موجود');
 
   return {
-    text:`📢 *${data.title}*\n\n${preview(data.body,500)}\n\nالحالة: ${data.active?'مفعّل':'متوقف'}`,
+    text:`📢 ${data.title}\n\n${preview(data.body,500)}\n\nالحالة: ${data.active?'مفعّل':'متوقف'}`,
     keyboard:{inline_keyboard:[
       [
         {text:data.active?'إيقاف':'تشغيل',callback_data:`anntoggle|${id}|${data.active?'off':'on'}`},
@@ -305,25 +314,37 @@ async function notifyInsert(payload:any){
   if(!def) return;
 
   const title=preview(record[def.title]||record.title||record.content||'طلب جديد',100);
-  const text=`🔔 *${def.label} جديد بانتظار المراجعة*\n\n${title}`;
+  const text=`🔔 ${def.label} جديد بانتظار المراجعة\n\n${title}`;
+
+  let delivered=0;
+  const failures:string[]=[];
 
   for(const admin of await activeAdmins()){
     if(!admin.notifications_enabled || !has(admin,def.approvePermission)) continue;
 
-    await telegram('sendMessage',{
-      chat_id:admin.chat_id,
-      text,
-      parse_mode:'Markdown',
-      reply_markup:{
-        inline_keyboard:[
-          [
-            {text:'قبول ✅',callback_data:`approve|${table}|${record.id}`},
-            {text:'رفض ❌',callback_data:`reject|${table}|${record.id}`}
-          ],
-          [{text:'فتح لوحة الإدارة 🔗',url:`${SITE_URL}/admin.html`}]
-        ]
-      }
-    });
+    try{
+      await telegram('sendMessage',{
+        chat_id:admin.chat_id,
+        text,
+        reply_markup:{
+          inline_keyboard:[
+            [
+              {text:'قبول ✅',callback_data:`approve|${table}|${record.id}`},
+              {text:'رفض ❌',callback_data:`reject|${table}|${record.id}`}
+            ],
+            [{text:'فتح لوحة الإدارة 🔗',url:`${SITE_URL}/admin.html`}]
+          ]
+        }
+      });
+      delivered++;
+    }catch(error){
+      failures.push(`${admin.chat_id}: ${String(error?.message||error)}`);
+      console.error('Telegram notification failed',admin.chat_id,error);
+    }
+  }
+
+  if(delivered===0){
+    throw new Error(`Telegram delivery failed: ${failures.join(' | ')||'no eligible active admins'}`);
   }
 }
 
@@ -354,7 +375,6 @@ async function editMessage(chatId:string,messageId:number,text:string,keyboard:a
     chat_id:chatId,
     message_id:messageId,
     text,
-    parse_mode:'Markdown',
     reply_markup:keyboard
   });
 }
@@ -369,7 +389,7 @@ async function handleCallback(callback:any,admin:any){
     const section=parts[1];
 
     if(section==='home'){
-      await editMessage(chatId,messageId,'🏠 *لوحة تحكم UON Hub*',mainKeyboard(admin));
+      await editMessage(chatId,messageId,'🏠 لوحة تحكم UON Hub',mainKeyboard(admin));
     }else if(section==='stats'){
       await editMessage(chatId,messageId,await statsText(),{inline_keyboard:[[{text:'⬅️ الرئيسية',callback_data:'menu|home'}]]});
     }else if(section==='pending'){
@@ -451,7 +471,7 @@ async function handleCallback(callback:any,admin:any){
 
     if(parts[1]==='new'){
       await setConversation(chatId,'announcement_title',{});
-      await telegram('sendMessage',{chat_id:chatId,text:'📢 أرسل الآن *عنوان الإعلان*',parse_mode:'Markdown'});
+      await telegram('sendMessage',{chat_id:chatId,text:'📢 أرسل الآن عنوان الإعلان'});
       await telegram('answerCallbackQuery',{callback_query_id:callback.id,text:'ابدأ بكتابة العنوان'});
     }else if(parts[1]==='list'){
       const menu=await listAnnouncements();
@@ -507,7 +527,7 @@ async function handleMessage(message:any,admin:any){
   if(conversation){
     if(conversation.state==='announcement_title'){
       await setConversation(chatId,'announcement_body',{title:text});
-      await telegram('sendMessage',{chat_id:chatId,text:'أرسل الآن *نص الإعلان*',parse_mode:'Markdown'});
+      await telegram('sendMessage',{chat_id:chatId,text:'أرسل الآن نص الإعلان'});
       return;
     }
 
@@ -515,8 +535,7 @@ async function handleMessage(message:any,admin:any){
       await setConversation(chatId,'announcement_url',{...conversation.data,body:text});
       await telegram('sendMessage',{
         chat_id:chatId,
-        text:'أرسل رابط الإعلان، أو اكتب `skip` لتخطيه',
-        parse_mode:'Markdown'
+        text:'أرسل رابط الإعلان، أو اكتب `skip` لتخطيه'
       });
       return;
     }
@@ -527,8 +546,7 @@ async function handleMessage(message:any,admin:any){
       await setConversation(chatId,'announcement_confirm',payload);
       await telegram('sendMessage',{
         chat_id:chatId,
-        text:`📢 *معاينة الإعلان*\n\n*${payload.title}*\n${payload.body}\n${url?`\n${url}`:''}`,
-        parse_mode:'Markdown',
+        text:`📢 معاينة الإعلان\n\n${payload.title}\n${payload.body}\n${url?`\n${url}`:''}`,
         reply_markup:{inline_keyboard:[
           [{text:'نشر ✅',callback_data:'annpublish|yes'}],
           [{text:'إلغاء ❌',callback_data:'annpublish|no'}]
@@ -540,7 +558,7 @@ async function handleMessage(message:any,admin:any){
 
   if(text==='/stats'){
     if(!has(admin,'stats')) throw new Error('ليس لديك صلاحية الإحصائيات');
-    await telegram('sendMessage',{chat_id:chatId,text:await statsText(),parse_mode:'Markdown'});
+    await telegram('sendMessage',{chat_id:chatId,text:await statsText()});
     return;
   }
 
@@ -639,23 +657,46 @@ async function handleTelegram(update:any){
 
 
 async function notifyWebSubmission(payload:any){
- const table=String(payload.table||'');const id=String(payload.id||'');const def=moderationTables[table];
+ const table=String(payload.table||'');
+ const id=String(payload.id||'');
+ const def=moderationTables[table];
+
  if(!def||!id)throw new Error('invalid submission');
+
  let q=supabase.from(table).select('*').eq('id',id);
  q=def.statusColumn==='approved'?q.eq('approved',false):q.eq('status','pending');
- const {data,error}=await q.maybeSingle();if(error)throw error;if(!data)throw new Error('pending record not found');
- const {error:logError}=await supabase.from('telegram_notification_log').insert({table_name:table,record_id:id});
- if(logError&&logError.code==='23505')return; if(logError)throw logError;
+
+ const {data,error}=await q.maybeSingle();
+ if(error)throw error;
+ if(!data)throw new Error('pending record not found');
+
+ const {data:existing}=await supabase
+   .from('telegram_notification_log')
+   .select('record_id')
+   .eq('table_name',table)
+   .eq('record_id',id)
+   .maybeSingle();
+
+ if(existing)return;
+
  await notifyInsert({table,record:data});
+
+ const {error:logError}=await supabase
+   .from('telegram_notification_log')
+   .insert({table_name:table,record_id:id});
+
+ if(logError&&logError.code!=='23505')throw logError;
 }
 
 Deno.serve(async(req)=>{
+  if(req.method==='OPTIONS')return corsResponse('',204);
+
   try{
     const telegramSecret=req.headers.get('x-telegram-bot-api-secret-token');
     const databaseSecret=req.headers.get('x-database-webhook-secret');
     const payload=await req.json();
 
-    if(payload?.source==='web-submit'){await notifyWebSubmission(payload);return new Response('ok');}
+    if(payload?.source==='web-submit'){await notifyWebSubmission(payload);return corsResponse('ok');}
 
     if(telegramSecret===WEBHOOK_SECRET){
       return handleTelegram(payload);
@@ -666,9 +707,9 @@ Deno.serve(async(req)=>{
       return new Response('ok');
     }
 
-    return new Response('unauthorized',{status:401});
+    return corsResponse('unauthorized',401);
   }catch(error){
     console.error(error);
-    return new Response(String(error.message||error),{status:500});
+    return corsResponse(String(error.message||error),500);
   }
 });
