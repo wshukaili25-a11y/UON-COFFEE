@@ -1,204 +1,51 @@
 
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
-
-const BOT_TOKEN = Deno.env.get('TELEGRAM_BOT_TOKEN')!;
-const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!;
-const SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-const WEBHOOK_SECRET = Deno.env.get('TELEGRAM_WEBHOOK_SECRET')!;
-const DATABASE_WEBHOOK_SECRET = Deno.env.get('DATABASE_WEBHOOK_SECRET')!;
-const SITE_URL = Deno.env.get('SITE_URL') || '';
-
-const supabase = createClient(SUPABASE_URL, SERVICE_ROLE_KEY);
-
-const moderationTables: Record<string, { label:string; title:string; statusColumn?:string; approvedValue?:unknown; rejectedValue?:unknown }> = {
-  summaries:{label:'ملخص',title:'title',statusColumn:'approved',approvedValue:true,rejectedValue:false},
-  whatsapp_groups:{label:'مجموعة واتساب',title:'subject',statusColumn:'approved',approvedValue:true,rejectedValue:false},
-  student_projects:{label:'مشروع طالب',title:'title'},
-  rating_submissions:{label:'تقييم',title:'target_name'},
-  confessions:{label:'اعتراف',title:'content'}
+import {createClient} from 'https://esm.sh/@supabase/supabase-js@2';
+const TOKEN=Deno.env.get('TELEGRAM_BOT_TOKEN')!;
+const URL=Deno.env.get('SUPABASE_URL')!;
+const KEY=Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+const TG_SECRET=Deno.env.get('TELEGRAM_WEBHOOK_SECRET')!;
+const DB_SECRET=Deno.env.get('DATABASE_WEBHOOK_SECRET')!;
+const SITE=Deno.env.get('SITE_URL')||'';
+const db=createClient(URL,KEY);
+const cors={'Access-Control-Allow-Origin':'*','Access-Control-Allow-Headers':'*','Access-Control-Allow-Methods':'POST,OPTIONS'};
+const res=(s='ok',status=200)=>new Response(s,{status,headers:cors});
+async function tg(method:string,body:any){const r=await fetch(`https://api.telegram.org/bot${TOKEN}/${method}`,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(body)});if(!r.ok)throw new Error(await r.text());return r.json()}
+async function admin(chat:string){const {data}=await db.from('telegram_admins').select('*').eq('chat_id',chat).eq('active',true).maybeSingle();return data}
+const tables:any={
+ summaries:{title:'title',pending:{approved:false},approve:{approved:true}},
+ whatsapp_groups:{title:'subject',pending:{approved:false},approve:{approved:true}},
+ student_projects:{title:'title',pending:{status:'pending'},approve:{status:'approved'},reject:{status:'rejected'}},
+ rating_submissions:{title:'target_name',pending:{status:'pending'},approve:{status:'approved'},reject:{status:'rejected'}},
+ confessions:{title:'content',pending:{status:'pending'},approve:{status:'approved'},reject:{status:'rejected'}}
 };
-
-async function telegram(method:string, body:Record<string,unknown>){
-  const res=await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/${method}`,{
-    method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(body)
-  });
-  if(!res.ok)throw new Error(await res.text());
-  return res.json();
-}
-
-async function activeAdmins(){
-  const {data,error}=await supabase.from('telegram_admins').select('*').eq('active',true);
-  if(error)throw error;
-  return data || [];
-}
-
-async function findAdmin(chatId:string){
-  const {data}=await supabase.from('telegram_admins').select('*').eq('chat_id',chatId).eq('active',true).maybeSingle();
-  return data;
-}
-
-function can(admin:any, permission:string){
-  if(!admin)return false;
-  if(admin.role==='owner'||admin.role==='admin')return true;
-  return admin.permissions?.[permission]===true;
-}
-
-function preview(value:unknown,max=160){
-  const s=String(value ?? '').replace(/\s+/g,' ').trim();
-  return s.length>max?s.slice(0,max)+'…':s;
-}
-
-async function notifyInsert(payload:any){
-  const table=payload.table;
-  const record=payload.record;
-  const def=moderationTables[table];
-  if(!def)return;
-
-  const title=preview(record[def.title]||record.title||record.content||'طلب جديد',100);
-  const text=`🔔 *${def.label} جديد بانتظار المراجعة*\n\n${title}`;
-  const keyboard={inline_keyboard:[
-    [
-      {text:'قبول ✅',callback_data:`approve|${table}|${record.id}`},
-      {text:'رفض ❌',callback_data:`reject|${table}|${record.id}`}
-    ],
-    SITE_URL?[{text:'فتح لوحة الإدارة 🔗',url:`${SITE_URL}/admin.html`}]:[]
-  ].filter((row:any[])=>row.length)};
-
-  for(const admin of await activeAdmins()){
-    if(!admin.notifications_enabled)continue;
-    await telegram('sendMessage',{
-      chat_id:admin.chat_id,text,parse_mode:'Markdown',
-      reply_markup:keyboard
-    });
+function menu(){return {inline_keyboard:[[{text:'📊 الإحصائيات',callback_data:'stats'},{text:'🕓 المعلقة',callback_data:'pending'}],[{text:'🛠 خدمات الموقع',callback_data:'features'}],[{text:'🔧 الصيانة',callback_data:'maintenance'}],[{text:'📢 إعلان جديد',callback_data:'new_ad'}],[{text:'🌐 لوحة الموقع',url:`${SITE}/admin.html`}]]}}
+async function sendMenu(chat:string,name:string){await tg('sendMessage',{chat_id:chat,text:`لوحة UON Hub\nمرحبًا ${name}`,reply_markup:menu()})}
+async function stats(){let s='إحصائيات UON Hub\n';for(const [t,d] of Object.entries(tables) as any){let q=db.from(t).select('*',{count:'exact',head:true});for(const[k,v]of Object.entries(d.pending))q=q.eq(k,v);const{count}=await q;s+=`${t}: ${count||0}\n`}return s}
+async function features(){const{data}=await db.from('platform_features').select('*').order('sort_order');return {text:'خدمات الموقع',keyboard:{inline_keyboard:(data||[]).map((x:any)=>[{text:`${x.status==='active'?'🟢':'🔴'} ${x.name}`,callback_data:`feature:${x.key}`}]).concat([[{text:'⬅️ رجوع',callback_data:'home'}]])}}}
+async function feature(key:string){const{data}=await db.from('platform_features').select('*').eq('key',key).single();return {text:`${data.name}\nالحالة: ${data.status}`,keyboard:{inline_keyboard:[[{text:'🟢 تشغيل',callback_data:`setf:${key}:active`},{text:'🔴 إيقاف',callback_data:`setf:${key}:disabled`}],[{text:'🟡 قريبًا',callback_data:`setf:${key}:coming_soon`},{text:'🛠 صيانة',callback_data:`setf:${key}:maintenance`}],[{text:'⬅️ الخدمات',callback_data:'features'}]]}}}
+async function notify(table:string,record:any){const d=tables[table];if(!d)return;const{data:admins}=await db.from('telegram_admins').select('*').eq('active',true).eq('notifications_enabled',true);for(const a of admins||[]){await tg('sendMessage',{chat_id:a.chat_id,text:`طلب جديد: ${record[d.title]||'بدون عنوان'}`,reply_markup:{inline_keyboard:[[{text:'قبول ✅',callback_data:`approve:${table}:${record.id}`},{text:'رفض ❌',callback_data:`reject:${table}:${record.id}`}]]}}).catch(console.error)}}
+Deno.serve(async req=>{
+ if(req.method==='OPTIONS')return res('',204);
+ try{
+  const payload=await req.json();
+  const tgHeader=req.headers.get('x-telegram-bot-api-secret-token');
+  const dbHeader=req.headers.get('x-database-webhook-secret');
+  if(payload.source==='web-submit'){const d=tables[payload.table];if(!d)return res('ignored');const{data}=await db.from(payload.table).select('*').eq('id',payload.id).single();await notify(payload.table,data);return res()}
+  if(dbHeader===DB_SECRET&&payload.type==='INSERT'){await notify(payload.table,payload.record);return res()}
+  if(tgHeader!==TG_SECRET)return res('unauthorized',401);
+  const cb=payload.callback_query,msg=payload.message;const chat=String(cb?.message?.chat?.id||msg?.chat?.id||'');const a=await admin(chat);if(!a)return res();
+  if(msg){const text=String(msg.text||'');if(text==='/start'||text==='/menu')await sendMenu(chat,a.name);else if(text==='/health')await tg('sendMessage',{chat_id:chat,text:'البوت يعمل ✅'});else await sendMenu(chat,a.name)}
+  if(cb){const data=String(cb.data),mid=cb.message.message_id;const edit=async(t:string,k:any)=>tg('editMessageText',{chat_id:chat,message_id:mid,text:t,reply_markup:k});
+   if(data==='home')await edit('لوحة UON Hub',menu());
+   else if(data==='stats')await edit(await stats(),{inline_keyboard:[[{text:'⬅️ رجوع',callback_data:'home'}]]});
+   else if(data==='features'){const x=await features();await edit(x.text,x.keyboard)}
+   else if(data.startsWith('feature:')){const x=await feature(data.split(':')[1]);await edit(x.text,x.keyboard)}
+   else if(data.startsWith('setf:')){const[,key,status]=data.split(':');await db.from('platform_features').update({status,updated_at:new Date().toISOString()}).eq('key',key);const x=await feature(key);await edit(x.text,x.keyboard)}
+   else if(data==='maintenance'){const{data:s}=await db.from('site_settings').select('value').eq('key','maintenance_enabled').maybeSingle();const raw=s?.value;const on=raw===true||raw===1||String(raw).replace(/\"/g,'').toLowerCase()==='true';await edit(`الصيانة: ${on?'مفعلة':'متوقفة'}`,{inline_keyboard:[[{text:'تشغيل',callback_data:'maint:on'},{text:'إيقاف',callback_data:'maint:off'}],[{text:'⬅️ رجوع',callback_data:'home'}]]})}
+   else if(data.startsWith('maint:')){const on=data.endsWith(':on');await db.from('site_settings').upsert({key:'maintenance_enabled',value:on,updated_at:new Date().toISOString()});await edit(`تم ${on?'تشغيل':'إيقاف'} الصيانة`,{inline_keyboard:[[{text:'⬅️ رجوع',callback_data:'home'}]]})}
+   else if(data.startsWith('approve:')||data.startsWith('reject:')){const[action,table,id]=data.split(':');const d=tables[table];if(action==='reject'&&d.reject)await db.from(table).update(d.reject).eq('id',id);else if(action==='reject')await db.from(table).delete().eq('id',id);else await db.from(table).update(d.approve).eq('id',id);await edit(action==='approve'?'تم القبول ✅':'تم الرفض ❌',{inline_keyboard:[]})}
+   await tg('answerCallbackQuery',{callback_query_id:cb.id}).catch(()=>{});
   }
-}
-
-async function moderate(admin:any, action:string, table:string, id:string){
-  if(!can(admin,action==='approve'?'approve':'reject'))throw new Error('ليس لديك صلاحية');
-  const def=moderationTables[table];
-  if(!def)throw new Error('جدول غير مسموح');
-
-  let patch:any;
-  if(def.statusColumn==='approved'){
-    if(action==='reject'){
-      const {error}=await supabase.from(table).delete().eq('id',id);
-      if(error)throw error;
-      return;
-    }
-    patch={approved:true};
-  }else{
-    patch={status:action==='approve'?'approved':'rejected',reviewed_at:new Date().toISOString()};
-  }
-
-  const {error}=await supabase.from(table).update(patch).eq('id',id);
-  if(error)throw error;
-}
-
-async function setMaintenance(admin:any,on:boolean){
-  if(!can(admin,'maintenance'))throw new Error('ليس لديك صلاحية الصيانة');
-  const {error}=await supabase.from('site_settings').upsert({
-    key:'maintenance_enabled',value:on,updated_at:new Date().toISOString()
-  });
-  if(error)throw error;
-}
-
-async function stats(){
-  const queries=[
-    ['summaries',{approved:false}],
-    ['whatsapp_groups',{approved:false}],
-    ['student_projects',{status:'pending'}],
-    ['rating_submissions',{status:'pending'}],
-    ['confessions',{status:'pending'}]
-  ] as const;
-  const values=[];
-  for(const [table,filter] of queries){
-    let q=supabase.from(table).select('*',{count:'exact',head:true});
-    for(const [k,v] of Object.entries(filter))q=q.eq(k,v);
-    const {count}=await q;values.push(count||0);
-  }
-  return `📊 *الطلبات المعلقة*\n\n📚 ملخصات: ${values[0]}\n💬 مجموعات: ${values[1]}\n💻 مشاريع: ${values[2]}\n⭐ تقييمات: ${values[3]}\n🗣 اعترافات: ${values[4]}`;
-}
-
-async function handleTelegram(update:any){
-  const callback=update.callback_query;
-  if(callback){
-    const chatId=String(callback.message.chat.id);
-    const admin=await findAdmin(chatId);
-    if(!admin)return new Response('ok');
-
-    try{
-      const [action,table,id]=String(callback.data).split('|');
-      await moderate(admin,action,table,id);
-      await telegram('answerCallbackQuery',{callback_query_id:callback.id,text:action==='approve'?'تم القبول ✅':'تم الرفض ❌'});
-      await telegram('editMessageReplyMarkup',{chat_id:chatId,message_id:callback.message.message_id,reply_markup:{inline_keyboard:[]}});
-      await telegram('sendMessage',{chat_id:chatId,text:action==='approve'?'تم اعتماد الطلب ونشره ✅':'تم رفض الطلب ❌'});
-    }catch(error){
-      await telegram('answerCallbackQuery',{callback_query_id:callback.id,text:String(error.message||error),show_alert:true});
-    }
-    return new Response('ok');
-  }
-
-  const message=update.message;
-  if(!message)return new Response('ok');
-  const chatId=String(message.chat.id);
-  const admin=await findAdmin(chatId);
-  if(!admin)return new Response('ok');
-
-  const text=String(message.text||'').trim();
-  try{
-    if(text==='/start'){
-      await telegram('sendMessage',{chat_id:chatId,text:`هلا ${admin.name} 👋\nأوامر المشرف:\n/stats\n/maintenance_on\n/maintenance_off\n/site\n/pending`});
-    }else if(text==='/stats'||text==='/pending'){
-      await telegram('sendMessage',{chat_id:chatId,text:await stats(),parse_mode:'Markdown'});
-    }else if(text==='/maintenance_on'){
-      await setMaintenance(admin,true);
-      await telegram('sendMessage',{chat_id:chatId,text:'تم تشغيل صيانة الموقع كاملة 🛠'});
-    }else if(text==='/maintenance_off'){
-      await setMaintenance(admin,false);
-      await telegram('sendMessage',{chat_id:chatId,text:'تم فتح الموقع للزوار ✅'});
-    }else if(text==='/site'){
-      await telegram('sendMessage',{chat_id:chatId,text:SITE_URL||'لم يتم إعداد SITE_URL'});
-    }else if(text==='/tools'){
-      const {data}=await supabase.from('tools_items').select('id,name,status').order('name');
-      const lines=(data||[]).map((t:any)=>`${t.status==='active'?'🟢':'🔴'} ${t.name} — ${t.id}`).join('\n');
-      await telegram('sendMessage',{chat_id:chatId,text:lines||'لا توجد أدوات'});
-    }else if(text.startsWith('/tool_on ')||text.startsWith('/tool_off ')){
-      if(!can(admin,'tools'))throw new Error('ليس لديك صلاحية الأدوات');
-      const [cmd,id]=text.split(/\s+/,2);const on=cmd==='/tool_on';
-      const {error}=await supabase.from('tools_items').update({status:on?'active':'disabled',disabled:!on}).eq('id',id);
-      if(error)throw error;
-      await telegram('sendMessage',{chat_id:chatId,text:on?'تم تشغيل الأداة ✅':'تم إيقاف الأداة ⛔'});
-    }else if(text.startsWith('/broadcast ')){
-      if(!can(admin,'announcements'))throw new Error('ليس لديك صلاحية الإعلانات');
-      const body=text.slice('/broadcast '.length).trim();if(!body)throw new Error('اكتب نص الإعلان');
-      const {error}=await supabase.from('site_announcements').insert({title:'إعلان UON Hub',body,type:'important',priority:50,active:true});
-      if(error)throw error;
-      await telegram('sendMessage',{chat_id:chatId,text:'تم نشر الإعلان في الموقع 📢'});
-    }else{
-      await telegram('sendMessage',{chat_id:chatId,text:'الأوامر: /stats /pending /maintenance_on /maintenance_off /tools /tool_on ID /tool_off ID /broadcast النص /site'});
-    }
-  }catch(error){
-    await telegram('sendMessage',{chat_id:chatId,text:`خطأ: ${String(error.message||error)}`});
-  }
-  return new Response('ok');
-}
-
-Deno.serve(async(req)=>{
-  try{
-    const telegramSecret=req.headers.get('x-telegram-bot-api-secret-token');
-    const databaseSecret=req.headers.get('x-database-webhook-secret');
-    const payload=await req.json();
-
-    if(telegramSecret===WEBHOOK_SECRET){
-      return handleTelegram(payload);
-    }
-    if(databaseSecret===DATABASE_WEBHOOK_SECRET){
-      if(payload.type==='INSERT')await notifyInsert(payload);
-      return new Response('ok');
-    }
-    return new Response('unauthorized',{status:401});
-  }catch(error){
-    console.error(error);
-    return new Response(String(error.message||error),{status:500});
-  }
+  return res();
+ }catch(e){console.error(e);return res(String(e),500)}
 });
