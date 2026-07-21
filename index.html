@@ -384,15 +384,25 @@ body.has-exam-banner .navbar{top:40px!important}
         <div class="logo-text hub-brand-mark">UON <span>Hub</span></div>
     </a>
     <ul class="nav-links">
-        <li><a href="#home">الرئيسية</a></li>
-        <li><a href="#tools">الأدوات</a></li>
+        <li><a href="#home" data-i18n="nav_home">الرئيسية</a></li>
+        <li><a href="#tools" data-i18n="nav_tools">الأدوات</a></li>
         
         
-        <li><a href="#botSection">المساعد AI</a></li>
-        <li><a href="#contact">التواصل</a></li>
+        <li><a href="#botSection" data-i18n="nav_ai">المساعد AI</a></li>
+        <li><a href="#contact" data-i18n="nav_contact">التواصل</a></li>
         <li><a href="features.html" target="_blank" style="color:var(--warning)!important;">🔥 الميزات</a></li>
     </ul>
     <div class="nav-actions">
+
+        <button id="langToggleBtn" type="button" onclick="toggleUONHubLanguage()"
+            style="min-width:68px;height:36px;padding:0 10px;background:rgba(255,255,255,.05);
+            border:1px solid rgba(255,255,255,.1);border-radius:10px;color:var(--text-muted);
+            cursor:pointer;font-family:'Tajawal',sans-serif;font-weight:800;font-size:.78rem;
+            display:flex;align-items:center;justify-content:center;gap:6px;transition:.2s;"
+            title="تغيير اللغة">
+            <i class="fas fa-globe"></i><span>EN</span>
+        </button>
+
         
         <button onclick="openGlobalSearch()" style="width:36px;height:36px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:10px;color:var(--text-muted);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .3s;" title="بحث"><i class="fas fa-search"></i></button>
     </div>
@@ -416,8 +426,8 @@ body.has-exam-banner .navbar{top:40px!important}
     </div>
     <div class="hero-content">
         <div class="hero-badge"><i class="fas fa-sparkles"></i> UON Hub — منصة طلاب جامعة نزوى</div>
-        <h1 id="heroTitle">منصتك الشاملة<br>للحياة الأكاديمية</h1>
-        <p id="heroDesc">أدوات ذكية، ملخصات، جداول دراسية، وكل ما تحتاجه للنجاح</p>
+        <h1 id="heroTitle" data-i18n-html="hero_title">منصتك الشاملة<br>للحياة الأكاديمية</h1>
+        <p id="heroDesc" data-i18n="hero_desc">أدوات ذكية، ملخصات، جداول دراسية، وكل ما تحتاجه للنجاح</p>
         <p class="sub">كل أدواتك الجامعية المهمة في مكان واحد</p>
         <div class="hero-buttons">
             <button class="btn-primary" onclick="scrollToSection('tools')"><i class="fas fa-rocket"></i> استكشف الأدوات</button>
@@ -451,7 +461,7 @@ body.has-exam-banner .navbar{top:40px!important}
 <!-- Tools -->
 <section class="tools-section" id="tools">
     <div class="section-header reveal">
-        <h2>الأدوات المتاحة</h2>
+        <h2 data-i18n="tools_title">الأدوات المتاحة</h2>
         <p>مجموعة شاملة من الأدوات المصممة خصيصاً لتلبية احتياجاتك الأكاديمية في جامعة نزوى</p>
     </div>
     <div class="tools-grid" id="toolsGrid">
@@ -481,7 +491,7 @@ body.has-exam-banner .navbar{top:40px!important}
 
 <!-- BOT -->
 <section class="bot-section" id="botSection">
-    <div class="section-header reveal"><h2>المساعد الذكي 🤖</h2><p>اسألني عن أي شيء يخص جامعة نزوى</p></div>
+    <div class="section-header reveal"><h2 data-i18n="ai_title">المساعد الذكي 🤖</h2><p>اسألني عن أي شيء يخص جامعة نزوى</p></div>
     <div style="background:var(--dark-light);border:1px solid rgba(255,255,255,0.08);border-radius:20px;overflow:hidden;">
         <div style="background:rgba(0,212,255,0.08);border-bottom:1px solid rgba(0,212,255,0.1);padding:16px 20px;display:flex;align-items:center;gap:12px;">
             <div style="width:38px;height:38px;background:linear-gradient(135deg,#00d4ff,#0099cc);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;">◆</div>
@@ -505,7 +515,7 @@ body.has-exam-banner .navbar{top:40px!important}
 <!-- Calculator -->
 <section class="calc-section" id="calcSection">
     <div class="section-header reveal">
-        <h2>حاسبة المعدل التراكمي 📊</h2>
+        <h2 data-i18n="gpa_title">حاسبة المعدل التراكمي 📊</h2>
         <p>احسب معدل الفصل والمعدل التراكمي المتوقع مع دعم المواد المعادة</p>
     </div>
 
@@ -1178,5 +1188,6 @@ window.addEventListener('beforeinstallprompt', e => {
 })();
 </script>
 
+<script src="language.js"></script>
 </body>
 </html>
