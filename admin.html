@@ -150,7 +150,6 @@ body { font-family:'Tajawal',sans-serif; background:var(--dark); color:var(--tex
 .mobile-sidebar-btn { display:none; position:fixed; top:16px; right:16px; z-index:9998; width:44px; height:44px; background:var(--dark-light); border:1px solid rgba(255,255,255,.1); border-radius:12px; align-items:center; justify-content:center; cursor:pointer; font-size:1.1rem; }
 .sidebar-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.5); z-index:9997; }
 
-.bus-del { width:30px; height:30px; background:rgba(239,68,68,.08); border:1px solid rgba(239,68,68,.15); border-radius:8px; color:var(--danger); cursor:pointer; display:flex; align-items:center; justify-content:center; }
 
 @media(max-width:768px) {
     .sidebar { position:fixed; right:-100%; top:0; z-index:9998; transition:right .3s; height:100vh; overflow-y:auto; width:280px; }
@@ -160,125 +159,13 @@ body { font-family:'Tajawal',sans-serif; background:var(--dark); color:var(--tex
     #sidebarCloseBtn { display:flex !important; }
     .main { padding:1rem; padding-top:70px; }
     .stats-row { grid-template-columns:1fr 1fr; }
-    .form-grid { grid-template-columns:1fr; }    .bus-row .bus-sel { display:none; }
+    .form-grid { grid-template-columns:1fr; }
 }
-
-/* ===== ADMIN POLISH + CONFESSIONS ===== */
-.sidebar{background:linear-gradient(180deg,#111733,#0b1027);box-shadow:12px 0 40px rgba(0,0,0,.18)}
-.nav-item{border:1px solid transparent;margin:.28rem .55rem;border-radius:12px}
-.nav-item:hover{background:rgba(0,212,255,.07);border-color:rgba(0,212,255,.1)}
-.nav-item.active{background:linear-gradient(135deg,rgba(0,212,255,.16),rgba(0,153,204,.08));border-color:rgba(0,212,255,.2)}
-.main{background:radial-gradient(circle at 90% 5%,rgba(0,212,255,.055),transparent 25%),var(--dark)}
-.content-card,.stat-card{border-color:rgba(255,255,255,.075);box-shadow:0 14px 35px rgba(0,0,0,.12)}
-.moderation-summary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1rem;margin-bottom:1.2rem}
-.moderation-stat{background:linear-gradient(145deg,rgba(26,31,61,.96),rgba(18,23,48,.96));border:1px solid rgba(255,255,255,.07);border-radius:16px;padding:1.1rem 1.2rem;display:flex;align-items:center;justify-content:space-between}
-.moderation-stat span{color:var(--text-dim);font-size:.8rem}
-.moderation-stat strong{font-size:1.55rem;color:var(--primary)}
-.confession-toolbar{gap:1rem;flex-wrap:wrap}
-.confession-actions{display:flex;align-items:center;gap:.65rem;flex-wrap:wrap}
-.confession-actions input{width:min(330px,70vw);background:var(--dark);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:.68rem .85rem;color:#fff;font-family:Tajawal,sans-serif;outline:none}
-.confession-actions input:focus{border-color:rgba(0,212,255,.65);box-shadow:0 0 0 3px rgba(0,212,255,.07)}
-.confessions-admin-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1rem}
-.confession-admin-card{background:linear-gradient(145deg,rgba(10,14,39,.8),rgba(18,23,48,.9));border:1px solid rgba(255,255,255,.07);border-radius:16px;padding:1.15rem;display:flex;flex-direction:column;gap:.85rem;min-height:190px;transition:.22s}
-.confession-admin-card:hover{transform:translateY(-3px);border-color:rgba(0,212,255,.22)}
-.confession-admin-text{font-size:.94rem;line-height:1.9;white-space:pre-wrap;word-break:break-word;flex:1;color:#eef2ff}
-.confession-admin-meta{display:flex;justify-content:space-between;gap:.5rem;flex-wrap:wrap;color:var(--text-dim);font-size:.72rem}
-.confession-admin-footer{display:flex;align-items:center;justify-content:space-between;padding-top:.75rem;border-top:1px solid rgba(255,255,255,.055)}
-.confession-category{padding:.28rem .62rem;border-radius:999px;background:rgba(0,212,255,.08);color:var(--primary);font-size:.7rem;font-weight:800}
-.confession-delete-btn{border:1px solid rgba(239,68,68,.25);background:rgba(239,68,68,.08);color:#ff7a7a;border-radius:9px;padding:.48rem .72rem;cursor:pointer;font-family:Tajawal,sans-serif;font-weight:800}
-.confession-delete-btn:hover{background:#ef4444;color:#fff}
-.admin-empty-state{grid-column:1/-1;min-height:180px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.8rem;color:var(--text-dim);border:1px dashed rgba(255,255,255,.1);border-radius:16px}
-@media(max-width:760px){.moderation-summary{grid-template-columns:1fr}.confession-actions,.confession-actions input{width:100%}.confessions-admin-grid{grid-template-columns:1fr}}
-
-
-.admin-health-panel{
-    display:flex;align-items:center;justify-content:space-between;gap:1rem;
-    padding:1rem 1.2rem;margin-bottom:1.2rem;border-radius:16px;
-    background:linear-gradient(135deg,rgba(0,212,255,.08),rgba(107,203,119,.05));
-    border:1px solid rgba(0,212,255,.14)
-}
-.admin-health-panel>div:first-child{display:grid;grid-template-columns:auto auto;column-gap:.55rem;align-items:center}
-.admin-health-panel small{grid-column:2;color:var(--text-dim);font-size:.72rem}
-.health-dot{width:10px;height:10px;border-radius:50%;background:#4ade80;box-shadow:0 0 0 5px rgba(74,222,128,.1)}
-.admin-health-actions{display:flex;gap:.55rem;flex-wrap:wrap}
-.admin-health-actions button,.admin-health-actions a{
-    border:1px solid rgba(255,255,255,.1);background:rgba(10,14,39,.55);
-    color:var(--text-muted);border-radius:9px;padding:.5rem .7rem;
-    font-family:Tajawal,sans-serif;font-size:.75rem;font-weight:800;
-    text-decoration:none;cursor:pointer
-}
-.admin-health-actions button:hover,.admin-health-actions a:hover{border-color:var(--primary);color:var(--primary)}
-@media(max-width:680px){.admin-health-panel{align-items:flex-start;flex-direction:column}.admin-health-actions{width:100%}}
-
-
-/* ===== PROJECTS + ANNOUNCEMENTS + MOBILE ===== */
-.announcement-admin-layout{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(280px,.65fr);gap:1rem;margin-bottom:1rem}
-.announcement-form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.8rem}
-.announcement-wide{grid-column:1/-1}
-.announcement-form-grid input,.announcement-form-grid textarea,.announcement-form-grid select{
-    width:100%;background:var(--dark);border:1px solid rgba(255,255,255,.1);border-radius:10px;
-    padding:.72rem .8rem;color:#fff;font-family:Tajawal,sans-serif;outline:none
-}
-.announcement-form-grid input:focus,.announcement-form-grid textarea:focus,.announcement-form-grid select:focus{border-color:rgba(0,212,255,.65);box-shadow:0 0 0 3px rgba(0,212,255,.07)}
-.announcement-save{margin-top:1rem}
-.announcement-switch-group{display:flex;flex-direction:column}
-.announcement-switch{display:flex;align-items:center;gap:.55rem;min-height:43px;cursor:pointer}
-.announcement-switch input{display:none}
-.announcement-switch span{width:43px;height:23px;border-radius:999px;background:#374151;position:relative;transition:.2s}
-.announcement-switch span:after{content:'';position:absolute;width:17px;height:17px;border-radius:50%;background:white;top:3px;right:3px;transition:.2s}
-.announcement-switch input:checked+span{background:#22c55e}
-.announcement-switch input:checked+span:after{transform:translateX(-20px)}
-.site-ann-preview{min-height:150px;border-radius:17px;padding:1.15rem;display:flex;align-items:center;gap:.9rem;border:1px solid rgba(255,255,255,.1);background:linear-gradient(135deg,#123052,#13213f)}
-.site-ann-preview.urgent{background:linear-gradient(135deg,#7f1d1d,#b91c1c)}
-.site-ann-preview.important{background:linear-gradient(135deg,#713f12,#a16207)}
-.site-ann-preview.event{background:linear-gradient(135deg,#4c1d95,#6d28d9)}
-.site-ann-preview-icon{width:45px;height:45px;border-radius:13px;background:rgba(255,255,255,.13);display:flex;align-items:center;justify-content:center;font-size:1.25rem;flex-shrink:0}
-.site-ann-preview div:nth-child(2){flex:1}.site-ann-preview strong{display:block;color:#fff}.site-ann-preview p{font-size:.78rem;color:rgba(255,255,255,.72);margin-top:.25rem}.site-ann-preview>span{font-size:.73rem;font-weight:900;color:#fff;border:1px solid rgba(255,255,255,.2);padding:.4rem .65rem;border-radius:9px}
-.site-ann-admin-list{display:flex;flex-direction:column;gap:.75rem}
-.site-ann-admin-item{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:.9rem;align-items:center;padding:1rem;border-radius:14px;background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.065)}
-.site-ann-admin-icon{width:40px;height:40px;border-radius:11px;display:flex;align-items:center;justify-content:center;background:rgba(251,191,36,.1);color:#fbbf24}
-.site-ann-admin-item h4{font-size:.9rem}.site-ann-admin-item p{font-size:.76rem;color:var(--text-dim);margin-top:.2rem}.site-ann-admin-meta{display:flex;gap:.45rem;flex-wrap:wrap;margin-top:.45rem}.site-ann-chip{font-size:.66rem;padding:.22rem .48rem;border-radius:999px;background:rgba(0,212,255,.08);color:var(--primary)}
-.site-ann-actions{display:flex;gap:.4rem}.site-ann-actions button{width:34px;height:34px;border-radius:9px;border:1px solid rgba(255,255,255,.1);background:rgba(10,14,39,.6);color:var(--text-muted);cursor:pointer}.site-ann-actions button:hover{color:#fff;border-color:var(--primary)}
-@media(max-width:900px){.announcement-admin-layout{grid-template-columns:1fr}.announcement-preview-card{order:-1}}
-@media(max-width:700px){
-    .dashboard{display:block}
-    .main{padding:1rem;padding-top:5rem}
-    .page-header h1{font-size:1.45rem}
-    .stats-row,.stats-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:.65rem}
-    .stat-card{padding:1rem}.stat-value{font-size:1.55rem}
-    .content-card{border-radius:16px;padding:1rem}
-    .card-header{align-items:flex-start;gap:.7rem;flex-wrap:wrap}
-    .announcement-form-grid{grid-template-columns:1fr}
-    .announcement-wide{grid-column:auto}
-    .site-ann-admin-item{grid-template-columns:auto minmax(0,1fr)}
-    .site-ann-actions{grid-column:1/-1;justify-content:flex-end}
-}
-@media(max-width:430px){.stats-row,.stats-grid{grid-template-columns:1fr!important}.main{padding:.75rem;padding-top:4.8rem}}
-
-
-/* ===== STUDENT PROJECTS ADMIN ===== */
-.projects-admin-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:1rem}
-.project-admin-card{background:linear-gradient(145deg,rgba(10,14,39,.8),rgba(18,23,48,.94));border:1px solid rgba(255,255,255,.07);border-radius:16px;overflow:hidden}
-.project-admin-image{aspect-ratio:16/8;background:#0d1531 center/cover no-repeat}
-.project-admin-body{padding:1rem;display:flex;flex-direction:column;gap:.65rem}
-.project-admin-body h3{font-size:1rem}.project-admin-body p{color:var(--text-dim);font-size:.8rem;line-height:1.7}
-.project-admin-meta{display:flex;gap:.4rem;flex-wrap:wrap}.project-admin-chip{font-size:.65rem;padding:.22rem .48rem;border-radius:999px;background:rgba(0,212,255,.08);color:var(--primary)}
-.project-admin-actions{display:flex;gap:.45rem;flex-wrap:wrap;margin-top:.35rem}.project-admin-actions button{border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04);color:var(--text-muted);border-radius:9px;padding:.48rem .65rem;font-family:Tajawal,sans-serif;font-size:.72rem;font-weight:800;cursor:pointer}.project-admin-actions .approve{color:#4ade80;border-color:rgba(74,222,128,.25)}.project-admin-actions .reject{color:#f87171;border-color:rgba(248,113,113,.25)}.project-admin-actions .feature{color:#facc15;border-color:rgba(250,204,21,.25)}
-@media(max-width:650px){.projects-admin-grid{grid-template-columns:1fr}}
-
-
-/* ===== RATINGS ADMIN ===== */
-.ratings-admin-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(285px,1fr));gap:1rem}
-.rating-admin-card{background:linear-gradient(145deg,rgba(10,14,39,.82),rgba(18,23,48,.95));border:1px solid rgba(255,255,255,.07);border-radius:16px;padding:1rem;display:flex;flex-direction:column;gap:.7rem}
-.rating-admin-head{display:flex;justify-content:space-between;gap:.7rem}.rating-admin-kind{font-size:.65rem;padding:.23rem .5rem;border-radius:999px;background:rgba(250,204,21,.09);color:#facc15}
-.rating-admin-score{color:#facc15;font-weight:900}.rating-admin-comment{color:var(--text-dim);line-height:1.7;font-size:.8rem}
-.rating-admin-meta{display:flex;gap:.4rem;flex-wrap:wrap}.rating-admin-chip{font-size:.63rem;padding:.2rem .45rem;border-radius:999px;background:rgba(0,212,255,.07);color:var(--primary)}
-.rating-admin-actions{display:flex;gap:.45rem;margin-top:auto}.rating-admin-actions button{flex:1;border-radius:9px;padding:.48rem;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04);font-family:Tajawal,sans-serif;font-weight:800;cursor:pointer}.rating-admin-actions .approve{color:#4ade80;border-color:rgba(74,222,128,.25)}.rating-admin-actions .reject{color:#f87171;border-color:rgba(248,113,113,.25)}
-
 </style>
 <style>
 </style>
 <link rel="stylesheet" href="site-enhancements.css">
+<link rel="stylesheet" href="brand.css">
 </head>
 <body>
 
@@ -307,8 +194,8 @@ body { font-family:'Tajawal',sans-serif; background:var(--dark); color:var(--tex
     <!-- SIDEBAR -->
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-logo">
-            <div class="sidebar-logo-icon">NU</div>
-            <div><div class="sidebar-logo-text">UoN <span>Coffee</span></div><div style="font-size:.7rem;color:var(--text-dim);">Admin Dashboard</div></div>
+            <div class="sidebar-logo-icon">UH</div>
+            <div><div class="sidebar-logo-text">UON <span>Hub</span></div><div style="font-size:.7rem;color:var(--text-dim);">Admin Dashboard</div></div>
             <button onclick="toggleSidebar()" style="margin-right:auto;background:none;border:none;color:var(--text-dim);font-size:1.2rem;cursor:pointer;padding:4px;display:none;" id="sidebarCloseBtn"><i class="fas fa-times"></i></button>
         </div>
 
@@ -321,20 +208,19 @@ body { font-family:'Tajawal',sans-serif; background:var(--dark); color:var(--tex
         </div>
 
         <div class="nav-section">
-            <div class="nav-label">لوحة المعلومات</div>
+            <div class="nav-label">الرئيسية</div>
             <div class="nav-item active" onclick="showSection('overview',this)"><i class="fas fa-chart-pie"></i> نظرة عامة</div>
             <div class="nav-item" onclick="showSection('notifications',this)"><i class="fas fa-bell"></i> الإشعارات <span class="nav-badge" id="navNotifBadge" style="display:none">0</span></div>
         </div>
 
         <div class="nav-section">
             <div class="nav-label">المحتوى</div>
-            <div class="nav-item" onclick="showSection('ratings',this)"><i class="fas fa-star"></i> التقييمات <span class="nav-badge" id="navRatingsBadge" style="display:none">0</span></div>
-            <div class="nav-item" onclick="showSection('confessions',this)"><i class="fas fa-comments"></i> الاعترافات <span class="nav-badge" id="navConfBadge" style="display:none">0</span></div>
+            <div class="nav-item" onclick="showSection('confessions',this)"><i class="fas fa-bullhorn"></i> الإعلانات <span class="nav-badge" id="navConfBadge" style="display:none">0</span></div>
             <div class="nav-item" onclick="showSection('summaries',this)"><i class="fas fa-book"></i> الملخصات <span class="nav-badge" id="navSumBadge" style="display:none">0</span></div>
             <div class="nav-item" onclick="showSection('restaurants',this)"><i class="fas fa-utensils"></i> المطاعم</div>
             <div class="nav-item" onclick="showSection('groups',this)"><i class="fab fa-whatsapp"></i> مجموعات الواتساب <span class="nav-badge" id="navGroupBadge" style="display:none">0</span></div>
-            <div class="nav-item" onclick="showSection('projects',this)"><i class="fas fa-code"></i> مشاريع الطلاب <span class="nav-badge" id="navProjBadge" style="display:none">0</span></div>
-            <div class="nav-item" onclick="showSection('siteannouncements',this)"><i class="fas fa-bullhorn"></i> الإعلانات <span class="nav-badge" id="navAnnBadge" style="display:none">0</span></div>
+            <div class="nav-item" onclick="showSection('marketplace',this)"><i class="fas fa-store"></i> سوق الطلاب <span class="nav-badge" id="navMktBadge" style="display:none">0</span></div>
+            <div class="nav-item" onclick="showSection('projects',this)"><i class="fas fa-code"></i> المشاريع <span class="nav-badge" id="navProjBadge" style="display:none">0</span></div>
         </div>
 
         <div class="nav-section">
@@ -346,7 +232,7 @@ body { font-family:'Tajawal',sans-serif; background:var(--dark); color:var(--tex
 
         <div class="sidebar-footer">
             <div class="nav-section">
-                <div class="nav-label">معاينة الموقع</div>
+                <div class="nav-label">روابط سريعة</div>
                 <a href="index.html" target="_blank" class="nav-item"><i class="fas fa-home"></i> الرئيسية</a>
                 <a href="features.html" target="_blank" class="nav-item"><i class="fas fa-star"></i> الميزات</a>
                 <a href="tools.html" target="_blank" class="nav-item"><i class="fas fa-wrench"></i> الأدوات</a>
@@ -366,11 +252,11 @@ body { font-family:'Tajawal',sans-serif; background:var(--dark); color:var(--tex
                 <p>مرحباً! إليك ملخص نشاط الموقع</p>
             </div>
             <div class="stats-row" id="statsRow">
-                <div class="stat-card"><div class="stat-top"><div class="stat-icon" style="background:rgba(0,212,255,.1);color:var(--primary)"><i class="fas fa-bullhorn"></i></div><span class="stat-change neutral">اعترافات</span></div><div class="stat-value" id="statConfessions">—</div><div class="stat-label">الاعترافات</div></div>
+                <div class="stat-card"><div class="stat-top"><div class="stat-icon" style="background:rgba(0,212,255,.1);color:var(--primary)"><i class="fas fa-bullhorn"></i></div><span class="stat-change neutral">إعلانات</span></div><div class="stat-value" id="statConfessions">—</div><div class="stat-label">الاعترافات</div></div>
                 <div class="stat-card"><div class="stat-top"><div class="stat-icon" style="background:rgba(107,203,119,.1);color:var(--success)"><i class="fas fa-book"></i></div><span class="stat-change neutral">ملخصات</span></div><div class="stat-value" id="statSummaries">—</div><div class="stat-label">الملخصات</div></div>
                 <div class="stat-card"><div class="stat-top"><div class="stat-icon" style="background:rgba(251,146,60,.1);color:var(--warning)"><i class="fas fa-clock"></i></div><span class="stat-change up">جديد</span></div><div class="stat-value" id="statPending">—</div><div class="stat-label">بانتظار الموافقة</div></div>
                 <div class="stat-card"><div class="stat-top"><div class="stat-icon" style="background:rgba(37,211,102,.1);color:#25d366"><i class="fab fa-whatsapp"></i></div><span class="stat-change neutral">مجموعات</span></div><div class="stat-value" id="statGroups">—</div><div class="stat-label">مجموعات الواتساب</div></div>
-                <div class="stat-card"><div class="stat-top"><div class="stat-icon" style="background:rgba(255,209,61,.1);color:var(--warning)"><i class="fas fa-bullhorn"></i></div><span class="stat-change neutral">بنرات</span></div><div class="stat-value" id="statMkt">—</div><div class="stat-label">الإعلانات</div></div>
+                <div class="stat-card"><div class="stat-top"><div class="stat-icon" style="background:rgba(255,209,61,.1);color:var(--warning)"><i class="fas fa-store"></i></div><span class="stat-change neutral">سوق</span></div><div class="stat-value" id="statMkt">—</div><div class="stat-label">إعلانات السوق</div></div>
                 <div class="stat-card"><div class="stat-top"><div class="stat-icon" style="background:rgba(164,139,250,.1);color:#a78bfa"><i class="fas fa-code"></i></div><span class="stat-change neutral">مشاريع</span></div><div class="stat-value" id="statProj">—</div><div class="stat-label">المشاريع</div></div>
                 <div class="stat-card"><div class="stat-top"><div class="stat-icon" style="background:rgba(255,107,107,.1);color:var(--secondary)"><i class="fas fa-tools"></i></div><span class="stat-change neutral">أدوات</span></div><div class="stat-value" id="statRestaurants">—</div><div class="stat-label">الأدوات</div></div>
             </div>
@@ -407,50 +293,21 @@ body { font-family:'Tajawal',sans-serif; background:var(--dark); color:var(--tex
             </div>
         </div>
 
-
-        <!-- RATINGS -->
-        <div class="section" id="section-ratings">
+        <!-- ANNOUNCEMENTS -->
+        <div class="section" id="section-confessions">
             <div class="page-header">
-                <h1>تقييمات المواد والدكاترة ⭐</h1>
-                <p>راجع التقييمات قبل نشرها، واقبل المحتوى المفيد وارفض الإساءة أو المعلومات غير الدقيقة</p>
-            </div>
-            <div class="moderation-summary">
-                <div class="moderation-stat"><span>بانتظار المراجعة</span><strong id="ratingsPendingCount">0</strong></div>
-                <div class="moderation-stat"><span>المعتمدة</span><strong id="ratingsApprovedCount">0</strong></div>
-                <div class="moderation-stat"><span>المرفوضة</span><strong id="ratingsRejectedCount">0</strong></div>
+                <h1>الإعلانات 📢</h1>
+                <p>إدارة إعلانات الجامعة</p>
             </div>
             <div class="content-card">
                 <div class="card-header">
-                    <div class="card-title"><i class="fas fa-clock" style="color:var(--warning)"></i> طلبات التقييم</div>
-                    <button class="card-action" onclick="loadRatingsAdmin()"><i class="fas fa-sync-alt"></i> تحديث</button>
+                    <div class="card-title"><i class="fas fa-bullhorn" style="color:var(--primary)"></i> جميع الإعلانات</div>
                 </div>
-                <div id="ratingsAdminGrid" class="ratings-admin-grid"></div>
-            </div>
-        </div>
-
-        <!-- CONFESSIONS -->
-        <div class="section" id="section-confessions">
-            <div class="page-header">
-                <h1>إدارة الاعترافات 💬</h1>
-                <p>عرض الاعترافات المنشورة وحذف المحتوى المخالف</p>
-            </div>
-
-            <div class="moderation-summary">
-                <div class="moderation-stat"><span>إجمالي الاعترافات</span><strong id="confessionTotalCount">0</strong></div>
-                <div class="moderation-stat"><span>اعترافات اليوم</span><strong id="confessionTodayCount">0</strong></div>
-                <div class="moderation-stat"><span>إجمالي الإعجابات</span><strong id="confessionLikesCount">0</strong></div>
-            </div>
-
-            <div class="content-card">
-                <div class="card-header confession-toolbar">
-                    <div class="card-title"><i class="fas fa-comments" style="color:var(--primary)"></i> جميع الاعترافات</div>
-                    <div class="confession-actions">
-                        <input id="confessionAdminSearch" type="search" placeholder="ابحث داخل الاعترافات..." oninput="filterAdminConfessions(this.value)">
-                        <button class="card-action" onclick="loadConfessions()"><i class="fas fa-sync-alt"></i> تحديث</button>
-                    </div>
-                </div>
-                <div id="confessionsAdminGrid" class="confessions-admin-grid">
-                    <div class="admin-empty-state"><i class="fas fa-spinner fa-spin"></i><span>جاري تحميل الاعترافات...</span></div>
+                <div style="overflow-x:auto;">
+                    <table class="data-table" id="confTable">
+                        <thead><tr><th>العنوان</th><th>المحتوى</th><th>الوقت</th><th>إجراء</th></tr></thead>
+                        <tbody id="confTableBody"><tr><td colspan="4" style="text-align:center;color:var(--text-dim);padding:2rem;">جاري التحميل...</td></tr></tbody>
+                    </table>
                 </div>
             </div>
         </div>
@@ -549,120 +406,23 @@ body { font-family:'Tajawal',sans-serif; background:var(--dark); color:var(--tex
             </div>
         </div>
 
-
-        <!-- SITE ANNOUNCEMENTS -->
-        <div class="section" id="section-siteannouncements">
-            <div class="page-header">
-                <h1>الإعلانات 📢</h1>
-                <p>أنشئ بنرات تظهر أعلى الصفحة الرئيسية وحدد الأولوية وموعد الانتهاء</p>
-            </div>
-
-            <div class="announcement-admin-layout">
-                <div class="content-card announcement-editor-card">
-                    <div class="card-header">
-                        <div class="card-title"><i class="fas fa-plus-circle" style="color:var(--primary)"></i> إعلان جديد</div>
-                    </div>
-                    <div class="announcement-form-grid">
-                        <div class="form-group announcement-wide">
-                            <label>عنوان الإعلان</label>
-                            <input id="siteAnnTitle" maxlength="90" placeholder="مثال: فتح التسجيل للفصل الصيفي">
-                        </div>
-                        <div class="form-group announcement-wide">
-                            <label>النص المختصر</label>
-                            <textarea id="siteAnnBody" rows="3" maxlength="240" placeholder="تفاصيل مختصرة وواضحة للطلاب"></textarea>
-                        </div>
-                        <div class="form-group">
-                            <label>نوع الإعلان</label>
-                            <select id="siteAnnType">
-                                <option value="normal">عادي</option>
-                                <option value="important">مهم</option>
-                                <option value="urgent">عاجل</option>
-                                <option value="event">فعالية</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>الأولوية</label>
-                            <input id="siteAnnPriority" type="number" min="0" max="100" value="10">
-                        </div>
-                        <div class="form-group">
-                            <label>نص الزر</label>
-                            <input id="siteAnnButtonText" maxlength="35" placeholder="اعرف التفاصيل">
-                        </div>
-                        <div class="form-group">
-                            <label>رابط الزر</label>
-                            <input id="siteAnnButtonUrl" placeholder="https://... أو صفحة داخل الموقع">
-                        </div>
-                        <div class="form-group">
-                            <label>تاريخ الانتهاء</label>
-                            <input id="siteAnnExpires" type="datetime-local">
-                        </div>
-                        <div class="form-group announcement-switch-group">
-                            <label>الحالة</label>
-                            <label class="announcement-switch">
-                                <input id="siteAnnActive" type="checkbox" checked>
-                                <span></span>
-                                <b>عرض الإعلان</b>
-                            </label>
-                        </div>
-                    </div>
-                    <button class="btn-save announcement-save" onclick="createSiteAnnouncement()">
-                        <i class="fas fa-paper-plane"></i> نشر الإعلان
-                    </button>
-                </div>
-
-                <div class="content-card announcement-preview-card">
-                    <div class="card-header">
-                        <div class="card-title"><i class="fas fa-eye" style="color:var(--success)"></i> معاينة البنر</div>
-                    </div>
-                    <div id="siteAnnPreview" class="site-ann-preview important">
-                        <div class="site-ann-preview-icon">📢</div>
-                        <div>
-                            <strong>عنوان الإعلان</strong>
-                            <p>سيظهر النص المختصر هنا كما سيراه الطالب.</p>
-                        </div>
-                        <span>اعرف التفاصيل</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="content-card">
-                <div class="card-header">
-                    <div class="card-title"><i class="fas fa-list" style="color:var(--warning)"></i> الإعلانات الحالية</div>
-                    <button class="card-action" onclick="loadSiteAnnouncementsAdmin()"><i class="fas fa-sync-alt"></i> تحديث</button>
-                </div>
-                <div id="siteAnnouncementsAdminList" class="site-ann-admin-list">
-                    <div class="admin-empty-state"><i class="fas fa-spinner fa-spin"></i><span>جاري تحميل الإعلانات...</span></div>
-                </div>
-            </div>
-        </div>
-
         <!-- PROJECTS -->
         <div class="section" id="section-projects">
             <div class="page-header">
-                <h1>مشاريع الطلاب 💻</h1>
-                <p>مراجعة الطلبات واعتماد المشاريع واختيار مشروع مميز</p>
+                <h1>المشاريع 💻</h1>
+                <p>إدارة مشاريع الطلاب المعروضة</p>
             </div>
-
-            <div class="moderation-summary">
-                <div class="moderation-stat"><span>بانتظار المراجعة</span><strong id="projectsPendingCount">0</strong></div>
-                <div class="moderation-stat"><span>المشاريع المعتمدة</span><strong id="projectsApprovedCount">0</strong></div>
-                <div class="moderation-stat"><span>المشاريع المميزة</span><strong id="projectsFeaturedCount">0</strong></div>
-            </div>
-
             <div class="content-card">
                 <div class="card-header">
-                    <div class="card-title"><i class="fas fa-clock" style="color:var(--warning)"></i> طلبات بانتظار المراجعة</div>
-                    <button class="card-action" onclick="loadStudentProjectsAdmin()"><i class="fas fa-sync-alt"></i> تحديث</button>
+                    <div class="card-title"><i class="fas fa-code" style="color:var(--primary)"></i> جميع المشاريع</div>
+                    <a href="projects.html" target="_blank" class="card-action"><i class="fas fa-external-link-alt"></i> فتح الصفحة</a>
                 </div>
-                <div id="projectsPendingList" class="projects-admin-grid"></div>
-            </div>
-
-            <div class="content-card" style="margin-top:1rem">
-                <div class="card-header">
-                    <div class="card-title"><i class="fas fa-check-circle" style="color:var(--success)"></i> المشاريع المعتمدة</div>
-                    <a class="card-action" href="projects.html" target="_blank"><i class="fas fa-external-link-alt"></i> فتح الصفحة</a>
+                <div style="overflow-x:auto;">
+                    <table class="data-table">
+                        <thead><tr><th>المشروع</th><th>التصنيف</th><th>صاحبه</th><th>GitHub</th><th>إجراء</th></tr></thead>
+                        <tbody id="projTableBody"><tr><td colspan="5" style="text-align:center;color:var(--text-dim);padding:2rem;">جاري التحميل...</td></tr></tbody>
+                    </table>
                 </div>
-                <div id="projectsApprovedList" class="projects-admin-grid"></div>
             </div>
         </div>
 
@@ -960,8 +720,7 @@ async function loadAll() {
         loadSummaries(),
         loadGroups(),
         loadMarketplace(),
-        loadStudentProjectsAdmin(),
-        loadSiteAnnouncementsAdmin(),
+        loadProjects(),
         loadPasswords(),
         loadToolsAdmin(),
         loadHomeTools(),
@@ -975,10 +734,10 @@ async function loadStats() {
     try {
         const [ann, sum, tools, grp, mkt, proj] = await Promise.all([
             supabase.from('announcements').select('id', { count:'exact' }),
-            supabase.from('summaries').select('id,approved', { count:'exact' }),
+            supabase.from('summaries').select('*', { count:'exact' }),
             supabase.from('tools_items').select('id', { count:'exact' }),
-            supabase.from('whatsapp_groups').select('id,approved', { count:'exact' }),
-            supabase.from('site_announcements').select('id,active', { count:'exact' }),
+            supabase.from('whatsapp_groups').select('*', { count:'exact' }),
+            supabase.from('marketplace').select('id', { count:'exact' }),
             supabase.from('projects').select('id', { count:'exact' }),
         ])
         document.getElementById('statConfessions').textContent = ann.count || 0
@@ -1074,345 +833,25 @@ window.markAllRead = async function() {
     showToast('تم تحديد الكل كمقروء!')
 }
 
-
-// ===== RATINGS ADMIN =====
-let ratingSubmissionsAdmin=[]
-function ratingEscape(v){return String(v??'').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;')}
-function renderRatingsAdmin(rows){
- const el=document.getElementById('ratingsAdminGrid');if(!el)return
- if(!rows.length){el.innerHTML='<div class="admin-empty-state"><i class="fas fa-star"></i><span>لا توجد تقييمات بانتظار المراجعة</span></div>';return}
- el.innerHTML=rows.map(r=>`
- <article class="rating-admin-card">
-  <div class="rating-admin-head"><div><strong>${ratingEscape(r.target_name)}</strong><small style="display:block;color:var(--text-dim)">${ratingEscape(r.college||'')}</small></div><span class="rating-admin-kind">${r.kind==='course'?'مادة':'دكتور'}</span></div>
-  <div class="rating-admin-score">${'★'.repeat(Number(r.overall_rating||0))}${'☆'.repeat(5-Number(r.overall_rating||0))}</div>
-  <p class="rating-admin-comment">${ratingEscape(r.comment)}</p>
-  <div class="rating-admin-meta">
-   <span class="rating-admin-chip">عام ${r.overall_rating}/5</span>
-   ${r.difficulty_rating?`<span class="rating-admin-chip">سهولة ${r.difficulty_rating}/5</span>`:''}
-   ${r.clarity_rating?`<span class="rating-admin-chip">شرح ${r.clarity_rating}/5</span>`:''}
-   <span class="rating-admin-chip">اختبارات ${r.exams_rating}/5</span>
-  </div>
-  <div class="rating-admin-actions"><button class="approve" onclick="moderateRating('${r.id}','approved')"><i class="fas fa-check"></i> قبول</button><button class="reject" onclick="moderateRating('${r.id}','rejected')"><i class="fas fa-times"></i> رفض</button></div>
- </article>`).join('')
-}
-async function loadRatingsAdmin(){
- try{
-  const {data,error}=await supabase.from('rating_submissions').select('*').order('created_at',{ascending:false})
-  if(error)throw error
-  ratingSubmissionsAdmin=data||[]
-  const pending=ratingSubmissionsAdmin.filter(r=>r.status==='pending')
-  renderRatingsAdmin(pending)
-  document.getElementById('ratingsPendingCount').textContent=pending.length
-  document.getElementById('ratingsApprovedCount').textContent=ratingSubmissionsAdmin.filter(r=>r.status==='approved').length
-  document.getElementById('ratingsRejectedCount').textContent=ratingSubmissionsAdmin.filter(r=>r.status==='rejected').length
-  const badge=document.getElementById('navRatingsBadge');if(badge){badge.textContent=pending.length;badge.style.display=pending.length?'inline-block':'none'}
- }catch(e){console.error(e)}
-}
-window.moderateRating=async function(id,status){
- try{
-  const {error}=await supabase.from('rating_submissions').update({status,reviewed_at:new Date().toISOString()}).eq('id',id)
-  if(error)throw error
-  await loadRatingsAdmin();showToast(status==='approved'?'تم اعتماد التقييم':'تم رفض التقييم')
- }catch(e){showToast(e.message||'فشل التحديث','error')}
-}
-
 // ===== CONFESSIONS =====
-let adminConfessions = []
-
-function escapeAdminHTML(value) {
-    return String(value ?? '')
-        .replaceAll('&','&amp;')
-        .replaceAll('<','&lt;')
-        .replaceAll('>','&gt;')
-        .replaceAll('"','&quot;')
-        .replaceAll("'","&#039;")
-}
-
-function renderAdminConfessions(records) {
-    const grid = document.getElementById('confessionsAdminGrid')
-    if (!grid) return
-
-    if (!records.length) {
-        grid.innerHTML = '<div class="admin-empty-state"><i class="fas fa-comment-slash"></i><span>لا توجد اعترافات</span></div>'
-        return
-    }
-
-    grid.innerHTML = records.map(c => {
-        const text = c.text || c.content || c.message || '—'
-        const words = String(text).trim() ? String(text).trim().split(/\s+/).length : 0
-        return `
-        <article class="confession-admin-card">
-            <div class="confession-admin-text">${escapeAdminHTML(text)}</div>
-            <div class="confession-admin-meta">
-                <span><i class="far fa-clock"></i> ${formatTime(c.created_at)}</span>
-                <span><i class="fas fa-font"></i> ${String(text).length} حرف · ${words} كلمة</span>
-                <span><i class="fas fa-heart"></i> ${Number(c.likes || 0)}</span>
-            </div>
-            <div class="confession-admin-footer">
-                <span class="confession-category">${escapeAdminHTML(c.category || 'عام')}</span>
-                <button class="confession-delete-btn" onclick="deleteConfessionAdmin('${c.id}')"><i class="fas fa-trash"></i> حذف</button>
-            </div>
-        </article>`
-    }).join('')
-}
-
 async function loadConfessions() {
-    const grid = document.getElementById('confessionsAdminGrid')
-    if (grid) grid.innerHTML = '<div class="admin-empty-state"><i class="fas fa-spinner fa-spin"></i><span>جاري تحميل الاعترافات...</span></div>'
-
     try {
-        const { data, error } = await supabase.from('confessions').select('*').order('created_at', { ascending:false })
-        if (error) throw error
-
-        adminConfessions = Array.isArray(data) ? data : []
-        renderAdminConfessions(adminConfessions)
-
-        const todayString = new Date().toDateString()
-        const todayCount = adminConfessions.filter(c => new Date(c.created_at).toDateString() === todayString).length
-        const likes = adminConfessions.reduce((sum,c) => sum + Number(c.likes || 0), 0)
-
-        document.getElementById('confessionTotalCount').textContent = adminConfessions.length
-        document.getElementById('confessionTodayCount').textContent = todayCount
-        document.getElementById('confessionLikesCount').textContent = likes
-        document.getElementById('statConfessions').textContent = adminConfessions.length
-
-        const badge = document.getElementById('navConfBadge')
-        if (badge) {
-            badge.textContent = adminConfessions.length
-            badge.style.display = adminConfessions.length ? 'inline-block' : 'none'
-        }
-    } catch(e) {
-        console.error('Confessions admin load failed:', e)
-        if (grid) grid.innerHTML = `<div class="admin-empty-state" style="color:var(--danger)"><i class="fas fa-exclamation-triangle"></i><span>${escapeAdminHTML(e?.message || 'تعذر تحميل الاعترافات')}</span></div>`
-    }
+        const { data } = await supabase.from('announcements').select('*').order('created_at', { ascending:false })
+        const tbody = document.getElementById('confTableBody')
+        if (!data || !data.length) { tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--text-dim);padding:2rem;">لا توجد إعلانات</td></tr>'; return }
+        tbody.innerHTML = data.map(c => `
+            <tr>
+                <td style="font-weight:700">${c.title || c.name || '—'}</td>
+                <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${c.content || c.body || c.message || '—'}</td>
+                <td style="font-size:.75rem;color:var(--text-dim);">${formatTime(c.created_at)}</td>
+                <td><button class="btn-del" onclick="deleteConf('${c.id}')"><i class="fas fa-trash"></i></button></td>
+            </tr>`).join('')
+    } catch(e) {}
 }
 
-window.filterAdminConfessions = function(query) {
-    const q = String(query || '').trim().toLowerCase()
-    renderAdminConfessions(!q ? adminConfessions : adminConfessions.filter(c =>
-        `${c.text || ''} ${c.category || ''}`.toLowerCase().includes(q)
-    ))
-}
-
-async function moderateConfessionSecure(id) {
-    const password = sessionStorage.getItem('uon_admin_password')
-    if (!password) throw new Error('انتهت جلسة المشرف، سجل الدخول مرة أخرى')
-
-    const response = await fetch(window._sbURL + '/rest/v1/rpc/moderate_confession', {
-        method: 'POST',
-        headers: {
-            apikey: window._sbKEY,
-            Authorization: 'Bearer ' + window._sbKEY,
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            p_password: password,
-            p_confession_id: String(id),
-            p_action: 'delete'
-        })
-    })
-
-    const result = await response.json()
-    if (!response.ok || result?.ok !== true) {
-        throw new Error(result?.message || result?.error || 'تعذر حذف الاعتراف')
-    }
-}
-
-window.deleteConfessionAdmin = async function(id) {
-    if (!confirm('هل تريد حذف هذا الاعتراف نهائيًا؟')) return
-    try {
-        await moderateConfessionSecure(id)
-        await loadConfessions()
-        showToast('تم حذف الاعتراف')
-    } catch(e) {
-        console.error('Delete confession failed:', e)
-        showToast(e.message || 'فشل حذف الاعتراف', 'error')
-    }
-}
-
-
-
-// ===== STUDENT PROJECTS ADMIN =====
-let studentProjectsAdmin=[]
-
-function projectAdminEscape(v){return String(v??'').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;')}
-
-function renderProjectAdminCards(rows,targetId,pending){
- const el=document.getElementById(targetId);if(!el)return
- if(!rows.length){el.innerHTML='<div class="admin-empty-state"><i class="fas fa-folder-open"></i><span>لا توجد مشاريع</span></div>';return}
- el.innerHTML=rows.map(p=>`
- <article class="project-admin-card">
-  <div class="project-admin-image" style="background-image:url('${projectAdminEscape(p.image_url||'')}')"></div>
-  <div class="project-admin-body">
-   <h3>${projectAdminEscape(p.title)}</h3>
-   <p>${projectAdminEscape(p.description)}</p>
-   <div class="project-admin-meta">
-    <span class="project-admin-chip">${projectAdminEscape(p.owner_name||'بدون اسم')}</span>
-    ${p.major?`<span class="project-admin-chip">${projectAdminEscape(p.major)}</span>`:''}
-    ${p.contact?`<span class="project-admin-chip">${projectAdminEscape(p.contact)}</span>`:''}
-   </div>
-   <div class="project-admin-actions">
-    ${pending?`<button class="approve" onclick="moderateStudentProject('${p.id}','approved')"><i class="fas fa-check"></i> قبول</button>
-    <button class="reject" onclick="moderateStudentProject('${p.id}','rejected')"><i class="fas fa-times"></i> رفض</button>`:
-    `<button class="feature" onclick="setFeaturedProject('${p.id}',${!p.featured})"><i class="fas fa-star"></i> ${p.featured?'إلغاء التمييز':'مشروع مميز'}</button>
-     <button class="reject" onclick="deleteStudentProject('${p.id}')"><i class="fas fa-trash"></i> حذف</button>`}
-   </div>
-  </div>
- </article>`).join('')
-}
-
-async function loadStudentProjectsAdmin(){
- try{
-  const {data,error}=await supabase.from('student_projects').select('*').order('created_at',{ascending:false})
-  if(error)throw error
-  studentProjectsAdmin=data||[]
-  const pending=studentProjectsAdmin.filter(p=>p.status==='pending')
-  const approved=studentProjectsAdmin.filter(p=>p.status==='approved')
-  renderProjectAdminCards(pending,'projectsPendingList',true)
-  renderProjectAdminCards(approved,'projectsApprovedList',false)
-  document.getElementById('projectsPendingCount').textContent=pending.length
-  document.getElementById('projectsApprovedCount').textContent=approved.length
-  document.getElementById('projectsFeaturedCount').textContent=approved.filter(p=>p.featured).length
-  const badge=document.getElementById('navProjBadge');if(badge){badge.textContent=pending.length;badge.style.display=pending.length?'inline-block':'none'}
- }catch(e){console.error(e)}
-}
-
-window.moderateStudentProject=async function(id,status){
- try{
-  const {error}=await supabase.from('student_projects').update({status,reviewed_at:new Date().toISOString()}).eq('id',id)
-  if(error)throw error
-  await loadStudentProjectsAdmin();showToast(status==='approved'?'تم اعتماد المشروع':'تم رفض المشروع')
- }catch(e){showToast(e.message||'فشل التحديث','error')}
-}
-
-window.setFeaturedProject=async function(id,featured){
- try{
-  if(featured){
-   const {error:clearError}=await supabase.from('student_projects').update({featured:false}).eq('featured',true)
-   if(clearError)throw clearError
-  }
-  const {error}=await supabase.from('student_projects').update({featured}).eq('id',id)
-  if(error)throw error
-  await loadStudentProjectsAdmin();showToast(featured?'تم تمييز المشروع ⭐':'تم إلغاء التمييز')
- }catch(e){showToast(e.message||'فشل التحديث','error')}
-}
-
-window.deleteStudentProject=async function(id){
- if(!confirm('حذف المشروع نهائيًا؟'))return
- try{
-  const {error}=await supabase.from('student_projects').delete().eq('id',id)
-  if(error)throw error
-  await loadStudentProjectsAdmin();showToast('تم حذف المشروع')
- }catch(e){showToast(e.message||'فشل الحذف','error')}
-}
-
-// ===== SITE ANNOUNCEMENTS =====
-function escapeSiteAnn(value) {
-    return String(value ?? '').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'","&#039;")
-}
-
-function getSiteAnnForm() {
-    return {
-        title: document.getElementById('siteAnnTitle').value.trim(),
-        body: document.getElementById('siteAnnBody').value.trim(),
-        type: document.getElementById('siteAnnType').value,
-        priority: Number(document.getElementById('siteAnnPriority').value || 0),
-        button_text: document.getElementById('siteAnnButtonText').value.trim(),
-        button_url: document.getElementById('siteAnnButtonUrl').value.trim(),
-        expires_at: document.getElementById('siteAnnExpires').value || null,
-        active: document.getElementById('siteAnnActive').checked
-    }
-}
-
-function updateSiteAnnPreview() {
-    const data = getSiteAnnForm()
-    const preview = document.getElementById('siteAnnPreview')
-    if (!preview) return
-    preview.className = 'site-ann-preview ' + data.type
-    preview.querySelector('strong').textContent = data.title || 'عنوان الإعلان'
-    preview.querySelector('p').textContent = data.body || 'سيظهر النص المختصر هنا كما سيراه الطالب.'
-    preview.querySelector(':scope > span').textContent = data.button_text || 'اعرف التفاصيل'
-}
-document.addEventListener('input', e => {
-    if (e.target.closest?.('.announcement-form-grid')) updateSiteAnnPreview()
-})
-document.addEventListener('change', e => {
-    if (e.target.closest?.('.announcement-form-grid')) updateSiteAnnPreview()
-})
-
-window.createSiteAnnouncement = async function() {
-    const payload = getSiteAnnForm()
-    if (!payload.title || !payload.body) { showToast('أدخل عنوان الإعلان ونصه', 'error'); return }
-    try {
-        const { error } = await supabase.from('site_announcements').insert(payload)
-        if (error) throw error
-        ;['siteAnnTitle','siteAnnBody','siteAnnButtonText','siteAnnButtonUrl','siteAnnExpires'].forEach(id => document.getElementById(id).value = '')
-        document.getElementById('siteAnnPriority').value = '10'
-        document.getElementById('siteAnnActive').checked = true
-        updateSiteAnnPreview()
-        await loadSiteAnnouncementsAdmin()
-        await loadStats()
-        showToast('تم نشر الإعلان ✅')
-    } catch(e) {
-        console.error(e)
-        showToast(e.message || 'فشل نشر الإعلان', 'error')
-    }
-}
-
-async function loadSiteAnnouncementsAdmin() {
-    const el = document.getElementById('siteAnnouncementsAdminList')
-    if (!el) return
-    try {
-        const { data, error } = await supabase.from('site_announcements').select('*').order('priority', { ascending:false }).order('created_at', { ascending:false })
-        if (error) throw error
-        const rows = data || []
-        document.getElementById('navAnnBadge').textContent = rows.filter(r => r.active).length
-        document.getElementById('navAnnBadge').style.display = rows.length ? 'inline-block' : 'none'
-        if (!rows.length) {
-            el.innerHTML = '<div class="admin-empty-state"><i class="fas fa-bullhorn"></i><span>لا توجد إعلانات</span></div>'
-            return
-        }
-        el.innerHTML = rows.map(r => `
-            <div class="site-ann-admin-item">
-                <div class="site-ann-admin-icon"><i class="fas fa-bullhorn"></i></div>
-                <div>
-                    <h4>${escapeSiteAnn(r.title)}</h4>
-                    <p>${escapeSiteAnn(r.body)}</p>
-                    <div class="site-ann-admin-meta">
-                        <span class="site-ann-chip">${escapeSiteAnn(r.type || 'normal')}</span>
-                        <span class="site-ann-chip">أولوية ${Number(r.priority || 0)}</span>
-                        <span class="site-ann-chip">${r.active ? 'نشط' : 'متوقف'}</span>
-                        ${r.expires_at ? `<span class="site-ann-chip">ينتهي ${new Date(r.expires_at).toLocaleDateString('ar-OM')}</span>` : ''}
-                    </div>
-                </div>
-                <div class="site-ann-actions">
-                    <button title="${r.active ? 'إيقاف' : 'تشغيل'}" onclick="toggleSiteAnnouncement('${r.id}',${!r.active})"><i class="fas ${r.active ? 'fa-pause' : 'fa-play'}"></i></button>
-                    <button title="حذف" onclick="deleteSiteAnnouncement('${r.id}')"><i class="fas fa-trash"></i></button>
-                </div>
-            </div>`).join('')
-    } catch(e) {
-        el.innerHTML = `<div class="admin-empty-state" style="color:var(--danger)"><i class="fas fa-exclamation-triangle"></i><span>${escapeSiteAnn(e.message || 'تعذر التحميل')}</span></div>`
-    }
-}
-
-window.toggleSiteAnnouncement = async function(id, active) {
-    try {
-        const { error } = await supabase.from('site_announcements').update({ active }).eq('id', id)
-        if (error) throw error
-        await loadSiteAnnouncementsAdmin()
-        showToast(active ? 'تم تشغيل الإعلان' : 'تم إيقاف الإعلان')
-    } catch(e) { showToast(e.message || 'فشل التحديث', 'error') }
-}
-
-window.deleteSiteAnnouncement = async function(id) {
-    if (!confirm('حذف الإعلان نهائيًا؟')) return
-    try {
-        const { error } = await supabase.from('site_announcements').delete().eq('id', id)
-        if (error) throw error
-        await loadSiteAnnouncementsAdmin()
-        await loadStats()
-        showToast('تم حذف الإعلان')
-    } catch(e) { showToast(e.message || 'فشل الحذف', 'error') }
+window.deleteConf = async function(id) {
+    if (!confirm('حذف هذا الإعلان؟')) return
+    try { await supabase.from('announcements').delete().eq('id', id); await loadConfessions(); showToast('تم الحذف', 'error') } catch(e) {}
 }
 
 // ===== SUMMARIES =====
@@ -1426,16 +865,10 @@ async function loadSummaries() {
         document.getElementById('sumPendingBody').innerHTML = pending.length
             ? pending.map(s => `
                 <tr>
-                    <td style="font-weight:700">
-                        ${s.subject}
-                        ${String(s.submitter_name || '').includes('استيراد') ? '<span style="display:inline-block;margin-inline-start:.35rem;padding:.15rem .42rem;border-radius:999px;background:rgba(251,191,36,.1);color:#fbbf24;font-size:.62rem;">مستورد</span>' : ''}
-                    </td>
+                    <td style="font-weight:700">${s.subject}</td>
                     <td>${s.college}</td>
-                    <td style="color:var(--text-dim);font-size:.8rem;">
-                        <div>${s.submitter_name || 'مجهول'}</div>
-                        ${s.description ? `<small style="display:block;margin-top:.25rem;color:var(--text-dim);max-width:260px;white-space:normal;line-height:1.45;">${s.description}</small>` : ''}
-                    </td>
-                    <td><a href="${s.link}" target="_blank" rel="noopener" style="color:var(--primary);font-size:.8rem;">🔗 معاينة الرابط</a></td>
+                    <td style="color:var(--text-dim);font-size:.8rem;">${s.submitter_name || 'مجهول'}</td>
+                    <td><a href="${s.link}" target="_blank" style="color:var(--primary);font-size:.8rem;">🔗 الرابط</a></td>
                     <td><div class="td-actions">
                         <button class="btn-approve" onclick="approveSum('${s.id}')">✅ قبول</button>
                         <button class="btn-reject" onclick="rejectSum('${s.id}')">❌ رفض</button>
@@ -1948,5 +1381,6 @@ if ('serviceWorker' in navigator) {
     caches.keys().then(keys => keys.forEach(k => caches.delete(k)))
 }
 </script>
+<script src="language.js" defer></script>
 </body>
 </html>
