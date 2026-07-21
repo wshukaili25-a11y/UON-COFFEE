@@ -48,18 +48,22 @@ export function fillCollege(select,{other=false}={}){
 export function openModal(id){$('#'+id)?.classList.add('open')} export function closeModal(id){$('#'+id)?.classList.remove('open')}
 
 export async function enforceMaintenance(){
- if(location.pathname.endsWith('/admin.html')||location.pathname.endsWith('/maintenance.html'))return;
+ const isAdmin=location.pathname.endsWith('/admin.html');
+ const isMaintenance=location.pathname.endsWith('/maintenance.html');
+ if(isAdmin)return;
  document.documentElement.classList.add('maintenance-check');
  try{
   const rows=await get('site_settings',`select=key,value&key=in.(maintenance_enabled,maintenance_message)&_=${Date.now()}`);
-  const map=Object.fromEntries(rows.map(x=>[x.key,x.value]));
-  const on=map.maintenance_enabled===true||String(map.maintenance_enabled).toLowerCase()==='true';
-  if(on){location.replace(`maintenance.html?v=${Date.now()}`);return}
- }catch(e){console.warn(e)}
+  const map=Object.fromEntries((rows||[]).map(x=>[x.key,x.value]));
+  const raw=map.maintenance_enabled;
+  const on=raw===true||raw===1||String(raw).replace(/"/g,'').toLowerCase()==='true';
+  if(on&&!isMaintenance){location.replace(`maintenance.html?v=${Date.now()}`);return}
+  if(!on&&isMaintenance){location.replace(`index.html?v=${Date.now()}`);return}
+ }catch(e){console.warn('Maintenance check failed',e)}
  document.documentElement.classList.remove('maintenance-check');
 }
 export async function platformStatuses(){
- const rows=await get('platform_features',`select=key,status&order=sort_order.asc&_=${Date.now()}`);
+ const rows=await get('platform_features',`select=key,status,updated_at&order=sort_order.asc&_=${Date.now()}`);
  return Object.fromEntries(rows.map(x=>[x.key,x.status]));
 }
 export async function notifyPending(table,id){
