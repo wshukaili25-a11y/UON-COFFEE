@@ -363,6 +363,51 @@ body.has-exam-banner .navbar{top:40px!important}
         @media(max-width:520px){.quick-hub-grid{grid-template-columns:1fr}.hero-trust span{font-size:.7rem}.tool-card{min-height:auto}.stats-bar{display:grid;grid-template-columns:1fr 1fr;padding:1rem}.stat-item{min-width:0;padding:1rem}}
         @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important;transition-duration:.01ms!important}}
 
+
+/* ===== UON HUB v2.1 POLISH ===== */
+.logo-icon{
+    background:linear-gradient(135deg,#22c55e,#00d4ff 55%,#7c3aed);
+    color:#071326;border-radius:13px;box-shadow:0 8px 25px rgba(0,212,255,.18);
+}
+.navbar{box-shadow:0 10px 40px rgba(0,0,0,.12)}
+.nav-links{align-items:center}
+.nav-links a{padding:.5rem .15rem}
+.tool-card{
+    border-color:rgba(255,255,255,.075);
+    background:linear-gradient(150deg,rgba(30,37,75,.98),rgba(20,26,55,.98));
+    box-shadow:0 12px 35px rgba(0,0,0,.12);
+}
+.tool-card:hover{
+    transform:translateY(-9px);
+    box-shadow:0 24px 60px rgba(0,0,0,.28),0 0 0 1px color-mix(in srgb,var(--card-color) 35%,transparent);
+}
+.tool-card:hover .tool-icon{transform:translateY(-4px) scale(1.08) rotate(-2deg)}
+.tool-icon{transition:transform .3s ease,box-shadow .3s ease;box-shadow:0 12px 25px rgba(0,0,0,.12)}
+.tool-link{border:1px solid color-mix(in srgb,var(--card-color) 25%,transparent);background:color-mix(in srgb,var(--card-color) 7%,transparent)}
+.tool-link:hover{background:color-mix(in srgb,var(--card-color) 14%,transparent)}
+.tool-card[style*="opacity"] .tool-link{
+    background:rgba(255,255,255,.045)!important;
+    border-color:rgba(255,255,255,.07)!important;
+    color:var(--text-dim)!important;
+}
+.modern-footer{text-align:initial;padding:4rem 5% 1.5rem}
+.footer-grid{max-width:1300px;margin:auto;display:grid;grid-template-columns:1.6fr repeat(3,1fr);gap:2.3rem}
+.footer-brand-column .footer-logo{display:flex;align-items:center;gap:.65rem;color:#fff;font-size:1.6rem}
+.footer-brand-column .footer-logo span:last-child{color:var(--primary)}
+.footer-logo-icon{width:42px;height:42px;display:inline-flex;align-items:center;justify-content:center;border-radius:12px;background:linear-gradient(135deg,#22c55e,#00d4ff);color:#071326!important;font-size:1rem}
+.footer-column{display:flex;flex-direction:column;gap:.65rem}
+.footer-column h3{font-size:.92rem;color:#fff;margin-bottom:.35rem}
+.footer-column a{color:var(--text-dim);text-decoration:none;font-size:.82rem;transition:.2s}
+.footer-column a:hover{color:var(--primary);transform:translateX(-3px)}
+html[dir="ltr"] .footer-column a:hover{transform:translateX(3px)}
+.footer-version{display:inline-flex;width:max-content;margin-top:.25rem;padding:.3rem .65rem;border-radius:999px;background:rgba(0,212,255,.08);color:var(--primary);font-size:.7rem;font-weight:800}
+.modern-footer .social-links{justify-content:flex-start;margin:1rem 0 0}
+.modern-footer .footer-bottom{max-width:1300px;margin:2.5rem auto 0;display:flex;justify-content:space-between;gap:1rem}
+html[dir="ltr"] body{font-family:'Tajawal',Arial,sans-serif}
+html[dir="ltr"] .nav-links a::after{left:0;right:auto}
+@media(max-width:900px){.footer-grid{grid-template-columns:1fr 1fr}.footer-brand-column{grid-column:1/-1}}
+@media(max-width:560px){.footer-grid{grid-template-columns:1fr}.footer-brand-column{grid-column:auto}.modern-footer .footer-bottom{flex-direction:column;text-align:center}}
+
 </style>
 <link rel="stylesheet" href="brand.css">
 </head>
@@ -380,7 +425,7 @@ body.has-exam-banner .navbar{top:40px!important}
 <!-- Navbar -->
 <nav class="navbar" id="navbar">
     <a href="javascript:void(0)" class="logo">
-        <div class="logo-icon">UH</div>
+        <div class="logo-icon" aria-label="UON Hub">U1</div>
         <div class="logo-text hub-brand-mark">UON <span>Hub</span></div>
     </a>
     <ul class="nav-links">
@@ -389,6 +434,8 @@ body.has-exam-banner .navbar{top:40px!important}
         
         
         <li><a href="#botSection" data-i18n="nav_ai">المساعد AI</a></li>
+        <li><a href="marketplace.html" data-i18n="nav_market">السوق</a></li>
+        <li><a href="#features" data-i18n="nav_about">عن المنصة</a></li>
         <li><a href="#contact" data-i18n="nav_contact">التواصل</a></li>
         <li><a href="features.html" target="_blank" style="color:var(--warning)!important;">🔥 الميزات</a></li>
     </ul>
@@ -589,17 +636,41 @@ body.has-exam-banner .navbar{top:40px!important}
 </section>
 
 <!-- Footer -->
-<footer class="footer">
-    <div class="footer-logo">UON <span style="color:var(--primary)">Hub</span></div>
-    <p class="footer-tagline">كل ما يحتاجه طالب جامعة نزوى في مكان واحد.</p>
-    <div class="social-links">
-        <a href="https://instagram.com/uonhub" target="_blank"><i class="fab fa-instagram"></i></a>
-        <a href="https://wa.me/96877144942" target="_blank"><i class="fab fa-whatsapp"></i></a>
-        <a href="features.html" target="_blank"><i class="fas fa-map-marked-alt"></i></a>
+<footer class="footer modern-footer">
+    <div class="footer-grid">
+        <div class="footer-brand-column">
+            <div class="footer-logo"><span class="footer-logo-icon">U1</span> UON <span>Hub</span></div>
+            <p class="footer-tagline" data-i18n="footer_tagline">كل ما يحتاجه طالب جامعة نزوى في مكان واحد.</p>
+            <div class="social-links">
+                <a href="https://instagram.com/uonhub" target="_blank" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                <a href="https://wa.me/96877144942" target="_blank" aria-label="WhatsApp"><i class="fab fa-whatsapp"></i></a>
+            </div>
+        </div>
+        <div class="footer-column">
+            <h3 data-i18n="footer_quick">روابط سريعة</h3>
+            <a href="#tools" data-i18n="nav_tools">الأدوات</a>
+            <a href="marketplace.html" data-i18n="nav_market">السوق</a>
+            <a href="summaries.html" data-i18n="footer_summaries">الملخصات</a>
+            <a href="university-guide.html" data-i18n="footer_guide">دليل الجامعة</a>
+        </div>
+        <div class="footer-column">
+            <h3 data-i18n="footer_official">الجامعة</h3>
+            <a href="https://www.unizwa.edu.om" target="_blank" data-i18n="footer_official_site">الموقع الرسمي</a>
+            <a href="https://portal.unizwa.edu.om" target="_blank" data-i18n="footer_portal">البوابة الطلابية</a>
+            <a href="https://moodle.unizwa.edu.om/login/index.php" target="_blank">Moodle</a>
+            <a href="#contact" data-i18n="nav_contact">التواصل</a>
+        </div>
+        <div class="footer-column">
+            <h3 data-i18n="footer_platform">المنصة</h3>
+            <a href="#features" data-i18n="nav_about">عن المنصة</a>
+            <a href="#" data-i18n="footer_privacy">الخصوصية</a>
+            <a href="#" data-i18n="footer_terms">الشروط</a>
+            <span class="footer-version">UON Hub v2.1</span>
+        </div>
     </div>
     <div class="footer-bottom">
-        <p>© 2026 جامعة نزوى - جميع الحقوق محفوظة</p>
-        <p style="margin-top:0.5rem;">صنع بحب <span class="heart">❤️</span> من طلاب جامعة نزوى</p>
+        <p>© 2026 UON Hub — <span data-i18n="footer_rights">جميع الحقوق محفوظة</span></p>
+        <p><span data-i18n="footer_made">صنع بحب لطلاب جامعة نزوى</span> <span class="heart">❤️</span></p>
     </div>
 </footer>
 
@@ -810,13 +881,27 @@ window.addEventListener('DOMContentLoaded', () => {
 })
 
 // ===== RENDER TOOLS =====
+const preferredToolOrder = [
+    'مساعد AI ذكي','حاسبة المعدل','سوق الطلاب','الملخصات الدراسية',
+    'الجدول الدراسي','مجموعات المواد','اعترافات الطلاب',
+    'دليل الجامعة الرسمي','أدوات أكاديمية','مشاريع الطلاب','مطاعم قريبة'
+]
+
+function sortToolsForHome(items) {
+    return [...items].sort((a,b) => {
+        const ai = preferredToolOrder.indexOf(a.title)
+        const bi = preferredToolOrder.indexOf(b.title)
+        return (ai === -1 ? 999 : ai) - (bi === -1 ? 999 : bi)
+    })
+}
+
 function renderTools() {
     const grid = document.getElementById('toolsGrid')
     if (!tools.length) {
         grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:3rem;color:var(--text-dim);">لا توجد أدوات بعد</div>'
         return
     }
-    const labels = { disabled:'غير متاحة', coming_soon:'Coming Soon', maintenance:'صيانة' }
+    const labels = { disabled:'غير متاحة', coming_soon:'Soon', maintenance:'صيانة' }
     grid.innerHTML = tools.map(tool => {
         const inactive = tool.status !== 'active'
         const statusBadge = inactive ? `<span style="position:absolute;top:12px;right:12px;padding:.35rem .65rem;border-radius:999px;background:rgba(10,14,39,.88);border:1px solid rgba(255,255,255,.12);font-size:.72rem;font-weight:900;z-index:3;">${labels[tool.status] || 'غير متاحة'}</span>` : ''
