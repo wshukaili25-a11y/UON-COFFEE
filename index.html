@@ -510,11 +510,50 @@ html[dir="ltr"] .whatsapp-banner{left:auto;right:14px}
     cursor:not-allowed
 }
 
+
+/* ===== SITE ANNOUNCEMENT BANNER ===== */
+.site-announcement-banner{position:fixed;top:0;left:0;right:0;z-index:100000;padding:.55rem 4%;background:linear-gradient(90deg,#16304f,#0f766e);box-shadow:0 8px 28px rgba(0,0,0,.22)}
+.site-announcement-banner[data-type="urgent"]{background:linear-gradient(90deg,#991b1b,#dc2626)}
+.site-announcement-banner[data-type="important"]{background:linear-gradient(90deg,#92400e,#d97706)}
+.site-announcement-banner[data-type="event"]{background:linear-gradient(90deg,#5b21b6,#7c3aed)}
+.site-announcement-inner{max-width:1400px;margin:auto;display:flex;align-items:center;gap:.75rem;color:#fff}
+.site-announcement-icon{width:34px;height:34px;border-radius:10px;background:rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.site-announcement-copy{display:flex;align-items:center;gap:.55rem;min-width:0;flex:1}.site-announcement-copy strong{font-size:.86rem;white-space:nowrap}.site-announcement-copy span{font-size:.76rem;color:rgba(255,255,255,.8);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.site-announcement-inner>a{color:#fff;text-decoration:none;border:1px solid rgba(255,255,255,.25);border-radius:9px;padding:.4rem .7rem;font-size:.72rem;font-weight:900;white-space:nowrap}
+.site-announcement-inner>button{width:31px;height:31px;border-radius:9px;border:0;background:rgba(0,0,0,.15);color:#fff;cursor:pointer}
+body.has-site-announcement{padding-top:54px}body.has-site-announcement .navbar{top:54px}
+@media(max-width:768px){
+    .navbar{padding:.75rem 1rem}.logo-text{font-size:1rem}.logo-icon{width:39px;height:39px}.nav-actions{gap:.4rem}
+    #langToggleBtn{min-width:55px!important;padding:0 7px!important}.hero{padding:7.5rem 1rem 3rem;min-height:auto}.hero h1{font-size:2rem}.hero p{font-size:1rem}
+    .tools-section,.features-section,.bot-section,.calc-section,.contact-section{padding:4rem 1rem}
+    .tools-grid{grid-template-columns:1fr;gap:1rem}.tool-card{padding:1.5rem;min-height:auto}.tool-card:hover{transform:none}
+    .quick-hub{padding:1rem 1rem 3rem}.quick-hub-grid{grid-template-columns:1fr 1fr;gap:.7rem}.quick-hub-card{padding:.85rem}.quick-hub-icon{width:40px;height:40px}
+    .site-announcement-copy{display:block}.site-announcement-copy strong,.site-announcement-copy span{display:block;max-width:100%}.site-announcement-copy span{margin-top:.1rem}
+}
+@media(max-width:480px){
+    .quick-hub-grid{grid-template-columns:1fr}.site-announcement-inner>a{display:none}.site-announcement-banner{padding:.45rem .6rem}
+    body.has-site-announcement{padding-top:64px}body.has-site-announcement .navbar{top:64px}
+    .hero h1{font-size:1.72rem}.hero-buttons{width:100%}.stats-bar{grid-template-columns:1fr 1fr!important}
+}
+
 </style>
 <link rel="stylesheet" href="brand.css">
 </head>
 <body>
 <a class="skip-link" href="#tools">تجاوز إلى الأدوات</a>
+
+<div id="siteAnnouncementBanner" class="site-announcement-banner" hidden>
+    <div class="site-announcement-inner">
+        <div class="site-announcement-icon"><i class="fas fa-bullhorn"></i></div>
+        <div class="site-announcement-copy">
+            <strong id="siteAnnouncementTitle"></strong>
+            <span id="siteAnnouncementBody"></span>
+        </div>
+        <a id="siteAnnouncementAction" href="#" hidden></a>
+        <button id="siteAnnouncementClose" aria-label="إغلاق الإعلان"><i class="fas fa-times"></i></button>
+    </div>
+</div>
+
 <div id="offlineBanner" class="offline-banner">أنت غير متصل — بعض البيانات قد لا تتحدث الآن</div>
 
 <!-- Loading -->
@@ -874,6 +913,45 @@ const supabase = (function() {
     return { from: buildQuery }
 })()
 
+
+// ===== SITE ANNOUNCEMENT BANNER =====
+async function loadSiteAnnouncementBanner() {
+    const banner = document.getElementById('siteAnnouncementBanner')
+    if (!banner) return
+    try {
+        const now = new Date().toISOString()
+        const { data, error } = await supabase.from('site_announcements').select('*').eq('active', true).order('priority', { ascending:false }).order('created_at', { ascending:false }).limit(10)
+        if (error) throw error
+        const dismissed = JSON.parse(sessionStorage.getItem('uonhub_dismissed_announcements') || '[]')
+        const row = (data || []).find(r => (!r.expires_at || new Date(r.expires_at) > new Date()) && !dismissed.includes(String(r.id)))
+        if (!row) {
+            banner.hidden = true
+            document.body.classList.remove('has-site-announcement')
+            return
+        }
+        banner.dataset.type = row.type || 'normal'
+        document.getElementById('siteAnnouncementTitle').textContent = row.title || ''
+        document.getElementById('siteAnnouncementBody').textContent = row.body || ''
+        const action = document.getElementById('siteAnnouncementAction')
+        if (row.button_url) {
+            action.hidden = false
+            action.textContent = row.button_text || 'اعرف التفاصيل'
+            action.href = row.button_url
+        } else action.hidden = true
+        banner.hidden = false
+        document.body.classList.add('has-site-announcement')
+        document.getElementById('siteAnnouncementClose').onclick = () => {
+            const values = JSON.parse(sessionStorage.getItem('uonhub_dismissed_announcements') || '[]')
+            values.push(String(row.id))
+            sessionStorage.setItem('uonhub_dismissed_announcements', JSON.stringify(values))
+            banner.hidden = true
+            document.body.classList.remove('has-site-announcement')
+        }
+    } catch(e) {
+        console.warn('Announcement banner:', e.message || e)
+    }
+}
+
 // ===== VARIABLES =====
 let tools = []
 let botHistory = []
@@ -904,7 +982,8 @@ const defaultTools = [
 function updateUI() { /* لوحة الإدارة مخفية من الواجهة العامة */ }
 
 // ===== TOOLS LOAD =====
-async function loadTools() {
+async function loadTools()
+    loadSiteAnnouncementBanner() {
     // اعرض الأدوات مباشرة حتى لا تتوقف الصفحة إذا تأخر الاتصال.
     tools = defaultTools.map(t => ({...t, desc:t.description, btnText:t.btn_text, status:'active', disabled:false}))
     renderTools()
@@ -1191,6 +1270,7 @@ window.openTool = function(id) {
         5: () => window.location.href = 'summaries.html',
         6: () => window.location.href = 'features.html#rest',
         7: () => window.location.href = 'tools.html',
+        8: () => window.location.href = 'projects.html',
         9: () => window.location.href = 'schedule.html',
         10: () => window.location.href = 'groups.html',
         11: () => window.location.href = 'marketplace.html',
