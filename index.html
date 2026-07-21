@@ -408,6 +408,17 @@ html[dir="ltr"] .nav-links a::after{left:0;right:auto}
 @media(max-width:900px){.footer-grid{grid-template-columns:1fr 1fr}.footer-brand-column{grid-column:1/-1}}
 @media(max-width:560px){.footer-grid{grid-template-columns:1fr}.footer-brand-column{grid-column:auto}.modern-footer .footer-bottom{flex-direction:column;text-align:center}}
 
+
+.tool-status-badge{
+    position:absolute;top:14px;right:14px;z-index:3;
+    padding:.35rem .72rem;border-radius:999px;
+    background:rgba(8,13,35,.9);border:1px solid rgba(255,255,255,.11);
+    color:var(--text-muted);font-size:.7rem;font-weight:900;
+    backdrop-filter:blur(10px)
+}
+html[dir="ltr"] .tool-status-badge{right:auto;left:14px}
+html[dir="ltr"] .tool-link i{transform:rotate(180deg)}
+
 </style>
 <link rel="stylesheet" href="brand.css">
 </head>
@@ -429,15 +440,15 @@ html[dir="ltr"] .nav-links a::after{left:0;right:auto}
         <div class="logo-text hub-brand-mark">UON <span>Hub</span></div>
     </a>
     <ul class="nav-links">
-        <li><a href="#home" data-i18n="nav_home">الرئيسية</a></li>
-        <li><a href="#tools" data-i18n="nav_tools">الأدوات</a></li>
+        <li><a href="#home" data-i18n="nav.home">الرئيسية</a></li>
+        <li><a href="#tools" data-i18n="nav.tools">الأدوات</a></li>
         
         
-        <li><a href="#botSection" data-i18n="nav_ai">المساعد AI</a></li>
-        <li><a href="marketplace.html" data-i18n="nav_market">السوق</a></li>
-        <li><a href="#features" data-i18n="nav_about">عن المنصة</a></li>
-        <li><a href="#contact" data-i18n="nav_contact">التواصل</a></li>
-        <li><a href="features.html" target="_blank" style="color:var(--warning)!important;">🔥 الميزات</a></li>
+        <li><a href="#botSection" data-i18n="nav.ai">المساعد AI</a></li>
+        <li><a href="marketplace.html" data-i18n="nav.market">السوق</a></li>
+        <li><a href="#features" data-i18n="nav.about">عن المنصة</a></li>
+        <li><a href="#contact" data-i18n="nav.contact">التواصل</a></li>
+        <li><a href="features.html" target="_blank" data-i18n="nav.features" style="color:var(--warning)!important;">🔥 الميزات</a></li>
     </ul>
     <div class="nav-actions">
 
@@ -472,15 +483,15 @@ html[dir="ltr"] .nav-links a::after{left:0;right:auto}
         <div class="circle circle-3"></div>
     </div>
     <div class="hero-content">
-        <div class="hero-badge"><i class="fas fa-sparkles"></i> UON Hub — منصة طلاب جامعة نزوى</div>
-        <h1 id="heroTitle" data-i18n-html="hero_title">منصتك الشاملة<br>للحياة الأكاديمية</h1>
-        <p id="heroDesc" data-i18n="hero_desc">أدوات ذكية، ملخصات، جداول دراسية، وكل ما تحتاجه للنجاح</p>
-        <p class="sub">كل أدواتك الجامعية المهمة في مكان واحد</p>
+        <div class="hero-badge"><i class="fas fa-sparkles"></i><span data-i18n="hero.badge">UON Hub — منصة طلاب جامعة نزوى</span></div>
+        <h1 id="heroTitle" data-i18n-html="hero.title">منصتك الشاملة<br>للحياة الأكاديمية</h1>
+        <p id="heroDesc" data-i18n="hero.description">أدوات ذكية، ملخصات، جداول دراسية، وكل ما تحتاجه للنجاح</p>
+        <p class="sub" data-i18n="hero.sub">كل أدواتك الجامعية المهمة في مكان واحد</p>
         <div class="hero-buttons">
-            <button class="btn-primary" onclick="scrollToSection('tools')"><i class="fas fa-rocket"></i> استكشف الأدوات</button>
-            <button class="btn-secondary" onclick="scrollToSection('features')"><i class="fas fa-users"></i> انضم للمجتمع</button>
+            <button class="btn-primary" onclick="scrollToSection('tools')"><i class="fas fa-rocket"></i><span data-i18n="hero.explore">استكشف الأدوات</span></button>
+            <button class="btn-secondary" onclick="scrollToSection('features')"><i class="fas fa-users"></i><span data-i18n="hero.community">انضم للمجتمع</span></button>
         </div>
-        <div class="hero-trust"><span>✓ مجاني بالكامل</span><span>✓ مصمم لطلاب نزوى</span><span>✓ يعمل على الجوال</span></div>
+        <div class="hero-trust"><span data-i18n="hero.free">✓ مجاني بالكامل</span><span data-i18n="hero.built">✓ مصمم لطلاب نزوى</span><span data-i18n="hero.mobile">✓ يعمل على الجوال</span></div>
     </div>
 </section>
 
@@ -493,23 +504,23 @@ html[dir="ltr"] .nav-links a::after{left:0;right:auto}
 <!-- Quick Hub -->
 <section class="quick-hub" aria-label="وصول سريع">
     <div class="section-header reveal" style="margin-bottom:2rem">
-        <span class="section-kicker"><i class="fas fa-bolt"></i> وصول سريع</span>
-        <h2 style="font-size:2rem">ابدأ من هنا</h2>
-        <p>أكثر الخدمات استخدامًا بدون دوران</p>
+        <span class="section-kicker"><i class="fas fa-bolt"></i><span data-i18n="quick.kicker">وصول سريع</span></span>
+        <h2 style="font-size:2rem" data-i18n="quick.title">ابدأ من هنا</h2>
+        <p data-i18n="quick.description">أكثر الخدمات استخدامًا بدون دوران</p>
     </div>
     <div class="quick-hub-grid">
-        <a class="quick-hub-card" href="#calcSection"><span class="quick-hub-icon"><i class="fas fa-calculator"></i></span><span><strong>حاسبة المعدل</strong><small>فصلي وتراكمي ومواد معادة</small></span></a>
-        <a class="quick-hub-card" href="schedule.html"><span class="quick-hub-icon"><i class="fas fa-calendar-alt"></i></span><span><strong>الجدول الدراسي</strong><small>رتب أسبوعك واطبعه</small></span></a>
-        <a class="quick-hub-card" href="summaries.html"><span class="quick-hub-icon"><i class="fas fa-book-open"></i></span><span><strong>مكتبة الملخصات</strong><small>مواد وملفات طلابية</small></span></a>
-        <a class="quick-hub-card" href="groups.html"><span class="quick-hub-icon"><i class="fab fa-whatsapp"></i></span><span><strong>مجموعات المواد</strong><small>ابحث عن مجموعة مادتك</small></span></a>
+        <a class="quick-hub-card" href="#calcSection"><span class="quick-hub-icon"><i class="fas fa-calculator"></i></span><span><strong data-i18n="quick.gpa_title">حاسبة المعدل</strong><small data-i18n="quick.gpa_desc">فصلي وتراكمي ومواد معادة</small></span></a>
+        <a class="quick-hub-card" href="schedule.html"><span class="quick-hub-icon"><i class="fas fa-calendar-alt"></i></span><span><strong data-i18n="quick.schedule_title">الجدول الدراسي</strong><small data-i18n="quick.schedule_desc">رتب أسبوعك واطبعه</small></span></a>
+        <a class="quick-hub-card" href="summaries.html"><span class="quick-hub-icon"><i class="fas fa-book-open"></i></span><span><strong data-i18n="quick.summaries_title">مكتبة الملخصات</strong><small data-i18n="quick.summaries_desc">مواد وملفات طلابية</small></span></a>
+        <a class="quick-hub-card" href="groups.html"><span class="quick-hub-icon"><i class="fab fa-whatsapp"></i></span><span><strong data-i18n="quick.groups_title">مجموعات المواد</strong><small data-i18n="quick.groups_desc">ابحث عن مجموعة مادتك</small></span></a>
     </div>
 </section>
 
 <!-- Tools -->
 <section class="tools-section" id="tools">
     <div class="section-header reveal">
-        <h2 data-i18n="tools_title">الأدوات المتاحة</h2>
-        <p>مجموعة شاملة من الأدوات المصممة خصيصاً لتلبية احتياجاتك الأكاديمية في جامعة نزوى</p>
+        <h2 data-i18n="sections.tools_title">الأدوات المتاحة</h2>
+        <p data-i18n="sections.tools_desc">مجموعة شاملة من الأدوات المصممة خصيصًا لتلبية احتياجاتك الأكاديمية في جامعة نزوى</p>
     </div>
     <div class="tools-grid" id="toolsGrid">
         <div style="grid-column:1/-1;text-align:center;padding:3rem;color:var(--text-dim);">
@@ -526,19 +537,19 @@ html[dir="ltr"] .nav-links a::after{left:0;right:auto}
 <!-- Features -->
 <section class="features-section" id="features">
     <div class="section-header reveal">
-        <h2>لماذا منصة جامعة نزوى؟</h2>
-        <p>نحن نقدم تجربة فريدة مصممة خصيصاً لطلاب جامعة نزوى</p>
+        <h2 data-i18n="sections.features_title">لماذا UON Hub؟</h2>
+        <p data-i18n="sections.features_desc">تجربة طلابية مصممة خصيصًا لطلاب جامعة نزوى</p>
     </div>
     <div class="features-grid">
-        <div class="feature-item reveal"><div class="feature-icon"><i class="fas fa-bolt"></i></div><h3>سريع ومجاني</h3><p>جميع الأدوات متاحة بالكامل بدون أي تكلفة أو اشتراكات مخفية</p></div>
-        <div class="feature-item reveal"><div class="feature-icon"><i class="fas fa-shield-alt"></i></div><h3>آمن وموثوق</h3><p>محتوى مراجع وموثق من طلاب جامعة نزوى مع نظام تقييم ذكي</p></div>
-        <div class="feature-item reveal"><div class="feature-icon"><i class="fas fa-mobile-alt"></i></div><h3>متجاوب تماماً</h3><p>تصميم يتكيف مع جميع الأجهزة من الجوال إلى سطح المكتب</p></div>
+        <div class="feature-item reveal"><div class="feature-icon"><i class="fas fa-bolt"></i></div><h3 data-i18n="sections.fast_title">سريع ومجاني</h3><p data-i18n="sections.fast_desc">جميع الأدوات متاحة بدون تكلفة أو اشتراكات مخفية</p></div>
+        <div class="feature-item reveal"><div class="feature-icon"><i class="fas fa-shield-alt"></i></div><h3 data-i18n="sections.safe_title">آمن وموثوق</h3><p data-i18n="sections.safe_desc">محتوى طلابي مع مراجعة وإدارة واضحة</p></div>
+        <div class="feature-item reveal"><div class="feature-icon"><i class="fas fa-mobile-alt"></i></div><h3 data-i18n="sections.responsive_title">متجاوب تمامًا</h3><p data-i18n="sections.responsive_desc">تصميم يعمل على الجوال والتابلت وسطح المكتب</p></div>
     </div>
 </section>
 
 <!-- BOT -->
 <section class="bot-section" id="botSection">
-    <div class="section-header reveal"><h2 data-i18n="ai_title">المساعد الذكي 🤖</h2><p>اسألني عن أي شيء يخص جامعة نزوى</p></div>
+    <div class="section-header reveal"><h2 data-i18n="sections.ai_title">المساعد الذكي 🤖</h2><p data-i18n="sections.ai_desc">اسألني عن أي شيء يخص جامعة نزوى</p></div>
     <div style="background:var(--dark-light);border:1px solid rgba(255,255,255,0.08);border-radius:20px;overflow:hidden;">
         <div style="background:rgba(0,212,255,0.08);border-bottom:1px solid rgba(0,212,255,0.1);padding:16px 20px;display:flex;align-items:center;gap:12px;">
             <div style="width:38px;height:38px;background:linear-gradient(135deg,#00d4ff,#0099cc);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;">◆</div>
@@ -562,8 +573,8 @@ html[dir="ltr"] .nav-links a::after{left:0;right:auto}
 <!-- Calculator -->
 <section class="calc-section" id="calcSection">
     <div class="section-header reveal">
-        <h2 data-i18n="gpa_title">حاسبة المعدل التراكمي 📊</h2>
-        <p>احسب معدل الفصل والمعدل التراكمي المتوقع مع دعم المواد المعادة</p>
+        <h2 data-i18n="sections.gpa_title">حاسبة المعدل التراكمي 📊</h2>
+        <p data-i18n="sections.gpa_desc">احسب معدل الفصل والمعدل التراكمي المتوقع مع دعم المواد المعادة</p>
     </div>
 
     <div class="gpa-card">
@@ -615,7 +626,7 @@ html[dir="ltr"] .nav-links a::after{left:0;right:auto}
 
 <!-- Contact -->
 <section class="contact-section" id="contact">
-    <div class="section-header reveal"><h2>أرقام جامعة نزوى 📞</h2><p>اضغط على الرقم للاتصال مباشرة</p></div>
+    <div class="section-header reveal"><h2 data-i18n="sections.contacts_title">أرقام جامعة نزوى 📞</h2><p data-i18n="sections.contacts_desc">اضغط على الرقم للاتصال مباشرة</p></div>
     <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;">
         <div style="background:var(--dark-light);border:1px solid rgba(255,255,255,0.05);border-radius:14px;padding:20px;display:flex;align-items:center;gap:14px;transition:all .3s;" onmouseover="this.style.borderColor='rgba(0,212,255,0.3)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.05)'"><div style="width:44px;height:44px;background:rgba(0,212,255,0.1);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;">🏦</div><div><div style="font-size:12px;color:var(--text-dim);margin-bottom:4px;">حساب البنك</div><span style="font-family:monospace;font-size:13px;color:#00d4ff;">0317008949900017</span></div></div>
         <div style="background:var(--dark-light);border:1px solid rgba(255,255,255,0.05);border-radius:14px;padding:20px;display:flex;align-items:center;gap:14px;transition:all .3s;" onmouseover="this.style.borderColor='rgba(0,212,255,0.3)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.05)'"><div style="width:44px;height:44px;background:rgba(0,212,255,0.1);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;">💰</div><div><div style="font-size:12px;color:var(--text-dim);margin-bottom:4px;">المالية</div><a href="tel:92596648" style="font-family:monospace;font-size:14px;color:#00d4ff;text-decoration:none;">92596648</a></div></div>
@@ -624,7 +635,7 @@ html[dir="ltr"] .nav-links a::after{left:0;right:auto}
         <div style="background:var(--dark-light);border:1px solid rgba(255,255,255,0.05);border-radius:14px;padding:20px;display:flex;align-items:center;gap:14px;transition:all .3s;" onmouseover="this.style.borderColor='rgba(0,212,255,0.3)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.05)'"><div style="width:44px;height:44px;background:rgba(0,212,255,0.1);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;">🤝</div><div><div style="font-size:12px;color:var(--text-dim);margin-bottom:4px;">الرعاية الاجتماعية 2</div><a href="tel:25446247" style="font-family:monospace;font-size:14px;color:#00d4ff;text-decoration:none;">25446247</a></div></div>
     </div>
     <div style="margin-top:32px;">
-        <div class="section-header reveal" style="margin-bottom:24px;"><h2>روابط سريعة 🔗</h2></div>
+        <div class="section-header reveal" style="margin-bottom:24px;"><h2 data-i18n="sections.links_title">روابط سريعة 🔗</h2></div>
         <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px;">
             <a href="https://portal.unizwa.edu.om" target="_blank" style="background:var(--dark-light);border:1px solid rgba(255,255,255,0.05);border-radius:14px;padding:18px;text-decoration:none;display:flex;align-items:center;gap:12px;transition:all .3s;" onmouseover="this.style.borderColor='rgba(0,212,255,0.3)';this.style.transform='translateX(-4px)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.05)';this.style.transform=''"><span style="font-size:24px;">🎓</span><div><div style="font-size:13px;font-weight:700;color:white;">البوابة الطلابية</div><div style="font-size:11px;color:var(--text-dim);">portal.unizwa.edu.om</div></div></a>
             <a href="https://moodle.unizwa.edu.om/login/index.php" target="_blank" style="background:var(--dark-light);border:1px solid rgba(255,255,255,0.05);border-radius:14px;padding:18px;text-decoration:none;display:flex;align-items:center;gap:12px;transition:all .3s;" onmouseover="this.style.borderColor='rgba(0,212,255,0.3)';this.style.transform='translateX(-4px)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.05)';this.style.transform=''"><span style="font-size:24px;">📚</span><div><div style="font-size:13px;font-weight:700;color:white;">Moodle</div><div style="font-size:11px;color:var(--text-dim);">moodle.unizwa.edu.om</div></div></a>
@@ -640,37 +651,37 @@ html[dir="ltr"] .nav-links a::after{left:0;right:auto}
     <div class="footer-grid">
         <div class="footer-brand-column">
             <div class="footer-logo"><span class="footer-logo-icon">U1</span> UON <span>Hub</span></div>
-            <p class="footer-tagline" data-i18n="footer_tagline">كل ما يحتاجه طالب جامعة نزوى في مكان واحد.</p>
+            <p class="footer-tagline" data-i18n="footer.tagline">كل ما يحتاجه طالب جامعة نزوى في مكان واحد.</p>
             <div class="social-links">
                 <a href="https://instagram.com/uonhub" target="_blank" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
                 <a href="https://wa.me/96877144942" target="_blank" aria-label="WhatsApp"><i class="fab fa-whatsapp"></i></a>
             </div>
         </div>
         <div class="footer-column">
-            <h3 data-i18n="footer_quick">روابط سريعة</h3>
+            <h3 data-i18n="footer.quick">روابط سريعة</h3>
             <a href="#tools" data-i18n="nav_tools">الأدوات</a>
             <a href="marketplace.html" data-i18n="nav_market">السوق</a>
-            <a href="summaries.html" data-i18n="footer_summaries">الملخصات</a>
-            <a href="university-guide.html" data-i18n="footer_guide">دليل الجامعة</a>
+            <a href="summaries.html" data-i18n="footer.summaries">الملخصات</a>
+            <a href="university-guide.html" data-i18n="footer.guide">دليل الجامعة</a>
         </div>
         <div class="footer-column">
-            <h3 data-i18n="footer_official">الجامعة</h3>
-            <a href="https://www.unizwa.edu.om" target="_blank" data-i18n="footer_official_site">الموقع الرسمي</a>
-            <a href="https://portal.unizwa.edu.om" target="_blank" data-i18n="footer_portal">البوابة الطلابية</a>
+            <h3 data-i18n="footer.university">الجامعة</h3>
+            <a href="https://www.unizwa.edu.om" target="_blank" data-i18n="footer.official">الموقع الرسمي</a>
+            <a href="https://portal.unizwa.edu.om" target="_blank" data-i18n="footer.portal">البوابة الطلابية</a>
             <a href="https://moodle.unizwa.edu.om/login/index.php" target="_blank">Moodle</a>
             <a href="#contact" data-i18n="nav_contact">التواصل</a>
         </div>
         <div class="footer-column">
-            <h3 data-i18n="footer_platform">المنصة</h3>
+            <h3 data-i18n="footer.platform">المنصة</h3>
             <a href="#features" data-i18n="nav_about">عن المنصة</a>
-            <a href="#" data-i18n="footer_privacy">الخصوصية</a>
-            <a href="#" data-i18n="footer_terms">الشروط</a>
+            <a href="#" data-i18n="footer.privacy">الخصوصية</a>
+            <a href="#" data-i18n="footer.terms">الشروط</a>
             <span class="footer-version">UON Hub v2.1</span>
         </div>
     </div>
     <div class="footer-bottom">
-        <p>© 2026 UON Hub — <span data-i18n="footer_rights">جميع الحقوق محفوظة</span></p>
-        <p><span data-i18n="footer_made">صنع بحب لطلاب جامعة نزوى</span> <span class="heart">❤️</span></p>
+        <p>© 2026 UON Hub — <span data-i18n="footer.rights">جميع الحقوق محفوظة</span></p>
+        <p><span data-i18n="footer.made">صنع بحب لطلاب جامعة نزوى</span> <span class="heart">❤️</span></p>
     </div>
 </footer>
 
@@ -882,9 +893,9 @@ window.addEventListener('DOMContentLoaded', () => {
 
 // ===== RENDER TOOLS =====
 const preferredToolOrder = [
-    'مساعد AI ذكي','حاسبة المعدل','سوق الطلاب','الملخصات الدراسية',
+    'مساعد AI ذكي','حاسبة المعدل','سوق الطلاب','مكتبة الملخصات',
     'الجدول الدراسي','مجموعات المواد','اعترافات الطلاب',
-    'دليل الجامعة الرسمي','أدوات أكاديمية','مشاريع الطلاب','مطاعم قريبة'
+    'دليل الجامعة الرسمي','مكتبة الأدوات','مشاريع الطلاب','دليل المطاعم'
 ]
 
 function sortToolsForHome(items) {
@@ -898,23 +909,42 @@ function sortToolsForHome(items) {
 function renderTools() {
     const grid = document.getElementById('toolsGrid')
     if (!tools.length) {
-        grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:3rem;color:var(--text-dim);">لا توجد أدوات بعد</div>'
+        grid.innerHTML = '<div class="status-message">لا توجد أدوات بعد</div>'
         return
     }
-    const labels = { disabled:'غير متاحة', coming_soon:'Soon', maintenance:'صيانة' }
-    grid.innerHTML = tools.map(tool => {
+
+    const locale = window.UON_I18N
+    const orderedTools = sortToolsForHome(tools)
+
+    grid.innerHTML = orderedTools.map(tool => {
         const inactive = tool.status !== 'active'
-        const statusBadge = inactive ? `<span style="position:absolute;top:12px;right:12px;padding:.35rem .65rem;border-radius:999px;background:rgba(10,14,39,.88);border:1px solid rgba(255,255,255,.12);font-size:.72rem;font-weight:900;z-index:3;">${labels[tool.status] || 'غير متاحة'}</span>` : ''
+        const title = locale?.t(`tools.${tool.id}.title`, tool.title) || tool.title
+        const description = locale?.t(`tools.${tool.id}.description`, tool.desc) || tool.desc
+        const activeButton = locale?.t(`tools.${tool.id}.button`, tool.btnText) || tool.btnText
+        const statusText = locale?.t(`tool_status.${tool.status}`, 'غير متاحة') || 'غير متاحة'
+        const buttonText = inactive ? statusText : activeButton
+
+        const statusBadge = inactive
+            ? `<span class="tool-status-badge">${statusText}</span>`
+            : ''
+
         return `
-        <div class="tool-card" data-id="${tool.id}" data-status="${tool.status}" style="--card-color:${tool.color};position:relative;${inactive?'opacity:.58;filter:grayscale(.25);':''}">
+        <article class="tool-card" data-id="${tool.id}" data-status="${tool.status}"
+            style="--card-color:${tool.color};position:relative;${inactive ? 'opacity:.58;filter:grayscale(.25);' : ''}">
             ${statusBadge}
-            <div class="tool-icon" style="background:${tool.color}20;color:${tool.color};"><i class="fas ${tool.icon}"></i></div>
-            <h3>${tool.title}</h3>
-            <p>${tool.desc}</p>
-            <button class="tool-link" style="color:${tool.color};" onclick="openTool(${tool.id})">${inactive ? (labels[tool.status] || 'غير متاحة') : tool.btnText} <i class="fas ${inactive?'fa-lock':'fa-arrow-left'}"></i></button>
-        </div>`
+            <div class="tool-icon" style="background:${tool.color}20;color:${tool.color};">
+                <i class="fas ${tool.icon}"></i>
+            </div>
+            <h3>${title}</h3>
+            <p>${description}</p>
+            <button class="tool-link" style="color:${tool.color};" onclick="openTool(${tool.id})">
+                ${buttonText} <i class="fas ${inactive ? 'fa-lock' : 'fa-arrow-left'}"></i>
+            </button>
+        </article>`
     }).join('')
 }
+
+window.addEventListener('uonhub:languagechange', () => renderTools())
 
 window.openTool = function(id) {
     const tool = tools.find(t => Number(t.id) === Number(id))
@@ -1272,6 +1302,7 @@ window.addEventListener('beforeinstallprompt', e => {
     setTimeout(removeLoading, 1200);
 })();
 </script>
+
 
 <script src="language.js"></script>
 </body>
