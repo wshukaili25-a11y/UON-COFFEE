@@ -2,7 +2,7 @@
 .hero{min-height:690px;position:relative;display:flex;align-items:center;background:
  linear-gradient(90deg,rgba(4,10,24,.96) 0%,rgba(4,10,24,.82) 45%,rgba(4,10,24,.28) 100%),
  linear-gradient(0deg,var(--bg),transparent 35%),
- url('../assets/unizwa-campus-official.jpg') center/cover no-repeat}
+ url('../assets/unizwa-new-gate.jpg') center/cover no-repeat}
 .hero-content{max-width:680px;padding:6rem 0 4rem;position:relative;z-index:2}
 .hero-kicker{display:inline-flex;align-items:center;gap:.45rem;color:var(--primary);font-weight:900;margin-bottom:1rem}
 .hero h1{font-size:clamp(2.7rem,7vw,5.6rem);line-height:1.02;letter-spacing:-.04em}
@@ -32,3 +32,6 @@
 @media(max-width:650px){.hero{min-height:570px}.hero-content{padding:5rem 0 3rem}.hero h1{font-size:2.55rem}.announcement-card{grid-template-columns:auto 1fr auto}.announcement-action{grid-column:1/-1;text-align:center}.announcement-close{grid-column:3}.quick-grid{grid-template-columns:1fr}.stats-grid{grid-template-columns:1fr 1fr}.announcement-zone{margin-top:-25px}}
 
 @media(max-width:1150px){.quick-grid{grid-template-columns:repeat(3,1fr)}}
+
+.hero{background-position:center 46%}
+@media(max-width:650px){.hero{background-position:center center}}

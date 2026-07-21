@@ -14,3 +14,11 @@
 .login-overlay{position:fixed;inset:0;z-index:2000;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:1rem}.login-card{width:min(430px,100%);padding:1.5rem}.login-card input{width:100%;margin:.8rem 0;background:var(--bg);border:1px solid var(--line);border-radius:11px;padding:.8rem;color:white}
 @media(max-width:900px){.admin-shell{grid-template-columns:1fr}.sidebar{position:fixed;inset:0 auto 0 0;width:245px;z-index:500;transform:translateX(-102%);transition:.25s}.sidebar.open{transform:none}.admin-main{padding:1rem}.admin-stats{grid-template-columns:1fr 1fr}}
 @media(max-width:520px){.admin-stats{grid-template-columns:1fr}.admin-row{grid-template-columns:1fr}.row-actions{justify-content:flex-end}}
+
+.admin-top{position:sticky;top:0;z-index:30;padding:.7rem 0;background:rgba(7,16,34,.92);backdrop-filter:blur(15px)}
+.admin-card h2{font-size:1.15rem}
+@media(max-width:900px){
+ .sidebar{right:auto;left:0}
+ html[dir="rtl"] .sidebar{left:auto;right:0;transform:translateX(102%)}
+ html[dir="rtl"] .sidebar.open{transform:none}
+}
