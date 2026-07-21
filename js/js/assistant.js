@@ -1,17 +1,2 @@
 
-import {get} from './api.js';import {$,esc,setupNav} from './ui.js';setupNav();
-let programs=[];
-try{programs=await get('university_programs','select=*&active=eq.true')}catch{}
-const links={portal:'https://portal.unizwa.edu.om',moodle:'https://moodle.unizwa.edu.om',library:'https://library.unizwa.edu.om',official:'https://www.unizwa.edu.om/'};
-function answer(q){
- const s=q.toLowerCase();
- if(s.includes('كلية')||s.includes('كليات'))return 'جامعة نزوى تضم أربع كليات رئيسية: العلوم والآداب، الاقتصاد والإدارة ونظم المعلومات، الهندسة والعمارة، والعلوم الصحية. افتح دليل الجامعة للتفاصيل.';
- if(s.includes('معدل'))return 'تقدر تستخدم حاسبة المعدل من الصفحة الرئيسية. نظام النقاط الشائع: A=4.0، A-=3.7، B+=3.3، B=3.0، B-=2.7، C+=2.3، C=2.0، D=1.0، F=0.';
- if(s.includes('رابط')||s.includes('بوابة')||s.includes('مودل'))return `الروابط: البوابة ${links.portal} — مودل ${links.moodle} — المكتبة ${links.library}`;
- const found=programs.filter(p=>`${p.name_ar||''} ${p.name_en||''} ${p.college||''}`.toLowerCase().includes(s)).slice(0,3);
- if(found.length)return found.map(p=>`${p.name_ar||p.name_en}: ${p.credit_hours||'—'} ساعة، سعر الساعة ${p.credit_hour_price||'—'} ر.ع`).join('\n');
- return 'ما حصلت إجابة دقيقة في بيانات المنصة. جرّب تكتب اسم التخصص أو افتح دليل الجامعة الرسمي.';
-}
-function add(text,type){const d=document.createElement('div');d.className=`msg ${type}`;d.textContent=text;$('#chatWindow').append(d);$('#chatWindow').scrollTop=$('#chatWindow').scrollHeight}
-$('#chatForm').addEventListener('submit',e=>{e.preventDefault();const q=$('#chatInput').value.trim();if(!q)return;add(q,'user');$('#chatInput').value='';setTimeout(()=>add(answer(q),'bot'),250)});
-document.querySelectorAll('.quick-q').forEach(b=>b.onclick=()=>{$('#chatInput').value=b.textContent;$('#chatForm').requestSubmit()});
+import {setupNav,enforceMaintenance,$,get,esc} from './core.js';setupNav();await enforceMaintenance();let programs=[];try{programs=await get('university_programs','select=*')}catch{}function msg(t,u=false){$('#chat').insertAdjacentHTML('beforeend',`<div class="list-row" style="margin-${u?'right':'left'}:auto;max-width:80%">${esc(t)}</div>`)}function answer(q){const s=q.toLowerCase();if(s.includes('كليات'))return 'الكليات: العلوم والآداب، الاقتصاد والإدارة ونظم المعلومات، الهندسة والعمارة، والعلوم الصحية.';if(s.includes('معدل'))return 'استخدم حاسبة المعدل؛ تدعم المادة المعادة والتقدير السابق وصافي النقاط.';const f=programs.filter(x=>`${x.name_ar} ${x.name_en}`.toLowerCase().includes(s)).slice(0,4);return f.length?f.map(x=>`${x.name_ar}: ${x.credit_hours||'—'} ساعة`).join(' — '):'ما حصلت نتيجة دقيقة. جرّب كتابة اسم التخصص أو افتح دليل الجامعة.'}msg('هلا 👋 أنا مساعد UON Hub.');$('#send').onclick=()=>{const q=$('#question').value.trim();if(!q)return;msg(q,true);$('#question').value='';setTimeout(()=>msg(answer(q)),200)};
