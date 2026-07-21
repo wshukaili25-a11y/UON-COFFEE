@@ -637,11 +637,25 @@ async function handleTelegram(update:any){
   return new Response('ok');
 }
 
+
+async function notifyWebSubmission(payload:any){
+ const table=String(payload.table||'');const id=String(payload.id||'');const def=moderationTables[table];
+ if(!def||!id)throw new Error('invalid submission');
+ let q=supabase.from(table).select('*').eq('id',id);
+ q=def.statusColumn==='approved'?q.eq('approved',false):q.eq('status','pending');
+ const {data,error}=await q.maybeSingle();if(error)throw error;if(!data)throw new Error('pending record not found');
+ const {error:logError}=await supabase.from('telegram_notification_log').insert({table_name:table,record_id:id});
+ if(logError&&logError.code==='23505')return; if(logError)throw logError;
+ await notifyInsert({table,record:data});
+}
+
 Deno.serve(async(req)=>{
   try{
     const telegramSecret=req.headers.get('x-telegram-bot-api-secret-token');
     const databaseSecret=req.headers.get('x-database-webhook-secret');
     const payload=await req.json();
+
+    if(payload?.source==='web-submit'){await notifyWebSubmission(payload);return new Response('ok');}
 
     if(telegramSecret===WEBHOOK_SECRET){
       return handleTelegram(payload);
