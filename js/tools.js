@@ -46,7 +46,7 @@ function render(){
     <span class="tool-category-label">${esc(c.name||'أداة')}</span>
     <h3>${esc(t.name)}</h3>
     <p>${esc(t.description||'')}</p>
-    <div class="actions"><a href="${esc(t.url||'#')}" target="_blank" rel="noopener">فتح الأداة <i class="fas fa-arrow-up-right-from-square"></i></a></div>
+    <div class="actions">${(t.status||'active')==='active'?`<a href="${esc(t.url||'#')}" target="_blank" rel="noopener">فتح الأداة <i class="fas fa-arrow-up-right-from-square"></i></a>`:`<button disabled>${t.status==='maintenance'?'صيانة':t.status==='coming_soon'?'قريبًا':'متوقفة'}</button>`}</div>
    </article>`
  }).join(''):'<div class="empty">لا توجد أدوات مطابقة</div>';
 
@@ -58,7 +58,7 @@ async function load(){
  try{
    const [dbCategories,dbTools]=await Promise.all([
      get('tools_categories','select=*&order=sort_order.asc'),
-     get('tools_items','select=*&disabled=eq.false&order=name.asc')
+     get('tools_items','select=*&order=name.asc')
    ]);
    categories=dbCategories?.length?dbCategories:fallbackCategories;
    tools=dbTools?.length?dbTools:fallbackTools;

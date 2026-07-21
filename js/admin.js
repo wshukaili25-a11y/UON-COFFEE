@@ -8,7 +8,8 @@ const defs={
  projects:{table:'student_projects',filter:'status=eq.pending',title:'المشاريع'},
  ratings:{table:'rating_submissions',filter:'status=eq.pending',title:'التقييمات'},
  tools:{table:'tools_items',filter:'',title:'الأدوات'},
- confessions:{table:'confessions',filter:'status=eq.pending',title:'الاعترافات'}
+ confessions:{table:'confessions',filter:'status=eq.pending',title:'الاعترافات'},
+ programs:{table:'university_programs',filter:'',title:'دليل الجامعة'}
 };
 window.login=async()=>{
  const password=$('#adminPassword').value.trim();
@@ -32,7 +33,7 @@ function row(name,x){
  if(name==='announcements'){
    actions=`<button onclick="toggleAnnouncement('${x.id}',${!x.active})">${x.active?'إيقاف':'تشغيل'}</button><button class="reject" onclick="deleteItem('${name}','${x.id}')">حذف</button>`;
  }else if(name==='tools'){
-   actions=`<button onclick="toggleTool('${x.id}',${!x.disabled})">${x.disabled?'تشغيل':'إيقاف'}</button><button class="feature" onclick="featureTool('${x.id}',${!x.featured})">${x.featured?'إلغاء التمييز':'تمييز'}</button><button class="reject" onclick="deleteItem('${name}','${x.id}')">حذف</button>`;
+   actions=`<select class="status-select" onchange="setToolStatus('${x.id}',this.value)"><option value="active" ${x.status==='active'?'selected':''}>تشغيل</option><option value="disabled" ${x.status==='disabled'?'selected':''}>إيقاف</option><option value="coming_soon" ${x.status==='coming_soon'?'selected':''}>قريبًا</option><option value="maintenance" ${x.status==='maintenance'?'selected':''}>صيانة</option></select><button class="feature" onclick="featureTool('${x.id}',${!x.featured})">${x.featured?'إلغاء التمييز':'تمييز'}</button><button class="reject" onclick="deleteItem('${name}','${x.id}')">حذف</button>`;
  }else{
    actions=`<button class="approve" onclick="approveItem('${name}','${x.id}')">قبول</button><button class="reject" onclick="rejectItem('${name}','${x.id}')">رفض</button>`;
  }
@@ -76,3 +77,6 @@ window.featureTool=async(id,featured)=>{
  try{await update('tools_items',`id=eq.${encodeURIComponent(id)}`,{featured});toast('تم التحديث');loadList('tools')}
  catch(e){toast(e.message,true)}
 };
+
+window.setToolStatus=async(id,status)=>{try{await update('tools_items',`id=eq.${encodeURIComponent(id)}`,{status,disabled:status!=='active'});toast('تم تحديث حالة الأداة');loadList('tools')}catch(e){toast(e.message,true)}};
+window.createProgram=async()=>{const body={name_ar:$('#progName').value.trim(),college:$('#progCollege').value.trim(),degree:$('#progDegree').value.trim(),credit_hours:Number($('#progHours').value)||null,credit_hour_price:Number($('#progPrice').value)||null,official_url:$('#progOfficial').value.trim(),study_plan_url:$('#progPlan').value.trim()||null,active:true};if(!body.name_ar||!body.official_url)return toast('أكمل الاسم والرابط الرسمي',true);try{await insert('university_programs',body);toast('تم حفظ البرنامج');loadList('programs')}catch(e){toast(e.message,true)}};
