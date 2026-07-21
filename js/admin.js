@@ -1,169 +1,23 @@
 
-import {get,update,remove,insert,rpc} from './api.js';import {$,$$,esc,toast,formatDate} from './ui.js';
-let authenticated=false;
-const defs={
- announcements:{table:'site_announcements',filter:'',title:'الإعلانات'},
- summaries:{table:'summaries',filter:'approved=eq.false',title:'الملخصات'},
- groups:{table:'whatsapp_groups',filter:'approved=eq.false',title:'المجموعات'},
- projects:{table:'student_projects',filter:'status=eq.pending',title:'المشاريع'},
- ratings:{table:'rating_submissions',filter:'status=eq.pending',title:'التقييمات'},
- tools:{table:'tools_items',filter:'',title:'الأدوات'},
- confessions:{table:'confessions',filter:'status=eq.pending',title:'الاعترافات'},
- programs:{table:'university_programs',filter:'',title:'دليل الجامعة'},
- telegram:{table:'telegram_admins',filter:'',title:'مشرفو تلجرام'}
-};
-window.login=async()=>{
- const password=$('#adminPassword').value.trim();
- if(!password)return toast('أدخل كلمة المرور',true);
- try{
-  const result=await rpc('check_admin_password',{p_password:password});
-  const ok=result===true||result==='true'||result?.ok===true;
-  if(!ok)throw new Error(result?.message||'كلمة المرور غير صحيحة');
-  sessionStorage.setItem('uon_admin_password',password);
-  authenticated=true;
-  $('#loginOverlay').style.display='none';
-  loadDashboard();
- }catch(e){toast(e.message||'تعذر تسجيل الدخول',true)}
-};
-window.showSection=(name,btn)=>{$$('.admin-section').forEach(x=>x.classList.remove('active'));$(`#section-${name}`)?.classList.add('active');$$('.admin-nav button').forEach(x=>x.classList.remove('active'));btn?.classList.add('active');if(defs[name])loadList(name)};
-function row(name,x){
- const title=x.title||x.subject||x.target_name||x.name||'بدون عنوان';
- const desc=x.body||x.description||x.comment||x.content||x.college||'';
- let actions='';
-
- if(name==='announcements'){
-   actions=`<button onclick="toggleAnnouncement('${x.id}',${!x.active})">${x.active?'إيقاف':'تشغيل'}</button><button class="reject" onclick="deleteItem('${name}','${x.id}')">حذف</button>`;
- }else if(name==='tools'){
-   actions=`<select class="status-select" onchange="setToolStatus('${x.id}',this.value)"><option value="active" ${x.status==='active'?'selected':''}>تشغيل</option><option value="disabled" ${x.status==='disabled'?'selected':''}>إيقاف</option><option value="coming_soon" ${x.status==='coming_soon'?'selected':''}>قريبًا</option><option value="maintenance" ${x.status==='maintenance'?'selected':''}>صيانة</option></select><button onclick="editTool(\'${x.id}\')">تعديل</button><button class="feature" onclick="featureTool('${x.id}',${!x.featured})">${x.featured?'إلغاء التمييز':'تمييز'}</button><button class="reject" onclick="deleteItem('${name}','${x.id}')">حذف</button>`;
- }else{
-   actions=`<button class="approve" onclick="approveItem('${name}','${x.id}')">قبول</button><button class="reject" onclick="rejectItem('${name}','${x.id}')">رفض</button>`;
- }
-
- return `<div class="admin-row"><div><strong>${esc(title)}</strong><p>${esc(desc)}</p><small>${formatDate(x.created_at)}</small></div><div class="row-actions">${actions}</div></div>`
-}
-async function loadList(name){const d=defs[name],el=$(`#list-${name}`);if(!el)return;try{const query=`select=*&${d.filter?d.filter+'&':''}order=created_at.desc`;const rows=await get(d.table,query);el.innerHTML=rows.length?rows.map(x=>row(name,x)).join(''):'<div class="empty">لا توجد طلبات</div>'}catch(e){el.innerHTML=`<div class="empty">${esc(e.message)}</div>`}}
-window.approveItem=async(name,id)=>{const d=defs[name];const body=name==='summaries'||name==='groups'?{approved:true}:name==='projects'?{status:'approved',reviewed_at:new Date().toISOString()}:{status:'approved',reviewed_at:new Date().toISOString()};try{await update(d.table,`id=eq.${encodeURIComponent(id)}`,body);toast('تم القبول');loadList(name);loadStats()}catch(e){toast(e.message,true)}};
-window.rejectItem=async(name,id)=>{const d=defs[name];if(name==='summaries'||name==='groups')return deleteItem(name,id);try{await update(d.table,`id=eq.${encodeURIComponent(id)}`,{status:'rejected',reviewed_at:new Date().toISOString()});toast('تم الرفض');loadList(name);loadStats()}catch(e){toast(e.message,true)}};
-window.deleteItem=async(name,id)=>{if(!confirm('حذف نهائي؟'))return;try{await remove(defs[name].table,`id=eq.${encodeURIComponent(id)}`);toast('تم الحذف');loadList(name);loadStats()}catch(e){toast(e.message,true)}};
-window.toggleAnnouncement=async(id,active)=>{try{await update('site_announcements',`id=eq.${id}`,{active});toast('تم التحديث');loadList('announcements')}catch(e){toast(e.message,true)}};
-window.featureProject=async(id,featured)=>{try{if(featured)await update('student_projects','featured=eq.true',{featured:false});await update('student_projects',`id=eq.${id}`,{featured});toast('تم التحديث');loadList('projects')}catch(e){toast(e.message,true)}};
-window.createAnnouncement=async()=>{const body={title:$('#annTitle').value.trim(),body:$('#annBody').value.trim(),type:$('#annType').value,priority:Number($('#annPriority').value),button_text:$('#annButtonText').value.trim(),button_url:$('#annButtonUrl').value.trim(),active:true,expires_at:$('#annExpires').value||null};if(!body.title||!body.body)return toast('أكمل العنوان والنص',true);try{await insert('site_announcements',body);toast('تم نشر الإعلان');loadList('announcements');loadStats()}catch(e){toast(e.message,true)}};
-async function count(table,query=''){try{return (await get(table,`select=id&${query}${query?'&':''}limit=1000`)).length}catch{return 0}}
-async function loadStats(){const vals=await Promise.all([count('summaries','approved=eq.false'),count('whatsapp_groups','approved=eq.false'),count('student_projects','status=eq.pending'),count('rating_submissions','status=eq.pending')]);['statSummaries','statGroups','statProjects','statRatings'].forEach((id,i)=>$(`#${id}`).textContent=vals[i])}
-async function loadDashboard(){await loadStats();loadList('announcements')}
-const saved=sessionStorage.getItem('uon_admin_password');if(saved){$('#adminPassword').value=saved;login()}
-
-
-window.createTool=async()=>{
- const body={
-  id:`custom-${Date.now()}`,
-  category_id:$('#toolCategoryId').value.trim()||'ai',
-  name:$('#toolName').value.trim(),
-  description:$('#toolDescription').value.trim(),
-  url:$('#toolUrl').value.trim(),
-  emoji:$('#toolEmoji').value.trim()||'🧰',
-  featured:false,disabled:false,status:'active'
- };
- if(!body.name||!body.url)return toast('أكمل اسم الأداة والرابط',true);
- try{await insert('tools_items',body);toast('تمت إضافة الأداة');loadList('tools')}
- catch(e){toast(e.message,true)}
-};
-
-window.toggleTool=async(id,disabled)=>{
- try{await update('tools_items',`id=eq.${encodeURIComponent(id)}`,{disabled});toast('تم التحديث');loadList('tools')}
- catch(e){toast(e.message,true)}
-};
-
-window.featureTool=async(id,featured)=>{
- try{await update('tools_items',`id=eq.${encodeURIComponent(id)}`,{featured});toast('تم التحديث');loadList('tools')}
- catch(e){toast(e.message,true)}
-};
-
-window.setToolStatus=async(id,status)=>{try{await update('tools_items',`id=eq.${encodeURIComponent(id)}`,{status,disabled:status!=='active'});toast('تم تحديث حالة الأداة');loadList('tools')}catch(e){toast(e.message,true)}};
-window.createProgram=async()=>{const body={name_ar:$('#progName').value.trim(),college:$('#progCollege').value.trim(),degree:$('#progDegree').value.trim(),credit_hours:Number($('#progHours').value)||null,credit_hour_price:Number($('#progPrice').value)||null,official_url:$('#progOfficial').value.trim(),study_plan_url:$('#progPlan').value.trim()||null,active:true};if(!body.name_ar||!body.official_url)return toast('أكمل الاسم والرابط الرسمي',true);try{await insert('university_programs',body);toast('تم حفظ البرنامج');loadList('programs')}catch(e){toast(e.message,true)}};
-
-async function getSetting(key){
- try{
-  const rows=await get('site_settings',`select=key,value&key=eq.${encodeURIComponent(key)}`);
-  return rows?.[0]?.value;
- }catch{return null}
-}
-async function saveSetting(key,value){
- const existing=await get('site_settings',`select=key&key=eq.${encodeURIComponent(key)}`);
- if(existing?.length){
-  return update('site_settings',`key=eq.${encodeURIComponent(key)}`,{value,updated_at:new Date().toISOString()});
- }
- return insert('site_settings',{key,value});
-}
-async function loadSiteControls(){
- const [maintenance,message,whatsapp]=await Promise.all([
-  getSetting('maintenance_enabled'),
-  getSetting('maintenance_message'),
-  getSetting('whatsapp_channel_url')
- ]);
- const on=maintenance===true||maintenance==='true';
- if($('#maintenanceToggle'))$('#maintenanceToggle').checked=on;
- if($('#maintenanceStatusText'))$('#maintenanceStatusText').textContent=on?'الموقع الآن تحت الصيانة':'الموقع متاح للزوار';
- if($('#maintenanceMessageInput'))$('#maintenanceMessageInput').value=message||'نعمل حاليًا على تحسين UON Hub. بنرجع لكم قريبًا.';
- if($('#whatsappChannelInput'))$('#whatsappChannelInput').value=whatsapp||'';
-}
-window.setMaintenance=async on=>{
- try{
-  await saveSetting('maintenance_enabled',on);
-  $('#maintenanceStatusText').textContent=on?'الموقع الآن تحت الصيانة':'الموقع متاح للزوار';
-  toast(on?'تم تشغيل الصيانة الكاملة':'تم فتح الموقع للزوار');
- }catch(e){toast(e.message,true)}
-};
-window.saveMaintenanceMessage=async()=>{
- try{await saveSetting('maintenance_message',$('#maintenanceMessageInput').value.trim());toast('تم حفظ رسالة الصيانة')}
- catch(e){toast(e.message,true)}
-};
-window.saveWhatsappChannel=async()=>{
- try{await saveSetting('whatsapp_channel_url',$('#whatsappChannelInput').value.trim());toast('تم حفظ رابط قناة واتساب')}
- catch(e){toast(e.message,true)}
-};
-window.createTelegramAdmin=async()=>{
- const body={
-  name:$('#tgAdminName').value.trim(),
-  chat_id:$('#tgAdminChatId').value.trim(),
-  role:$('#tgAdminRole').value,
-  notifications_enabled:$('#tgAdminNotifications').value==='true',
-  active:true
- };
- if(!body.name||!body.chat_id)return toast('أدخل الاسم وChat ID',true);
- try{await insert('telegram_admins',body);toast('تمت إضافة مشرف تلجرام');loadList('telegram')}
- catch(e){toast(e.message,true)}
-};
-window.toggleTelegramAdmin=async(id,active)=>{
- try{await update('telegram_admins',`id=eq.${id}`,{active});toast('تم التحديث');loadList('telegram')}
- catch(e){toast(e.message,true)}
-};
-const originalRow=row;
-row=function(name,x){
- if(name==='telegram'){
-  return `<div class="admin-row"><div><strong>${esc(x.name)}</strong><p>Chat ID: ${esc(x.chat_id)} — ${esc(x.role)}</p><small>${x.notifications_enabled?'الإشعارات مفعلة':'الإشعارات متوقفة'}</small></div><div class="row-actions"><button onclick="toggleTelegramAdmin('${x.id}',${!x.active})">${x.active?'إيقاف':'تشغيل'}</button><button class="reject" onclick="deleteItem('telegram','${x.id}')">حذف</button></div></div>`;
- }
- return originalRow(name,x);
-};
-loadSiteControls();
-
-window.editTool=async id=>{
- try{
-  const rows=await get('tools_items',`select=*&id=eq.${encodeURIComponent(id)}`);
-  const t=rows?.[0];if(!t)return;
-  $('#toolEditId').value=t.id;$('#toolName').value=t.name||'';$('#toolCategoryId').value=t.category_id||'';$('#toolDescription').value=t.description||'';$('#toolUrl').value=t.url||'';$('#toolEmoji').value=t.emoji||'';
-  window.scrollTo({top:0,behavior:'smooth'});
- }catch(e){toast(e.message,true)}
-};
-window.resetToolForm=()=>{$('#toolEditId').value='';['toolName','toolCategoryId','toolDescription','toolUrl','toolEmoji'].forEach(id=>$('#'+id).value='')};
-window.saveTool=async()=>{
- const id=$('#toolEditId').value.trim();
- const body={category_id:$('#toolCategoryId').value.trim()||'ai',name:$('#toolName').value.trim(),description:$('#toolDescription').value.trim(),url:$('#toolUrl').value.trim(),emoji:$('#toolEmoji').value.trim()||'🧰'};
- if(!body.name||!body.url)return toast('أكمل اسم الأداة والرابط',true);
- try{new URL(body.url)}catch{return toast('رابط الأداة غير صالح',true)}
- try{
-  if(id)await update('tools_items',`id=eq.${encodeURIComponent(id)}`,body);
-  else await insert('tools_items',{id:`custom-${Date.now()}`,...body,featured:false,disabled:false,status:'active'});
-  resetToolForm();toast(id?'تم تعديل الأداة':'تمت إضافة الأداة');loadList('tools')
- }catch(e){toast(e.message,true)}
-};
+import {$,$$,get,insert,update,remove,rpc,toast,esc} from './core.js';
+let authed=false;
+$('#loginForm').onsubmit=async e=>{e.preventDefault();try{const r=await rpc('check_admin_password',{p_password:$('#password').value});if(!(r?.ok??r===true))throw new Error('كلمة المرور غير صحيحة');authed=true;sessionStorage.setItem('uon_admin','1');$('#login').hidden=true;$('#dashboard').hidden=false;loadAll()}catch(err){toast(err.message,true)}};
+if(sessionStorage.getItem('uon_admin')==='1'){authed=true;$('#login').hidden=true;$('#dashboard').hidden=false;loadAll()}
+$('#logout').onclick=()=>{sessionStorage.clear();location.reload()};$('#menuAdmin').onclick=()=>$('#sidebar').classList.toggle('open');
+$$('[data-section]').forEach(b=>b.onclick=()=>{$$('.admin-section').forEach(x=>x.classList.remove('active'));$('#sec-'+b.dataset.section).classList.add('active');$('#sidebar').classList.remove('open');if(b.dataset.section==='pending')loadPending()});
+async function settings(){const r=await get('site_settings','select=key,value');const m=Object.fromEntries(r.map(x=>[x.key,x.value]));$('#maintenance').checked=m.maintenance_enabled===true||String(m.maintenance_enabled).toLowerCase()==='true';$('#maintenanceMessage').value=m.maintenance_message||'';$('#whatsappUrl').value=m.whatsapp_channel_url||''}
+async function upsertSetting(key,value){const r=await get('site_settings',`select=key&key=eq.${encodeURIComponent(key)}`);return r.length?update('site_settings',`key=eq.${encodeURIComponent(key)}`,{value,updated_at:new Date().toISOString()}):insert('site_settings',{key,value})}
+$('#saveSite').onclick=async()=>{try{await Promise.all([upsertSetting('maintenance_enabled',$('#maintenance').checked),upsertSetting('maintenance_message',$('#maintenanceMessage').value),upsertSetting('whatsapp_channel_url',$('#whatsappUrl').value)]);toast('تم الحفظ')}catch(e){toast(e.message,true)}};
+async function features(){const r=await get('platform_features','select=*&order=sort_order.asc');$('#featuresList').innerHTML=r.map(x=>`<div class="list-row"><div><strong>${esc(x.name)}</strong><small>${esc(x.key)}</small></div><select data-feature="${esc(x.key)}"><option value="active" ${x.status==='active'?'selected':''}>تشغيل</option><option value="disabled" ${x.status==='disabled'?'selected':''}>إيقاف</option><option value="coming_soon" ${x.status==='coming_soon'?'selected':''}>قريبًا</option><option value="maintenance" ${x.status==='maintenance'?'selected':''}>صيانة</option></select></div>`).join('');$$('[data-feature]').forEach(s=>s.onchange=async()=>{await update('platform_features',`key=eq.${encodeURIComponent(s.dataset.feature)}`,{status:s.value,updated_at:new Date().toISOString()});toast('تم تحديث الخدمة')})}
+const defs={summaries:['title','approved'],whatsapp_groups:['subject','approved'],student_market:['title','status'],rating_submissions:['target_name','status'],confessions:['content','status']};
+async function loadPending(){const t=$('#pendingTable').value,[title,col]=defs[t];const q=col==='approved'?`${col}=eq.false`:`${col}=eq.pending`;const r=await get(t,`select=*&${q}&order=created_at.desc`);$('#pendingList').innerHTML=r.length?r.map(x=>`<div class="list-row"><div><strong>${esc(x[title])}</strong><small>${new Date(x.created_at).toLocaleString('ar')}</small></div><div class="actions"><button class="btn success" data-ok="${x.id}">قبول</button><button class="btn danger" data-no="${x.id}">رفض</button></div></div>`).join(''):'<div class="empty">لا توجد طلبات</div>';$$('[data-ok]').forEach(b=>b.onclick=()=>moderate(t,b.dataset.ok,true));$$('[data-no]').forEach(b=>b.onclick=()=>moderate(t,b.dataset.no,false))}
+async function moderate(t,id,ok){const col=defs[t][1];if(!ok&&col==='approved')await remove(t,`id=eq.${id}`);else await update(t,`id=eq.${id}`,col==='approved'?{approved:true}:{status:ok?'approved':'rejected'});toast(ok?'تم القبول':'تم الرفض');loadPending()}
+$('#pendingTable').onchange=loadPending;
+async function ads(){const r=await get('site_announcements','select=*&order=created_at.desc');$('#adsList').innerHTML=r.map(x=>`<div class="list-row"><strong>${esc(x.title)}</strong><button class="btn danger" data-delad="${x.id}">حذف</button></div>`).join('');$$('[data-delad]').forEach(b=>b.onclick=async()=>{await remove('site_announcements',`id=eq.${b.dataset.delad}`);ads()})}
+$('#addAd').onclick=async()=>{await insert('site_announcements',{title:$('#adTitle').value,body:$('#adBody').value,button_url:$('#adUrl').value||null,active:true,priority:10});toast('تمت الإضافة');ads()}
+async function tools(){const r=await get('tools_items','select=*&order=name.asc');$('#toolsList').innerHTML=r.map(x=>`<div class="list-row"><div><strong>${esc(x.name)}</strong><small>${esc(x.url||'')}</small></div><select data-tool="${esc(x.id)}"><option value="active" ${x.status==='active'?'selected':''}>تشغيل</option><option value="disabled" ${x.status==='disabled'?'selected':''}>إيقاف</option><option value="coming_soon" ${x.status==='coming_soon'?'selected':''}>قريبًا</option><option value="maintenance" ${x.status==='maintenance'?'selected':''}>صيانة</option></select></div>`).join('');$$('[data-tool]').forEach(s=>s.onchange=()=>update('tools_items',`id=eq.${encodeURIComponent(s.dataset.tool)}`,{status:s.value,disabled:s.value!=='active'}))}
+async function programs(){const r=await get('university_programs','select=*&order=college.asc,name_ar.asc');$('#programsList').innerHTML=r.map(x=>`<div class="list-row"><div><strong>${esc(x.name_ar)}</strong><small>${esc(x.college)}</small></div><span>${x.credit_hours||'—'} ساعة</span></div>`).join('')}
+async function tg(){const r=await get('telegram_admins','select=*&order=created_at.desc');$('#tgList').innerHTML=r.map(x=>`<div class="list-row"><div><strong>${esc(x.name)}</strong><small>${esc(x.chat_id)} • ${esc(x.role)}</small></div><button class="btn danger" data-deltg="${x.id}">حذف</button></div>`).join('');$$('[data-deltg]').forEach(b=>b.onclick=async()=>{await remove('telegram_admins',`id=eq.${b.dataset.deltg}`);tg()})}
+$('#addTg').onclick=async()=>{await insert('telegram_admins',{name:$('#tgName').value,chat_id:$('#tgChat').value,role:$('#tgRole').value,active:true,notifications_enabled:true});toast('تمت الإضافة');tg()}
+async function stats(){const names=['summaries','whatsapp_groups','student_market','rating_submissions'];const counts=[];for(const t of names){const r=await get(t,'select=id');counts.push(r.length)}$('#stats').innerHTML=names.map((n,i)=>`<div class="card stat"><span>${n}</span><strong>${counts[i]}</strong></div>`).join('')}
+async function loadAll(){await Promise.allSettled([settings(),features(),loadPending(),ads(),tools(),programs(),tg(),stats()])}

@@ -1,34 +1,19 @@
 
-import {get} from './api.js';import {$,esc,setupNav,formatDate} from './ui.js';import {initI18n} from './i18n.js';
-setupNav();initI18n();
-async function safe(table,query){try{return await get(table,query)}catch(e){console.warn(table,e);return[]}}
-function renderList(id,rows,mapper){const el=$(id);if(!el)return;el.innerHTML=rows.length?rows.map(mapper).join(''):'<div class="empty">لا توجد بيانات بعد</div>'}
-async function load(){
- const [ann,sums,groups,projects,ratings]=await Promise.all([
-  safe('site_announcements','select=*&active=eq.true&order=priority.desc,created_at.desc&limit=5'),
-  safe('summaries','select=*&approved=eq.true&order=created_at.desc&limit=4'),
-  safe('whatsapp_groups','select=*&approved=eq.true&order=created_at.desc&limit=4'),
-  safe('student_projects','select=*&status=eq.approved&order=featured.desc,created_at.desc&limit=4'),
-  safe('rating_public_summary','select=*&order=overall_rating.desc&limit=4')
- ]);
- const now=new Date();const current=ann.find(x=>!x.expires_at||new Date(x.expires_at)>now);
- if(current){$('#announcement').hidden=false;$('#announcementTitle').textContent=current.title;$('#announcementBody').textContent=current.body;const a=$('#announcementAction');if(current.button_url){a.hidden=false;a.href=current.button_url;a.textContent=current.button_text||'التفاصيل'}}
- $('#announcementClose')?.addEventListener('click',()=>$('#announcement').hidden=true);
- $('#statSummaries').textContent=sums.length;$('#statGroups').textContent=groups.length;$('#statProjects').textContent=projects.length;$('#statRatings').textContent=ratings.reduce((n,r)=>n+Number(r.reviews_count||0),0);
- renderList('#latestSummaries',sums,s=>`<div class="list-item"><div><p>${esc(s.title||s.subject)}</p><small>${esc(s.college||'')}</small></div><a class="list-link" href="${esc(s.url||s.link||'#')}" target="_blank">فتح</a></div>`);
- renderList('#latestGroups',groups,g=>`<div class="list-item"><div><p>${esc(g.subject||g.name||'مجموعة')}</p><small>${esc(g.college||'')}</small></div><a class="list-link" href="${esc(g.link||g.url||'#')}" target="_blank">انضم</a></div>`);
- renderList('#latestProjects',projects,p=>`<div class="list-item"><div><p>${esc(p.title)}</p><small>${esc(p.major||p.owner_name||'')}</small></div><a class="list-link" href="projects.html">عرض</a></div>`);
-}
-load();
-
-async function loadWhatsappChannel(){
+import {setupNav,enforceMaintenance,platformStatuses,get,$$,get as fetchRows,esc} from './core.js';
+setupNav();await enforceMaintenance();
+async function refresh(){
  try{
-  const rows=await get('site_settings','select=key,value&key=eq.whatsapp_channel_url');
-  const url=rows?.[0]?.value;
-  if(url){
-    $('#whatsappChannelLink').href=url;
-    $('#whatsappChannelBanner').hidden=false;
-  }
- }catch{}
+  const map=await platformStatuses();
+  $$('[data-feature]').forEach(card=>{
+   const status=map[card.dataset.feature]||'active';card.dataset.status=status;
+   card.querySelector('.status-badge')?.remove();
+   if(status!=='active'){const b=document.createElement('span');b.className='status-badge';b.textContent=status==='maintenance'?'صيانة':status==='coming_soon'?'قريبًا':'متوقفة';card.append(b)}
+  })
+ }catch(e){console.warn(e)}
 }
-loadWhatsappChannel();
+document.addEventListener('click',e=>{const c=e.target.closest('[data-feature]');if(c&&c.dataset.status&&c.dataset.status!=='active'){e.preventDefault();alert('الخدمة غير متاحة حاليًا')}} ,true);
+async function ads(){
+ try{const rows=await fetchRows('site_announcements','select=*&active=eq.true&order=priority.desc,created_at.desc&limit=6');document.querySelector('#announcements').innerHTML=rows.length?rows.map(a=>`<article class="card item-card"><span class="badge">إعلان</span><h3>${esc(a.title)}</h3><p>${esc(a.body)}</p>${a.button_url?`<a class="btn" target="_blank" href="${esc(a.button_url)}">${esc(a.button_text||'التفاصيل')}</a>`:''}</article>`).join(''):'<div class="empty">لا توجد إعلانات حاليًا</div>'}catch{}
+}
+try{const rows=await get('site_settings','select=key,value&key=eq.whatsapp_channel_url');if(rows[0]?.value)document.querySelector('#waChannel').href=rows[0].value}catch{}
+refresh();ads();setInterval(refresh,10000);window.addEventListener('focus',refresh);
