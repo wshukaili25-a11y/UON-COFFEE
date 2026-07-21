@@ -11,3 +11,5 @@
 .featured-tool p{color:#c7d3e7;font-size:.8rem;margin:.4rem 0 .7rem}
 @media(max-width:900px){.featured-tools{grid-template-columns:1fr}}
 @media(max-width:650px){.tools-grid{grid-template-columns:1fr}}
+
+.tools-health{padding:.8rem 1rem;margin-bottom:1rem;display:flex;align-items:center;gap:.6rem;color:var(--muted)}.tools-health i{color:var(--green)}.tool-app-card[data-status='disabled'],.tool-app-card[data-status='maintenance'],.tool-app-card[data-status='coming_soon']{opacity:.62;filter:saturate(.55)}
