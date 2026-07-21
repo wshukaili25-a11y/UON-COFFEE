@@ -99,7 +99,8 @@
     "10": {
       "title": "WhatsApp Groups",
       "description": "Find or submit a course group to help your classmates",
-      "button": "Find a Group"
+      "button": "Find a Group",
+      "banner": "WhatsApp"
     },
     "11": {
       "title": "Student Marketplace",
