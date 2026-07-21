@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>UoN Coffee — خرائط · اعترافات · مطاعم</title>
+<title>UON Hub — خرائط · اعترافات · مطاعم</title>
 <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <style>
@@ -261,6 +261,7 @@ body.has-exam-banner{padding-top:40px!important}
 body.has-exam-banner .navbar{top:40px!important}
 </style>
 <link rel="stylesheet" href="site-enhancements.css">
+<link rel="stylesheet" href="brand.css">
 </head>
 <body>
 
@@ -373,7 +374,7 @@ body.has-exam-banner .navbar{top:40px!important}
                 <div class="mb mb-main" onclick="showTip(event,'المبنى الرئيسي','يضم الإدارة العليا، القبول والتسجيل، المالية','🏛️ إداري')"><span class="mb-icon">🏛️</span><span class="mb-name">المبنى الرئيسي</span></div>
                 <div class="mb mb-eco" onclick="showTip(event,'كلية الاقتصاد ونظم المعلومات','برامج: المحاسبة، إدارة الأعمال، نظم المعلومات','💼 كلية')"><span class="mb-icon">💼</span><span class="mb-name">الاقتصاد</span></div>
                 <div class="mb mb-eng" onclick="showTip(event,'كلية الهندسة والعمارة','برامج: هندسة مدنية، كهربائية، معمارية','🏗️ كلية')"><span class="mb-icon">🏗️</span><span class="mb-name">الهندسة</span></div>
-                <div class="mb mb-cafe" onclick="showTip(event,'كافيتيريا الجامعة','وجبات، مشروبات، سناكس — مفتوحة 7ص - 8م','☕ مفتوحة')"><span class="mb-icon">☕</span><span class="mb-name">الكافيتيريا</span></div>
+                <div class="mb mb-cafe" onclick="showTip(event,'كافيتيريا الجامعة','وجبات، مشروبات، سناكس — مفتوحة 7ص - 8م','◆ مفتوحة')"><span class="mb-icon">◆</span><span class="mb-name">الكافيتيريا</span></div>
                 <div class="mb mb-sci" onclick="showTip(event,'كلية العلوم والآداب','برامج: كيمياء، فيزياء، رياضيات، إنجليزي','🔬 كلية')"><span class="mb-icon">🔬</span><span class="mb-name">العلوم والآداب</span></div>
                 <div class="mb mb-health" onclick="showTip(event,'كلية العلوم الصحية','برامج: تمريض، صحة عامة، علوم مختبرية','⚕️ كلية')"><span class="mb-icon">⚕️</span><span class="mb-name">العلوم الصحية</span></div>
                 <div class="mb mb-found" onclick="showTip(event,'معهد التأسيس','برامج تأسيسية للطلاب المستجدين — سنة أولى','📖 معهد')"><span class="mb-icon">📖</span><span class="mb-name">معهد التأسيس</span></div>
@@ -415,7 +416,7 @@ body.has-exam-banner .navbar{top:40px!important}
                 <button class="cf-cat" onclick="selCat(this,'🚗 باركينج')">🚗 باركينج</button>
             </div>
             <textarea class="cf-ta" id="confText" placeholder="اكتب اعترافك هنا... كلنا في نفس الوضع 😅" minlength="20" maxlength="300" oninput="updateConfCounter()"></textarea>
-            <div id="confCounter" style="font-size:.78rem;color:var(--text-dim);text-align:left;margin-top:6px;">0 / 300 — يسمح بأي نص حتى لو حرف واحد</div>
+            <div id="confCounter" style="font-size:.78rem;color:var(--text-dim);text-align:left;margin-top:6px;">0 / 300 — الحد الأدنى 20 حرفًا و3 كلمات</div>
             <div class="cf-row">
                 <label class="cf-anon"><input type="checkbox" id="anonCheck" checked> نشر بشكل مجهول 👤</label>
                 <button class="cf-send" onclick="submitConf()">نشر 🚀</button>
@@ -443,7 +444,7 @@ body.has-exam-banner .navbar{top:40px!important}
         <div class="rest-filters reveal">
             <button class="rf active" onclick="filterRest('all',this)">الكل</button>
             <button class="rf" onclick="filterRest('مطعم',this)">🍽️ مطاعم</button>
-            <button class="rf" onclick="filterRest('كافيه',this)">☕ كافيهات</button>
+            <button class="rf" onclick="filterRest('كافيه',this)">◆ كافيهات</button>
             <button class="rf" onclick="filterRest('وجبات سريعة',this)">🍔 وجبات سريعة</button>
         </div>
         <div class="rest-grid reveal" id="restGrid">
@@ -551,7 +552,7 @@ const defaultRestaurants = [
     { name:'Antalya Shack', type:'مطعم', emoji:'🥙', description:'أكل تركي، كباب، شاورما', distance:'بركة الموز', stars:4, price:'mid', status:'open', tags:['تركي','كباب'] },
     { name:'Reem Al Yemen', type:'مطعم', emoji:'🫕', description:'مندي، أكلات يمنية وعربية', distance:'بركة الموز', stars:4, price:'mid', status:'open', tags:['مندي','يمني'] },
     { name:'DBites', type:'وجبات سريعة', emoji:'🍟', description:'وجبات سريعة قريب من الجامعة', distance:'قريب جداً', stars:4, price:'cheap', status:'open', tags:['سريع','قريب','رخيص'] },
-    { name:'Kawa Kava', type:'كافيه', emoji:'☕', description:'أفضل مكان للمذاكرة والقهوة', distance:'بركة الموز', stars:5, price:'mid', status:'open', tags:['مذاكرة','قهوة','مشهور'] },
+    { name:'Kawa Kava', type:'كافيه', emoji:'◆', description:'أفضل مكان للمذاكرة والقهوة', distance:'بركة الموز', stars:5, price:'mid', status:'open', tags:['مذاكرة','قهوة','مشهور'] },
     { name:'Alam علم', type:'كافيه', emoji:'🎨', description:'كوفي جميل وجلسات هادئة', distance:'بركة الموز', stars:5, price:'mid', status:'open', tags:['جلسات','هادئ'] },
     { name:'Over Value Cafe', type:'كافيه', emoji:'💚', description:'اقتصادي ومناسب للطلاب', distance:'بركة الموز', stars:4, price:'cheap', status:'open', tags:['رخيص','طلاب'] },
     { name:'Aroma Cafe', type:'كافيه', emoji:'🌸', description:'مشروبات وقهوة ممتازة', distance:'بركة الموز', stars:4, price:'mid', status:'open', tags:['قهوة','مشروبات'] },
@@ -629,7 +630,7 @@ window.updateConfCounter = function() {
     if (!el || !counter) return
     const text = el.value.trim()
     const words = text ? text.split(/\s+/).filter(Boolean).length : 0
-    counter.textContent = `${el.value.length} / 300 — ${words} كلمة (يسمح بأي نص حتى لو حرف واحد)`
+    counter.textContent = `${el.value.length} / 300 — ${words} كلمة (الحد الأدنى 20 حرفًا و3 كلمات)`
     counter.style.color = (text.length >= 20 && words >= 3) ? 'var(--success)' : 'var(--text-dim)'
 }
 
@@ -637,8 +638,8 @@ window.submitConf = async function() {
     const input = document.getElementById('confText')
     const text = input.value.trim()
     const words = text ? text.split(/\s+/).filter(Boolean) : []
-    if (text.trim().length < 1) {
-        showToast('اكتب اعترافك أولًا 😅', 'error')
+    if (text.length < 20 || words.length < 3) {
+        showToast('اكتب اعترافًا أوضح: 20 حرفًا و3 كلمات على الأقل 😅', 'error')
         input.focus()
         return
     }
@@ -727,7 +728,7 @@ window.deleteConf = async function(id) {
 }
 
 window.shareConf = function(text) {
-    if (navigator.share) navigator.share({ title: 'اعتراف من UoN Coffee', text })
+    if (navigator.share) navigator.share({ title: 'اعتراف من UON Hub', text })
     else { navigator.clipboard.writeText(text); showToast('تم نسخ الاعتراف! 📋') }
 }
 
@@ -992,5 +993,6 @@ window.toggleMobileMenu = function() {
 }
 </script>
 <script src="app-status.js"></script>
+<script src="language.js" defer></script>
 </body>
 </html>
