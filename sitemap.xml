@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url><loc>https://uoncoffee.space/</loc><priority>1.0</priority></url>
-  <url><loc>https://uoncoffee.space/summaries.html</loc><priority>0.8</priority></url>
-  <url><loc>https://uoncoffee.space/tools.html</loc><priority>0.8</priority></url>
-  <url><loc>https://uoncoffee.space/schedule.html</loc><priority>0.7</priority></url>
-  <url><loc>https://uoncoffee.space/groups.html</loc><priority>0.7</priority></url>
-  <url><loc>https://uoncoffee.space/marketplace.html</loc><priority>0.7</priority></url>
-  <url><loc>https://uoncoffee.space/features.html</loc><priority>0.6</priority></url>
+<url><loc>https://www.uoncoffee.space/</loc></url>
+<url><loc>https://www.uoncoffee.space/features.html</loc></url>
+<url><loc>https://www.uoncoffee.space/summaries.html</loc></url>
+<url><loc>https://www.uoncoffee.space/groups.html</loc></url>
+<url><loc>https://www.uoncoffee.space/marketplace.html</loc></url>
+<url><loc>https://www.uoncoffee.space/tools.html</loc></url>
+<url><loc>https://www.uoncoffee.space/schedule.html</loc></url>
+  <url><loc>https://www.uoncoffee.space/university-guide.html</loc></url>
 </urlset>
