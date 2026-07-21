@@ -1,87 +1,10 @@
-<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>لوحة الإدارة | UON Hub</title><link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"><link rel="stylesheet" href="css/base.css"><link rel="stylesheet" href="css/admin.css">
-</head><body><div class="login-overlay" id="loginOverlay"><div class="card login-card"><a class="brand" href="index.html"><span class="brand-mark">U1</span>UON <span>Hub</span></a><h2 style="margin-top:1rem">دخول المشرف</h2><input id="adminPassword" type="password" placeholder="كلمة المرور" autocomplete="current-password"><button class="primary-btn" style="width:100%" onclick="login()">دخول</button><a class="outline-btn" href="index.html" style="width:100%;margin-top:.6rem">الرجوع للرئيسية</a></div></div><div class="admin-shell"><aside class="sidebar" id="sidebar"><a class="brand" href="index.html"><span class="brand-mark">U1</span>UON <span>Hub</span></a><nav class="admin-nav"><button class="active" onclick="showSection('overview',this)"><i class="fas fa-chart-pie"></i>نظرة عامة</button><button onclick="showSection('site',this)"><i class="fas fa-power-off"></i>الموقع والصيانة</button><button onclick="showSection('announcements',this)"><i class="fas fa-bullhorn"></i>الإعلانات</button><button onclick="showSection('summaries',this)"><i class="fas fa-book"></i>الملخصات</button><button onclick="showSection('groups',this)"><i class="fab fa-whatsapp"></i>المجموعات</button><button onclick="showSection('projects',this)"><i class="fas fa-code"></i>المشاريع</button><button onclick="showSection('ratings',this)"><i class="fas fa-star"></i>التقييمات</button><button onclick="showSection('tools',this)"><i class="fas fa-toolbox"></i>التحكم بالأدوات</button><button onclick="showSection('programs',this)"><i class="fas fa-building-columns"></i>دليل الجامعة</button><button onclick="showSection('confessions',this)"><i class="fas fa-comments"></i>الاعترافات</button><button onclick="showSection('telegram',this)"><i class="fab fa-telegram"></i>مشرفو تلجرام</button></nav></aside><main class="admin-main"><div class="admin-top"><div><h1>لوحة التحكم</h1><p style="color:var(--muted)">UON Hub v6</p></div><button class="icon-btn" onclick="document.getElementById('sidebar').classList.toggle('open')"><i class="fas fa-bars"></i></button></div>
-<section class="admin-section active" id="section-overview"><div class="grid admin-stats"><div class="card admin-stat"><strong id="statSummaries">0</strong><span>ملخصات معلقة</span></div><div class="card admin-stat"><strong id="statGroups">0</strong><span>مجموعات معلقة</span></div><div class="card admin-stat"><strong id="statProjects">0</strong><span>مشاريع معلقة</span></div><div class="card admin-stat"><strong id="statRatings">0</strong><span>تقييمات معلقة</span></div></div><div class="card admin-card"><h2>مرحبًا في UON Hub v6</h2><p style="color:var(--muted);margin-top:.5rem">لوحة موحدة لمراجعة المحتوى وإدارة الإعلانات.</p></div></section>
-
-<section class="admin-section" id="section-site">
-  <div class="card admin-card">
-    <h2>حالة الموقع</h2>
-    <p style="color:var(--muted);margin:.5rem 0 1rem">عند تشغيل الصيانة، جميع الزوار يشاهدون صفحة الصيانة، بينما يبقى وصول المشرف متاحًا.</p>
-    <div class="site-control-row">
-      <div>
-        <strong>وضع الصيانة الكامل</strong>
-        <small id="maintenanceStatusText">جاري قراءة الحالة...</small>
-      </div>
-      <label class="switch">
-        <input type="checkbox" id="maintenanceToggle" onchange="setMaintenance(this.checked)">
-        <span class="slider"></span>
-      </label>
-    </div>
-    <div class="field" style="margin-top:1rem">
-      <label>رسالة الصيانة</label>
-      <textarea id="maintenanceMessageInput" rows="3"></textarea>
-    </div>
-    <button class="primary-btn" style="margin-top:.7rem" onclick="saveMaintenanceMessage()">حفظ الرسالة</button>
-  </div>
-
-  <div class="card admin-card">
-    <h2>قناة واتساب الرسمية</h2>
-    <div class="field" style="margin-top:1rem">
-      <label>رابط القناة</label>
-      <input id="whatsappChannelInput" placeholder="https://whatsapp.com/channel/...">
-    </div>
-    <button class="primary-btn" style="margin-top:.7rem" onclick="saveWhatsappChannel()">حفظ الرابط</button>
-  </div>
-</section>
-<section class="admin-section" id="section-announcements"><div class="card admin-card"><h2>إعلان جديد</h2><div class="form-grid" style="margin-top:1rem"><div class="field"><label>العنوان</label><input id="annTitle"></div><div class="field"><label>النوع</label><select id="annType"><option value="normal">عادي</option><option value="important">مهم</option><option value="urgent">عاجل</option><option value="event">فعالية</option></select></div><div class="field wide"><label>النص</label><textarea id="annBody"></textarea></div><div class="field"><label>الأولوية</label><input id="annPriority" type="number" value="10"></div><div class="field"><label>انتهاء</label><input id="annExpires" type="datetime-local"></div><div class="field"><label>نص الزر</label><input id="annButtonText"></div><div class="field"><label>الرابط</label><input id="annButtonUrl"></div></div><button class="primary-btn" style="margin-top:1rem" onclick="createAnnouncement()">نشر الإعلان</button></div><div class="card admin-card"><div id="list-announcements" class="admin-list"></div></div></section>
-<section class="admin-section" id="section-summaries"><div class="card admin-card"><h2>طلبات الملخصات</h2><div id="list-summaries" class="admin-list" style="margin-top:1rem"></div></div></section>
-<section class="admin-section" id="section-groups"><div class="card admin-card"><h2>طلبات المجموعات</h2><div id="list-groups" class="admin-list" style="margin-top:1rem"></div></div></section>
-<section class="admin-section" id="section-projects"><div class="card admin-card"><h2>طلبات المشاريع</h2><div id="list-projects" class="admin-list" style="margin-top:1rem"></div></div></section>
-<section class="admin-section" id="section-ratings"><div class="card admin-card"><h2>طلبات التقييمات</h2><div id="list-ratings" class="admin-list" style="margin-top:1rem"></div></div></section>
-
-<section class="admin-section" id="section-tools">
-  <div class="card admin-card">
-    <h2>إضافة أداة</h2>
-    <div class="form-grid" style="margin-top:1rem">
-      <div class="field"><label>الاسم</label><input id="toolName"></div>
-      <div class="field"><label>التصنيف</label><input id="toolCategoryId" placeholder="ai / pdf / math"></div>
-      <div class="field wide"><label>الوصف</label><textarea id="toolDescription"></textarea></div>
-      <div class="field"><label>الرابط</label><input id="toolUrl"></div>
-      <div class="field"><label>الإيموجي</label><input id="toolEmoji" placeholder="🧰"></div>
-    </div>
-    <input type="hidden" id="toolEditId"><button class="primary-btn" style="margin-top:1rem" onclick="saveTool()">حفظ الأداة</button><button class="outline-btn" style="margin-top:1rem" onclick="resetToolForm()">إلغاء التعديل</button>
-  </div>
-  <div class="card admin-card"><div id="list-tools" class="admin-list"></div></div>
-</section>
-<section class="admin-section" id="section-programs"><div class="card admin-card"><h2>إضافة/تعديل برنامج</h2><div class="form-grid" style="margin-top:1rem"><div class="field"><label>اسم البرنامج</label><input id="progName"></div><div class="field"><label>الكلية</label><input id="progCollege"></div><div class="field"><label>الدرجة</label><input id="progDegree"></div><div class="field"><label>الساعات</label><input id="progHours" type="number"></div><div class="field"><label>سعر الساعة</label><input id="progPrice" type="number"></div><div class="field"><label>الرابط الرسمي</label><input id="progOfficial"></div><div class="field wide"><label>رابط الخطة</label><input id="progPlan"></div></div><button class="primary-btn" style="margin-top:1rem" onclick="createProgram()">حفظ البرنامج</button></div><div class="card admin-card"><div id="list-programs" class="admin-list"></div></div></section><section class="admin-section" id="section-confessions">
-  <div class="card admin-card">
-    <h2>طلبات الاعترافات</h2>
-    <div id="list-confessions" class="admin-list" style="margin-top:1rem"></div>
-  </div>
-</section>
-
-<section class="admin-section" id="section-telegram">
-  <div class="card admin-card">
-    <h2>إضافة مشرف تلجرام</h2>
-    <p style="color:var(--muted);margin:.5rem 0 1rem">أضف Chat ID لكل مشرف. رمز البوت لا يُحفظ هنا أو داخل GitHub.</p>
-    <div class="form-grid">
-      <div class="field"><label>اسم المشرف</label><input id="tgAdminName"></div>
-      <div class="field"><label>Telegram Chat ID</label><input id="tgAdminChatId"></div>
-      <div class="field"><label>الدور</label>
-        <select id="tgAdminRole">
-          <option value="owner">مالك</option>
-          <option value="admin">مشرف كامل</option>
-          <option value="moderator">مراجعة فقط</option>
-        </select>
-      </div>
-      <div class="field"><label>الإشعارات</label>
-        <select id="tgAdminNotifications">
-          <option value="true">مفعلة</option>
-          <option value="false">متوقفة</option>
-        </select>
-      </div>
-    </div>
-    <button class="primary-btn" style="margin-top:1rem" onclick="createTelegramAdmin()">إضافة المشرف</button>
-  </div>
-  <div class="card admin-card"><div id="list-telegram" class="admin-list"></div></div>
-</section>
-</main></div><script type="module" src="js/admin.js"></script></body></html>
+<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>إدارة UON Hub</title><link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet"><link rel="stylesheet" href="css/app.css"></head><body><div id="login" class="login-shell"><form class="card login-card" id="loginForm"><h1>دخول الإدارة</h1><label>كلمة المرور</label><input id="password" type="password" required><button class="btn primary" style="width:100%;margin-top:12px">دخول</button><a class="btn" href="index.html" style="width:100%;margin-top:8px">الرئيسية</a></form></div><div id="dashboard" class="admin-layout" hidden><aside class="sidebar" id="sidebar"><h2>UON Hub V7</h2><button class="btn" data-section="overview">نظرة عامة</button><button class="btn" data-section="site">الموقع والصيانة</button><button class="btn" data-section="features">خدمات الموقع</button><button class="btn" data-section="pending">الطلبات المعلقة</button><button class="btn" data-section="announcements">الإعلانات</button><button class="btn" data-section="tools">الأدوات الخارجية</button><button class="btn" data-section="programs">دليل الجامعة</button><button class="btn" data-section="telegram">مشرفو تلجرام</button></aside><main class="admin-main"><div class="admin-top"><h1>لوحة الإدارة</h1><div><button class="btn" id="menuAdmin">☰</button><button class="btn danger" id="logout">خروج</button></div></div>
+<section class="admin-section active" id="sec-overview"><div id="stats" class="grid grid-4"></div></section>
+<section class="admin-section" id="sec-site"><div class="card form-card"><label><input id="maintenance" type="checkbox" style="width:auto"> تفعيل صيانة الموقع بالكامل</label><label>رسالة الصيانة</label><textarea id="maintenanceMessage"></textarea><label>رابط قناة واتساب</label><input id="whatsappUrl"><button class="btn primary" id="saveSite">حفظ</button></div></section>
+<section class="admin-section" id="sec-features"><div id="featuresList" class="list"></div></section>
+<section class="admin-section" id="sec-pending"><div class="toolbar"><select id="pendingTable"><option value="summaries">الملخصات</option><option value="whatsapp_groups">المجموعات</option><option value="student_market">السوق</option><option value="rating_submissions">التقييمات</option><option value="confessions">الاعترافات</option></select></div><div id="pendingList" class="list"></div></section>
+<section class="admin-section" id="sec-announcements"><div class="card form-card"><input id="adTitle" placeholder="عنوان الإعلان"><textarea id="adBody" placeholder="النص"></textarea><input id="adUrl" placeholder="الرابط اختياري"><button class="btn primary" id="addAd">إضافة إعلان</button></div><div id="adsList" class="list" style="margin-top:18px"></div></section>
+<section class="admin-section" id="sec-tools"><div id="toolsList" class="list"></div></section>
+<section class="admin-section" id="sec-programs"><div id="programsList" class="list"></div></section>
+<section class="admin-section" id="sec-telegram"><div class="card form-card"><div class="form-grid"><input id="tgName" placeholder="اسم المشرف"><input id="tgChat" placeholder="Chat ID"><select id="tgRole"><option value="owner">مالك</option><option value="admin">مشرف</option><option value="moderator">مراجع</option></select></div><button class="btn primary" id="addTg">إضافة</button></div><div id="tgList" class="list" style="margin-top:18px"></div></section>
+</main></div><div id="toast" class="toast"></div><script type="module" src="js/admin.js?v=7"></script></body></html>
