@@ -20,3 +20,15 @@ async function load(){
  renderList('#latestProjects',projects,p=>`<div class="list-item"><div><p>${esc(p.title)}</p><small>${esc(p.major||p.owner_name||'')}</small></div><a class="list-link" href="projects.html">عرض</a></div>`);
 }
 load();
+
+async function loadWhatsappChannel(){
+ try{
+  const rows=await get('site_settings','select=key,value&key=eq.whatsapp_channel_url');
+  const url=rows?.[0]?.value;
+  if(url){
+    $('#whatsappChannelLink').href=url;
+    $('#whatsappChannelBanner').hidden=false;
+  }
+ }catch{}
+}
+loadWhatsappChannel();

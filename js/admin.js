@@ -9,7 +9,8 @@ const defs={
  ratings:{table:'rating_submissions',filter:'status=eq.pending',title:'التقييمات'},
  tools:{table:'tools_items',filter:'',title:'الأدوات'},
  confessions:{table:'confessions',filter:'status=eq.pending',title:'الاعترافات'},
- programs:{table:'university_programs',filter:'',title:'دليل الجامعة'}
+ programs:{table:'university_programs',filter:'',title:'دليل الجامعة'},
+ telegram:{table:'telegram_admins',filter:'',title:'مشرفو تلجرام'}
 };
 window.login=async()=>{
  const password=$('#adminPassword').value.trim();
@@ -80,3 +81,68 @@ window.featureTool=async(id,featured)=>{
 
 window.setToolStatus=async(id,status)=>{try{await update('tools_items',`id=eq.${encodeURIComponent(id)}`,{status,disabled:status!=='active'});toast('تم تحديث حالة الأداة');loadList('tools')}catch(e){toast(e.message,true)}};
 window.createProgram=async()=>{const body={name_ar:$('#progName').value.trim(),college:$('#progCollege').value.trim(),degree:$('#progDegree').value.trim(),credit_hours:Number($('#progHours').value)||null,credit_hour_price:Number($('#progPrice').value)||null,official_url:$('#progOfficial').value.trim(),study_plan_url:$('#progPlan').value.trim()||null,active:true};if(!body.name_ar||!body.official_url)return toast('أكمل الاسم والرابط الرسمي',true);try{await insert('university_programs',body);toast('تم حفظ البرنامج');loadList('programs')}catch(e){toast(e.message,true)}};
+
+async function getSetting(key){
+ try{
+  const rows=await get('site_settings',`select=key,value&key=eq.${encodeURIComponent(key)}`);
+  return rows?.[0]?.value;
+ }catch{return null}
+}
+async function saveSetting(key,value){
+ const existing=await get('site_settings',`select=key&key=eq.${encodeURIComponent(key)}`);
+ if(existing?.length){
+  return update('site_settings',`key=eq.${encodeURIComponent(key)}`,{value,updated_at:new Date().toISOString()});
+ }
+ return insert('site_settings',{key,value});
+}
+async function loadSiteControls(){
+ const [maintenance,message,whatsapp]=await Promise.all([
+  getSetting('maintenance_enabled'),
+  getSetting('maintenance_message'),
+  getSetting('whatsapp_channel_url')
+ ]);
+ const on=maintenance===true||maintenance==='true';
+ if($('#maintenanceToggle'))$('#maintenanceToggle').checked=on;
+ if($('#maintenanceStatusText'))$('#maintenanceStatusText').textContent=on?'الموقع الآن تحت الصيانة':'الموقع متاح للزوار';
+ if($('#maintenanceMessageInput'))$('#maintenanceMessageInput').value=message||'نعمل حاليًا على تحسين UON Hub. بنرجع لكم قريبًا.';
+ if($('#whatsappChannelInput'))$('#whatsappChannelInput').value=whatsapp||'';
+}
+window.setMaintenance=async on=>{
+ try{
+  await saveSetting('maintenance_enabled',on);
+  $('#maintenanceStatusText').textContent=on?'الموقع الآن تحت الصيانة':'الموقع متاح للزوار';
+  toast(on?'تم تشغيل الصيانة الكاملة':'تم فتح الموقع للزوار');
+ }catch(e){toast(e.message,true)}
+};
+window.saveMaintenanceMessage=async()=>{
+ try{await saveSetting('maintenance_message',$('#maintenanceMessageInput').value.trim());toast('تم حفظ رسالة الصيانة')}
+ catch(e){toast(e.message,true)}
+};
+window.saveWhatsappChannel=async()=>{
+ try{await saveSetting('whatsapp_channel_url',$('#whatsappChannelInput').value.trim());toast('تم حفظ رابط قناة واتساب')}
+ catch(e){toast(e.message,true)}
+};
+window.createTelegramAdmin=async()=>{
+ const body={
+  name:$('#tgAdminName').value.trim(),
+  chat_id:$('#tgAdminChatId').value.trim(),
+  role:$('#tgAdminRole').value,
+  notifications_enabled:$('#tgAdminNotifications').value==='true',
+  active:true
+ };
+ if(!body.name||!body.chat_id)return toast('أدخل الاسم وChat ID',true);
+ try{await insert('telegram_admins',body);toast('تمت إضافة مشرف تلجرام');loadList('telegram')}
+ catch(e){toast(e.message,true)}
+};
+window.toggleTelegramAdmin=async(id,active)=>{
+ try{await update('telegram_admins',`id=eq.${id}`,{active});toast('تم التحديث');loadList('telegram')}
+ catch(e){toast(e.message,true)}
+};
+const originalRow=row;
+row=function(name,x){
+ if(name==='telegram'){
+  return `<div class="admin-row"><div><strong>${esc(x.name)}</strong><p>Chat ID: ${esc(x.chat_id)} — ${esc(x.role)}</p><small>${x.notifications_enabled?'الإشعارات مفعلة':'الإشعارات متوقفة'}</small></div><div class="row-actions"><button onclick="toggleTelegramAdmin('${x.id}',${!x.active})">${x.active?'إيقاف':'تشغيل'}</button><button class="reject" onclick="deleteItem('telegram','${x.id}')">حذف</button></div></div>`;
+ }
+ return originalRow(name,x);
+};
+loadSiteControls();
