@@ -126,5 +126,10 @@
     "terms": "Terms",
     "rights": "All rights reserved",
     "made": "Made with care for University of Nizwa students"
+  },
+  "tool_messages": {
+    "disabled": "This tool is currently unavailable",
+    "coming_soon": "This tool is coming soon 🔜",
+    "maintenance": "This tool is currently under maintenance 🛠️"
   }
 }
