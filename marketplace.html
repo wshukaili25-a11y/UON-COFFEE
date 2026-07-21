@@ -3,7 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>UoN Coffee — سوق الطلاب</title>
+<meta name="description" content="سوق طلاب جامعة نزوى للبيع والشراء والتبادل مع مراجعة الإعلانات قبل النشر.">
+<title>UON Hub — سوق الطلاب</title>
 <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <style>
@@ -137,6 +138,7 @@ body.has-exam-banner{padding-top:40px!important}
 body.has-exam-banner .navbar{top:40px!important}
 </style>
 <link rel="stylesheet" href="site-enhancements.css">
+<link rel="stylesheet" href="brand.css">
 </head>
 <body>
 <div class="page-bg"><div class="c c1"></div><div class="c c2"></div></div>
@@ -260,6 +262,8 @@ body.has-exam-banner .navbar{top:40px!important}
 </main>
 
 <script>
+function escapeHTML(value){return String(value??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]))}
+
 window._sbURL = 'https://irkhvydgxpseflggbeqq.supabase.co'
 window._sbKEY = 'sb_publishable_gZ9tyM1udrkuQIXHqDtToQ_FyFmePgH'
 
@@ -369,7 +373,7 @@ function renderItems() {
                 <span class="item-type-badge badge-${item.type}">${typeLabels[item.type] || item.type}</span>
             </div>
             <div class="item-body">
-                <div class="item-title">${item.title}</div>
+                <div class="item-title">${escapeHTML(item.title)}</div>
                 <div class="item-desc">${item.description || ''}</div>
                 <div class="item-footer">
                     <span class="item-price ${!item.price || item.price == 0 ? 'free' : ''}">
@@ -503,5 +507,6 @@ function initReveal() {
 }
 </script>
 <script src="app-status.js"></script>
+<script src="language.js" defer></script>
 </body>
 </html>
