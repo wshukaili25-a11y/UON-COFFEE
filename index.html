@@ -462,6 +462,54 @@ html[dir="rtl"] .whatsapp-banner{left:14px;right:auto}
 html[dir="ltr"] .whatsapp-banner{left:auto;right:14px}
 .whatsapp-banner i{font-size:.88rem}
 
+
+/* ===== Embedded tool lock enforcement ===== */
+.tool-locked-panel{
+    min-height:360px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    gap:.85rem;
+    padding:2rem;
+    background:linear-gradient(145deg,rgba(26,31,61,.9),rgba(14,19,43,.96));
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:22px;
+    box-shadow:0 18px 50px rgba(0,0,0,.16)
+}
+.tool-locked-icon{
+    width:72px;height:72px;border-radius:20px;
+    display:flex;align-items:center;justify-content:center;
+    background:rgba(251,146,60,.1);
+    color:var(--warning);
+    font-size:1.8rem
+}
+.tool-locked-panel h3{font-size:1.35rem;color:#fff}
+.tool-locked-panel p{max-width:520px;color:var(--text-dim);line-height:1.8}
+.tool-locked-panel span{
+    padding:.35rem .75rem;border-radius:999px;
+    background:rgba(251,146,60,.1);
+    border:1px solid rgba(251,146,60,.2);
+    color:var(--warning);font-size:.75rem;font-weight:900
+}
+.quick-hub-card.quick-hub-disabled{
+    opacity:.5;
+    filter:grayscale(.35);
+    cursor:not-allowed;
+    pointer-events:auto
+}
+.quick-hub-card.quick-hub-disabled:hover{
+    transform:none;
+    border-color:rgba(255,255,255,.065);
+    box-shadow:none
+}
+.tool-card[data-status="maintenance"],
+.tool-card[data-status="disabled"],
+.tool-card[data-status="coming_soon"]{
+    cursor:not-allowed
+}
+
 </style>
 <link rel="stylesheet" href="brand.css">
 </head>
@@ -949,6 +997,137 @@ function sortToolsForHome(items) {
     })
 }
 
+
+function normalizeToolStatus(value) {
+    const raw = String(value ?? 'active').trim().toLowerCase()
+    const aliases = {
+        active: 'active',
+        enabled: 'active',
+        on: 'active',
+        true: 'active',
+        تشغيل: 'active',
+        شغال: 'active',
+
+        disabled: 'disabled',
+        inactive: 'disabled',
+        off: 'disabled',
+        false: 'disabled',
+        إيقاف: 'disabled',
+        متوقف: 'disabled',
+
+        maintenance: 'maintenance',
+        صيانة: 'maintenance',
+        تحت_الصيانة: 'maintenance',
+        'تحت الصيانة': 'maintenance',
+
+        coming_soon: 'coming_soon',
+        comingsoon: 'coming_soon',
+        soon: 'coming_soon',
+        قريباً: 'coming_soon',
+        قريبًا: 'coming_soon'
+    }
+    return aliases[raw] || (raw === 'active' ? 'active' : 'disabled')
+}
+
+function getToolById(id) {
+    return tools.find(t => Number(t.id) === Number(id))
+}
+
+function isToolActive(id) {
+    const tool = getToolById(id)
+    return !tool || normalizeToolStatus(tool.status) === 'active'
+}
+
+function getInactiveMessage(tool) {
+    const status = normalizeToolStatus(tool?.status)
+    const locale = window.UON_I18N
+    const fallback = {
+        disabled: 'هذه الأداة موقوفة حالياً',
+        coming_soon: 'هذه الأداة قادمة قريباً 🔜',
+        maintenance: 'هذه الأداة تحت الصيانة حالياً 🛠️'
+    }
+    return locale?.t(`tool_messages.${status}`, fallback[status] || 'الأداة غير متاحة حالياً')
+        || fallback[status]
+        || 'الأداة غير متاحة حالياً'
+}
+
+function buildLockedSection(tool, originalSection) {
+    const title = window.UON_I18N?.t(`tools.${tool.id}.title`, tool.title) || tool.title
+    const status = normalizeToolStatus(tool.status)
+    const statusLabel = window.UON_I18N?.t(`tool_status.${status}`, 'غير متاحة') || 'غير متاحة'
+
+    const wrapper = document.createElement('div')
+    wrapper.className = 'tool-locked-panel'
+    wrapper.innerHTML = `
+        <div class="tool-locked-icon"><i class="fas ${status === 'maintenance' ? 'fa-tools' : 'fa-lock'}"></i></div>
+        <h3>${title}</h3>
+        <p>${getInactiveMessage(tool)}</p>
+        <span>${statusLabel}</span>
+    `
+    return wrapper
+}
+
+function syncEmbeddedToolSections() {
+    const sectionMap = {
+        1: 'botSection',
+        2: 'calcSection'
+    }
+
+    Object.entries(sectionMap).forEach(([toolId, sectionId]) => {
+        const section = document.getElementById(sectionId)
+        const tool = getToolById(toolId)
+        if (!section || !tool) return
+
+        const active = normalizeToolStatus(tool.status) === 'active'
+        section.dataset.toolStatus = normalizeToolStatus(tool.status)
+
+        let locked = section.querySelector(':scope > .tool-locked-panel')
+        let original = section.querySelector(':scope > .embedded-tool-content')
+
+        if (!original) {
+            original = document.createElement('div')
+            original.className = 'embedded-tool-content'
+            while (section.firstChild) original.appendChild(section.firstChild)
+            section.appendChild(original)
+        }
+
+        if (active) {
+            original.hidden = false
+            if (locked) locked.remove()
+        } else {
+            original.hidden = true
+            if (locked) locked.remove()
+            section.appendChild(buildLockedSection(tool, section))
+        }
+    })
+
+    const quickMap = {
+        2: 'a[href="#calcSection"]',
+        9: 'a[href="schedule.html"]',
+        5: 'a[href="summaries.html"]',
+        10: 'a[href="groups.html"]'
+    }
+
+    Object.entries(quickMap).forEach(([toolId, selector]) => {
+        const link = document.querySelector(selector)
+        const tool = getToolById(toolId)
+        if (!link || !tool) return
+
+        const active = normalizeToolStatus(tool.status) === 'active'
+        link.classList.toggle('quick-hub-disabled', !active)
+        link.setAttribute('aria-disabled', active ? 'false' : 'true')
+
+        if (!link.dataset.originalHref) link.dataset.originalHref = link.getAttribute('href') || '#'
+        link.setAttribute('href', active ? link.dataset.originalHref : '#')
+
+        link.onclick = active ? null : function(event) {
+            event.preventDefault()
+            showToast(getInactiveMessage(tool))
+            return false
+        }
+    })
+}
+
 function renderTools() {
     const grid = document.getElementById('toolsGrid')
     if (!tools.length) {
@@ -960,11 +1139,12 @@ function renderTools() {
     const orderedTools = sortToolsForHome(tools)
 
     grid.innerHTML = orderedTools.map(tool => {
-        const inactive = tool.status !== 'active'
+        const normalizedStatus = normalizeToolStatus(tool.status)
+        const inactive = normalizedStatus !== 'active'
         const title = locale?.t(`tools.${tool.id}.title`, tool.title) || tool.title
         const description = locale?.t(`tools.${tool.id}.description`, tool.desc) || tool.desc
         const activeButton = locale?.t(`tools.${tool.id}.button`, tool.btnText) || tool.btnText
-        const statusText = locale?.t(`tool_status.${tool.status}`, 'غير متاحة') || 'غير متاحة'
+        const statusText = locale?.t(`tool_status.${normalizedStatus}`, 'غير متاحة') || 'غير متاحة'
         const buttonText = inactive ? statusText : activeButton
 
         const statusBadge = inactive
@@ -972,7 +1152,7 @@ function renderTools() {
             : ''
 
         return `
-        <article class="tool-card ${String(tool.id) === '10' ? 'whatsapp-tool-card' : ''}" data-id="${tool.id}" data-status="${tool.status}"
+        <article class="tool-card ${String(tool.id) === '10' ? 'whatsapp-tool-card' : ''}" data-id="${tool.id}" data-status="${normalizedStatus}"
             style="--card-color:${String(tool.id) === '10' ? '#25D366' : tool.color};position:relative;${inactive ? 'opacity:.58;filter:grayscale(.25);' : ''}">
             ${statusBadge}
             ${String(tool.id) === '10' ? `
@@ -990,24 +1170,23 @@ function renderTools() {
             </button>
         </article>`
     }).join('')
+
+    syncEmbeddedToolSections()
 }
 
 window.addEventListener('uonhub:languagechange', () => renderTools())
 
 window.openTool = function(id) {
-    const tool = tools.find(t => Number(t.id) === Number(id))
-    if (tool && tool.status !== 'active') {
-        const messages = {
-            disabled:'هذه الأداة موقوفة حالياً',
-            coming_soon:'هذه الأداة قادمة قريباً 🔜',
-            maintenance:'هذه الأداة تحت الصيانة حالياً 🛠️'
-        }
-        showToast(messages[tool.status] || 'الأداة غير متاحة حالياً')
+    const tool = getToolById(id)
+
+    if (tool && normalizeToolStatus(tool.status) !== 'active') {
+        showToast(getInactiveMessage(tool))
         return
     }
+
     const actions = {
-        1: () => document.getElementById('botSection').scrollIntoView({behavior:'smooth'}),
-        2: () => document.getElementById('calcSection').scrollIntoView({behavior:'smooth'}),
+        1: () => document.getElementById('botSection')?.scrollIntoView({behavior:'smooth'}),
+        2: () => document.getElementById('calcSection')?.scrollIntoView({behavior:'smooth'}),
         4: () => window.location.href = 'features.html#conf',
         5: () => window.location.href = 'summaries.html',
         6: () => window.location.href = 'features.html#rest',
@@ -1015,8 +1194,9 @@ window.openTool = function(id) {
         9: () => window.location.href = 'schedule.html',
         10: () => window.location.href = 'groups.html',
         11: () => window.location.href = 'marketplace.html',
-        12: () => window.location.href = 'university-guide.html',
+        12: () => window.location.href = 'university-guide.html'
     }
+
     if (actions[id]) actions[id]()
     else showToast('قريباً! 🔜')
 }
