@@ -10,7 +10,9 @@
     "market": "Marketplace",
     "about": "About",
     "contact": "Contact",
-    "features": "🔥 Features"
+    "features": "🔥 Features",
+    "projects": "Student Projects",
+    "announcements": "Announcements"
   },
   "hero": {
     "badge": "UON Hub — University of Nizwa Student Platform",
@@ -111,6 +113,11 @@
       "title": "Official University Guide",
       "description": "Explore colleges, programs, fees, and admission links from official sources",
       "button": "Explore Programs"
+    },
+    "8": {
+      "title": "Student Projects",
+      "description": "Explore University of Nizwa student projects and submit your own",
+      "button": "Browse Projects"
     }
   },
   "footer": {
