@@ -18,6 +18,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#00d4ff">
+    <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="UON Hub">
@@ -982,8 +983,7 @@ const defaultTools = [
 function updateUI() { /* لوحة الإدارة مخفية من الواجهة العامة */ }
 
 // ===== TOOLS LOAD =====
-async function loadTools()
-    loadSiteAnnouncementBanner() {
+async function loadTools() {
     // اعرض الأدوات مباشرة حتى لا تتوقف الصفحة إذا تأخر الاتصال.
     tools = defaultTools.map(t => ({...t, desc:t.description, btnText:t.btn_text, status:'active', disabled:false}))
     renderTools()
@@ -1043,6 +1043,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
     // تحميل الأدوات فوراً من القيم الافتراضية
     loadTools()
+    loadSiteAnnouncementBanner()
 
     // باقي التهيئة
     updateUI()
