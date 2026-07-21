@@ -10,15 +10,14 @@
     <meta property="og:title" content="UON Hub | منصة طلاب جامعة نزوى">
     <meta property="og:description" content="أدوات أكاديمية مجانية ومجتمع طلابي في مكان واحد.">
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://uon-coffee.vercel.app/">
-    <link rel="canonical" href="https://uon-coffee.vercel.app/">
+    <meta property="og:url" content="https://www.uoncoffee.space/">
+    <link rel="canonical" href="https://www.uoncoffee.space/">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#00d4ff">
-    <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="UON Hub">
@@ -364,235 +363,11 @@ body.has-exam-banner .navbar{top:40px!important}
         @media(max-width:520px){.quick-hub-grid{grid-template-columns:1fr}.hero-trust span{font-size:.7rem}.tool-card{min-height:auto}.stats-bar{display:grid;grid-template-columns:1fr 1fr;padding:1rem}.stat-item{min-width:0;padding:1rem}}
         @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important;transition-duration:.01ms!important}}
 
-
-/* ===== UON HUB v2.1 POLISH ===== */
-.logo-icon{
-    background:linear-gradient(135deg,#22c55e,#00d4ff 55%,#7c3aed);
-    color:#071326;border-radius:13px;box-shadow:0 8px 25px rgba(0,212,255,.18);
-}
-.navbar{box-shadow:0 10px 40px rgba(0,0,0,.12)}
-.nav-links{align-items:center}
-.nav-links a{padding:.5rem .15rem}
-.tool-card{
-    border-color:rgba(255,255,255,.075);
-    background:linear-gradient(150deg,rgba(30,37,75,.98),rgba(20,26,55,.98));
-    box-shadow:0 12px 35px rgba(0,0,0,.12);
-}
-.tool-card:hover{
-    transform:translateY(-9px);
-    box-shadow:0 24px 60px rgba(0,0,0,.28),0 0 0 1px color-mix(in srgb,var(--card-color) 35%,transparent);
-}
-.tool-card:hover .tool-icon{transform:translateY(-4px) scale(1.08) rotate(-2deg)}
-.tool-icon{transition:transform .3s ease,box-shadow .3s ease;box-shadow:0 12px 25px rgba(0,0,0,.12)}
-.tool-link{border:1px solid color-mix(in srgb,var(--card-color) 25%,transparent);background:color-mix(in srgb,var(--card-color) 7%,transparent)}
-.tool-link:hover{background:color-mix(in srgb,var(--card-color) 14%,transparent)}
-.tool-card[style*="opacity"] .tool-link{
-    background:rgba(255,255,255,.045)!important;
-    border-color:rgba(255,255,255,.07)!important;
-    color:var(--text-dim)!important;
-}
-.modern-footer{text-align:initial;padding:4rem 5% 1.5rem}
-.footer-grid{max-width:1300px;margin:auto;display:grid;grid-template-columns:1.6fr repeat(3,1fr);gap:2.3rem}
-.footer-brand-column .footer-logo{display:flex;align-items:center;gap:.65rem;color:#fff;font-size:1.6rem}
-.footer-brand-column .footer-logo span:last-child{color:var(--primary)}
-.footer-logo-icon{width:42px;height:42px;display:inline-flex;align-items:center;justify-content:center;border-radius:12px;background:linear-gradient(135deg,#22c55e,#00d4ff);color:#071326!important;font-size:1rem}
-.footer-column{display:flex;flex-direction:column;gap:.65rem}
-.footer-column h3{font-size:.92rem;color:#fff;margin-bottom:.35rem}
-.footer-column a{color:var(--text-dim);text-decoration:none;font-size:.82rem;transition:.2s}
-.footer-column a:hover{color:var(--primary);transform:translateX(-3px)}
-html[dir="ltr"] .footer-column a:hover{transform:translateX(3px)}
-.footer-version{display:inline-flex;width:max-content;margin-top:.25rem;padding:.3rem .65rem;border-radius:999px;background:rgba(0,212,255,.08);color:var(--primary);font-size:.7rem;font-weight:800}
-.modern-footer .social-links{justify-content:flex-start;margin:1rem 0 0}
-.modern-footer .footer-bottom{max-width:1300px;margin:2.5rem auto 0;display:flex;justify-content:space-between;gap:1rem}
-html[dir="ltr"] body{font-family:'Tajawal',Arial,sans-serif}
-html[dir="ltr"] .nav-links a::after{left:0;right:auto}
-@media(max-width:900px){.footer-grid{grid-template-columns:1fr 1fr}.footer-brand-column{grid-column:1/-1}}
-@media(max-width:560px){.footer-grid{grid-template-columns:1fr}.footer-brand-column{grid-column:auto}.modern-footer .footer-bottom{flex-direction:column;text-align:center}}
-
-
-.tool-status-badge{
-    position:absolute;top:14px;right:14px;z-index:3;
-    padding:.35rem .72rem;border-radius:999px;
-    background:rgba(8,13,35,.9);border:1px solid rgba(255,255,255,.11);
-    color:var(--text-muted);font-size:.7rem;font-weight:900;
-    backdrop-filter:blur(10px)
-}
-html[dir="ltr"] .tool-status-badge{right:auto;left:14px}
-html[dir="ltr"] .tool-link i{transform:rotate(180deg)}
-
-
-/* ===== WhatsApp tool branding ===== */
-.whatsapp-tool-card{
-    border-color:rgba(37,211,102,.18)!important;
-    background:
-      radial-gradient(circle at 50% 0%,rgba(37,211,102,.10),transparent 36%),
-      linear-gradient(150deg,rgba(30,37,75,.98),rgba(20,26,55,.98))!important;
-}
-.whatsapp-tool-card .tool-icon{
-    background:rgba(37,211,102,.13)!important;
-    color:#25D366!important;
-    box-shadow:0 14px 30px rgba(37,211,102,.12);
-}
-.whatsapp-tool-card .tool-icon i{font-size:2.05rem}
-.whatsapp-tool-card .tool-link{
-    color:#25D366!important;
-    border-color:rgba(37,211,102,.28)!important;
-    background:rgba(37,211,102,.07)!important;
-}
-.whatsapp-tool-card .tool-link:hover{
-    background:rgba(37,211,102,.14)!important;
-    box-shadow:0 10px 28px rgba(37,211,102,.12);
-}
-.whatsapp-banner{
-    position:absolute;
-    top:14px;
-    left:14px;
-    z-index:4;
-    display:inline-flex;
-    align-items:center;
-    gap:.4rem;
-    padding:.35rem .65rem;
-    border-radius:999px;
-    background:linear-gradient(135deg,#25D366,#128C7E);
-    color:#fff;
-    font-size:.68rem;
-    font-weight:900;
-    box-shadow:0 8px 22px rgba(37,211,102,.22);
-}
-html[dir="rtl"] .whatsapp-banner{left:14px;right:auto}
-html[dir="ltr"] .whatsapp-banner{left:auto;right:14px}
-.whatsapp-banner i{font-size:.88rem}
-
-
-/* ===== Embedded tool lock enforcement ===== */
-.tool-locked-panel{
-    min-height:360px;
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    justify-content:center;
-    text-align:center;
-    gap:.85rem;
-    padding:2rem;
-    background:linear-gradient(145deg,rgba(26,31,61,.9),rgba(14,19,43,.96));
-    border:1px solid rgba(255,255,255,.08);
-    border-radius:22px;
-    box-shadow:0 18px 50px rgba(0,0,0,.16)
-}
-.tool-locked-icon{
-    width:72px;height:72px;border-radius:20px;
-    display:flex;align-items:center;justify-content:center;
-    background:rgba(251,146,60,.1);
-    color:var(--warning);
-    font-size:1.8rem
-}
-.tool-locked-panel h3{font-size:1.35rem;color:#fff}
-.tool-locked-panel p{max-width:520px;color:var(--text-dim);line-height:1.8}
-.tool-locked-panel span{
-    padding:.35rem .75rem;border-radius:999px;
-    background:rgba(251,146,60,.1);
-    border:1px solid rgba(251,146,60,.2);
-    color:var(--warning);font-size:.75rem;font-weight:900
-}
-.quick-hub-card.quick-hub-disabled{
-    opacity:.5;
-    filter:grayscale(.35);
-    cursor:not-allowed;
-    pointer-events:auto
-}
-.quick-hub-card.quick-hub-disabled:hover{
-    transform:none;
-    border-color:rgba(255,255,255,.065);
-    box-shadow:none
-}
-.tool-card[data-status="maintenance"],
-.tool-card[data-status="disabled"],
-.tool-card[data-status="coming_soon"]{
-    cursor:not-allowed
-}
-
-
-/* ===== SITE ANNOUNCEMENT BANNER ===== */
-.site-announcement-banner{position:fixed;top:0;left:0;right:0;z-index:100000;padding:.55rem 4%;background:linear-gradient(90deg,#16304f,#0f766e);box-shadow:0 8px 28px rgba(0,0,0,.22)}
-.site-announcement-banner[data-type="urgent"]{background:linear-gradient(90deg,#991b1b,#dc2626)}
-.site-announcement-banner[data-type="important"]{background:linear-gradient(90deg,#92400e,#d97706)}
-.site-announcement-banner[data-type="event"]{background:linear-gradient(90deg,#5b21b6,#7c3aed)}
-.site-announcement-inner{max-width:1400px;margin:auto;display:flex;align-items:center;gap:.75rem;color:#fff}
-.site-announcement-icon{width:34px;height:34px;border-radius:10px;background:rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.site-announcement-copy{display:flex;align-items:center;gap:.55rem;min-width:0;flex:1}.site-announcement-copy strong{font-size:.86rem;white-space:nowrap}.site-announcement-copy span{font-size:.76rem;color:rgba(255,255,255,.8);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.site-announcement-inner>a{color:#fff;text-decoration:none;border:1px solid rgba(255,255,255,.25);border-radius:9px;padding:.4rem .7rem;font-size:.72rem;font-weight:900;white-space:nowrap}
-.site-announcement-inner>button{width:31px;height:31px;border-radius:9px;border:0;background:rgba(0,0,0,.15);color:#fff;cursor:pointer}
-body.has-site-announcement{padding-top:54px}body.has-site-announcement .navbar{top:54px}
-@media(max-width:768px){
-    .navbar{padding:.75rem 1rem}.logo-text{font-size:1rem}.logo-icon{width:39px;height:39px}.nav-actions{gap:.4rem}
-    #langToggleBtn{min-width:55px!important;padding:0 7px!important}.hero{padding:7.5rem 1rem 3rem;min-height:auto}.hero h1{font-size:2rem}.hero p{font-size:1rem}
-    .tools-section,.features-section,.bot-section,.calc-section,.contact-section{padding:4rem 1rem}
-    .tools-grid{grid-template-columns:1fr;gap:1rem}.tool-card{padding:1.5rem;min-height:auto}.tool-card:hover{transform:none}
-    .quick-hub{padding:1rem 1rem 3rem}.quick-hub-grid{grid-template-columns:1fr 1fr;gap:.7rem}.quick-hub-card{padding:.85rem}.quick-hub-icon{width:40px;height:40px}
-    .site-announcement-copy{display:block}.site-announcement-copy strong,.site-announcement-copy span{display:block;max-width:100%}.site-announcement-copy span{margin-top:.1rem}
-}
-@media(max-width:480px){
-    .quick-hub-grid{grid-template-columns:1fr}.site-announcement-inner>a{display:none}.site-announcement-banner{padding:.45rem .6rem}
-    body.has-site-announcement{padding-top:64px}body.has-site-announcement .navbar{top:64px}
-    .hero h1{font-size:1.72rem}.hero-buttons{width:100%}.stats-bar{grid-template-columns:1fr 1fr!important}
-}
-
-
-/* ===== UON HUB v3 HERO ===== */
-.hero{
-    position:relative;
-    min-height:680px;
-    padding-top:9rem;
-    background:
-      linear-gradient(90deg,rgba(5,10,27,.93) 0%,rgba(5,10,27,.72) 48%,rgba(5,10,27,.38) 100%),
-      linear-gradient(0deg,var(--dark) 0%,transparent 38%),
-      url('assets/uon-campus-hero.jpg') center/cover no-repeat;
-    overflow:hidden
-}
-.hero::before{
-    content:'';
-    position:absolute;inset:0;
-    background:
-      radial-gradient(circle at 72% 35%,rgba(0,212,255,.12),transparent 27%),
-      radial-gradient(circle at 18% 20%,rgba(34,197,94,.08),transparent 23%);
-    pointer-events:none
-}
-.hero-content{position:relative;z-index:2}
-.hero-campus-label{
-    display:inline-flex;align-items:center;gap:.55rem;
-    margin-top:1.2rem;padding:.55rem .8rem;border-radius:12px;
-    background:rgba(7,19,38,.72);border:1px solid rgba(255,255,255,.12);
-    color:#fff;font-size:.78rem;font-weight:800;backdrop-filter:blur(12px)
-}
-.hero-campus-label i{color:var(--primary)}
-.home-rating-card{
-    background:linear-gradient(145deg,rgba(30,37,75,.98),rgba(20,26,55,.98));
-    border:1px solid rgba(250,204,21,.16);
-}
-.home-rating-card .tool-icon{background:rgba(250,204,21,.1)!important;color:#facc15!important}
-.home-rating-card .tool-link{color:#facc15!important;border-color:rgba(250,204,21,.22)!important;background:rgba(250,204,21,.06)!important}
-@media(max-width:768px){
-    .hero{min-height:610px;padding-top:7.8rem;background-position:62% center}
-}
-
 </style>
 <link rel="stylesheet" href="brand.css">
 </head>
 <body>
 <a class="skip-link" href="#tools">تجاوز إلى الأدوات</a>
-
-<div id="siteAnnouncementBanner" class="site-announcement-banner" hidden>
-    <div class="site-announcement-inner">
-        <div class="site-announcement-icon"><i class="fas fa-bullhorn"></i></div>
-        <div class="site-announcement-copy">
-            <strong id="siteAnnouncementTitle"></strong>
-            <span id="siteAnnouncementBody"></span>
-        </div>
-        <a id="siteAnnouncementAction" href="#" hidden></a>
-        <button id="siteAnnouncementClose" aria-label="إغلاق الإعلان"><i class="fas fa-times"></i></button>
-    </div>
-</div>
-
 <div id="offlineBanner" class="offline-banner">أنت غير متصل — بعض البيانات قد لا تتحدث الآن</div>
 
 <!-- Loading -->
@@ -605,32 +380,19 @@ body.has-site-announcement{padding-top:54px}body.has-site-announcement .navbar{t
 <!-- Navbar -->
 <nav class="navbar" id="navbar">
     <a href="javascript:void(0)" class="logo">
-        <div class="logo-icon" aria-label="UON Hub">U1</div>
+        <div class="logo-icon">UH</div>
         <div class="logo-text hub-brand-mark">UON <span>Hub</span></div>
     </a>
     <ul class="nav-links">
-        <li><a href="#home" data-i18n="nav.home">الرئيسية</a></li>
-        <li><a href="#tools" data-i18n="nav.tools">الأدوات</a></li>
+        <li><a href="#home">الرئيسية</a></li>
+        <li><a href="#tools">الأدوات</a></li>
         
         
-        <li><a href="#botSection" data-i18n="nav.ai">المساعد AI</a></li>
-        <li><a href="marketplace.html" data-i18n="nav.market">السوق</a></li>
-        <li><a href="#features" data-i18n="nav.about">عن المنصة</a></li>
-        <li><a href="ratings.html">التقييمات</a></li>
-        <li><a href="#contact" data-i18n="nav.contact">التواصل</a></li>
-        <li><a href="features.html" target="_blank" data-i18n="nav.features" style="color:var(--warning)!important;">🔥 الميزات</a></li>
+        <li><a href="#botSection">المساعد AI</a></li>
+        <li><a href="#contact">التواصل</a></li>
+        <li><a href="features.html" target="_blank" style="color:var(--warning)!important;">🔥 الميزات</a></li>
     </ul>
     <div class="nav-actions">
-
-        <button id="langToggleBtn" type="button" onclick="toggleUONHubLanguage()"
-            style="min-width:68px;height:36px;padding:0 10px;background:rgba(255,255,255,.05);
-            border:1px solid rgba(255,255,255,.1);border-radius:10px;color:var(--text-muted);
-            cursor:pointer;font-family:'Tajawal',sans-serif;font-weight:800;font-size:.78rem;
-            display:flex;align-items:center;justify-content:center;gap:6px;transition:.2s;"
-            title="تغيير اللغة">
-            <i class="fas fa-globe"></i><span>EN</span>
-        </button>
-
         
         <button onclick="openGlobalSearch()" style="width:36px;height:36px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:10px;color:var(--text-muted);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .3s;" title="بحث"><i class="fas fa-search"></i></button>
     </div>
@@ -653,15 +415,15 @@ body.has-site-announcement{padding-top:54px}body.has-site-announcement .navbar{t
         <div class="circle circle-3"></div>
     </div>
     <div class="hero-content">
-        <div class="hero-badge"><i class="fas fa-sparkles"></i><span data-i18n="hero.badge">UON Hub — منصة طلاب جامعة نزوى</span></div>
-        <h1 id="heroTitle" data-i18n-html="hero.title">منصتك الشاملة<br>للحياة الأكاديمية</h1>
-        <p id="heroDesc" data-i18n="hero.description">أدوات ذكية، ملخصات، جداول دراسية، وكل ما تحتاجه للنجاح</p>
-        <p class="sub" data-i18n="hero.sub">كل أدواتك الجامعية المهمة في مكان واحد</p>
+        <div class="hero-badge"><i class="fas fa-sparkles"></i> UON Hub — منصة طلاب جامعة نزوى</div>
+        <h1 id="heroTitle">منصتك الشاملة<br>للحياة الأكاديمية</h1>
+        <p id="heroDesc">أدوات ذكية، ملخصات، جداول دراسية، وكل ما تحتاجه للنجاح</p>
+        <p class="sub">كل أدواتك الجامعية المهمة في مكان واحد</p>
         <div class="hero-buttons">
-            <button class="btn-primary" onclick="scrollToSection('tools')"><i class="fas fa-rocket"></i><span data-i18n="hero.explore">استكشف الأدوات</span></button>
-            <button class="btn-secondary" onclick="scrollToSection('features')"><i class="fas fa-users"></i><span data-i18n="hero.community">انضم للمجتمع</span></button>
+            <button class="btn-primary" onclick="scrollToSection('tools')"><i class="fas fa-rocket"></i> استكشف الأدوات</button>
+            <button class="btn-secondary" onclick="scrollToSection('features')"><i class="fas fa-users"></i> انضم للمجتمع</button>
         </div>
-        <div class="hero-trust"><span data-i18n="hero.free">✓ مجاني بالكامل</span><span data-i18n="hero.built">✓ مصمم لطلاب نزوى</span><span data-i18n="hero.mobile">✓ يعمل على الجوال</span></div>
+        <div class="hero-trust"><span>✓ مجاني بالكامل</span><span>✓ مصمم لطلاب نزوى</span><span>✓ يعمل على الجوال</span></div>
     </div>
 </section>
 
@@ -674,23 +436,23 @@ body.has-site-announcement{padding-top:54px}body.has-site-announcement .navbar{t
 <!-- Quick Hub -->
 <section class="quick-hub" aria-label="وصول سريع">
     <div class="section-header reveal" style="margin-bottom:2rem">
-        <span class="section-kicker"><i class="fas fa-bolt"></i><span data-i18n="quick.kicker">وصول سريع</span></span>
-        <h2 style="font-size:2rem" data-i18n="quick.title">ابدأ من هنا</h2>
-        <p data-i18n="quick.description">أكثر الخدمات استخدامًا بدون دوران</p>
+        <span class="section-kicker"><i class="fas fa-bolt"></i> وصول سريع</span>
+        <h2 style="font-size:2rem">ابدأ من هنا</h2>
+        <p>أكثر الخدمات استخدامًا بدون دوران</p>
     </div>
     <div class="quick-hub-grid">
-        <a class="quick-hub-card" href="#calcSection"><span class="quick-hub-icon"><i class="fas fa-calculator"></i></span><span><strong data-i18n="quick.gpa_title">حاسبة المعدل</strong><small data-i18n="quick.gpa_desc">فصلي وتراكمي ومواد معادة</small></span></a>
-        <a class="quick-hub-card" href="schedule.html"><span class="quick-hub-icon"><i class="fas fa-calendar-alt"></i></span><span><strong data-i18n="quick.schedule_title">الجدول الدراسي</strong><small data-i18n="quick.schedule_desc">رتب أسبوعك واطبعه</small></span></a>
-        <a class="quick-hub-card" href="summaries.html"><span class="quick-hub-icon"><i class="fas fa-book-open"></i></span><span><strong data-i18n="quick.summaries_title">مكتبة الملخصات</strong><small data-i18n="quick.summaries_desc">مواد وملفات طلابية</small></span></a>
-        <a class="quick-hub-card" href="groups.html"><span class="quick-hub-icon"><i class="fab fa-whatsapp"></i></span><span><strong data-i18n="quick.groups_title">مجموعات المواد</strong><small data-i18n="quick.groups_desc">ابحث عن مجموعة مادتك</small></span></a>
+        <a class="quick-hub-card" href="#calcSection"><span class="quick-hub-icon"><i class="fas fa-calculator"></i></span><span><strong>حاسبة المعدل</strong><small>فصلي وتراكمي ومواد معادة</small></span></a>
+        <a class="quick-hub-card" href="schedule.html"><span class="quick-hub-icon"><i class="fas fa-calendar-alt"></i></span><span><strong>الجدول الدراسي</strong><small>رتب أسبوعك واطبعه</small></span></a>
+        <a class="quick-hub-card" href="summaries.html"><span class="quick-hub-icon"><i class="fas fa-book-open"></i></span><span><strong>مكتبة الملخصات</strong><small>مواد وملفات طلابية</small></span></a>
+        <a class="quick-hub-card" href="groups.html"><span class="quick-hub-icon"><i class="fab fa-whatsapp"></i></span><span><strong>مجموعات المواد</strong><small>ابحث عن مجموعة مادتك</small></span></a>
     </div>
 </section>
 
 <!-- Tools -->
 <section class="tools-section" id="tools">
     <div class="section-header reveal">
-        <h2 data-i18n="sections.tools_title">الأدوات المتاحة</h2>
-        <p data-i18n="sections.tools_desc">مجموعة شاملة من الأدوات المصممة خصيصًا لتلبية احتياجاتك الأكاديمية في جامعة نزوى</p>
+        <h2>الأدوات المتاحة</h2>
+        <p>مجموعة شاملة من الأدوات المصممة خصيصاً لتلبية احتياجاتك الأكاديمية في جامعة نزوى</p>
     </div>
     <div class="tools-grid" id="toolsGrid">
         <div style="grid-column:1/-1;text-align:center;padding:3rem;color:var(--text-dim);">
@@ -707,19 +469,19 @@ body.has-site-announcement{padding-top:54px}body.has-site-announcement .navbar{t
 <!-- Features -->
 <section class="features-section" id="features">
     <div class="section-header reveal">
-        <h2 data-i18n="sections.features_title">لماذا UON Hub؟</h2>
-        <p data-i18n="sections.features_desc">تجربة طلابية مصممة خصيصًا لطلاب جامعة نزوى</p>
+        <h2>لماذا منصة جامعة نزوى؟</h2>
+        <p>نحن نقدم تجربة فريدة مصممة خصيصاً لطلاب جامعة نزوى</p>
     </div>
     <div class="features-grid">
-        <div class="feature-item reveal"><div class="feature-icon"><i class="fas fa-bolt"></i></div><h3 data-i18n="sections.fast_title">سريع ومجاني</h3><p data-i18n="sections.fast_desc">جميع الأدوات متاحة بدون تكلفة أو اشتراكات مخفية</p></div>
-        <div class="feature-item reveal"><div class="feature-icon"><i class="fas fa-shield-alt"></i></div><h3 data-i18n="sections.safe_title">آمن وموثوق</h3><p data-i18n="sections.safe_desc">محتوى طلابي مع مراجعة وإدارة واضحة</p></div>
-        <div class="feature-item reveal"><div class="feature-icon"><i class="fas fa-mobile-alt"></i></div><h3 data-i18n="sections.responsive_title">متجاوب تمامًا</h3><p data-i18n="sections.responsive_desc">تصميم يعمل على الجوال والتابلت وسطح المكتب</p></div>
+        <div class="feature-item reveal"><div class="feature-icon"><i class="fas fa-bolt"></i></div><h3>سريع ومجاني</h3><p>جميع الأدوات متاحة بالكامل بدون أي تكلفة أو اشتراكات مخفية</p></div>
+        <div class="feature-item reveal"><div class="feature-icon"><i class="fas fa-shield-alt"></i></div><h3>آمن وموثوق</h3><p>محتوى مراجع وموثق من طلاب جامعة نزوى مع نظام تقييم ذكي</p></div>
+        <div class="feature-item reveal"><div class="feature-icon"><i class="fas fa-mobile-alt"></i></div><h3>متجاوب تماماً</h3><p>تصميم يتكيف مع جميع الأجهزة من الجوال إلى سطح المكتب</p></div>
     </div>
 </section>
 
 <!-- BOT -->
 <section class="bot-section" id="botSection">
-    <div class="section-header reveal"><h2 data-i18n="sections.ai_title">المساعد الذكي 🤖</h2><p data-i18n="sections.ai_desc">اسألني عن أي شيء يخص جامعة نزوى</p></div>
+    <div class="section-header reveal"><h2>المساعد الذكي 🤖</h2><p>اسألني عن أي شيء يخص جامعة نزوى</p></div>
     <div style="background:var(--dark-light);border:1px solid rgba(255,255,255,0.08);border-radius:20px;overflow:hidden;">
         <div style="background:rgba(0,212,255,0.08);border-bottom:1px solid rgba(0,212,255,0.1);padding:16px 20px;display:flex;align-items:center;gap:12px;">
             <div style="width:38px;height:38px;background:linear-gradient(135deg,#00d4ff,#0099cc);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;">◆</div>
@@ -743,8 +505,8 @@ body.has-site-announcement{padding-top:54px}body.has-site-announcement .navbar{t
 <!-- Calculator -->
 <section class="calc-section" id="calcSection">
     <div class="section-header reveal">
-        <h2 data-i18n="sections.gpa_title">حاسبة المعدل التراكمي 📊</h2>
-        <p data-i18n="sections.gpa_desc">احسب معدل الفصل والمعدل التراكمي المتوقع مع دعم المواد المعادة</p>
+        <h2>حاسبة المعدل التراكمي 📊</h2>
+        <p>احسب معدل الفصل والمعدل التراكمي المتوقع مع دعم المواد المعادة</p>
     </div>
 
     <div class="gpa-card">
@@ -796,7 +558,7 @@ body.has-site-announcement{padding-top:54px}body.has-site-announcement .navbar{t
 
 <!-- Contact -->
 <section class="contact-section" id="contact">
-    <div class="section-header reveal"><h2 data-i18n="sections.contacts_title">أرقام جامعة نزوى 📞</h2><p data-i18n="sections.contacts_desc">اضغط على الرقم للاتصال مباشرة</p></div>
+    <div class="section-header reveal"><h2>أرقام جامعة نزوى 📞</h2><p>اضغط على الرقم للاتصال مباشرة</p></div>
     <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;">
         <div style="background:var(--dark-light);border:1px solid rgba(255,255,255,0.05);border-radius:14px;padding:20px;display:flex;align-items:center;gap:14px;transition:all .3s;" onmouseover="this.style.borderColor='rgba(0,212,255,0.3)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.05)'"><div style="width:44px;height:44px;background:rgba(0,212,255,0.1);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;">🏦</div><div><div style="font-size:12px;color:var(--text-dim);margin-bottom:4px;">حساب البنك</div><span style="font-family:monospace;font-size:13px;color:#00d4ff;">0317008949900017</span></div></div>
         <div style="background:var(--dark-light);border:1px solid rgba(255,255,255,0.05);border-radius:14px;padding:20px;display:flex;align-items:center;gap:14px;transition:all .3s;" onmouseover="this.style.borderColor='rgba(0,212,255,0.3)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.05)'"><div style="width:44px;height:44px;background:rgba(0,212,255,0.1);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;">💰</div><div><div style="font-size:12px;color:var(--text-dim);margin-bottom:4px;">المالية</div><a href="tel:92596648" style="font-family:monospace;font-size:14px;color:#00d4ff;text-decoration:none;">92596648</a></div></div>
@@ -805,7 +567,7 @@ body.has-site-announcement{padding-top:54px}body.has-site-announcement .navbar{t
         <div style="background:var(--dark-light);border:1px solid rgba(255,255,255,0.05);border-radius:14px;padding:20px;display:flex;align-items:center;gap:14px;transition:all .3s;" onmouseover="this.style.borderColor='rgba(0,212,255,0.3)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.05)'"><div style="width:44px;height:44px;background:rgba(0,212,255,0.1);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;">🤝</div><div><div style="font-size:12px;color:var(--text-dim);margin-bottom:4px;">الرعاية الاجتماعية 2</div><a href="tel:25446247" style="font-family:monospace;font-size:14px;color:#00d4ff;text-decoration:none;">25446247</a></div></div>
     </div>
     <div style="margin-top:32px;">
-        <div class="section-header reveal" style="margin-bottom:24px;"><h2 data-i18n="sections.links_title">روابط سريعة 🔗</h2></div>
+        <div class="section-header reveal" style="margin-bottom:24px;"><h2>روابط سريعة 🔗</h2></div>
         <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px;">
             <a href="https://portal.unizwa.edu.om" target="_blank" style="background:var(--dark-light);border:1px solid rgba(255,255,255,0.05);border-radius:14px;padding:18px;text-decoration:none;display:flex;align-items:center;gap:12px;transition:all .3s;" onmouseover="this.style.borderColor='rgba(0,212,255,0.3)';this.style.transform='translateX(-4px)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.05)';this.style.transform=''"><span style="font-size:24px;">🎓</span><div><div style="font-size:13px;font-weight:700;color:white;">البوابة الطلابية</div><div style="font-size:11px;color:var(--text-dim);">portal.unizwa.edu.om</div></div></a>
             <a href="https://moodle.unizwa.edu.om/login/index.php" target="_blank" style="background:var(--dark-light);border:1px solid rgba(255,255,255,0.05);border-radius:14px;padding:18px;text-decoration:none;display:flex;align-items:center;gap:12px;transition:all .3s;" onmouseover="this.style.borderColor='rgba(0,212,255,0.3)';this.style.transform='translateX(-4px)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.05)';this.style.transform=''"><span style="font-size:24px;">📚</span><div><div style="font-size:13px;font-weight:700;color:white;">Moodle</div><div style="font-size:11px;color:var(--text-dim);">moodle.unizwa.edu.om</div></div></a>
@@ -817,41 +579,17 @@ body.has-site-announcement{padding-top:54px}body.has-site-announcement .navbar{t
 </section>
 
 <!-- Footer -->
-<footer class="footer modern-footer">
-    <div class="footer-grid">
-        <div class="footer-brand-column">
-            <div class="footer-logo"><span class="footer-logo-icon">U1</span> UON <span>Hub</span></div>
-            <p class="footer-tagline" data-i18n="footer.tagline">كل ما يحتاجه طالب جامعة نزوى في مكان واحد.</p>
-            <div class="social-links">
-                <a href="https://instagram.com/uonhub" target="_blank" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
-                <a href="https://wa.me/96877144942" target="_blank" aria-label="WhatsApp"><i class="fab fa-whatsapp"></i></a>
-            </div>
-        </div>
-        <div class="footer-column">
-            <h3 data-i18n="footer.quick">روابط سريعة</h3>
-            <a href="#tools" data-i18n="nav_tools">الأدوات</a>
-            <a href="marketplace.html" data-i18n="nav_market">السوق</a>
-            <a href="summaries.html" data-i18n="footer.summaries">الملخصات</a>
-            <a href="university-guide.html" data-i18n="footer.guide">دليل الجامعة</a>
-        </div>
-        <div class="footer-column">
-            <h3 data-i18n="footer.university">الجامعة</h3>
-            <a href="https://www.unizwa.edu.om" target="_blank" data-i18n="footer.official">الموقع الرسمي</a>
-            <a href="https://portal.unizwa.edu.om" target="_blank" data-i18n="footer.portal">البوابة الطلابية</a>
-            <a href="https://moodle.unizwa.edu.om/login/index.php" target="_blank">Moodle</a>
-            <a href="#contact" data-i18n="nav_contact">التواصل</a>
-        </div>
-        <div class="footer-column">
-            <h3 data-i18n="footer.platform">المنصة</h3>
-            <a href="#features" data-i18n="nav_about">عن المنصة</a>
-            <a href="#" data-i18n="footer.privacy">الخصوصية</a>
-            <a href="#" data-i18n="footer.terms">الشروط</a>
-            <span class="footer-version">UON Hub v2.1</span>
-        </div>
+<footer class="footer">
+    <div class="footer-logo">UoN <span style="color:var(--primary)">Coffee</span></div>
+    <p class="footer-tagline">كل ما يحتاجه طالب جامعة نزوى في مكان واحد.</p>
+    <div class="social-links">
+        <a href="https://instagram.com/uonhub" target="_blank"><i class="fab fa-instagram"></i></a>
+        <a href="https://wa.me/96877144942" target="_blank"><i class="fab fa-whatsapp"></i></a>
+        <a href="features.html" target="_blank"><i class="fas fa-map-marked-alt"></i></a>
     </div>
     <div class="footer-bottom">
-        <p>© 2026 UON Hub — <span data-i18n="footer.rights">جميع الحقوق محفوظة</span></p>
-        <p><span data-i18n="footer.made">صنع بحب لطلاب جامعة نزوى</span> <span class="heart">❤️</span></p>
+        <p>© 2026 جامعة نزوى - جميع الحقوق محفوظة</p>
+        <p style="margin-top:0.5rem;">صنع بحب <span class="heart">❤️</span> من طلاب جامعة نزوى</p>
     </div>
 </footer>
 
@@ -953,45 +691,6 @@ const supabase = (function() {
     return { from: buildQuery }
 })()
 
-
-// ===== SITE ANNOUNCEMENT BANNER =====
-async function loadSiteAnnouncementBanner() {
-    const banner = document.getElementById('siteAnnouncementBanner')
-    if (!banner) return
-    try {
-        const now = new Date().toISOString()
-        const { data, error } = await supabase.from('site_announcements').select('*').eq('active', true).order('priority', { ascending:false }).order('created_at', { ascending:false }).limit(10)
-        if (error) throw error
-        const dismissed = JSON.parse(sessionStorage.getItem('uonhub_dismissed_announcements') || '[]')
-        const row = (data || []).find(r => (!r.expires_at || new Date(r.expires_at) > new Date()) && !dismissed.includes(String(r.id)))
-        if (!row) {
-            banner.hidden = true
-            document.body.classList.remove('has-site-announcement')
-            return
-        }
-        banner.dataset.type = row.type || 'normal'
-        document.getElementById('siteAnnouncementTitle').textContent = row.title || ''
-        document.getElementById('siteAnnouncementBody').textContent = row.body || ''
-        const action = document.getElementById('siteAnnouncementAction')
-        if (row.button_url) {
-            action.hidden = false
-            action.textContent = row.button_text || 'اعرف التفاصيل'
-            action.href = row.button_url
-        } else action.hidden = true
-        banner.hidden = false
-        document.body.classList.add('has-site-announcement')
-        document.getElementById('siteAnnouncementClose').onclick = () => {
-            const values = JSON.parse(sessionStorage.getItem('uonhub_dismissed_announcements') || '[]')
-            values.push(String(row.id))
-            sessionStorage.setItem('uonhub_dismissed_announcements', JSON.stringify(values))
-            banner.hidden = true
-            document.body.classList.remove('has-site-announcement')
-        }
-    } catch(e) {
-        console.warn('Announcement banner:', e.message || e)
-    }
-}
-
 // ===== VARIABLES =====
 let tools = []
 let botHistory = []
@@ -1082,7 +781,6 @@ window.addEventListener('DOMContentLoaded', () => {
 
     // تحميل الأدوات فوراً من القيم الافتراضية
     loadTools()
-    loadSiteAnnouncementBanner()
 
     // باقي التهيئة
     updateUI()
@@ -1102,231 +800,50 @@ window.addEventListener('DOMContentLoaded', () => {
 })
 
 // ===== RENDER TOOLS =====
-const preferredToolOrder = [
-    'مساعد AI ذكي','حاسبة المعدل','سوق الطلاب','مكتبة الملخصات',
-    'الجدول الدراسي','مجموعات المواد','اعترافات الطلاب',
-    'دليل الجامعة الرسمي','مكتبة الأدوات','مشاريع الطلاب','دليل المطاعم'
-]
-
-function sortToolsForHome(items) {
-    return [...items].sort((a,b) => {
-        const ai = preferredToolOrder.indexOf(a.title)
-        const bi = preferredToolOrder.indexOf(b.title)
-        return (ai === -1 ? 999 : ai) - (bi === -1 ? 999 : bi)
-    })
-}
-
-
-function normalizeToolStatus(value) {
-    const raw = String(value ?? 'active').trim().toLowerCase()
-    const aliases = {
-        active: 'active',
-        enabled: 'active',
-        on: 'active',
-        true: 'active',
-        تشغيل: 'active',
-        شغال: 'active',
-
-        disabled: 'disabled',
-        inactive: 'disabled',
-        off: 'disabled',
-        false: 'disabled',
-        إيقاف: 'disabled',
-        متوقف: 'disabled',
-
-        maintenance: 'maintenance',
-        صيانة: 'maintenance',
-        تحت_الصيانة: 'maintenance',
-        'تحت الصيانة': 'maintenance',
-
-        coming_soon: 'coming_soon',
-        comingsoon: 'coming_soon',
-        soon: 'coming_soon',
-        قريباً: 'coming_soon',
-        قريبًا: 'coming_soon'
-    }
-    return aliases[raw] || (raw === 'active' ? 'active' : 'disabled')
-}
-
-function getToolById(id) {
-    return tools.find(t => Number(t.id) === Number(id))
-}
-
-function isToolActive(id) {
-    const tool = getToolById(id)
-    return !tool || normalizeToolStatus(tool.status) === 'active'
-}
-
-function getInactiveMessage(tool) {
-    const status = normalizeToolStatus(tool?.status)
-    const locale = window.UON_I18N
-    const fallback = {
-        disabled: 'هذه الأداة موقوفة حالياً',
-        coming_soon: 'هذه الأداة قادمة قريباً 🔜',
-        maintenance: 'هذه الأداة تحت الصيانة حالياً 🛠️'
-    }
-    return locale?.t(`tool_messages.${status}`, fallback[status] || 'الأداة غير متاحة حالياً')
-        || fallback[status]
-        || 'الأداة غير متاحة حالياً'
-}
-
-function buildLockedSection(tool, originalSection) {
-    const title = window.UON_I18N?.t(`tools.${tool.id}.title`, tool.title) || tool.title
-    const status = normalizeToolStatus(tool.status)
-    const statusLabel = window.UON_I18N?.t(`tool_status.${status}`, 'غير متاحة') || 'غير متاحة'
-
-    const wrapper = document.createElement('div')
-    wrapper.className = 'tool-locked-panel'
-    wrapper.innerHTML = `
-        <div class="tool-locked-icon"><i class="fas ${status === 'maintenance' ? 'fa-tools' : 'fa-lock'}"></i></div>
-        <h3>${title}</h3>
-        <p>${getInactiveMessage(tool)}</p>
-        <span>${statusLabel}</span>
-    `
-    return wrapper
-}
-
-function syncEmbeddedToolSections() {
-    const sectionMap = {
-        1: 'botSection',
-        2: 'calcSection'
-    }
-
-    Object.entries(sectionMap).forEach(([toolId, sectionId]) => {
-        const section = document.getElementById(sectionId)
-        const tool = getToolById(toolId)
-        if (!section || !tool) return
-
-        const active = normalizeToolStatus(tool.status) === 'active'
-        section.dataset.toolStatus = normalizeToolStatus(tool.status)
-
-        let locked = section.querySelector(':scope > .tool-locked-panel')
-        let original = section.querySelector(':scope > .embedded-tool-content')
-
-        if (!original) {
-            original = document.createElement('div')
-            original.className = 'embedded-tool-content'
-            while (section.firstChild) original.appendChild(section.firstChild)
-            section.appendChild(original)
-        }
-
-        if (active) {
-            original.hidden = false
-            if (locked) locked.remove()
-        } else {
-            original.hidden = true
-            if (locked) locked.remove()
-            section.appendChild(buildLockedSection(tool, section))
-        }
-    })
-
-    const quickMap = {
-        2: 'a[href="#calcSection"]',
-        9: 'a[href="schedule.html"]',
-        5: 'a[href="summaries.html"]',
-        10: 'a[href="groups.html"]'
-    }
-
-    Object.entries(quickMap).forEach(([toolId, selector]) => {
-        const link = document.querySelector(selector)
-        const tool = getToolById(toolId)
-        if (!link || !tool) return
-
-        const active = normalizeToolStatus(tool.status) === 'active'
-        link.classList.toggle('quick-hub-disabled', !active)
-        link.setAttribute('aria-disabled', active ? 'false' : 'true')
-
-        if (!link.dataset.originalHref) link.dataset.originalHref = link.getAttribute('href') || '#'
-        link.setAttribute('href', active ? link.dataset.originalHref : '#')
-
-        link.onclick = active ? null : function(event) {
-            event.preventDefault()
-            showToast(getInactiveMessage(tool))
-            return false
-        }
-    })
-}
-
 function renderTools() {
     const grid = document.getElementById('toolsGrid')
     if (!tools.length) {
-        grid.innerHTML = '<div class="status-message">لا توجد أدوات بعد</div>'
+        grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:3rem;color:var(--text-dim);">لا توجد أدوات بعد</div>'
         return
     }
-
-    const locale = window.UON_I18N
-    const orderedTools = sortToolsForHome(tools)
-
-    grid.innerHTML = orderedTools.map(tool => {
-        const normalizedStatus = normalizeToolStatus(tool.status)
-        const inactive = normalizedStatus !== 'active'
-        const title = locale?.t(`tools.${tool.id}.title`, tool.title) || tool.title
-        const description = locale?.t(`tools.${tool.id}.description`, tool.desc) || tool.desc
-        const activeButton = locale?.t(`tools.${tool.id}.button`, tool.btnText) || tool.btnText
-        const statusText = locale?.t(`tool_status.${normalizedStatus}`, 'غير متاحة') || 'غير متاحة'
-        const buttonText = inactive ? statusText : activeButton
-
-        const statusBadge = inactive
-            ? `<span class="tool-status-badge">${statusText}</span>`
-            : ''
-
+    const labels = { disabled:'غير متاحة', coming_soon:'Coming Soon', maintenance:'صيانة' }
+    grid.innerHTML = tools.map(tool => {
+        const inactive = tool.status !== 'active'
+        const statusBadge = inactive ? `<span style="position:absolute;top:12px;right:12px;padding:.35rem .65rem;border-radius:999px;background:rgba(10,14,39,.88);border:1px solid rgba(255,255,255,.12);font-size:.72rem;font-weight:900;z-index:3;">${labels[tool.status] || 'غير متاحة'}</span>` : ''
         return `
-        <article class="tool-card ${String(tool.id) === '10' ? 'whatsapp-tool-card' : ''}" data-id="${tool.id}" data-status="${normalizedStatus}"
-            style="--card-color:${String(tool.id) === '10' ? '#25D366' : tool.color};position:relative;${inactive ? 'opacity:.58;filter:grayscale(.25);' : ''}">
+        <div class="tool-card" data-id="${tool.id}" data-status="${tool.status}" style="--card-color:${tool.color};position:relative;${inactive?'opacity:.58;filter:grayscale(.25);':''}">
             ${statusBadge}
-            ${String(tool.id) === '10' ? `
-                <div class="whatsapp-banner">
-                    <i class="fab fa-whatsapp"></i>
-                    <span>${locale?.t('tools.10.banner', 'WhatsApp')}</span>
-                </div>` : ''}
-            <div class="tool-icon" style="background:${tool.color}20;color:${tool.color};">
-                <i class="${String(tool.id) === '10' ? 'fab fa-whatsapp' : 'fas ' + tool.icon}"></i>
-            </div>
-            <h3>${title}</h3>
-            <p>${description}</p>
-            <button class="tool-link" style="color:${tool.color};" onclick="openTool(${tool.id})">
-                ${buttonText} <i class="fas ${inactive ? 'fa-lock' : 'fa-arrow-left'}"></i>
-            </button>
-        </article>`
+            <div class="tool-icon" style="background:${tool.color}20;color:${tool.color};"><i class="fas ${tool.icon}"></i></div>
+            <h3>${tool.title}</h3>
+            <p>${tool.desc}</p>
+            <button class="tool-link" style="color:${tool.color};" onclick="openTool(${tool.id})">${inactive ? (labels[tool.status] || 'غير متاحة') : tool.btnText} <i class="fas ${inactive?'fa-lock':'fa-arrow-left'}"></i></button>
+        </div>`
     }).join('')
-
-    grid.insertAdjacentHTML('beforeend', `
-        <article class="tool-card home-rating-card" data-id="ratings" data-status="active" style="--card-color:#facc15;position:relative;">
-            <div class="tool-icon"><i class="fas fa-star-half-stroke"></i></div>
-            <h3>تقييم المواد والدكاترة</h3>
-            <p>اطّلع على تجارب الطلاب وأرسل تقييمك بشكل مجهول بعد مراجعة المشرف.</p>
-            <button class="tool-link" onclick="window.location.href='ratings.html'">
-                افتح التقييمات <i class="fas fa-arrow-left"></i>
-            </button>
-        </article>
-`)
-    syncEmbeddedToolSections()
 }
 
-window.addEventListener('uonhub:languagechange', () => renderTools())
-
 window.openTool = function(id) {
-    const tool = getToolById(id)
-
-    if (tool && normalizeToolStatus(tool.status) !== 'active') {
-        showToast(getInactiveMessage(tool))
+    const tool = tools.find(t => Number(t.id) === Number(id))
+    if (tool && tool.status !== 'active') {
+        const messages = {
+            disabled:'هذه الأداة موقوفة حالياً',
+            coming_soon:'هذه الأداة قادمة قريباً 🔜',
+            maintenance:'هذه الأداة تحت الصيانة حالياً 🛠️'
+        }
+        showToast(messages[tool.status] || 'الأداة غير متاحة حالياً')
         return
     }
-
     const actions = {
-        1: () => document.getElementById('botSection')?.scrollIntoView({behavior:'smooth'}),
-        2: () => document.getElementById('calcSection')?.scrollIntoView({behavior:'smooth'}),
+        1: () => document.getElementById('botSection').scrollIntoView({behavior:'smooth'}),
+        2: () => document.getElementById('calcSection').scrollIntoView({behavior:'smooth'}),
         4: () => window.location.href = 'features.html#conf',
         5: () => window.location.href = 'summaries.html',
         6: () => window.location.href = 'features.html#rest',
         7: () => window.location.href = 'tools.html',
-        8: () => window.location.href = 'projects.html',
         9: () => window.location.href = 'schedule.html',
         10: () => window.location.href = 'groups.html',
         11: () => window.location.href = 'marketplace.html',
-        12: () => window.location.href = 'university-guide.html'
+        12: () => window.location.href = 'university-guide.html',
     }
-
     if (actions[id]) actions[id]()
     else showToast('قريباً! 🔜')
 }
@@ -1509,7 +1026,13 @@ function initCounters() {
     document.querySelectorAll('.stat-number').forEach(c => obs.observe(c))
 }
 function initParallax() {
-    // Disabled for stability and better performance on low-power devices.
+    document.addEventListener('mousemove', e => {
+        const x = e.clientX/window.innerWidth, y = e.clientY/window.innerHeight
+        document.querySelectorAll('.hero-bg .circle').forEach((c,i) => {
+            const speed = (i+1)*20
+            c.style.transform = `translate(${x*speed}px,${y*speed}px)`
+        })
+    })
 }
 window.addEventListener('scroll', () => document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 50))
 window.scrollToSection = function(id) { document.getElementById(id)?.scrollIntoView({behavior:'smooth'}) }
@@ -1607,16 +1130,9 @@ window.addEventListener('unhandledrejection', function(e){ console.error('UON Hu
 
 // ===== PWA =====
 if ('serviceWorker' in navigator) {
-    window.addEventListener('load', async () => {
-        try {
-            const registrations = await navigator.serviceWorker.getRegistrations()
-            await Promise.all(registrations.map(registration => registration.unregister()))
-            const cacheKeys = await caches.keys()
-            await Promise.all(cacheKeys.map(key => caches.delete(key)))
-        } catch (error) {
-            console.warn('Cache cleanup:', error)
-        }
-    }, { once: true })
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js').catch(err => console.warn('Service worker:', err))
+    })
 }
 
 let deferredInstall = null
@@ -1638,30 +1154,6 @@ window.addEventListener('beforeinstallprompt', e => {
     setTimeout(() => btn?.remove(), 30000)
 })
 </script>
-
-<script>
-(function () {
-    function removeLoading() {
-        var overlay = document.getElementById('loadingOverlay');
-        if (!overlay) return;
-        overlay.classList.add('hidden');
-        setTimeout(function () {
-            overlay.style.display = 'none';
-        }, 450);
-    }
-
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', removeLoading, { once: true });
-    } else {
-        removeLoading();
-    }
-
-    // Absolute fallback: never leave visitors trapped on the spinner.
-    setTimeout(removeLoading, 1200);
-})();
-</script>
-
-
-<script src="language.js"></script>
+<script src="language.js" defer></script>
 </body>
 </html>
