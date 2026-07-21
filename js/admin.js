@@ -6,7 +6,9 @@ const defs={
  summaries:{table:'summaries',filter:'approved=eq.false',title:'الملخصات'},
  groups:{table:'whatsapp_groups',filter:'approved=eq.false',title:'المجموعات'},
  projects:{table:'student_projects',filter:'status=eq.pending',title:'المشاريع'},
- ratings:{table:'rating_submissions',filter:'status=eq.pending',title:'التقييمات'}
+ ratings:{table:'rating_submissions',filter:'status=eq.pending',title:'التقييمات'},
+ tools:{table:'tools_items',filter:'',title:'الأدوات'},
+ confessions:{table:'confessions',filter:'status=eq.pending',title:'الاعترافات'}
 };
 window.login=async()=>{
  const password=$('#adminPassword').value.trim();
@@ -22,10 +24,21 @@ window.login=async()=>{
  }catch(e){toast(e.message||'تعذر تسجيل الدخول',true)}
 };
 window.showSection=(name,btn)=>{$$('.admin-section').forEach(x=>x.classList.remove('active'));$(`#section-${name}`)?.classList.add('active');$$('.admin-nav button').forEach(x=>x.classList.remove('active'));btn?.classList.add('active');if(defs[name])loadList(name)};
-function row(name,x){const title=x.title||x.subject||x.target_name||x.name||'بدون عنوان';const desc=x.body||x.description||x.comment||x.college||'';let actions='';
- if(name==='announcements')actions=`<button onclick="toggleAnnouncement('${x.id}',${!x.active})">${x.active?'إيقاف':'تشغيل'}</button><button class="reject" onclick="deleteItem('${name}','${x.id}')">حذف</button>`;
- else actions=`<button class="approve" onclick="approveItem('${name}','${x.id}')">قبول</button><button class="reject" onclick="rejectItem('${name}','${x.id}')">رفض</button>${name==='projects'&&x.status==='approved'?`<button class="feature" onclick="featureProject('${x.id}',${!x.featured})">تمييز</button>`:''}`;
- return `<div class="admin-row"><div><strong>${esc(title)}</strong><p>${esc(desc)}</p><small>${formatDate(x.created_at)}</small></div><div class="row-actions">${actions}</div></div>`}
+function row(name,x){
+ const title=x.title||x.subject||x.target_name||x.name||'بدون عنوان';
+ const desc=x.body||x.description||x.comment||x.content||x.college||'';
+ let actions='';
+
+ if(name==='announcements'){
+   actions=`<button onclick="toggleAnnouncement('${x.id}',${!x.active})">${x.active?'إيقاف':'تشغيل'}</button><button class="reject" onclick="deleteItem('${name}','${x.id}')">حذف</button>`;
+ }else if(name==='tools'){
+   actions=`<button onclick="toggleTool('${x.id}',${!x.disabled})">${x.disabled?'تشغيل':'إيقاف'}</button><button class="feature" onclick="featureTool('${x.id}',${!x.featured})">${x.featured?'إلغاء التمييز':'تمييز'}</button><button class="reject" onclick="deleteItem('${name}','${x.id}')">حذف</button>`;
+ }else{
+   actions=`<button class="approve" onclick="approveItem('${name}','${x.id}')">قبول</button><button class="reject" onclick="rejectItem('${name}','${x.id}')">رفض</button>`;
+ }
+
+ return `<div class="admin-row"><div><strong>${esc(title)}</strong><p>${esc(desc)}</p><small>${formatDate(x.created_at)}</small></div><div class="row-actions">${actions}</div></div>`
+}
 async function loadList(name){const d=defs[name],el=$(`#list-${name}`);if(!el)return;try{const query=`select=*&${d.filter?d.filter+'&':''}order=created_at.desc`;const rows=await get(d.table,query);el.innerHTML=rows.length?rows.map(x=>row(name,x)).join(''):'<div class="empty">لا توجد طلبات</div>'}catch(e){el.innerHTML=`<div class="empty">${esc(e.message)}</div>`}}
 window.approveItem=async(name,id)=>{const d=defs[name];const body=name==='summaries'||name==='groups'?{approved:true}:name==='projects'?{status:'approved',reviewed_at:new Date().toISOString()}:{status:'approved',reviewed_at:new Date().toISOString()};try{await update(d.table,`id=eq.${encodeURIComponent(id)}`,body);toast('تم القبول');loadList(name);loadStats()}catch(e){toast(e.message,true)}};
 window.rejectItem=async(name,id)=>{const d=defs[name];if(name==='summaries'||name==='groups')return deleteItem(name,id);try{await update(d.table,`id=eq.${encodeURIComponent(id)}`,{status:'rejected',reviewed_at:new Date().toISOString()});toast('تم الرفض');loadList(name);loadStats()}catch(e){toast(e.message,true)}};
@@ -37,3 +50,29 @@ async function count(table,query=''){try{return (await get(table,`select=id&${qu
 async function loadStats(){const vals=await Promise.all([count('summaries','approved=eq.false'),count('whatsapp_groups','approved=eq.false'),count('student_projects','status=eq.pending'),count('rating_submissions','status=eq.pending')]);['statSummaries','statGroups','statProjects','statRatings'].forEach((id,i)=>$(`#${id}`).textContent=vals[i])}
 async function loadDashboard(){await loadStats();loadList('announcements')}
 const saved=sessionStorage.getItem('uon_admin_password');if(saved){$('#adminPassword').value=saved;login()}
+
+
+window.createTool=async()=>{
+ const body={
+  id:`custom-${Date.now()}`,
+  category_id:$('#toolCategoryId').value.trim()||'ai',
+  name:$('#toolName').value.trim(),
+  description:$('#toolDescription').value.trim(),
+  url:$('#toolUrl').value.trim(),
+  emoji:$('#toolEmoji').value.trim()||'🧰',
+  featured:false,disabled:false,status:'active'
+ };
+ if(!body.name||!body.url)return toast('أكمل اسم الأداة والرابط',true);
+ try{await insert('tools_items',body);toast('تمت إضافة الأداة');loadList('tools')}
+ catch(e){toast(e.message,true)}
+};
+
+window.toggleTool=async(id,disabled)=>{
+ try{await update('tools_items',`id=eq.${encodeURIComponent(id)}`,{disabled});toast('تم التحديث');loadList('tools')}
+ catch(e){toast(e.message,true)}
+};
+
+window.featureTool=async(id,featured)=>{
+ try{await update('tools_items',`id=eq.${encodeURIComponent(id)}`,{featured});toast('تم التحديث');loadList('tools')}
+ catch(e){toast(e.message,true)}
+};

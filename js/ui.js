@@ -9,22 +9,48 @@ export function formatDate(v){if(!v)return '—';return new Date(v).toLocaleDate
 export function setupHiddenAdminEntry(){
  const brand=document.querySelector('[data-admin-entry]');
  if(!brand)return;
- let clicks=0,timer=null;
- brand.addEventListener('click',event=>{
-   clicks++;
-   clearTimeout(timer);
-   if(clicks>=5){
-     event.preventDefault();
-     clicks=0;
-     sessionStorage.setItem('uon_admin_entry','granted');
-     window.location.href='admin.html';
+
+ let tapCount=0;
+ let tapTimer=null;
+ let holdTimer=null;
+ let holding=false;
+
+ const openAdmin=()=>{
+   tapCount=0;
+   clearTimeout(tapTimer);
+   clearTimeout(holdTimer);
+   sessionStorage.setItem('uon_admin_entry','granted');
+   window.location.assign('admin.html');
+ };
+
+ brand.addEventListener('pointerdown',event=>{
+   holding=true;
+   holdTimer=setTimeout(()=>{
+     if(holding){event.preventDefault();openAdmin()}
+   },2000);
+ });
+
+ brand.addEventListener('pointerup',event=>{
+   holding=false;
+   clearTimeout(holdTimer);
+   event.preventDefault();
+   tapCount++;
+   clearTimeout(tapTimer);
+
+   if(tapCount>=5){
+     openAdmin();
      return;
    }
-   event.preventDefault();
-   timer=setTimeout(()=>{
-     clicks=0;
-     if(location.pathname.endsWith('/index.html')||location.pathname==='/'||location.pathname==='')return;
-     window.location.href='index.html';
-   },650);
+
+   tapTimer=setTimeout(()=>{
+     tapCount=0;
+     const path=location.pathname;
+     if(!(path==='/'||path.endsWith('/index.html')))window.location.assign('index.html');
+   },1800);
+ });
+
+ brand.addEventListener('pointercancel',()=>{
+   holding=false;
+   clearTimeout(holdTimer);
  });
 }
