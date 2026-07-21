@@ -55,7 +55,7 @@
       ]
     },
     {
-      "source": "/js/home.js",
+      "source": "/ratings.html",
       "headers": [
         {
           "key": "Cache-Control",
@@ -64,7 +64,16 @@
       ]
     },
     {
-      "source": "/css/home.css",
+      "source": "/js/(api|home|maintenance|maintenance-page).js",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-store, no-cache, must-revalidate"
+        }
+      ]
+    },
+    {
+      "source": "/css/(base|home).css",
       "headers": [
         {
           "key": "Cache-Control",

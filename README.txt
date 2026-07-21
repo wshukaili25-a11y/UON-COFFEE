@@ -1,16 +1,10 @@
-UON Hub V5 Final
+UON Hub V6.2 Core Fix
 
-1. شغّل UON_HUB_V5_SMART_MIGRATION.sql في Supabase.
-2. أنشئ كلمة مرور المشرف بعد نجاح Migration.
-3. ارفع جميع الملفات والمجلدات إلى جذر GitHub.
-4. بعد نشر Vercel امسح بيانات الموقع القديمة مرة واحدة.
-
-دخول الإدارة:
-- اضغط شعار UON Hub خمس مرات خلال أقل من ثانيتين.
-- أو اضغط عليه مطولًا لمدة ثانيتين.
-- لا يوجد زر إدارة ظاهر.
-- فتح admin.html مباشرة يعيد الزائر للرئيسية.
-
-الصورة:
-- assets/unizwa-new-gate.jpg هي صورة تعريفية لتصميم البوابة الجديدة.
-- assets/unizwa-campus-aerial.jpg هي الصورة الجوية التي أرسلتها.
+1. Run V6_2_CORE_FIX.sql.
+2. Upload all patch files to GitHub in the same paths.
+3. Redeploy Telegram:
+   supabase functions deploy telegram-admin --no-verify-jwt
+4. Test bot:
+   /notify_test
+   /health
+5. Test maintenance in a private/incognito browser.
