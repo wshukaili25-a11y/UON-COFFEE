@@ -22,3 +22,8 @@
  html[dir="rtl"] .sidebar{left:auto;right:0;transform:translateX(102%)}
  html[dir="rtl"] .sidebar.open{transform:none}
 }
+
+.site-control-row{display:flex;justify-content:space-between;align-items:center;gap:1rem;padding:1rem;border:1px solid var(--line);border-radius:14px;background:rgba(255,255,255,.025)}
+.site-control-row small{display:block;color:var(--muted);margin-top:.25rem}
+.switch{position:relative;width:58px;height:32px}.switch input{display:none}.slider{position:absolute;inset:0;border-radius:999px;background:#293451;cursor:pointer;transition:.25s}.slider::before{content:'';position:absolute;width:24px;height:24px;left:4px;top:4px;border-radius:50%;background:white;transition:.25s}.switch input:checked+.slider{background:#22c55e}.switch input:checked+.slider::before{transform:translateX(26px)}
+html[dir="rtl"] .slider::before{left:auto;right:4px}html[dir="rtl"] .switch input:checked+.slider::before{transform:translateX(-26px)}

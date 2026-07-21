@@ -2,7 +2,7 @@
 .hero{min-height:690px;position:relative;display:flex;align-items:center;background:
  linear-gradient(90deg,rgba(4,10,24,.96) 0%,rgba(4,10,24,.82) 45%,rgba(4,10,24,.28) 100%),
  linear-gradient(0deg,var(--bg),transparent 35%),
- url('../assets/unizwa-new-gate.jpg') center/cover no-repeat}
+ url('../assets/unizwa-new-gate-v52.jpg') center/cover no-repeat}
 .hero-content{max-width:680px;padding:6rem 0 4rem;position:relative;z-index:2}
 .hero-kicker{display:inline-flex;align-items:center;gap:.45rem;color:var(--primary);font-weight:900;margin-bottom:1rem}
 .hero h1{font-size:clamp(2.7rem,7vw,5.6rem);line-height:1.02;letter-spacing:-.04em}
@@ -35,3 +35,8 @@
 
 .hero{background-position:center 46%}
 @media(max-width:650px){.hero{background-position:center center}}
+
+.whatsapp-channel-banner{padding:1rem 1.2rem;display:grid;grid-template-columns:auto 1fr auto;gap:.85rem;align-items:center;text-decoration:none;border-color:rgba(37,211,102,.22);background:linear-gradient(135deg,rgba(18,57,44,.96),rgba(12,34,40,.98))}
+.whatsapp-channel-banner:hover{border-color:rgba(37,211,102,.55);transform:translateY(-2px)}
+.whatsapp-channel-icon{width:50px;height:50px;border-radius:15px;display:grid;place-items:center;background:rgba(37,211,102,.12);color:#25d366;font-size:1.45rem}
+.whatsapp-channel-banner small{display:block;color:#a8b8bd;margin-top:.2rem}
