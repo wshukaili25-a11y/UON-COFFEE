@@ -1,0 +1,2 @@
+
+import {get,$} from './core.js';try{const r=await get('site_settings','select=key,value&key=in.(maintenance_enabled,maintenance_message)');const m=Object.fromEntries(r.map(x=>[x.key,x.value]));const on=m.maintenance_enabled===true||String(m.maintenance_enabled).toLowerCase()==='true';if(!on)location.replace('index.html');if(m.maintenance_message)$('#message').textContent=m.maintenance_message}catch{}
