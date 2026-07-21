@@ -102,6 +102,37 @@
     'دليل الجامعة الرسمي':'Official University Guide'
   };
 
+
+  const toolDescriptionMap = {
+    'بوت ذكي يجيب عن كل شيء يخص جامعة نزوى — متاح 24/7':'A smart assistant for University of Nizwa questions — available 24/7',
+    'احسب معدلك الفصلي بسهولة — أضف موادك وساعاتها وتقديراتها':'Calculate semester and cumulative GPA with ease',
+    'شارك اعترافك الجامعي بشكل مجهول — كلنا في نفس الوضع 😅':'Share your campus confession anonymously 😅',
+    'ملخصات وشروحات من طلاب نزوى لجميع الكليات والمواد':'Summaries and explanations from UON students across colleges',
+    'أقرب المطاعم والكافيهات حول جامعة نزوى مع التقييمات':'Nearby restaurants and cafés around University of Nizwa',
+    'أدوات أكاديمية وتقنية مفيدة لكل طالب في جامعة نزوى':'Useful academic and digital tools for every UON student',
+    'أنشئ جدولك الدراسي الأسبوعي بسهولة واطبعه':'Create and print your weekly study schedule',
+    'ابحث عن مجموعة مادتك أو أضف مجموعتك لمساعدة زملائك':'Find or submit a course group to help classmates',
+    'بيع واشترِ الكتب والأجهزة والأغراض الطلابية':'Buy and sell books, devices, and student items',
+    'كل ما يخص البرامج والرسوم والخطط الدراسية والمصادر الرسمية':'Programs, fees, study plans, and official sources',
+    'استعرض وشارك مشاريع طلاب جامعة نزوى':'Explore and share University of Nizwa student projects'
+  };
+
+  const toolButtonMap = {
+    'جرب الآن':'Try now',
+    'احسب معدلك':'Calculate GPA',
+    'اعترف الحين':'Confess now',
+    'تصفح الملخصات':'Browse summaries',
+    'استكشف':'Explore',
+    'افتح الأدوات':'Open tools',
+    'أنشئ جدولك':'Create schedule',
+    'ابحث عن مجموعة':'Find a group',
+    'افتح السوق':'Open marketplace',
+    'اكتشف الآن':'Explore now',
+    'عرض المشاريع':'View projects',
+    'قريبًا':'Soon',
+    'صيانة':'Maintenance'
+  };
+
   const originalText = new WeakMap();
   const originalPlaceholder = new WeakMap();
 
@@ -135,10 +166,30 @@
       el.setAttribute('placeholder', lang === 'en' ? (placeholderMap[original] || original) : original);
     });
 
-    document.querySelectorAll('.tool-card h3').forEach(el => {
-      const ar = el.dataset.arText || el.textContent.trim();
-      el.dataset.arText = ar;
-      el.textContent = lang === 'en' ? (toolTitleMap[ar] || ar) : ar;
+    document.querySelectorAll('.tool-card').forEach(card => {
+      const title = card.querySelector('h3');
+      const description = card.querySelector('p');
+      const button = card.querySelector('.tool-link');
+
+      if (title) {
+        const ar = title.dataset.arText || title.textContent.trim();
+        title.dataset.arText = ar;
+        title.textContent = lang === 'en' ? (toolTitleMap[ar] || ar) : ar;
+      }
+
+      if (description) {
+        const ar = description.dataset.arText || description.textContent.trim();
+        description.dataset.arText = ar;
+        description.textContent = lang === 'en' ? (toolDescriptionMap[ar] || ar) : ar;
+      }
+
+      if (button) {
+        const icon = button.querySelector('i')?.outerHTML || '';
+        let raw = button.dataset.arText || button.textContent.trim();
+        button.dataset.arText = raw;
+        const translated = lang === 'en' ? (toolButtonMap[raw] || raw) : raw;
+        button.innerHTML = `${translated} ${icon}`;
+      }
     });
 
     const button = document.getElementById('langToggleBtn');
@@ -153,7 +204,22 @@
     document.documentElement.lang = language;
     document.documentElement.dir = language === 'ar' ? 'rtl' : 'ltr';
     document.body.classList.toggle('lang-en', language === 'en');
-    translatePage(language);
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+      const key = el.getAttribute('data-i18n');
+      const english = {
+        nav_home:'Home',nav_tools:'Tools',nav_ai:'AI Assistant',nav_contact:'Contact',
+        nav_market:'Marketplace',nav_about:'About',
+        footer_tagline:'Everything a University of Nizwa student needs in one place.',
+        footer_quick:'Quick Links',footer_summaries:'Summaries',footer_guide:'University Guide',
+        footer_official:'University',footer_official_site:'Official Website',
+        footer_portal:'Student Portal',footer_platform:'Platform',footer_privacy:'Privacy',
+        footer_terms:'Terms',footer_rights:'All rights reserved',
+        footer_made:'Made with care for University of Nizwa students'
+      };
+      if (!el.dataset.originalText) el.dataset.originalText = el.textContent.trim();
+      el.textContent = language === 'en' ? (english[key] || el.dataset.originalText) : el.dataset.originalText;
+    });
+        translatePage(language);
     localStorage.setItem(STORAGE_KEY, language);
   }
 
