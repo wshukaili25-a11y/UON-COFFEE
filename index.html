@@ -537,6 +537,44 @@ body.has-site-announcement{padding-top:54px}body.has-site-announcement .navbar{t
     .hero h1{font-size:1.72rem}.hero-buttons{width:100%}.stats-bar{grid-template-columns:1fr 1fr!important}
 }
 
+
+/* ===== UON HUB v3 HERO ===== */
+.hero{
+    position:relative;
+    min-height:680px;
+    padding-top:9rem;
+    background:
+      linear-gradient(90deg,rgba(5,10,27,.93) 0%,rgba(5,10,27,.72) 48%,rgba(5,10,27,.38) 100%),
+      linear-gradient(0deg,var(--dark) 0%,transparent 38%),
+      url('assets/uon-campus-hero.jpg') center/cover no-repeat;
+    overflow:hidden
+}
+.hero::before{
+    content:'';
+    position:absolute;inset:0;
+    background:
+      radial-gradient(circle at 72% 35%,rgba(0,212,255,.12),transparent 27%),
+      radial-gradient(circle at 18% 20%,rgba(34,197,94,.08),transparent 23%);
+    pointer-events:none
+}
+.hero-content{position:relative;z-index:2}
+.hero-campus-label{
+    display:inline-flex;align-items:center;gap:.55rem;
+    margin-top:1.2rem;padding:.55rem .8rem;border-radius:12px;
+    background:rgba(7,19,38,.72);border:1px solid rgba(255,255,255,.12);
+    color:#fff;font-size:.78rem;font-weight:800;backdrop-filter:blur(12px)
+}
+.hero-campus-label i{color:var(--primary)}
+.home-rating-card{
+    background:linear-gradient(145deg,rgba(30,37,75,.98),rgba(20,26,55,.98));
+    border:1px solid rgba(250,204,21,.16);
+}
+.home-rating-card .tool-icon{background:rgba(250,204,21,.1)!important;color:#facc15!important}
+.home-rating-card .tool-link{color:#facc15!important;border-color:rgba(250,204,21,.22)!important;background:rgba(250,204,21,.06)!important}
+@media(max-width:768px){
+    .hero{min-height:610px;padding-top:7.8rem;background-position:62% center}
+}
+
 </style>
 <link rel="stylesheet" href="brand.css">
 </head>
@@ -578,6 +616,7 @@ body.has-site-announcement{padding-top:54px}body.has-site-announcement .navbar{t
         <li><a href="#botSection" data-i18n="nav.ai">المساعد AI</a></li>
         <li><a href="marketplace.html" data-i18n="nav.market">السوق</a></li>
         <li><a href="#features" data-i18n="nav.about">عن المنصة</a></li>
+        <li><a href="ratings.html">التقييمات</a></li>
         <li><a href="#contact" data-i18n="nav.contact">التواصل</a></li>
         <li><a href="features.html" target="_blank" data-i18n="nav.features" style="color:var(--warning)!important;">🔥 الميزات</a></li>
     </ul>
@@ -1251,6 +1290,16 @@ function renderTools() {
         </article>`
     }).join('')
 
+    grid.insertAdjacentHTML('beforeend', `
+        <article class="tool-card home-rating-card" data-id="ratings" data-status="active" style="--card-color:#facc15;position:relative;">
+            <div class="tool-icon"><i class="fas fa-star-half-stroke"></i></div>
+            <h3>تقييم المواد والدكاترة</h3>
+            <p>اطّلع على تجارب الطلاب وأرسل تقييمك بشكل مجهول بعد مراجعة المشرف.</p>
+            <button class="tool-link" onclick="window.location.href='ratings.html'">
+                افتح التقييمات <i class="fas fa-arrow-left"></i>
+            </button>
+        </article>
+`)
     syncEmbeddedToolSections()
 }
 
