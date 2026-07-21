@@ -16,7 +16,7 @@
 .announcement-copy strong{font-size:1.1rem}.announcement-copy p{color:#c9d1e1;margin-top:.3rem}
 .announcement-action{padding:.62rem .9rem;border-radius:10px;background:linear-gradient(135deg,#f59e0b,#f43f5e);text-decoration:none;font-weight:900;white-space:nowrap}
 .announcement-close{width:36px;height:36px;border:0;border-radius:10px;background:rgba(0,0,0,.2);color:white;cursor:pointer}
-.quick-grid{grid-template-columns:repeat(4,minmax(0,1fr))}
+.quick-grid{grid-template-columns:repeat(5,minmax(0,1fr))}
 .quick-card{padding:1rem;display:flex;align-items:center;gap:.8rem;text-decoration:none;transition:.22s}
 .quick-card:hover{transform:translateY(-4px);border-color:rgba(24,199,244,.3)}
 .quick-icon{width:48px;height:48px;border-radius:14px;display:grid;place-items:center;background:rgba(24,199,244,.1);color:var(--primary);font-size:1.2rem}
@@ -30,3 +30,5 @@
 .list-link{color:var(--primary);text-decoration:none;font-size:.75rem;font-weight:900}
 @media(max-width:900px){.quick-grid,.stats-grid{grid-template-columns:repeat(2,1fr)}.content-columns{grid-template-columns:1fr}.hero{min-height:610px;background-position:58% center}}
 @media(max-width:650px){.hero{min-height:570px}.hero-content{padding:5rem 0 3rem}.hero h1{font-size:2.55rem}.announcement-card{grid-template-columns:auto 1fr auto}.announcement-action{grid-column:1/-1;text-align:center}.announcement-close{grid-column:3}.quick-grid{grid-template-columns:1fr}.stats-grid{grid-template-columns:1fr 1fr}.announcement-zone{margin-top:-25px}}
+
+@media(max-width:1150px){.quick-grid{grid-template-columns:repeat(3,1fr)}}
