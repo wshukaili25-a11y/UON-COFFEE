@@ -171,3 +171,38 @@ export function trackClicks(){
   if(link.matches('a[href*="summaries"]'))trackEvent('summary_section_open',{href:link.getAttribute('href')});
  },{capture:true});
 }
+
+
+export async function getSetting(key,fallback=''){
+ try{
+  const rows=await get('site_settings',`select=value&key=eq.${encodeURIComponent(key)}&limit=1`);
+  const value=rows?.[0]?.value;
+  return value===null||value===undefined?fallback:value;
+ }catch{return fallback}
+}
+
+export async function loadSocialLinks(){
+ const [whatsapp,instagram]=await Promise.all([
+  getSetting('whatsapp_channel_url','https://whatsapp.com/channel/0029Vb9RCFoHgZWkH8X6di1x'),
+  getSetting('instagram_url','')
+ ]);
+ document.querySelectorAll('[data-social="whatsapp"]').forEach(a=>{
+  a.href=whatsapp||'#';a.hidden=!whatsapp;
+ });
+ document.querySelectorAll('[data-social="instagram"]').forEach(a=>{
+  a.href=instagram||'#';a.hidden=!instagram;
+ });
+ return {whatsapp,instagram};
+}
+
+export async function loadNotificationCenter(limit=20){
+ const target=document.querySelector('#notificationItems');
+ if(!target)return;
+ try{
+  const rows=await get('site_notifications',`select=*&active=eq.true&order=created_at.desc&limit=${limit}`);
+  target.innerHTML=rows.length?rows.map(x=>`<a class="notification-item" href="${esc(x.url||'#')}">
+   <span>${esc(x.icon||'🔔')}</span>
+   <div><strong>${esc(x.title)}</strong><small>${esc(x.body||'')}</small></div>
+  </a>`).join(''):'<div class="empty">لا توجد إشعارات جديدة</div>';
+ }catch(error){target.innerHTML='<div class="empty">تعذر تحميل الإشعارات</div>'}
+}

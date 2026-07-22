@@ -31,7 +31,7 @@ function mainMenu(a:any){
   [{text:'🔧 الصيانة',callback_data:'maintenance'}]
  ];
  if(isOwner(a))rows.push([{text:'👥 المشرفون',callback_data:'admins'}]);
- rows.push([{text:'🌐 لوحة الموقع',url:`${SITE}/admin.html?v=9.3`}]);
+ if(isOwner(a))rows.push([{text:'🔗 الروابط الرسمية',callback_data:'socials'},{text:'🔔 إشعار جديد',callback_data:'newnotify'}]);rows.push([{text:'🌐 لوحة الموقع',url:`${SITE}/admin.html?v=9.3`}]);
  return {inline_keyboard:rows};
 }
 async function sendHome(chatId:string,a:any){
@@ -101,6 +101,25 @@ Deno.serve(async req=>{
    const text=String(msg.text||'').trim();
    const {data:conv}=await db.from('telegram_conversations').select('*').eq('chat_id',chatId).maybeSingle();
 
+   if(conv?.state==='await_social_whatsapp'){
+    await db.from('site_settings').upsert({key:'whatsapp_channel_url',value:text,updated_at:new Date().toISOString()});
+    await db.from('telegram_conversations').delete().eq('chat_id',chatId);
+    await telegram('sendMessage',{chat_id:chatId,text:'تم تحديث قناة واتساب ✅'});return response()
+   }
+   if(conv?.state==='await_social_instagram'){
+    await db.from('site_settings').upsert({key:'instagram_url',value:text,updated_at:new Date().toISOString()});
+    await db.from('telegram_conversations').delete().eq('chat_id',chatId);
+    await telegram('sendMessage',{chat_id:chatId,text:'تم تحديث حساب إنستغرام ✅'});return response()
+   }
+   if(conv?.state==='await_notification_title'){
+    await db.from('telegram_conversations').upsert({chat_id:chatId,state:'await_notification_body',data:{title:text},updated_at:new Date().toISOString()});
+    await telegram('sendMessage',{chat_id:chatId,text:'أرسل نص الإشعار'});return response()
+   }
+   if(conv?.state==='await_notification_body'){
+    const {error}=await db.from('site_notifications').insert({title:conv.data.title,body:text,icon:'🔔',active:true});
+    if(error)throw error;await db.from('telegram_conversations').delete().eq('chat_id',chatId);
+    await telegram('sendMessage',{chat_id:chatId,text:'تم نشر الإشعار في الموقع ✅'});return response()
+   }
    if(conv?.state==='await_chat_id'){
     if(!/^-?\d+$/.test(text)){await telegram('sendMessage',{chat_id:chatId,text:'أرسل Chat ID رقميًا'});return response()}
     await db.from('telegram_conversations').upsert({chat_id:chatId,state:'await_name',data:{new_chat_id:text},updated_at:new Date().toISOString()});
@@ -197,6 +216,20 @@ Deno.serve(async req=>{
      await edit(chatId,mid,`تم حذف ${target.name} ✅\n${x.text}`,x.keyboard);
     }
 
+    else if(data==='socials'){
+     if(!isOwner(a))throw new Error('للمالك فقط');
+     await edit(chatId,mid,'اختر الرابط الذي تريد تعديله',{inline_keyboard:[[{text:'واتساب',callback_data:'social:whatsapp'},{text:'إنستغرام',callback_data:'social:instagram'}],[{text:'⬅️ رجوع',callback_data:'home'}]]});
+    }
+    else if(data.startsWith('social:')){
+     const type=data.split(':')[1];
+     await db.from('telegram_conversations').upsert({chat_id:chatId,state:type==='whatsapp'?'await_social_whatsapp':'await_social_instagram',data:{},updated_at:new Date().toISOString()});
+     await edit(chatId,mid,`أرسل رابط ${type==='whatsapp'?'قناة واتساب':'حساب إنستغرام'}`,{inline_keyboard:[[{text:'⬅️ رجوع',callback_data:'socials'}]]});
+    }
+    else if(data==='newnotify'){
+     if(!isOwner(a))throw new Error('للمالك فقط');
+     await db.from('telegram_conversations').upsert({chat_id:chatId,state:'await_notification_title',data:{},updated_at:new Date().toISOString()});
+     await edit(chatId,mid,'أرسل عنوان الإشعار',{inline_keyboard:[[{text:'⬅️ رجوع',callback_data:'home'}]]});
+    }
     else if(data==='stats'){
      const {data:state}=await db.rpc('uon_public_state');
      await edit(chatId,mid,`الصيانة: ${state?.maintenance_enabled?'مفعلة':'متوقفة'}\nالخدمات: ${Object.keys(state?.features||{}).length}`,{inline_keyboard:[[{text:'⬅️ رجوع',callback_data:'home'}]]});
