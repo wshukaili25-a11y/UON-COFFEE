@@ -31,7 +31,7 @@ function mainMenu(a:any){
   [{text:'🔧 الصيانة',callback_data:'maintenance'}]
  ];
  if(isOwner(a))rows.push([{text:'👥 المشرفون',callback_data:'admins'}]);
- if(isOwner(a))rows.push([{text:'🔗 الروابط الرسمية',callback_data:'socials'},{text:'🔔 إشعار جديد',callback_data:'newnotify'}]);rows.push([{text:'🌐 لوحة الموقع',url:`${SITE}/admin.html?v=9.3`}]);
+ if(isOwner(a))rows.push([{text:'📘 نادي المواد',callback_data:'coursesctl'}]);if(isOwner(a))rows.push([{text:'🔗 الروابط الرسمية',callback_data:'socials'},{text:'🔔 إشعار جديد',callback_data:'newnotify'}]);rows.push([{text:'🌐 لوحة الموقع',url:`${SITE}/admin.html?v=9.3`}]);
  return {inline_keyboard:rows};
 }
 async function sendHome(chatId:string,a:any){
@@ -101,6 +101,26 @@ Deno.serve(async req=>{
    const text=String(msg.text||'').trim();
    const {data:conv}=await db.from('telegram_conversations').select('*').eq('chat_id',chatId).maybeSingle();
 
+   if(conv?.state==='course_add_code'){
+    await db.from('telegram_conversations').upsert({chat_id:chatId,state:'course_add_name',data:{code:text.toUpperCase()},updated_at:new Date().toISOString()});
+    await telegram('sendMessage',{chat_id:chatId,text:'أرسل اسم المادة بالعربي'});return response()
+   }
+   if(conv?.state==='course_add_name'){
+    await db.from('telegram_conversations').upsert({chat_id:chatId,state:'course_add_college',data:{...conv.data,name_ar:text},updated_at:new Date().toISOString()});
+    await telegram('sendMessage',{chat_id:chatId,text:'أرسل اسم الكلية'});return response()
+   }
+   if(conv?.state==='course_add_college'){
+    const {error}=await db.from('courses').insert({code:conv.data.code,name_ar:conv.data.name_ar,college:text,active:true,status:'approved'});
+    if(error)throw error;
+    await db.from('telegram_conversations').delete().eq('chat_id',chatId);
+    await telegram('sendMessage',{chat_id:chatId,text:'تمت إضافة المادة ✅'});return response()
+   }
+   if(conv?.state==='course_edit_name'){
+    const {error}=await db.from('courses').update({name_ar:text,updated_at:new Date().toISOString()}).eq('id',conv.data.course_id);
+    if(error)throw error;
+    await db.from('telegram_conversations').delete().eq('chat_id',chatId);
+    await telegram('sendMessage',{chat_id:chatId,text:'تم تعديل اسم المادة ✅'});return response()
+   }
    if(conv?.state==='await_social_whatsapp'){
     await db.from('site_settings').upsert({key:'whatsapp_channel_url',value:text,updated_at:new Date().toISOString()});
     await db.from('telegram_conversations').delete().eq('chat_id',chatId);
@@ -216,6 +236,88 @@ Deno.serve(async req=>{
      await edit(chatId,mid,`تم حذف ${target.name} ✅\n${x.text}`,x.keyboard);
     }
 
+    else if(data==='coursesctl'){
+     const {data:state,error}=await db.rpc('uon_public_state');if(error)throw error;
+     const current=state.features?.courses||'active';
+     await edit(chatId,mid,`نادي المواد\nالحالة الحالية: ${current}`,{inline_keyboard:[
+      [{text:'🟢 تشغيل',callback_data:'coursefeature:active'},{text:'🔴 إيقاف',callback_data:'coursefeature:disabled'}],
+      [{text:'🟡 قريبًا',callback_data:'coursefeature:coming_soon'},{text:'🛠 صيانة',callback_data:'coursefeature:maintenance'}],
+      [{text:'➕ إضافة مادة',callback_data:'courseadd'},{text:'📚 إدارة المواد',callback_data:'courselist:0'}],
+      [{text:'🕓 طلبات المواد',callback_data:'courserequests:0'}],
+      [{text:'⬅️ رجوع',callback_data:'home'}]
+     ]});
+    }
+    else if(data.startsWith('coursefeature:')){
+     const status=data.split(':')[1];
+     const {error}=await db.rpc('uon_set_feature_state',{p_key:'courses',p_status:status});
+     if(error)throw error;
+     await edit(chatId,mid,`تم تحديث نادي المواد إلى: ${status} ✅`,{inline_keyboard:[[{text:'⬅️ رجوع',callback_data:'coursesctl'}]]});
+    }
+    else if(data==='courseadd'){
+     await db.from('telegram_conversations').upsert({chat_id:chatId,state:'course_add_code',data:{},updated_at:new Date().toISOString()});
+     await edit(chatId,mid,'أرسل رمز المادة مثل STAT101',{inline_keyboard:[[{text:'⬅️ رجوع',callback_data:'coursesctl'}]]});
+    }
+    else if(data.startsWith('courselist:')){
+     const page=Number(data.split(':')[1]||0);
+     const {data:rows,error}=await db.from('courses').select('id,code,name_ar,active').order('code').range(page*8,page*8+7);
+     if(error)throw error;
+     const keyboard=(rows||[]).map((x:any)=>[{text:`${x.active?'🟢':'🔴'} ${x.code} — ${x.name_ar}`,callback_data:`course:${x.id}`}]);
+     keyboard.push([{text:'⬅️ رجوع',callback_data:'coursesctl'}]);
+     await edit(chatId,mid,'اختر المادة',{inline_keyboard:keyboard});
+    }
+    else if(data.startsWith('course:')){
+     const id=data.split(':')[1];
+     const {data:c,error}=await db.from('courses').select('*').eq('id',id).single();if(error)throw error;
+     await edit(chatId,mid,`${c.code} — ${c.name_ar}\n${c.college||''}`,{inline_keyboard:[
+      [{text:'✏️ تعديل الاسم',callback_data:`courseedit:${id}`},{text:c.active?'🔴 إيقاف':'🟢 تفعيل',callback_data:`coursetoggle:${id}:${c.active?'off':'on'}`}],
+      [{text:'🗑 حذف',callback_data:`coursedelete:${id}`}],
+      [{text:'⬅️ المواد',callback_data:'courselist:0'}]
+     ]});
+    }
+    else if(data.startsWith('courseedit:')){
+     const id=data.split(':')[1];
+     await db.from('telegram_conversations').upsert({chat_id:chatId,state:'course_edit_name',data:{course_id:id},updated_at:new Date().toISOString()});
+     await edit(chatId,mid,'أرسل الاسم الجديد للمادة',{inline_keyboard:[[{text:'⬅️ رجوع',callback_data:`course:${id}`}]]});
+    }
+    else if(data.startsWith('coursetoggle:')){
+     const[,id,state]=data.split(':');
+     const {error}=await db.from('courses').update({active:state==='on',updated_at:new Date().toISOString()}).eq('id',id);if(error)throw error;
+     await edit(chatId,mid,'تم تحديث حالة المادة ✅',{inline_keyboard:[[{text:'⬅️ رجوع',callback_data:`course:${id}`}]]});
+    }
+    else if(data.startsWith('coursedelete:')){
+     const id=data.split(':')[1];
+     const {error}=await db.from('courses').delete().eq('id',id);if(error)throw error;
+     await edit(chatId,mid,'تم حذف المادة ✅',{inline_keyboard:[[{text:'⬅️ المواد',callback_data:'courselist:0'}]]});
+    }
+    else if(data.startsWith('courserequests:')){
+     const page=Number(data.split(':')[1]||0);
+     const {data:rows,error}=await db.from('course_requests').select('*').eq('status','pending').order('created_at').range(page*6,page*6+5);
+     if(error)throw error;
+     const keyboard=(rows||[]).map((x:any)=>[
+      {text:`✅ ${x.code||x.name_ar||'طلب'}`,callback_data:`courseaccept:${x.id}`},
+      {text:'❌',callback_data:`coursereject:${x.id}`}
+     ]);
+     keyboard.push([{text:'⬅️ رجوع',callback_data:'coursesctl'}]);
+     await edit(chatId,mid,(rows||[]).length?'طلبات المواد المعلقة':'لا توجد طلبات معلقة',{inline_keyboard:keyboard});
+    }
+    else if(data.startsWith('courseaccept:')){
+     const id=data.split(':')[1];
+     const {data:r,error}=await db.from('course_requests').select('*').eq('id',id).single();if(error)throw error;
+     if(r.request_type==='add'){
+      const {error:e}=await db.from('courses').insert({code:r.code,name_ar:r.name_ar,name_en:r.name_en,college:r.college,department:r.department,credit_hours:r.credit_hours,description:r.description,active:true,status:'approved'});if(e)throw e;
+     }else if(r.request_type==='edit'&&r.course_id){
+      const {error:e}=await db.from('courses').update({name_ar:r.name_ar,name_en:r.name_en,college:r.college,department:r.department,credit_hours:r.credit_hours,description:r.description,updated_at:new Date().toISOString()}).eq('id',r.course_id);if(e)throw e;
+     }else if(r.request_type==='delete'&&r.course_id){
+      const {error:e}=await db.from('courses').delete().eq('id',r.course_id);if(e)throw e;
+     }
+     await db.from('course_requests').update({status:'approved',reviewed_at:new Date().toISOString()}).eq('id',id);
+     await edit(chatId,mid,'تم قبول الطلب ✅',{inline_keyboard:[[{text:'⬅️ الطلبات',callback_data:'courserequests:0'}]]});
+    }
+    else if(data.startsWith('coursereject:')){
+     const id=data.split(':')[1];
+     await db.from('course_requests').update({status:'rejected',reviewed_at:new Date().toISOString()}).eq('id',id);
+     await edit(chatId,mid,'تم رفض الطلب',{inline_keyboard:[[{text:'⬅️ الطلبات',callback_data:'courserequests:0'}]]});
+    }
     else if(data==='socials'){
      if(!isOwner(a))throw new Error('للمالك فقط');
      await edit(chatId,mid,'اختر الرابط الذي تريد تعديله',{inline_keyboard:[[{text:'واتساب',callback_data:'social:whatsapp'},{text:'إنستغرام',callback_data:'social:instagram'}],[{text:'⬅️ رجوع',callback_data:'home'}]]});

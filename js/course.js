@@ -1,6 +1,12 @@
 
-import {$,$$,get,esc,toast,enforceUonMaintenance,watchUonMaintenance,loadSocialLinks,trackEvent} from './core.js';
-await enforceUonMaintenance();watchUonMaintenance();loadSocialLinks();
+import {checkFeature,$,$$,get,esc,toast,enforceUonMaintenance,watchUonMaintenance,loadSocialLinks,trackEvent} from './core.js';
+await enforceUonMaintenance();watchUonMaintenance();
+const featureState=await checkFeature('courses');
+if(featureState!=='active'){
+ document.querySelector('main').innerHTML=`<section class="page-hero"><div class="container"><h1>نادي المواد</h1><p>${featureState==='maintenance'?'الخدمة تحت الصيانة حاليًا':featureState==='coming_soon'?'الخدمة قادمة قريبًا':'الخدمة متوقفة حاليًا'}</p></div></section>`;
+ throw new Error('COURSES_FEATURE_DISABLED');
+}
+
 const code=(new URLSearchParams(location.search).get('code')||'').trim();
 if(!code){location.replace('courses.html')}
 let course=null,summaries=[],groups=[],ratings=[],resources=[];
