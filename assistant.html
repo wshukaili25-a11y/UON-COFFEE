@@ -1,4 +1,4 @@
-<!doctype html><html lang="ar" dir="rtl"><head><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#060b1b"><title>مساعد UON AI | UON Hub</title><link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet"><link rel="stylesheet" href="css/app.css?v=18.3"><link rel="manifest" href="manifest.webmanifest"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="theme-color" content="#060b1b">
+<!doctype html><html lang="ar" dir="rtl"><head><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#060b1b"><title>مساعد UON AI | UON Hub</title><link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet"><link rel="stylesheet" href="css/app.css?v=18.5"><link rel="manifest" href="manifest.webmanifest"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="theme-color" content="#060b1b">
 <meta name="description" content="مساعد ذكي للإجابة عن أسئلة خدمات المنصة والمقررات ودليل الجامعة.">
 <meta name="robots" content="index,follow,max-image-preview:large">
 <link rel="canonical" href="https://uon-coffee.vercel.app/assistant.html">
@@ -26,9 +26,33 @@
    <a href="useful-sites.html">مواقع مهمة ومفيدة ←</a>
   </aside>
   <section class="v175-ai-chat">
-   <div id="chat" class="chat-list"><div class="message bot">مرحبًا! اسألني عن خدمات المنصة أو جامعة نزوى.</div></div>
-   <form id="chatForm" class="chat-form"><textarea id="question" placeholder="اكتب سؤالك هنا..." required></textarea><button class="btn primary">إرسال</button></form>
+   <div id="chat" class="chat-list" role="log" aria-live="polite" aria-label="محادثة مساعد UON AI"><div class="message bot">مرحبًا! اسألني عن خدمات المنصة أو جامعة نزوى.</div></div>
+   <form id="chatForm" class="chat-form" action="javascript:void(0)" method="post" novalidate onsubmit="return false;"><textarea id="question" placeholder="اكتب سؤالك هنا..." maxlength="800" required></textarea><button type="submit" class="btn primary">إرسال</button></form>
   </section>
  </div>
 </div></section></main>
-<footer class="site-footer"><div class="container footer-row"><span>UON Hub · 2026</span><span>منصة طلابية مستقلة لطلاب جامعة نزوى</span></div></footer><div id="toast" class="toast"></div><script type="module" src="js/assistant.js?v=18.3"></script><aside class="notification-drawer" id="notificationDrawer"><div class="section-head"><h3>الإشعارات</h3><button class="icon-btn" id="closeNotifications">✕</button></div><div id="notificationItems" class="notification-list"></div></aside><script type="module">import {setupV14Shell} from "./js/v14-ui.js?v=18.3";setupV14Shell();</script><script type="module">import {applyFeatureStates} from "./js/core.js?v=18.3";applyFeatureStates(document);</script><script type="module" src="js/runtime-guard.js?v=18.3"></script></body></html>
+<footer class="site-footer"><div class="container footer-row"><span>UON Hub · 2026</span><span>منصة طلابية مستقلة لطلاب جامعة نزوى</span></div></footer><div id="toast" class="toast"></div>
+<script>
+(function(){
+  function stopAssistantSubmit(event){
+    if(event && event.preventDefault) event.preventDefault();
+    if(event && event.stopPropagation) event.stopPropagation();
+    return false;
+  }
+
+  document.addEventListener('submit', function(event){
+    if(event.target && event.target.id === 'chatForm'){
+      stopAssistantSubmit(event);
+    }
+  }, true);
+
+  document.addEventListener('DOMContentLoaded', function(){
+    var form=document.getElementById('chatForm');
+    if(form){
+      form.setAttribute('action','javascript:void(0)');
+      form.addEventListener('submit',stopAssistantSubmit,true);
+    }
+  });
+})();
+</script>
+<script type="module" src="js/assistant.js?v=18.5"></script><aside class="notification-drawer" id="notificationDrawer"><div class="section-head"><h3>الإشعارات</h3><button class="icon-btn" id="closeNotifications">✕</button></div><div id="notificationItems" class="notification-list"></div></aside><script type="module">import {setupV14Shell} from "./js/v14-ui.js?v=18.5";setupV14Shell();</script><script type="module">import {applyFeatureStates} from "./js/core.js?v=18.5";applyFeatureStates(document);</script><script type="module" src="js/runtime-guard.js?v=18.5"></script></body></html>
