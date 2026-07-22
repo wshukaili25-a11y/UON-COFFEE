@@ -1,7 +1,7 @@
-import {whatsappShare,reportBrokenLink,installErrorCapture,startMaintenanceWatcher} from './core.js';
+import {whatsappShare,reportBrokenLink,installErrorCapture} from './core.js';
 
-import {whatsappShare,reportBrokenLink,installErrorCapture,setupNav,enforceMaintenance,$,get,insert,notifyPending,toast,fillCollege,esc,openModal,closeModal} from './core.js';
-setupNav();await enforceMaintenance();startMaintenanceWatcher();fillCollege($('#collegeFilter'));fillCollege($('#collegeInput'));
+import {whatsappShare,reportBrokenLink,installErrorCapture,setupNav,enforceUonMaintenance,watchUonMaintenance,$,get,insert,notifyPending,toast,fillCollege,esc,openModal,closeModal} from './core.js';
+setupNav();await enforceUonMaintenance();watchUonMaintenance();fillCollege($('#collegeFilter'));fillCollege($('#collegeInput'));
 let rows=[];async function load(){try{rows=await get('summaries','select=*&approved=eq.true&order=created_at.desc');render()}catch(e){toast(e.message,true)}}
 function render(){const q=$('#search').value.toLowerCase(),c=$('#collegeFilter').value;const list=rows.filter(x=>(!c||x.college===c)&&`${x.title||''} ${x.subject||''}`.toLowerCase().includes(q));$('#items').innerHTML=list.length?list.map(x=>`<article class="card item-card"><span class="badge">${esc(x.college||'')}</span><h3>${esc(x.title)}</h3><p>${esc(x.subject||'')} — ${esc(x.description||'')}</p><a class="btn" target="_blank" href="${esc(x.url||x.link)}">فتح الملف</a><div class="resource-actions"><a class="btn" target="_blank" href="${whatsappShare(x.title,x.url)}">مشاركة</a><button class="btn danger" data-report-table="summaries" data-report-id="${x.id}" data-report-title="${esc(x.title)}" data-report-url="${esc(x.url||'')}">بلاغ عن الرابط</button></div></article>`).join(''):'<div class="empty">لا توجد نتائج</div>'}
 $('#search').oninput=render;$('#collegeFilter').onchange=render;$('#openForm').onclick=()=>openModal('submitModal');$('#closeForm').onclick=()=>closeModal('submitModal');

@@ -1,6 +1,5 @@
-import {startMaintenanceWatcher} from './core.js';
-import {setupNav,enforceMaintenance,$,get,insert,notifyPending,toast,esc,openModal,closeModal} from './core.js';
-setupNav();await enforceMaintenance();startMaintenanceWatcher();let rows=[];
+import {setupNav,enforceUonMaintenance,watchUonMaintenance,$,get,insert,notifyPending,toast,esc,openModal,closeModal} from './core.js';
+setupNav();await enforceUonMaintenance();watchUonMaintenance();let rows=[];
 async function load(){try{rows=await get('student_projects','select=*&status=eq.approved&order=created_at.desc');render()}catch(e){toast(e.message,true)}}
 function render(){const q=$('#search').value.toLowerCase();const list=rows.filter(x=>`${x.title||''} ${x.major||''} ${x.description||''}`.toLowerCase().includes(q));$('#items').innerHTML=list.length?list.map(x=>`<article class="card item-card"><span class="badge">${esc(x.major||'مشروع طلابي')}</span><h3>${esc(x.title)}</h3><p>${esc(x.description||'')}</p><small>${esc(x.owner_name||'')}</small><div class="actions" style="margin-top:12px"><a class="btn primary" target="_blank" href="${esc(x.url||'#')}">فتح المشروع</a></div></article>`).join(''):'<div class="empty">لا توجد مشاريع معتمدة حاليًا</div>'}
 $('#search').oninput=render;$('#openForm').onclick=()=>openModal('modal');$('#close').onclick=()=>closeModal('modal');

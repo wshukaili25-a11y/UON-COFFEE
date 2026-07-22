@@ -1,6 +1,4 @@
-import {startMaintenanceWatcher} from './core.js';
-
-import {setupNav,enforceMaintenance,$,toast} from './core.js';setupNav();await enforceMaintenance();startMaintenanceWatcher();
+import {setupNav,enforceUonMaintenance,watchUonMaintenance,$,toast} from './core.js';setupNav();await enforceUonMaintenance();watchUonMaintenance();
 const grades={A:4,'A-':3.7,'B+':3.3,B:3,'B-':2.7,'C+':2.3,C:2,'C-':1.7,'D+':1.3,D:1,F:0};const body=$('#courses');
 const opts=(s='A')=>Object.entries(grades).map(([g,p])=>`<option ${g===s?'selected':''}>${g}</option>`).join('');
 function add(){const tr=document.createElement('tr');tr.innerHTML=`<td><input placeholder="STAT101"></td><td><input class="hrs" type="number" min=".5" step=".5" value="3"></td><td><select class="new">${opts()}</select></td><td><select class="repeat"><option value="no">لا</option><option value="yes">نعم</option></select></td><td><select class="old" disabled><option value="">—</option>${opts('F')}</select></td><td class="net">12.00</td><td><button class="icon-btn">✕</button></td>`;tr.querySelector('button').onclick=()=>{tr.remove();calc()};tr.querySelector('.repeat').onchange=e=>{tr.querySelector('.old').disabled=e.target.value!=='yes';calc()};tr.querySelectorAll('input,select').forEach(x=>x.addEventListener('input',calc));body.append(tr);calc()}
