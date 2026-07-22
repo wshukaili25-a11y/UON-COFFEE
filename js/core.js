@@ -252,24 +252,25 @@ export async function applyFeatureStates(root=document){
  try{
   const state=await getUonState();
   const map=state?.features||{};
+  const {showFeatureStateBanner}=await import('./v14-ui.js?v=17.6');
+
   root.querySelectorAll('[data-feature]').forEach(card=>{
    const status=map[card.dataset.feature]||'active';
    card.dataset.status=status;
-   card.querySelector('.feature-state')?.remove();
+   card.classList.toggle('feature-unavailable',status!=='active');
 
-   const badge=document.createElement('div');
-   badge.className=`feature-state ${status}`;
-   badge.innerHTML=`<span>${status==='active'?'✓':'!'}</span><strong>${featureStatusLabel(status)}</strong>`;
-   card.appendChild(badge);
+   card.querySelector('.feature-state')?.remove();
 
    if(status!=='active'){
     card.setAttribute('aria-disabled','true');
     card.addEventListener('click',event=>{
      event.preventDefault();
-     event.stopImmediatePropagation();
-     card.classList.add('state-shake');
-     setTimeout(()=>card.classList.remove('state-shake'),350);
-    },{capture:true,once:false});
+     event.stopPropagation();
+     const title=card.querySelector('h3')?.textContent?.trim()||'';
+     showFeatureStateBanner(status,title);
+    },true);
+   }else{
+    card.removeAttribute('aria-disabled');
    }
   });
   return state;

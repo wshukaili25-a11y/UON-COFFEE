@@ -1444,3 +1444,219 @@ body.v175-app .site-footer,body.v175-app .notification-drawer{background:var(--u
 
 @media(max-width:960px){.v175-nav>nav{display:none}.v175-services{grid-template-columns:repeat(2,1fr)}.v175-useful-grid{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:680px){.v175-hero{padding-top:52px}.v175-hero h1{font-size:2.75rem;letter-spacing:-1.2px}.v175-stats{grid-template-columns:repeat(2,1fr)}.v175-services,.v175-two-columns,.v175-support-grid,.v175-useful-grid,.v175-ai-layout{grid-template-columns:1fr}.v175-services>a{min-height:170px}.v175-support-grid article{grid-template-columns:1fr}.v175-support-image{min-height:190px}.v175-ai-chat .chat-form{grid-template-columns:1fr}.v175-section{padding:44px 0}}
+
+
+/* ==========================================================
+   V17.6 — Stable cards, themes and inline status banner
+   ========================================================== */
+:root{
+ --app-bg:#f6f8fc;
+ --app-surface:#ffffff;
+ --app-surface-soft:#f0f4fa;
+ --app-text:#101827;
+ --app-muted:#718096;
+ --app-line:#dbe3ee;
+ --app-primary:#3461eb;
+ --app-shadow:0 8px 26px rgba(20,36,66,.06);
+ --app-danger:#dc2626;
+ --app-danger-bg:#fff1f2;
+}
+
+:root[data-theme="dark"]{
+ --app-bg:#07101d;
+ --app-surface:#0e1929;
+ --app-surface-soft:#142135;
+ --app-text:#f5f7fb;
+ --app-muted:#9da9bc;
+ --app-line:#293a51;
+ --app-primary:#7e8cff;
+ --app-shadow:0 14px 34px rgba(0,0,0,.24);
+ --app-danger:#ff6b6b;
+ --app-danger-bg:#32181d;
+ color-scheme:dark;
+}
+
+html,body{background:var(--app-bg)!important;color:var(--app-text)!important}
+a,a:hover,a:focus,a:active,
+h1,h2,h3,h4,p,span,strong,small,b,
+.v175-services a,.v16-service-card,.student-service-card,
+.simple-desktop-links a,.v176-desktop-nav a{
+ text-decoration:none!important;
+}
+
+.site-header{
+ background:color-mix(in srgb,var(--app-surface) 95%,transparent)!important;
+ border-bottom:1px solid var(--app-line)!important;
+ box-shadow:none!important;
+}
+
+.v176-nav{height:68px;display:flex;align-items:center;justify-content:space-between;gap:18px}
+.v176-brand{display:flex;align-items:center;gap:9px;color:var(--app-text)!important;text-decoration:none!important}
+.v176-brand span{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;background:linear-gradient(135deg,#5875ff,#8b7cff);color:#fff;font-weight:900}
+.v176-desktop-nav{display:flex;gap:5px}
+.v176-desktop-nav a{padding:10px 12px;border-radius:9px;color:var(--app-muted)!important}
+.v176-desktop-nav a:hover,.v176-desktop-nav a.active{background:var(--app-surface-soft);color:var(--app-primary)!important}
+.v176-nav-actions{display:flex;gap:7px}
+.v176-nav-button{min-width:42px;height:42px;border:1px solid var(--app-line);border-radius:11px;background:var(--app-surface);color:var(--app-text);cursor:pointer}
+
+.v176-side-menu{position:fixed;top:0;right:-380px;z-index:1500;width:min(350px,90vw);height:100vh;padding:20px;background:var(--app-surface);border-left:1px solid var(--app-line);box-shadow:-18px 0 55px rgba(0,0,0,.18);display:flex;flex-direction:column;transition:.22s}
+.v176-side-menu.open{right:0}
+[dir="ltr"] .v176-side-menu{right:auto;left:-380px;border-left:0;border-right:1px solid var(--app-line)}
+[dir="ltr"] .v176-side-menu.open{left:0}
+.v176-menu-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+.v176-menu-head button{border:0;background:transparent;color:var(--app-muted);font-size:1.1rem}
+.v176-side-menu nav{display:grid;gap:4px;overflow:auto}
+.v176-side-menu nav a{padding:12px;border-radius:9px;color:var(--app-text)!important}
+.v176-side-menu nav a:hover,.v176-side-menu nav a.active{background:var(--app-surface-soft);color:var(--app-primary)!important}
+.v176-menu-settings{margin-top:auto;display:grid;gap:7px;padding-top:14px;border-top:1px solid var(--app-line)}
+.v176-menu-settings button{display:flex;align-items:center;gap:10px;padding:12px;border:1px solid var(--app-line);border-radius:10px;background:var(--app-surface-soft);color:var(--app-text)}
+.v176-backdrop{position:fixed;inset:0;z-index:1400;background:rgba(0,0,0,.45);opacity:0;visibility:hidden;transition:.2s}
+.v176-backdrop.open{opacity:1;visibility:visible}
+
+/* Old-style clean service cards */
+.v175-services,
+.student-service-grid,
+.v16-service-grid{
+ gap:14px!important;
+}
+
+.v175-services>a,
+.student-service-card,
+.v16-service-card,
+.feature-card,
+.course-card,
+.item-card{
+ background:var(--app-surface)!important;
+ border:1px solid var(--app-line)!important;
+ border-radius:20px!important;
+ box-shadow:var(--app-shadow)!important;
+ color:var(--app-text)!important;
+ transition:.2s ease!important;
+}
+
+.v175-services>a:hover,
+.student-service-card:hover,
+.v16-service-card:hover,
+.feature-card:hover,
+.course-card:hover,
+.item-card:hover{
+ transform:translateY(-3px)!important;
+ border-color:color-mix(in srgb,var(--app-primary) 32%,var(--app-line))!important;
+}
+
+.v175-services h3,
+.student-service-card h3,
+.v16-service-card h3,
+.feature-card h3{
+ color:var(--app-text)!important;
+ text-decoration:none!important;
+}
+
+.v175-services p,
+.student-service-card p,
+.v16-service-card p,
+.feature-card p{
+ color:var(--app-muted)!important;
+ text-decoration:none!important;
+}
+
+/* Unavailable tools are shaded only */
+[data-feature].feature-unavailable,
+[data-feature][data-status="maintenance"],
+[data-feature][data-status="disabled"],
+[data-feature][data-status="coming_soon"]{
+ position:relative;
+ opacity:.68!important;
+ filter:saturate(.55)!important;
+ cursor:not-allowed!important;
+ border-color:var(--app-line)!important;
+ background:var(--app-surface-soft)!important;
+}
+
+[data-feature].feature-unavailable::after,
+[data-feature][data-status="maintenance"]::after,
+[data-feature][data-status="disabled"]::after,
+[data-feature][data-status="coming_soon"]::after{
+ content:"";
+ position:absolute;
+ inset:0;
+ border-radius:inherit;
+ background:rgba(20,28,44,.06);
+ pointer-events:none;
+}
+
+.feature-state{display:none!important}
+.v175-unavailable{display:none!important}
+
+/* Banner appears only after clicking unavailable tool */
+.feature-state-banner{
+ position:fixed;
+ left:50%;
+ bottom:22px;
+ transform:translate(-50%,120px);
+ z-index:1800;
+ width:min(560px,calc(100% - 28px));
+ padding:16px 18px;
+ border-radius:14px;
+ border:1px solid color-mix(in srgb,var(--app-danger) 46%,var(--app-line));
+ background:var(--app-danger-bg);
+ color:var(--app-danger);
+ box-shadow:0 20px 55px rgba(0,0,0,.24);
+ display:grid;
+ grid-template-columns:auto 1fr;
+ gap:12px;
+ opacity:0;
+ visibility:hidden;
+ transition:.25s ease;
+}
+
+.feature-state-banner.show{
+ transform:translate(-50%,0);
+ opacity:1;
+ visibility:visible;
+}
+
+.feature-state-banner button{
+ width:32px;height:32px;border-radius:9px;
+ border:1px solid currentColor;background:transparent;color:inherit;cursor:pointer;
+}
+.feature-state-banner strong{display:block;margin-bottom:4px}
+.feature-state-banner p{margin:0;color:inherit;opacity:.88;line-height:1.6}
+
+/* Full-page theme coverage */
+.card,.form-card,.modal-card,.simple-group-card,.guide-program-card,
+.v16-resource-card,.v16-rating-card,.v175-panel,.v175-site-card,
+.v175-ai-info,.v175-ai-chat,.v175-support-grid article,
+.official-whatsapp-channel,.simple-toolbar{
+ background:var(--app-surface)!important;
+ color:var(--app-text)!important;
+ border-color:var(--app-line)!important;
+}
+
+.page-hero,.course-hero,.v175-page-hero,.simple-guide-hero,
+.v16-course-header,.v16-hero,.student-hero,.v175-hero{
+ background:linear-gradient(180deg,var(--app-surface),var(--app-bg))!important;
+ color:var(--app-text)!important;
+}
+
+input,select,textarea{
+ background:var(--app-surface)!important;
+ color:var(--app-text)!important;
+ border-color:var(--app-line)!important;
+}
+
+.site-footer,.notification-drawer,.simple-bottom-nav{
+ background:var(--app-surface)!important;
+ color:var(--app-muted)!important;
+ border-color:var(--app-line)!important;
+}
+
+@media(max-width:900px){
+ .v176-desktop-nav{display:none}
+}
+
+@media(max-width:650px){
+ .v176-nav{height:64px}
+ .v175-services>a,.student-service-card,.v16-service-card{min-height:190px!important}
+ .feature-state-banner{bottom:88px}
+}
