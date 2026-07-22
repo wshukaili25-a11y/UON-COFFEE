@@ -87,3 +87,44 @@ async function loadHealth(){
 
 $('#refreshHealth')?.addEventListener('click',loadHealth);
 document.querySelector('[data-section="health"]')?.addEventListener('click',loadHealth);
+
+
+async function loadAnalytics(){
+ const events=await get('usage_events','select=event_type,metadata,created_at&order=created_at.desc&limit=5000');
+ const today=new Date().toISOString().slice(0,10);
+ const todayEvents=events.filter(x=>String(x.created_at).startsWith(today));
+ const views=events.filter(x=>x.event_type==='page_view').length;
+ const suggestions=await get('feature_suggestions','select=id&status=eq.pending');
+ const cards=[
+  ['أحداث اليوم',todayEvents.length],
+  ['مشاهدات مسجلة',views],
+  ['اقتراحات معلقة',suggestions.length],
+  ['إجمالي الأحداث',events.length]
+ ];
+ $('#analyticsCards').innerHTML=cards.map(x=>`<div class="card stat"><span>${x[0]}</span><strong>${x[1]}</strong></div>`).join('');
+ const featureCounts={},searchCounts={};
+ events.forEach(x=>{
+  if(x.event_type==='feature_open'&&x.metadata?.feature)featureCounts[x.metadata.feature]=(featureCounts[x.metadata.feature]||0)+1;
+  if((x.event_type==='search'||x.event_type==='assistant_question')&&x.metadata?.query){const q=String(x.metadata.query).toLowerCase();searchCounts[q]=(searchCounts[q]||0)+1}
+ });
+ const render=(obj)=>Object.entries(obj).sort((a,b)=>b[1]-a[1]).slice(0,10).map(([k,v])=>`<div class="list-row"><strong>${esc(k)}</strong><span>${v}</span></div>`).join('')||'<div class="empty">لا توجد بيانات بعد</div>';
+ $('#topFeatures').innerHTML=render(featureCounts);$('#topSearches').innerHTML=render(searchCounts);
+}
+$('#refreshAnalytics')?.addEventListener('click',loadAnalytics);
+document.querySelector('[data-section="analytics"]')?.addEventListener('click',loadAnalytics);
+
+async function loadCalendarAdmin(){
+ const rows=await get('academic_calendar_events','select=*&order=start_date.asc');
+ $('#calendarAdminList').innerHTML=rows.map(x=>`<div class="list-row"><div><strong>${esc(x.title)}</strong><small>${x.start_date} • ${esc(x.event_type)}</small></div><button class="btn danger" data-cal-del="${x.id}">حذف</button></div>`).join('')||'<div class="empty">لا توجد مواعيد</div>';
+ $$('[data-cal-del]').forEach(b=>b.onclick=async()=>{await remove('academic_calendar_events',`id=eq.${b.dataset.calDel}`);loadCalendarAdmin()});
+}
+$('#calendarForm')?.addEventListener('submit',async e=>{e.preventDefault();const body=Object.fromEntries(new FormData(e.target));body.active=true;await insert('academic_calendar_events',body);toast('تمت إضافة الموعد');e.target.reset();loadCalendarAdmin()});
+document.querySelector('[data-section="calendar-admin"]')?.addEventListener('click',loadCalendarAdmin);
+
+async function loadSuggestions(){
+ const rows=await get('feature_suggestions','select=*&order=created_at.desc');
+ $('#suggestionsList').innerHTML=rows.map(x=>`<div class="list-row"><div><span class="badge">${esc(x.category)}</span><strong>${esc(x.title)}</strong><small>${esc(x.details)} • ${new Date(x.created_at).toLocaleString('ar')}</small></div><div class="actions"><button class="btn success" data-sug-ok="${x.id}">تمت المراجعة</button><button class="btn danger" data-sug-del="${x.id}">حذف</button></div></div>`).join('')||'<div class="empty">لا توجد اقتراحات</div>';
+ $$('[data-sug-ok]').forEach(b=>b.onclick=async()=>{await update('feature_suggestions',`id=eq.${b.dataset.sugOk}`,{status:'reviewed'});loadSuggestions()});
+ $$('[data-sug-del]').forEach(b=>b.onclick=async()=>{await remove('feature_suggestions',`id=eq.${b.dataset.sugDel}`);loadSuggestions()});
+}
+document.querySelector('[data-section="suggestions"]')?.addEventListener('click',loadSuggestions);

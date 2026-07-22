@@ -6,7 +6,7 @@ import {
  getUonState,
  enforceUonMaintenance,
  watchUonMaintenance
-} from './core.js';
+,trackEvent,trackClicks} from './core.js';
 setupNav();await enforceUonMaintenance();watchUonMaintenance();
 async function refresh(){
  try{
@@ -56,3 +56,5 @@ function setupHeroSlider(){
  document.addEventListener('visibilitychange',()=>document.hidden?stop():start());show(0);
 }
 setupHeroSlider();
+
+trackClicks();trackEvent('page_view',{page:'home'});

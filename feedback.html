@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>اقترح ميزة | UON Hub</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/app.css?v=11">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#060b1b">
+</head>
+<body>
+<header class="site-header">
+<div class="container nav">
+<a class="brand" href="index.html"><span class="brand-mark">U1</span>UON <span>Hub</span></a>
+<a class="btn" href="index.html">الرئيسية</a>
+</div>
+</header>
+<main>
+<section class="page-hero"><div class="container">
+<span class="badge">شاركنا رأيك</span>
+<h1>اقترح ميزة</h1>
+<p>لا نطلب تسجيل دخول أو بيانات شخصية. اكتب فكرتك فقط.</p>
+</div></section>
+<section class="section"><div class="container">
+<form id="feedbackForm" class="card form-card form-grid">
+<div class="field"><label>نوع الاقتراح</label>
+<select name="category" required>
+<option value="feature">ميزة جديدة</option>
+<option value="improvement">تحسين</option>
+<option value="bug">مشكلة</option>
+<option value="content">محتوى ناقص</option>
+</select></div>
+<div class="field"><label>الكلية — اختياري</label><select id="feedbackCollege" name="college"></select></div>
+<div class="field wide"><label>عنوان الفكرة</label><input name="title" required maxlength="120"></div>
+<div class="field wide"><label>التفاصيل</label><textarea name="details" rows="7" required maxlength="2000"></textarea></div>
+<div class="field wide"><label>وسيلة تواصل — اختياري</label><input name="contact" placeholder="رقم أو معرف تيليجرام، ويترك فارغًا إذا تفضل"></div>
+<button class="btn primary field wide">إرسال الاقتراح</button>
+</form>
+</div></section>
+</main>
+<div id="toast" class="toast"></div>
+<script type="module" src="js/feedback.js?v=11"></script>
+</body>
+</html>

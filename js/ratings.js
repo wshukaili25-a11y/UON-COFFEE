@@ -1,3 +1,29 @@
-import {startMaintenanceWatcher} from './core.js';
 
-import {setupNav,enforceMaintenance,$,get,insert,notifyPending,toast,fillCollege,esc,openModal,closeModal} from './core.js';setupNav();await enforceMaintenance();startMaintenanceWatcher();fillCollege($('#college'));let rows=[];async function load(){try{rows=await get('rating_public_summary','select=*&order=overall_rating.desc');render()}catch(e){toast(e.message,true)}}function render(){const q=$('#search').value.toLowerCase(),k=$('#kind').value;const a=rows.filter(x=>(!k||x.kind===k)&&String(x.target_name).toLowerCase().includes(q));$('#items').innerHTML=a.length?a.map(x=>`<article class="card item-card"><span class="badge">${x.kind==='course'?'مادة':'دكتور'}</span><h3>${esc(x.target_name)}</h3><p>⭐ ${x.overall_rating||0} من 5 • ${x.reviews_count||0} تقييم</p><p>${esc(x.latest_comment||'')}</p></article>`).join(''):'<div class="empty">لا توجد تقييمات</div>'}$('#search').oninput=render;$('#kind').onchange=render;$('#openForm').onclick=()=>openModal('modal');$('#close').onclick=()=>closeModal('modal');$('#form').onsubmit=async e=>{e.preventDefault();const b=Object.fromEntries(new FormData(e.target));b.status='pending';try{const d=await insert('rating_submissions',b);await notifyPending('rating_submissions',d[0].id);toast('تم الإرسال');closeModal('modal')}catch(err){toast(err.message,true)}};load();
+import {$,get,insert,esc,toast,openModal,closeModal,notifyPending,enforceUonMaintenance,watchUonMaintenance,trackEvent} from './core.js';
+await enforceUonMaintenance();watchUonMaintenance();
+let rows=[];
+async function load(){
+ rows=await get('rating_submissions','select=*&status=eq.approved&order=created_at.desc');
+ render();trackEvent('page_view',{page:'ratings'});
+}
+function stars(n){return '★'.repeat(Math.round(Number(n)||0))+'☆'.repeat(5-Math.round(Number(n)||0))}
+function render(){
+ const q=$('#ratingSearch').value.toLowerCase();
+ const filtered=rows.filter(x=>`${x.target_name||''} ${x.course_code||''}`.toLowerCase().includes(q));
+ $('#ratingCards').innerHTML=filtered.length?filtered.map(x=>`<article class="card rating-card">
+ <span class="badge">${x.target_type==='course'?'مقرر':'دكتور'}</span>
+ <h3>${esc(x.target_name)}</h3><strong class="rating-stars">${stars(x.overall)}</strong>
+ <small>${esc(x.course_code||'')}</small>
+ <p>${esc(x.comment||'بدون تعليق')}</p>
+ <div class="rating-metrics"><span>الشرح: ${x.teaching||'—'}</span><span>التعامل: ${x.interaction||'—'}</span><span>الصعوبة: ${x.exam_difficulty||'—'}</span></div>
+ </article>`).join(''):'<div class="empty">لا توجد تقييمات معتمدة حاليًا</div>';
+}
+$('#ratingSearch').oninput=render;
+$('#openRating').onclick=()=>openModal('ratingModal');$('#closeRating').onclick=()=>closeModal('ratingModal');
+$('#ratingForm').onsubmit=async event=>{
+ event.preventDefault();const body=Object.fromEntries(new FormData(event.target));
+ ['overall','teaching','interaction','exam_difficulty'].forEach(k=>{if(body[k])body[k]=Number(body[k])});
+ body.recommended=body.recommended==='true';body.status='pending';
+ try{const r=await insert('rating_submissions',body);await notifyPending('rating_submissions',r[0].id);trackEvent('rating_submit',{target_type:body.target_type});toast('تم إرسال التقييم للمراجعة');event.target.reset();closeModal('ratingModal')}catch(e){toast(e.message,true)}
+};
+load();

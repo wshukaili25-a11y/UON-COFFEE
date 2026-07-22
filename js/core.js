@@ -145,3 +145,29 @@ export function clearAdminSession(){
  sessionStorage.removeItem('uon_admin_session');
  sessionStorage.removeItem('uon_admin');
 }
+
+
+export async function trackEvent(eventType,metadata={}){
+ try{
+  const sessionKey='uon_anon_session';
+  let sessionId=localStorage.getItem(sessionKey);
+  if(!sessionId){sessionId=crypto.randomUUID();localStorage.setItem(sessionKey,sessionId)}
+  await insert('usage_events',{
+   event_type:eventType,
+   page_path:location.pathname,
+   session_id:sessionId,
+   metadata,
+   user_agent:navigator.userAgent.slice(0,300)
+  });
+ }catch(error){console.warn('Usage tracking skipped',error)}
+}
+
+export function trackClicks(){
+ document.addEventListener('click',event=>{
+  const link=event.target.closest('a,button');
+  if(!link)return;
+  const feature=link.closest('[data-feature]')?.dataset.feature;
+  if(feature)trackEvent('feature_open',{feature});
+  if(link.matches('a[href*="summaries"]'))trackEvent('summary_section_open',{href:link.getAttribute('href')});
+ },{capture:true});
+}
