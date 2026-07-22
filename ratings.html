@@ -2,7 +2,7 @@
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>التقييمات | UON Hub</title>
 <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/app.css?v=18.2">
+<link rel="stylesheet" href="css/app.css?v=18.3">
 
 <meta name="description" content="تقييمات الطلاب للمقررات والدكاترة في جامعة نزوى.">
 <meta name="robots" content="index,follow,max-image-preview:large">
@@ -21,10 +21,10 @@
 <header class="site-header"><div class="container nav"><a class="brand" href="index.html"><span class="brand-mark">U1</span>UON <span>Hub</span></a><a class="btn" href="index.html">الرئيسية</a></div></header>
 <main class="v14-page-main"><section class="page-hero"><div class="container"><span class="badge">تجارب الطلاب</span><h1>تقييمات الدكاترة والمقررات</h1><p>التقييمات مجهولة ولا نطلب حسابًا.</p></div></section>
 <section class="section"><div class="container">
-<div class="toolbar"><input id="ratingSearch" placeholder="ابحث عن دكتور أو مقرر"><button id="openRating" class="btn primary" data-ar="إضافة تقييم" data-en="Add Rating">إضافة تقييم</button></div>
+<div class="toolbar"><input id="ratingSearch" placeholder="ابحث عن دكتور أو مقرر"><button type="button" id="openRating" class="btn primary" data-ar="إضافة تقييم" data-en="Add Rating">إضافة تقييم</button></div>
 <div id="ratingCards" class="grid grid-3"></div>
 </div></section></main>
-<div class="modal" id="ratingModal"><div class="card modal-card"><div class="section-head"><h2 data-ar="إضافة تقييم" data-en="Add Rating">إضافة تقييم</h2><button id="closeRating" class="icon-btn">✕</button></div>
+<div class="modal" id="ratingModal"><div class="card modal-card"><div class="section-head"><h2 data-ar="إضافة تقييم" data-en="Add Rating">إضافة تقييم</h2><button type="button" id="closeRating" class="icon-btn">✕</button></div>
 <form id="ratingForm" class="form-grid">
 <div class="field"><label>النوع</label><select name="target_type"><option value="instructor">دكتور</option><option value="course">مقرر</option></select></div>
 <div class="field"><label>الاسم</label><input name="target_name" required></div>
@@ -35,8 +35,8 @@
 <div class="field"><label>صعوبة الاختبارات</label><input name="exam_difficulty" type="number" min="1" max="5"></div>
 <div class="field"><label>هل تنصح به؟</label><select name="recommended"><option value="true">نعم</option><option value="false">لا</option></select></div>
 <div class="field wide"><label>تعليق</label><textarea name="comment" rows="5" maxlength="1000"></textarea></div>
-<button class="btn primary field wide">إرسال للمراجعة</button>
+<button type="submit" class="btn primary field wide">إرسال للمراجعة</button>
 </form></div></div>
 <div id="toast" class="toast"></div>
-<script type="module" src="js/ratings.js?v=18.2"></script>
-<aside class="notification-drawer" id="notificationDrawer"><div class="section-head"><h3>الإشعارات</h3><button class="icon-btn" id="closeNotifications">✕</button></div><div id="notificationItems" class="notification-list"></div></aside><script type="module">import {setupV14Shell} from "./js/v14-ui.js?v=18.2";setupV14Shell();</script><script type="module">import {applyFeatureStates} from "./js/core.js?v=18.2";applyFeatureStates(document);</script><script type="module" src="js/runtime-guard.js?v=18.2"></script></body></html>
+<script type="module" src="js/ratings.js?v=18.3"></script>
+<aside class="notification-drawer" id="notificationDrawer"><div class="section-head"><h3>الإشعارات</h3><button class="icon-btn" id="closeNotifications">✕</button></div><div id="notificationItems" class="notification-list"></div></aside><script type="module">import {setupV14Shell} from "./js/v14-ui.js?v=18.3";setupV14Shell();</script><script type="module">import {applyFeatureStates} from "./js/core.js?v=18.3";applyFeatureStates(document);</script><script type="module" src="js/runtime-guard.js?v=18.3"></script></body></html>

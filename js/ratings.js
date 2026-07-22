@@ -21,9 +21,53 @@ function render(){
 $('#ratingSearch').oninput=render;
 $('#openRating').onclick=()=>openModal('ratingModal');$('#closeRating').onclick=()=>closeModal('ratingModal');
 $('#ratingForm').onsubmit=async event=>{
- event.preventDefault();const body=Object.fromEntries(new FormData(event.target));
- ['overall','teaching','interaction','exam_difficulty'].forEach(k=>{if(body[k])body[k]=Number(body[k])});
- body.recommended=body.recommended==='true';body.status='pending';
- try{const r=await insert('rating_submissions',body);await notifyPending('rating_submissions',r[0].id);trackEvent('rating_submit',{target_type:body.target_type});toast('تم إرسال التقييم للمراجعة');event.target.reset();closeModal('ratingModal')}catch(e){toast(e.message,true)}
+ event.preventDefault();
+
+ const form=event.target;
+ const submitButton=form.querySelector('button[type="submit"],button:not([type])');
+ const originalText=submitButton?.textContent||'إرسال للمراجعة';
+ const body=Object.fromEntries(new FormData(form));
+
+ ['overall','teaching','interaction','exam_difficulty'].forEach(key=>{
+  if(body[key]!==''&&body[key]!==undefined)body[key]=Number(body[key]);
+  else delete body[key];
+ });
+
+ body.target_type=body.target_type||'instructor';
+
+ // Compatibility with the original rating_submissions schema.
+ body.kind=body.target_type;
+ body.overall_rating=body.overall;
+ body.recommended=body.recommended==='true';
+ body.status='pending';
+
+ try{
+  if(submitButton){
+   submitButton.disabled=true;
+   submitButton.textContent='جاري الإرسال...';
+  }
+
+  const result=await insert('rating_submissions',body);
+  if(result?.[0]?.id)await notifyPending('rating_submissions',result[0].id);
+
+  trackEvent('rating_submit',{target_type:body.target_type});
+  toast('تم إرسال التقييم للمراجعة');
+  form.reset();
+  closeModal('ratingModal');
+ }catch(error){
+  console.error(error);
+  const message=String(error?.message||'');
+
+  if(/kind.*not-null|overall_rating.*not-null/i.test(message)){
+   toast('تعذر إرسال التقييم بسبب عدم توافق قديم في قاعدة البيانات',true);
+  }else{
+   toast('تعذر إرسال التقييم، راجع البيانات وحاول مرة أخرى',true);
+  }
+ }finally{
+  if(submitButton){
+   submitButton.disabled=false;
+   submitButton.textContent=originalText;
+  }
+ }
 };
 load();

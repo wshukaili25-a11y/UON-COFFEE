@@ -36,8 +36,10 @@ addEventListener('online',()=>{
 addEventListener('unhandledrejection',event=>{
  console.error('Unhandled promise rejection:',event.reason);
  if(!navigator.onLine)return;
- const message=String(event.reason?.message||event.reason||'تعذر إكمال العملية. حاول مرة أخرى.');
- if(!/COURSES_FEATURE_DISABLED|FEATURE_DISABLED/i.test(message))showMessage(message.slice(0,180));
+ const technical=String(event.reason?.message||event.reason||'');
+ if(/COURSES_FEATURE_DISABLED|FEATURE_DISABLED/i.test(technical))return;
+ console.error('Hidden technical error:',technical);
+ showMessage('تعذر إكمال العملية حاليًا. حدّث الصفحة أو حاول مرة أخرى.');
 });
 
 addEventListener('error',event=>{
