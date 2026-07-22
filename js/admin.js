@@ -2,8 +2,24 @@ document.documentElement.classList.remove('maintenance-check');
 
 import {$,$$,get,insert,update,remove,rpc,toast,esc,edge} from './core.js';
 let authed=false;
-$('#loginForm').onsubmit=async e=>{e.preventDefault();try{const r=await rpc('uon_admin_login',{p_password:$('#password').value});if(!(r?.ok??r===true))throw new Error('كلمة المرور غير صحيحة');authed=true;sessionStorage.setItem('uon_admin','1');$('#login').hidden=true;$('#dashboard').hidden=false;loadAll()}catch(err){toast(err.message,true)}};
-if(sessionStorage.getItem('uon_admin')==='1'){authed=true;$('#login').hidden=true;$('#dashboard').hidden=false;loadAll()}
+
+function showLogin(){
+ const login=$('#login');
+ const dashboard=$('#dashboard');
+ if(login){login.hidden=false;login.style.display='grid'}
+ if(dashboard){dashboard.hidden=true;dashboard.style.display='none'}
+}
+
+function showDashboard(){
+ const login=$('#login');
+ const dashboard=$('#dashboard');
+ if(login){login.hidden=true;login.style.display='none'}
+ if(dashboard){dashboard.hidden=false;dashboard.style.display='grid'}
+}
+
+showLogin();
+$('#loginForm').onsubmit=async e=>{e.preventDefault();try{const r=await rpc('uon_admin_login',{p_password:$('#password').value});if(!(r?.ok??r===true))throw new Error('كلمة المرور غير صحيحة');authed=true;sessionStorage.setItem('uon_admin','1');showDashboard();loadAll().catch(err=>toast(err.message,true))}catch(err){toast(err.message,true)}};
+if(sessionStorage.getItem('uon_admin')==='1'){authed=true;showDashboard();loadAll().catch(err=>toast(err.message,true))}
 $('#logout').onclick=()=>{sessionStorage.clear();location.reload()};$('#menuAdmin').onclick=()=>$('#sidebar').classList.toggle('open');
 $$('[data-section]').forEach(b=>b.onclick=()=>{$$('.admin-section').forEach(x=>x.classList.remove('active'));$('#sec-'+b.dataset.section).classList.add('active');$('#sidebar').classList.remove('open');if(b.dataset.section==='pending')loadPending()});
 async function settings(){const r=await get('site_settings','select=key,value');const m=Object.fromEntries(r.map(x=>[x.key,x.value]));$('#maintenance').checked=m.maintenance_enabled===true||String(m.maintenance_enabled).toLowerCase()==='true';$('#maintenanceMessage').value=m.maintenance_message||'';$('#maintenanceUntil').value=m.maintenance_until?String(m.maintenance_until).slice(0,16):'';$('#whatsappUrl').value=m.whatsapp_channel_url||''}

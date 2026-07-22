@@ -1,4 +1,3 @@
-
 const SUPABASE_URL='https://irkhvydgxpseflggbeqq.supabase.co';
 const SUPABASE_KEY='sb_publishable_gZ9tyM1udrkuQIXHqDtToQ_FyFmePgH';
 const headers={apikey:SUPABASE_KEY,Authorization:`Bearer ${SUPABASE_KEY}`,'Content-Type':'application/json'};
@@ -47,30 +46,10 @@ export function fillCollege(select,{other=false}={}){
 }
 export function openModal(id){$('#'+id)?.classList.add('open')} export function closeModal(id){$('#'+id)?.classList.remove('open')}
 
-export async function enforceMaintenance(){
- const isAdmin=location.pathname.endsWith('/admin.html');
- const isMaintenance=location.pathname.endsWith('/maintenance.html');
- if(isAdmin)return;
- document.documentElement.classList.add('maintenance-check');
- try{
-  const rows=await get('site_settings',`select=key,value&key=in.(maintenance_enabled,maintenance_message)&_=${Date.now()}`);
-  const map=Object.fromEntries((rows||[]).map(x=>[x.key,x.value]));
-  const raw=map.maintenance_enabled;
-  const on=raw===true||raw===1||String(raw).replace(/"/g,'').toLowerCase()==='true';
-  if(on&&!isMaintenance){location.replace(`maintenance.html?v=${Date.now()}`);return}
-  if(!on&&isMaintenance){location.replace(`index.html?v=${Date.now()}`);return}
- }catch(e){console.warn('Maintenance check failed',e)}
- document.documentElement.classList.remove('maintenance-check');
-}
-export async function platformStatuses(){
- const rows=await get('platform_features',`select=key,status,updated_at&order=sort_order.asc&_=${Date.now()}`);
- return Object.fromEntries(rows.map(x=>[x.key,x.status]));
-}
 export async function notifyPending(table,id){
  try{await edge({source:'web-submit',table,id})}catch(e){console.warn('Notification fallback failed',e)}
 }
 
-export function startMaintenanceWatcher(interval=5000){if(location.pathname.endsWith('/admin.html'))return;const check=()=>enforceMaintenance();setInterval(check,interval);document.addEventListener('visibilitychange',()=>{if(!document.hidden)check()});window.addEventListener('focus',check)}
 
 
 export async function getUonState(){
@@ -78,40 +57,61 @@ export async function getUonState(){
 }
 
 let maintenanceInitialCheck=true;
+let maintenanceRedirecting=false;
+
 export async function enforceUonMaintenance(){
  const isAdmin=location.pathname.endsWith('/admin.html');
  const isMaintenance=location.pathname.endsWith('/maintenance.html');
  if(isAdmin)return false;
 
- if(maintenanceInitialCheck && document.readyState==='loading')document.documentElement.classList.add('maintenance-check');
+ if(maintenanceInitialCheck && document.readyState==='loading'){
+  document.documentElement.classList.add('maintenance-check');
+ }
+
  try{
   const state=await getUonState();
-  if(state.maintenance_enabled&&!isMaintenance){
-   location.replace(`maintenance.html?v=${Date.now()}`);
+  const enabled=state?.maintenance_enabled===true;
+
+  if(enabled&&!isMaintenance&&!maintenanceRedirecting){
+   maintenanceRedirecting=true;
+   location.replace('maintenance.html');
    return true;
   }
-  if(!state.maintenance_enabled&&isMaintenance){
-   location.replace(`index.html?v=${Date.now()}`);
+
+  if(!enabled&&isMaintenance&&!maintenanceRedirecting){
+   maintenanceRedirecting=true;
+   location.replace('index.html');
    return false;
   }
- }catch(e){console.error('state check',e)}
- finally{
+ }catch(error){
+  console.error('UON maintenance state error',error);
+ }finally{
   if(maintenanceInitialCheck){
    document.documentElement.classList.remove('maintenance-check');
    maintenanceInitialCheck=false;
   }
  }
+
  return false;
 }
 
 export function watchUonMaintenance(){
  if(location.pathname.endsWith('/admin.html'))return;
+
  let checking=false;
  const check=async()=>{
-  if(checking)return;
+  if(checking||maintenanceRedirecting)return;
   checking=true;
-  try{await enforceUonMaintenance()}finally{checking=false}
+  try{
+   await enforceUonMaintenance();
+  }finally{
+   checking=false;
+  }
  };
+
+ // No interval: check only when the user returns to the tab/window.
  window.addEventListener('focus',check);
- document.addEventListener('visibilitychange',()=>{if(!document.hidden)check()});
+ document.addEventListener('visibilitychange',()=>{
+  if(!document.hidden)check();
+ });
 }
