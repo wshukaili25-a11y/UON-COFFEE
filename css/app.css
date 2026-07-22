@@ -863,3 +863,457 @@ input:focus,select:focus,textarea:focus{border-color:rgba(24,199,245,.45)!import
   width:min(360px,94vw)!important;
  }
 }
+
+
+/* =========================================================
+   UON HUB V14.2 — Simple Student Design
+   ========================================================= */
+.student-home,
+.simple-guide-page{
+ background:#070c18;
+}
+
+.student-hero{
+ padding:72px 0 46px;
+ background:linear-gradient(180deg,#0c1729,#070c18);
+}
+
+.student-hero-inner{
+ display:grid;
+ grid-template-columns:1.05fr .95fr;
+ gap:34px;
+ align-items:center;
+}
+
+.student-hero-copy h1{
+ max-width:720px;
+ font-size:clamp(2.6rem,6vw,5.5rem);
+ line-height:1.08;
+ letter-spacing:-2.5px;
+ margin:14px 0 18px;
+}
+
+.student-hero-copy p{
+ max-width:590px;
+ color:#aab5c8;
+ font-size:1.08rem;
+ line-height:1.8;
+}
+
+.student-label{
+ display:inline-block;
+ color:#49c5f2;
+ font-size:.78rem;
+ font-weight:900;
+ letter-spacing:1.8px;
+}
+
+.student-hero-actions{
+ display:flex;
+ gap:10px;
+ margin-top:25px;
+}
+
+.student-hero-image{
+ min-height:420px;
+ border-radius:20px;
+ background:
+ linear-gradient(0deg,rgba(7,12,24,.28),rgba(7,12,24,.08)),
+ url('../assets/unizwa-new-gate-v52.jpg') center/cover;
+ border:1px solid rgba(255,255,255,.09);
+}
+
+.student-section{
+ padding:64px 0;
+}
+
+.student-section-title{
+ margin-bottom:22px;
+}
+
+.student-section-title h2{
+ margin:0 0 7px;
+ font-size:clamp(1.8rem,4vw,2.7rem);
+}
+
+.student-section-title p{
+ margin:0;
+ color:#9ca9bd;
+}
+
+.student-service-grid{
+ display:grid;
+ grid-template-columns:repeat(2,minmax(0,1fr));
+ gap:12px;
+}
+
+.student-service-card{
+ min-height:125px;
+ display:grid;
+ grid-template-columns:54px 1fr auto;
+ gap:15px;
+ align-items:center;
+ padding:19px;
+ border-radius:14px;
+ background:#0d1628;
+ border:1px solid rgba(255,255,255,.08);
+ text-decoration:none;
+ transition:.18s;
+}
+
+.student-service-card:hover{
+ background:#101c31;
+ border-color:rgba(73,197,242,.3);
+ transform:translateY(-2px);
+}
+
+.student-service-card h3{
+ margin:0 0 5px;
+ font-size:1.13rem;
+}
+
+.student-service-card p{
+ margin:0;
+ color:#98a6bb;
+ line-height:1.55;
+ font-size:.9rem;
+}
+
+.student-service-card>b{
+ color:#49c5f2;
+ font-size:.85rem;
+}
+
+.service-icon{
+ width:50px;
+ height:50px;
+ display:grid;
+ place-items:center;
+ border-radius:13px;
+ background:#14213a;
+ font-size:1.5rem;
+}
+
+.whatsapp-service{
+ border-color:rgba(37,211,102,.17);
+}
+
+.whatsapp-service-icon{
+ background:rgba(37,211,102,.11);
+ color:#25d366;
+}
+
+.whatsapp-service-icon svg{
+ width:31px;
+ height:31px;
+}
+
+.student-support{
+ background:#09111f;
+}
+
+.student-support-grid{
+ display:grid;
+ grid-template-columns:1fr 1fr;
+ gap:14px;
+}
+
+.student-support-card{
+ overflow:hidden;
+ border-radius:16px;
+ background:#0d1628;
+ border:1px solid rgba(255,255,255,.08);
+}
+
+.student-support-card .support-thumb{
+ height:210px;
+ background-position:center;
+ background-size:cover;
+}
+
+#anjizCard .support-thumb{
+ background-image:url('../assets/unizwa-new-gate-v52.jpg');
+}
+
+#masalikCard .support-thumb{
+ background-image:url('../assets/unizwa-campus-aerial.jpg');
+}
+
+.student-support-card>div:last-child{
+ padding:20px;
+}
+
+.student-support-card span{
+ color:#49c5f2;
+ font-size:.8rem;
+ font-weight:800;
+}
+
+.student-support-card h3{
+ margin:8px 0;
+ font-size:1.45rem;
+}
+
+.student-support-card p{
+ color:#9ca9bd;
+ line-height:1.7;
+ min-height:55px;
+}
+
+.student-feedback-box{
+ display:flex;
+ justify-content:space-between;
+ align-items:center;
+ gap:20px;
+ padding:26px;
+ border-radius:16px;
+ background:#0d1628;
+ border:1px solid rgba(255,255,255,.08);
+}
+
+.student-feedback-box h2{
+ margin:0 0 5px;
+}
+
+.student-feedback-box p{
+ margin:0;
+ color:#9ca9bd;
+}
+
+.simple-guide-hero{
+ padding-bottom:42px!important;
+}
+
+.guide-summary{
+ display:grid;
+ grid-template-columns:repeat(3,1fr);
+ gap:10px;
+ margin-bottom:16px;
+}
+
+.guide-summary>div{
+ padding:17px;
+ border-radius:13px;
+ background:#0d1628;
+ border:1px solid rgba(255,255,255,.08);
+ display:flex;
+ flex-direction:column;
+}
+
+.guide-summary strong{
+ font-size:1.7rem;
+ color:#49c5f2;
+}
+
+.guide-summary span{
+ color:#9ca9bd;
+ font-size:.83rem;
+}
+
+.simple-guide-filter{
+ display:grid;
+ grid-template-columns:1fr 260px 180px;
+ gap:9px;
+ margin-bottom:15px;
+}
+
+.guide-college-tabs{
+ display:flex;
+ gap:7px;
+ overflow:auto;
+ padding-bottom:9px;
+ margin-bottom:19px;
+}
+
+.guide-college-tabs button{
+ white-space:nowrap;
+ border:1px solid rgba(255,255,255,.08);
+ border-radius:999px;
+ background:#0d1628;
+ color:#aab5c8;
+ padding:9px 13px;
+ cursor:pointer;
+}
+
+.guide-college-tabs button.active{
+ background:#49c5f2;
+ color:#04101a;
+ border-color:#49c5f2;
+ font-weight:900;
+}
+
+.guide-program-list{
+ display:grid;
+ gap:30px;
+}
+
+.guide-college-heading{
+ display:flex;
+ align-items:end;
+ justify-content:space-between;
+ gap:15px;
+ margin-bottom:13px;
+}
+
+.guide-college-heading span{
+ color:#49c5f2;
+ font-size:.77rem;
+ font-weight:800;
+}
+
+.guide-college-heading h2{
+ margin:4px 0 0;
+ font-size:1.75rem;
+}
+
+.guide-college-heading>strong{
+ color:#9ca9bd;
+ font-size:.82rem;
+}
+
+.guide-program-grid{
+ display:grid;
+ grid-template-columns:repeat(3,minmax(0,1fr));
+ gap:10px;
+}
+
+.guide-program-card{
+ min-height:175px;
+ padding:16px;
+ display:flex;
+ flex-direction:column;
+ border-radius:13px;
+ background:#0d1628;
+ border:1px solid rgba(255,255,255,.08);
+}
+
+.guide-program-top{
+ display:flex;
+ align-items:center;
+ justify-content:space-between;
+ gap:9px;
+}
+
+.degree-tag{
+ padding:5px 8px;
+ border-radius:999px;
+ background:#15233c;
+ color:#70d7fa;
+ font-size:.73rem;
+ font-weight:800;
+}
+
+.guide-program-top small{
+ color:#718097;
+ text-align:left;
+ font-size:.72rem;
+}
+
+.guide-program-card h3{
+ margin:17px 0 15px;
+ font-size:1.08rem;
+ line-height:1.5;
+ flex:1;
+}
+
+.guide-program-actions{
+ display:flex;
+ gap:7px;
+}
+
+.guide-program-actions .btn{
+ min-height:38px!important;
+ padding:8px 10px!important;
+ font-size:.78rem;
+}
+
+.guide-source-note{
+ margin-top:28px;
+ padding:18px;
+ border-radius:13px;
+ background:#0b1425;
+ border:1px solid rgba(255,255,255,.08);
+}
+
+.guide-source-note p{
+ color:#9ca9bd;
+ line-height:1.65;
+}
+
+@media(max-width:900px){
+ .student-hero-inner{
+  grid-template-columns:1fr;
+ }
+
+ .student-hero-image{
+  min-height:310px;
+ }
+
+ .guide-program-grid{
+  grid-template-columns:repeat(2,minmax(0,1fr));
+ }
+
+ .simple-guide-filter{
+  grid-template-columns:1fr 1fr;
+ }
+
+ .simple-guide-filter input{
+  grid-column:1/-1;
+ }
+}
+
+@media(max-width:650px){
+ .student-hero{
+  padding-top:50px;
+ }
+
+ .student-hero-copy h1{
+  font-size:2.8rem;
+  letter-spacing:-1.5px;
+ }
+
+ .student-hero-actions{
+  flex-direction:column;
+ }
+
+ .student-service-grid,
+ .student-support-grid,
+ .guide-program-grid{
+  grid-template-columns:1fr;
+ }
+
+ .student-service-card{
+  grid-template-columns:48px 1fr auto;
+  padding:16px;
+ }
+
+ .student-feedback-box{
+  align-items:flex-start;
+  flex-direction:column;
+ }
+
+ .guide-summary{
+  grid-template-columns:1fr;
+ }
+
+ .simple-guide-filter{
+  grid-template-columns:1fr;
+ }
+
+ .simple-guide-filter input{
+  grid-column:auto;
+ }
+
+ .guide-program-top{
+  align-items:flex-start;
+  flex-direction:column;
+ }
+
+ .guide-program-top small{
+  text-align:right;
+ }
+
+ .guide-program-actions{
+  flex-direction:column;
+ }
+}
