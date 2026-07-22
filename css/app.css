@@ -54,3 +54,33 @@ table{width:100%;border-collapse:collapse}th,td{padding:.75rem;border-bottom:1px
 
 .admin-page #login{display:grid!important;visibility:visible;opacity:1}
 .admin-page #dashboard[hidden]{display:none!important}
+
+
+/* UON Hub V10 */
+.v10-search-card{
+ display:grid;
+ grid-template-columns:1fr minmax(300px,520px);
+ align-items:center;
+ gap:28px;
+ background:
+  radial-gradient(circle at 10% 10%,rgba(28,200,245,.14),transparent 32%),
+  radial-gradient(circle at 90% 90%,rgba(139,124,255,.12),transparent 35%),
+  var(--card);
+}
+.v10-search-box{display:flex;gap:10px}
+.v10-search-box input{min-width:0}
+.search-result strong{display:block;margin:8px 0 4px}
+.search-result small{display:block;line-height:1.6}
+.health-card{min-height:145px;display:flex;flex-direction:column;justify-content:space-between}
+.health-card strong{font-size:1.15rem;word-break:break-word}
+.health-card.ok{border-color:rgba(46,213,115,.32)}
+.health-card.error{border-color:rgba(255,71,87,.36)}
+.permission-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.permission-grid label{display:flex;gap:8px;align-items:center;background:rgba(255,255,255,.03);padding:10px;border-radius:10px}
+.admin-section.active{animation:v10Fade .22s ease}
+@keyframes v10Fade{from{opacity:.35;transform:translateY(4px)}to{opacity:1;transform:none}}
+@media(max-width:760px){
+ .v10-search-card{grid-template-columns:1fr}
+ .v10-search-box{flex-direction:column}
+ .permission-grid{grid-template-columns:1fr}
+}

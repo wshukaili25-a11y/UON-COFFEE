@@ -1,7 +1,23 @@
 
 export function setupPWA(){
- if('serviceWorker' in navigator)navigator.serviceWorker.register('/sw.js').catch(console.warn);
- let deferred;
- window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferred=e;const b=document.querySelector('#installApp');if(b)b.hidden=false});
- document.querySelector('#installApp')?.addEventListener('click',async()=>{if(!deferred)return;deferred.prompt();await deferred.userChoice;deferred=null;document.querySelector('#installApp').hidden=true});
+ if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('/sw.js?v=10').catch(console.warn);
+ }
+
+ let deferredPrompt=null;
+ const button=document.querySelector('#installApp');
+
+ window.addEventListener('beforeinstallprompt',event=>{
+  event.preventDefault();
+  deferredPrompt=event;
+  if(button)button.hidden=false;
+ });
+
+ button?.addEventListener('click',async()=>{
+  if(!deferredPrompt)return;
+  deferredPrompt.prompt();
+  await deferredPrompt.userChoice;
+  deferredPrompt=null;
+  button.hidden=true;
+ });
 }

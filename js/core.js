@@ -115,3 +115,33 @@ export function watchUonMaintenance(){
   if(!document.hidden)check();
  });
 }
+
+
+export function debounce(fn,delay=250){
+ let timer;
+ return (...args)=>{
+  clearTimeout(timer);
+  timer=setTimeout(()=>fn(...args),delay);
+ };
+}
+
+export function formatDate(value){
+ if(!value)return '—';
+ try{return new Date(value).toLocaleString('ar')}catch{return String(value)}
+}
+
+export function adminSession(){
+ try{return JSON.parse(sessionStorage.getItem('uon_admin_session')||'null')}catch{return null}
+}
+
+export function saveAdminSession(data){
+ sessionStorage.setItem('uon_admin_session',JSON.stringify({
+  ...data,
+  created_at:Date.now()
+ }));
+}
+
+export function clearAdminSession(){
+ sessionStorage.removeItem('uon_admin_session');
+ sessionStorage.removeItem('uon_admin');
+}

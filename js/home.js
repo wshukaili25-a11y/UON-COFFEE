@@ -26,3 +26,16 @@ try{const rows=await get('site_settings','select=key,value&key=eq.whatsapp_chann
 refresh();ads();setInterval(refresh,15000);window.addEventListener('focus',refresh);
 
 async function loadLiveStats(){const specs=[['summaries','approved=eq.true','الملخصات','📚'],['whatsapp_groups','approved=eq.true','المجموعات','🟢'],['student_projects','status=eq.approved','المشاريع','💻'],['rating_submissions','status=eq.approved','التقييمات','⭐']];const vals=[];for(const [t,f,l,i] of specs){try{const r=await get(t,`select=id&${f}`);vals.push({l,i,n:r.length})}catch{vals.push({l,i,n:0})}}document.querySelector('#liveStats').innerHTML=vals.map(x=>`<div class="card stat"><span>${x.i} ${x.l}</span><strong>${x.n}</strong></div>`).join('')}loadLiveStats();setInterval(loadLiveStats,30000);
+
+
+const quickSearch=document.querySelector('#quickSearch');
+document.querySelector('#quickSearchBtn')?.addEventListener('click',()=>{
+ const q=quickSearch?.value.trim();
+ if(q)location.href=`search.html?q=${encodeURIComponent(q)}`;
+});
+quickSearch?.addEventListener('keydown',event=>{
+ if(event.key==='Enter'){
+  const q=quickSearch.value.trim();
+  if(q)location.href=`search.html?q=${encodeURIComponent(q)}`;
+ }
+});
