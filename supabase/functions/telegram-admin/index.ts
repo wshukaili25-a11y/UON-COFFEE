@@ -85,6 +85,7 @@ function mainMenu(admin:any){
   [{text:'📘 مركز المقررات',callback_data:'courses:menu'}],
   [{text:'📢 الإعلانات والإشعارات',callback_data:'content:menu'}],
   [{text:'🏫 مراكز الدعم والروابط',callback_data:'settings:menu'}],
+  [{text:'🔗 المواقع المهمة والمفيدة',callback_data:'useful:menu'}],
  ];
  if(can(admin,'backups'))rows.push([{text:'💾 النسخ والاستعادة',callback_data:'backup:menu'}]);
  if(can(admin,'admins'))rows.push([{text:'👥 المشرفون والصلاحيات',callback_data:'admins:menu'}]);
@@ -484,6 +485,28 @@ async function handleConversation(chatId:string,admin:any,text:string,conv:any){
   return true;
  }
 
+ if(state==='useful_add_title'){
+  await setConversation(chatId,'useful_add_url',{title_ar:text});
+  await send(chatId,'أرسل رابط الموقع كاملًا');
+  return true;
+ }
+ if(state==='useful_add_url'){
+  await setConversation(chatId,'useful_add_category',{...data,url:text});
+  await send(chatId,'أرسل التصنيف: university أو math أو files أو ai أو academic أو books');
+  return true;
+ }
+ if(state==='useful_add_category'){
+  const {error}=await db.from('useful_sites').insert({
+   title_ar:data.title_ar,url:data.url,category:text.trim().toLowerCase(),
+   icon:'🔗',active:true,sort_order:100
+  });
+  if(error)throw error;
+  await clearConversation(chatId);
+  await audit(admin,'useful_site_create','useful_sites','',{title:data.title_ar,url:data.url});
+  await send(chatId,'تمت إضافة الموقع ✅');
+  return true;
+ }
+
  if(state==='notification_title'){
   await setConversation(chatId,'notification_body',{title:text});
   await send(chatId,'أرسل نص الإشعار');
@@ -727,6 +750,54 @@ Deno.serve(async req=>{
      await db.from('site_notifications').update({active:state==='on'}).eq('id',id);
      await audit(admin,'notification_toggle','site_notifications',id,{active:state==='on'});
      await contentMenu(chatId,mid);
+    }
+    else if(data==='useful:menu'){
+     const {data:rows,error}=await db.from('useful_sites').select('*').order('sort_order').limit(20);
+     if(error)throw error;
+     const keyboard=(rows||[]).map((item:any)=>[{
+      text:`${item.active?'🟢':'🔴'} ${item.title_ar}`,
+      callback_data:`useful:view:${item.id}`
+     }]);
+     keyboard.unshift([{text:'➕ إضافة موقع',callback_data:'useful:add'}]);
+     keyboard.push([{text:'⚙️ حالة الأداة',callback_data:'service:view:useful-sites'}],[{text:'⬅️ الرئيسية',callback_data:'home'}]);
+     await edit(chatId,mid,'المواقع المهمة والمفيدة',keyboard);
+    }
+    else if(data==='useful:add'){
+     await setConversation(chatId,'useful_add_title',{});
+     await edit(chatId,mid,'أرسل اسم الموقع',[[{text:'⬅️ إلغاء',callback_data:'useful:menu'}]]);
+    }
+    else if(data.startsWith('useful:view:')){
+     const id=data.split(':')[2];
+     const {data:item,error}=await db.from('useful_sites').select('*').eq('id',id).single();
+     if(error)throw error;
+     await edit(chatId,mid,`${item.title_ar}\n${item.url}\nالتصنيف: ${item.category}\nالحالة: ${item.active?'نشط':'متوقف'}`,[
+      [{text:item.active?'🔴 إيقاف':'🟢 تفعيل',callback_data:`useful:toggle:${id}:${item.active?'off':'on'}`}],
+      [{text:'🗑 حذف',callback_data:`useful:deleteask:${id}`}],
+      [{text:'⬅️ المواقع',callback_data:'useful:menu'}]
+     ]);
+    }
+    else if(data.startsWith('useful:toggle:')){
+     const [, ,id,state]=data.split(':');
+     const {error}=await db.from('useful_sites').update({active:state==='on',updated_at:new Date().toISOString()}).eq('id',id);
+     if(error)throw error;
+     await audit(admin,'useful_site_toggle','useful_sites',id,{active:state==='on'});
+     const {data:item}=await db.from('useful_sites').select('*').eq('id',id).single();
+     await edit(chatId,mid,`${item.title_ar}\nتم تحديث الحالة ✅`,[[{text:'⬅️ المواقع',callback_data:'useful:menu'}]]);
+    }
+    else if(data.startsWith('useful:deleteask:')){
+     const id=data.split(':')[2];
+     await edit(chatId,mid,'تأكيد حذف الموقع؟',[
+      [{text:'نعم، حذف',callback_data:`useful:delete:${id}`}],
+      [{text:'إلغاء',callback_data:`useful:view:${id}`}]
+     ]);
+    }
+    else if(data.startsWith('useful:delete:')){
+     if(!isOwner(admin))throw new Error('الحذف للمالك فقط');
+     const id=data.split(':')[2];
+     const {error}=await db.from('useful_sites').delete().eq('id',id);
+     if(error)throw error;
+     await audit(admin,'useful_site_delete','useful_sites',id);
+     await edit(chatId,mid,'تم حذف الموقع ✅',[[{text:'⬅️ المواقع',callback_data:'useful:menu'}]]);
     }
     else if(data==='settings:menu')await settingsMenu(chatId,mid);
     else if(data.startsWith('center:view:'))await centerView(chatId,mid,data.split(':')[2]);

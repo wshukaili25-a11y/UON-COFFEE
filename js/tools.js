@@ -20,3 +20,27 @@ async function reorderToolsByUsage(){
 }
 
 setTimeout(reorderToolsByUsage,500);
+
+
+import {applyFeatureStates as applyV175States} from './core.js';
+
+function addV175Tools(){
+ const container=document.querySelector('#items');
+ if(!container)return;
+ const existing=new Set([...container.querySelectorAll('[data-feature]')].map(x=>x.dataset.feature));
+ const additions=[
+  {feature:'useful-sites',href:'useful-sites.html',icon:'🔗',title:'مواقع مهمة ومفيدة',description:'مواقع الجامعة وأدوات دراسية مختارة.'},
+  {feature:'assistant',href:'assistant.html',icon:'AI',title:'مساعد UON AI',description:'اسأل عن المقررات والخدمات ودليل الجامعة.'}
+ ];
+ additions.forEach(item=>{
+  if(existing.has(item.feature))return;
+  const card=document.createElement('a');
+  card.className='card feature-card';
+  card.href=item.href;
+  card.dataset.feature=item.feature;
+  card.innerHTML=`<span class="tool-icon">${item.icon}</span><h3>${item.title}</h3><p>${item.description}</p><b>فتح</b>`;
+  container.appendChild(card);
+ });
+ applyV175States(container);
+}
+setTimeout(addV175Tools,450);

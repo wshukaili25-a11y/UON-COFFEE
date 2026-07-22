@@ -237,3 +237,44 @@ export function installErrorCapture(){
   insert('system_errors',{source:location.pathname,message:String(event.reason?.message||event.reason||'Unhandled rejection')}).catch(()=>{});
  });
 }
+
+
+export function featureStatusLabel(status){
+ const lang=localStorage.getItem('uon_language')||'ar';
+ const labels={
+  ar:{active:'متاحة',disabled:'متوقفة',maintenance:'صيانة',coming_soon:'قريبًا'},
+  en:{active:'Available',disabled:'Unavailable',maintenance:'Maintenance',coming_soon:'Coming soon'}
+ };
+ return labels[lang]?.[status]||status;
+}
+
+export async function applyFeatureStates(root=document){
+ try{
+  const state=await getUonState();
+  const map=state?.features||{};
+  root.querySelectorAll('[data-feature]').forEach(card=>{
+   const status=map[card.dataset.feature]||'active';
+   card.dataset.status=status;
+   card.querySelector('.feature-state')?.remove();
+
+   const badge=document.createElement('div');
+   badge.className=`feature-state ${status}`;
+   badge.innerHTML=`<span>${status==='active'?'✓':'!'}</span><strong>${featureStatusLabel(status)}</strong>`;
+   card.appendChild(badge);
+
+   if(status!=='active'){
+    card.setAttribute('aria-disabled','true');
+    card.addEventListener('click',event=>{
+     event.preventDefault();
+     event.stopImmediatePropagation();
+     card.classList.add('state-shake');
+     setTimeout(()=>card.classList.remove('state-shake'),350);
+    },{capture:true,once:false});
+   }
+  });
+  return state;
+ }catch(error){
+  console.warn('Feature states unavailable',error);
+  return null;
+ }
+}

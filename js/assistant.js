@@ -32,3 +32,11 @@ form.onsubmit=async event=>{
  const rows=await searchPlatform(q);
  output.innerHTML=rows.length?`<div class="assistant-answer"><p>لقيت لك النتائج التالية داخل UON Hub:</p>${rows.map(x=>`<a class="list-row" href="${esc(x.url||'#')}" target="${x.url?'_blank':'_self'}"><div><span class="badge">${esc(x.type)}</span><strong>${esc(x.title)}</strong><small>${esc(x.desc)}</small></div><span>←</span></a>`).join('')}</div>`:'<div class="empty">ما حصلت نتيجة مباشرة. جرّب اسم المادة أو رمزها أو اسم البرنامج.</div>';
 };
+
+document.querySelectorAll('[data-prompt]').forEach(button=>{
+ button.addEventListener('click',()=>{
+  const field=document.querySelector('#question');
+  field.value=button.dataset.prompt;
+  field.focus();
+ });
+});
