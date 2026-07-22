@@ -47,24 +47,38 @@ export function fillCollege(select,{other=false}={}){
 }
 export function openModal(id){$('#'+id)?.classList.add('open')} export function closeModal(id){$('#'+id)?.classList.remove('open')}
 
+export async function readPublicState(){
+ const data=await rpc('uon_public_state',{});
+ return (typeof data==='string')?JSON.parse(data):data;
+}
+
 export async function enforceMaintenance(){
  const isAdmin=location.pathname.endsWith('/admin.html');
  const isMaintenance=location.pathname.endsWith('/maintenance.html');
- if(isAdmin)return;
+ if(isAdmin)return false;
+
  document.documentElement.classList.add('maintenance-check');
  try{
-  const rows=await get('site_settings',`select=key,value&key=in.(maintenance_enabled,maintenance_message)&_=${Date.now()}`);
-  const map=Object.fromEntries((rows||[]).map(x=>[x.key,x.value]));
-  const raw=map.maintenance_enabled;
-  const on=raw===true||raw===1||String(raw).replace(/"/g,'').toLowerCase()==='true';
-  if(on&&!isMaintenance){location.replace(`maintenance.html?v=${Date.now()}`);return}
-  if(!on&&isMaintenance){location.replace(`index.html?v=${Date.now()}`);return}
- }catch(e){console.warn('Maintenance check failed',e)}
+  const state=await readPublicState();
+  const on=state?.maintenance_enabled===true;
+
+  if(on&&!isMaintenance){
+   location.replace(`maintenance.html?v=${Date.now()}`);
+   return true;
+  }
+  if(!on&&isMaintenance){
+   location.replace(`index.html?v=${Date.now()}`);
+   return false;
+  }
+ }catch(error){
+  console.error('Maintenance state error',error);
+ }
  document.documentElement.classList.remove('maintenance-check');
+ return false;
 }
 export async function platformStatuses(){
- const rows=await get('platform_features',`select=key,status,updated_at&order=sort_order.asc&_=${Date.now()}`);
- return Object.fromEntries(rows.map(x=>[x.key,x.status]));
+ const state=await readPublicState();
+ return state?.features||{};
 }
 export async function notifyPending(table,id){
  try{await edge({source:'web-submit',table,id})}catch(e){console.warn('Notification fallback failed',e)}

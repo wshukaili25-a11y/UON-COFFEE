@@ -35,15 +35,33 @@ Deno.serve(async req=>{
   if(dbHeader===DB_SECRET&&payload.type==='INSERT'){await notify(payload.table,payload.record);return res()}
   if(tgHeader!==TG_SECRET)return res('unauthorized',401);
   const cb=payload.callback_query,msg=payload.message;const chat=String(cb?.message?.chat?.id||msg?.chat?.id||'');const a=await admin(chat);if(!a)return res();
-  if(msg){const text=String(msg.text||'');if(text==='/start'||text==='/menu')await sendMenu(chat,a.name);else if(text==='/health')await tg('sendMessage',{chat_id:chat,text:'البوت يعمل ✅'});else await sendMenu(chat,a.name)}
+  if(msg){const text=String(msg.text||'');if(text==='/start'||text==='/menu')await sendMenu(chat,a.name);else if(text==='/health'){
+    const{data:state,error}=await db.rpc('uon_public_state');
+    await tg('sendMessage',{chat_id:chat,text:error?`البوت يعمل لكن قراءة الحالة فشلت: ${error.message}`:`البوت يعمل ✅
+الصيانة: ${state?.maintenance_enabled?'مفعلة':'متوقفة'}
+آخر تحديث: ${state?.updated_at||'—'}`})
+   };else await sendMenu(chat,a.name)}
   if(cb){const data=String(cb.data),mid=cb.message.message_id;const edit=async(t:string,k:any)=>tg('editMessageText',{chat_id:chat,message_id:mid,text:t,reply_markup:k});
    if(data==='home')await edit('لوحة UON Hub',menu());
    else if(data==='stats')await edit(await stats(),{inline_keyboard:[[{text:'⬅️ رجوع',callback_data:'home'}]]});
    else if(data==='features'){const x=await features();await edit(x.text,x.keyboard)}
    else if(data.startsWith('feature:')){const x=await feature(data.split(':')[1]);await edit(x.text,x.keyboard)}
-   else if(data.startsWith('setf:')){const[,key,status]=data.split(':');await db.from('platform_features').update({status,updated_at:new Date().toISOString()}).eq('key',key);const x=await feature(key);await edit(x.text,x.keyboard)}
+   else if(data.startsWith('setf:')){
+    const[,key,status]=data.split(':');
+    const{data:changed,error}=await db.rpc('uon_set_feature_state',{p_key:key,p_status:status});
+    if(error)throw new Error(`Feature update failed: ${error.message}`);
+    const x=await feature(key);
+    await edit(`${x.text}
+تم الحفظ في قاعدة البيانات ✅`,x.keyboard)
+   }
    else if(data==='maintenance'){const{data:s}=await db.from('site_settings').select('value').eq('key','maintenance_enabled').maybeSingle();const raw=s?.value;const on=raw===true||raw===1||String(raw).replace(/\"/g,'').toLowerCase()==='true';await edit(`الصيانة: ${on?'مفعلة':'متوقفة'}`,{inline_keyboard:[[{text:'تشغيل',callback_data:'maint:on'},{text:'إيقاف',callback_data:'maint:off'}],[{text:'⬅️ رجوع',callback_data:'home'}]]})}
-   else if(data.startsWith('maint:')){const on=data.endsWith(':on');await db.from('site_settings').upsert({key:'maintenance_enabled',value:on,updated_at:new Date().toISOString()});await edit(`تم ${on?'تشغيل':'إيقاف'} الصيانة`,{inline_keyboard:[[{text:'⬅️ رجوع',callback_data:'home'}]]})}
+   else if(data.startsWith('maint:')){
+    const on=data.endsWith(':on');
+    const{data:state,error}=await db.rpc('uon_set_maintenance',{p_enabled:on,p_message:null,p_until:null});
+    if(error)throw new Error(`Maintenance update failed: ${error.message}`);
+    if(state?.maintenance_enabled!==on)throw new Error('Maintenance verification failed');
+    await edit(`تم ${on?'تشغيل':'إيقاف'} الصيانة فعليًا ✅`,{inline_keyboard:[[{text:'⬅️ رجوع',callback_data:'home'}]]})
+   }
    else if(data.startsWith('approve:')||data.startsWith('reject:')){const[action,table,id]=data.split(':');const d=tables[table];if(action==='reject'&&d.reject)await db.from(table).update(d.reject).eq('id',id);else if(action==='reject')await db.from(table).delete().eq('id',id);else await db.from(table).update(d.approve).eq('id',id);await edit(action==='approve'?'تم القبول ✅':'تم الرفض ❌',{inline_keyboard:[]})}
    await tg('answerCallbackQuery',{callback_query_id:cb.id}).catch(()=>{});
   }
