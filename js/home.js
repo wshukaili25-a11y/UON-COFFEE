@@ -39,3 +39,20 @@ quickSearch?.addEventListener('keydown',event=>{
   if(q)location.href=`search.html?q=${encodeURIComponent(q)}`;
  }
 });
+
+function setupHeroSlider(){
+ const root=document.querySelector('#heroSlider');if(!root)return;
+ const slides=[...root.querySelectorAll('.hero-slide')],dotsRoot=root.querySelector('#heroDots');
+ const prev=root.querySelector('#heroPrev'),next=root.querySelector('#heroNext'),pause=root.querySelector('#heroPause');
+ let index=0,timer=null,paused=false;const delay=6000;
+ dotsRoot.innerHTML=slides.map((_,i)=>`<button class="hero-dot ${i===0?'active':''}" data-i="${i}" aria-label="الشريحة ${i+1}"></button>`).join('');
+ const dots=[...dotsRoot.querySelectorAll('.hero-dot')];
+ const stop=()=>{if(timer){clearInterval(timer);timer=null}};
+ const start=()=>{if(paused)return;stop();timer=setInterval(()=>show(index+1,false),delay)};
+ function show(i,restart=true){index=(i+slides.length)%slides.length;slides.forEach((s,n)=>s.classList.toggle('active',n===index));dots.forEach((d,n)=>d.classList.toggle('active',n===index));if(restart)start()}
+ prev.onclick=()=>show(index-1);next.onclick=()=>show(index+1);pause.onclick=()=>{paused=!paused;pause.textContent=paused?'▶':'❚❚';paused?stop():start()};
+ dots.forEach(d=>d.onclick=()=>show(Number(d.dataset.i)));
+ let x=0;root.addEventListener('touchstart',e=>x=e.changedTouches[0].clientX,{passive:true});root.addEventListener('touchend',e=>{const dx=e.changedTouches[0].clientX-x;if(Math.abs(dx)>45)show(dx>0?index+1:index-1)},{passive:true});
+ document.addEventListener('visibilitychange',()=>document.hidden?stop():start());show(0);
+}
+setupHeroSlider();

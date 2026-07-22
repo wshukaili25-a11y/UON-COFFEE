@@ -84,3 +84,27 @@ table{width:100%;border-collapse:collapse}th,td{padding:.75rem;border-bottom:1px
  .v10-search-box{flex-direction:column}
  .permission-grid{grid-template-columns:1fr}
 }
+
+.hero-slider{position:relative;min-height:640px;padding:0;overflow:hidden;background:#050a18;isolation:isolate}
+.hero-slider::before{display:none}.hero-slides,.hero-slide{position:absolute;inset:0}
+.hero-slide{display:flex;align-items:center;opacity:0;visibility:hidden;transform:scale(1.025);transition:opacity .7s ease,transform 1s ease,visibility .7s;pointer-events:none}
+.hero-slide.active{opacity:1;visibility:visible;transform:scale(1);pointer-events:auto;z-index:2}
+.hero-slide-bg{position:absolute;inset:0;background-position:center;background-size:cover;transform:scale(1.04);transition:transform 7s ease}
+.hero-slide.active .hero-slide-bg{transform:scale(1)}
+.hero-slide-bg::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(4,9,24,.97) 5%,rgba(4,9,24,.82) 48%,rgba(4,9,24,.43)),linear-gradient(0deg,rgba(4,9,24,.55),transparent 48%)}
+.hero-main{background-image:url('../assets/unizwa-new-gate-v52.jpg')}
+.hero-summaries{background:radial-gradient(circle at 75% 25%,rgba(28,200,245,.34),transparent 30%),linear-gradient(135deg,#071126,#11295a 58%,#0a6a82)}
+.hero-groups{background:radial-gradient(circle at 75% 30%,rgba(37,211,102,.33),transparent 30%),linear-gradient(135deg,#071713,#123c2e 58%,#087d53)}
+.hero-gpa{background:radial-gradient(circle at 75% 30%,rgba(139,124,255,.36),transparent 31%),linear-gradient(135deg,#0a0b24,#26215f 58%,#5649a9)}
+.hero-guide{background-image:linear-gradient(135deg,rgba(8,18,44,.3),rgba(12,65,96,.3)),url('../assets/unizwa-campus-aerial.jpg')}
+.hero-projects{background:radial-gradient(circle at 72% 30%,rgba(250,204,21,.27),transparent 28%),linear-gradient(135deg,#111020,#382b47 58%,#76521d)}
+.hero-slider .hero-content{position:relative;z-index:3;max-width:720px;padding-top:90px;padding-bottom:110px}
+.hero-slider h1,.hero-slider h2{font-size:clamp(2.35rem,5.7vw,4.9rem);line-height:1.15;margin:1rem 0;max-width:760px}
+.hero-slide .hero-badge,.hero-slide h1,.hero-slide h2,.hero-slide p,.hero-slide .hero-actions{opacity:0;transform:translateY(18px);transition:.6s ease}
+.hero-slide.active .hero-badge,.hero-slide.active h1,.hero-slide.active h2,.hero-slide.active p,.hero-slide.active .hero-actions{opacity:1;transform:none}
+.hero-arrow{position:absolute;top:50%;z-index:8;width:48px;height:48px;border-radius:50%;border:1px solid rgba(255,255,255,.2);background:rgba(5,10,25,.55);backdrop-filter:blur(12px);color:white;font-size:2rem;cursor:pointer;display:grid;place-items:center;transform:translateY(-50%)}
+.hero-prev{right:22px}.hero-next{left:22px}
+.hero-controls{position:absolute;z-index:9;right:50%;bottom:26px;transform:translateX(50%);display:flex;align-items:center;gap:12px;padding:9px 12px;border:1px solid rgba(255,255,255,.12);border-radius:999px;background:rgba(5,10,25,.55);backdrop-filter:blur(14px)}
+.hero-dots{display:flex;gap:7px}.hero-dot{width:9px;height:9px;padding:0;border:0;border-radius:50%;background:rgba(255,255,255,.35);cursor:pointer;transition:.25s}
+.hero-dot.active{width:28px;border-radius:999px;background:var(--primary)}.hero-pause{width:30px;height:30px;border:0;border-radius:50%;background:transparent;color:white;cursor:pointer}
+@media(max-width:760px){.hero-slider{min-height:690px}.hero-slide-bg::after{background:linear-gradient(0deg,rgba(4,9,24,.98) 5%,rgba(4,9,24,.72) 63%,rgba(4,9,24,.42))}.hero-slider .hero-content{padding-top:110px;padding-bottom:120px;text-align:center}.hero-slider .hero-actions{justify-content:center}.hero-arrow{top:auto;bottom:24px;width:40px;height:40px}.hero-prev{right:18px}.hero-next{left:18px}}
