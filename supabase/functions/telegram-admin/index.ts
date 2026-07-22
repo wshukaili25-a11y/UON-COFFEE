@@ -7,6 +7,18 @@ const SECRET=Deno.env.get('TELEGRAM_WEBHOOK_SECRET')!;
 const SITE=Deno.env.get('SITE_URL')||'https://uon-coffee.vercel.app';
 const db=createClient(URL,KEY);
 
+const adminCache=new Map<string,{admin:any,expires:number}>();
+const ADMIN_CACHE_TTL=60_000;
+
+function background(task:Promise<any>){
+ try{
+  // Supabase Edge Runtime keeps the task alive after returning the webhook response.
+  // @ts-ignore
+  if(typeof EdgeRuntime!=='undefined'&&EdgeRuntime.waitUntil)EdgeRuntime.waitUntil(task.catch(()=>{}));
+  else task.catch(()=>{});
+ }catch{}
+}
+
 const cors={
  'Access-Control-Allow-Origin':'*',
  'Access-Control-Allow-Headers':'authorization, x-client-info, apikey, content-type, x-telegram-bot-api-secret-token',
@@ -30,10 +42,23 @@ async function telegram(method:string,body:any){
 }
 
 async function getAdmin(chatId:string){
+ const cached=adminCache.get(chatId);
+ if(cached&&cached.expires>Date.now())return cached.admin;
+
  const {data,error}=await db.from('telegram_admins')
-  .select('*').eq('chat_id',chatId).eq('active',true).maybeSingle();
+  .select('id,chat_id,name,role,permissions,notifications_enabled,active')
+  .eq('chat_id',chatId).eq('active',true).maybeSingle();
  if(error)throw error;
- if(data)await db.from('telegram_admins').update({last_seen_at:new Date().toISOString()}).eq('id',data.id);
+
+ if(data){
+  adminCache.set(chatId,{admin:data,expires:Date.now()+ADMIN_CACHE_TTL});
+  background(
+   db.from('telegram_admins')
+    .update({last_seen_at:new Date().toISOString()})
+    .eq('id',data.id)
+    .then(()=>{})
+  );
+ }
  return data;
 }
 
@@ -44,13 +69,15 @@ const can=(admin:any,permission:string)=>{
  return admin?.permissions?.[permission]===true;
 };
 
-async function audit(admin:any,action:string,targetType='',targetId='',details:any={},success=true,error=''){
- await db.from('bot_audit_log').insert({
-  admin_chat_id:String(admin?.chat_id||''),
-  admin_name:admin?.name||'',
-  action,target_type:targetType,target_id:String(targetId||''),
-  details,success,error:error||null
- }).catch(()=>{});
+function audit(admin:any,action:string,targetType='',targetId='',details:any={},success=true,error=''){
+ background(
+  db.from('bot_audit_log').insert({
+   admin_chat_id:String(admin?.chat_id||''),
+   admin_name:admin?.name||'',
+   action,target_type:targetType,target_id:String(targetId||''),
+   details,success,error:error||null
+  }).then(()=>{})
+ );
 }
 
 async function edit(chatId:string,messageId:number,text:string,inline_keyboard:any[]){
@@ -91,13 +118,13 @@ function mainMenu(admin:any){
  if(can(admin,'admins'))rows.push([{text:'👥 المشرفون والصلاحيات',callback_data:'admins:menu'}]);
  rows.push(
   [{text:'📋 سجل العمليات',callback_data:'audit:list'}],
-  [{text:'🌐 فتح لوحة الموقع',url:`${SITE}/admin.html?v=15`}],
+  [{text:'🌐 فتح لوحة الموقع',url:`${SITE}/admin.html?v=18.1`}],
  );
  return rows;
 }
 
 async function home(chatId:string,admin:any,messageId?:number){
- const text=`لوحة إدارة UON Hub V15\nمرحبًا ${admin.name||'مشرف'} 👋\nاختر القسم الذي تريد إدارته.`;
+ const text=`لوحة إدارة UON Hub V18.1\nمرحبًا ${admin.name||'مشرف'} 👋\nاختر القسم الذي تريد إدارته.`;
  if(messageId)await edit(chatId,messageId,text,mainMenu(admin));
  else await send(chatId,text,mainMenu(admin));
 }
@@ -144,16 +171,14 @@ function displayValue(value:any){
 }
 
 async function pendingCounts(){
- const result:any={};
- for(const [table,cfg] of Object.entries(pendingConfigs) as any){
-  let query=db.from(table).select('id',{count:'exact',head:true});
-  query=typeof cfg.pending==='boolean'
-   ?query.eq(cfg.status,cfg.pending)
-   :query.eq(cfg.status,cfg.pending);
-  const {count}=await query;
-  result[table]=count||0;
- }
- return result;
+ const entries=Object.entries(pendingConfigs) as any[];
+ const values=await Promise.all(entries.map(async([table,cfg])=>{
+  const {count}=await db.from(table)
+   .select('id',{count:'exact',head:true})
+   .eq(cfg.status,cfg.pending);
+  return [table,count||0];
+ }));
+ return Object.fromEntries(values);
 }
 
 async function pendingMenu(chatId:string,mid:number){
@@ -430,7 +455,7 @@ async function handleConversation(chatId:string,admin:any,text:string,conv:any){
  if(state==='maintenance_message'){
   await db.from('site_settings').upsert({key:'maintenance_message',value:text,updated_at:new Date().toISOString()});
   await clearConversation(chatId);
-  await audit(admin,'maintenance_message','site_settings','maintenance_message',{value:text});
+  audit(admin,'maintenance_message','site_settings','maintenance_message',{value:text});
   await send(chatId,'تم تحديث رسالة الصيانة ✅');
   return true;
  }
@@ -438,7 +463,7 @@ async function handleConversation(chatId:string,admin:any,text:string,conv:any){
  if(state==='setting_value'){
   await db.from('site_settings').upsert({key:data.key,value:text,updated_at:new Date().toISOString()});
   await clearConversation(chatId);
-  await audit(admin,'setting_update','site_settings',data.key,{value:text});
+  audit(admin,'setting_update','site_settings',data.key,{value:text});
   await send(chatId,'تم حفظ الإعداد ✅');
   return true;
  }
@@ -470,7 +495,7 @@ async function handleConversation(chatId:string,admin:any,text:string,conv:any){
   },{onConflict:'code'});
   if(error)throw error;
   await clearConversation(chatId);
-  await audit(admin,'course_create','courses',data.code,data);
+  audit(admin,'course_create','courses',data.code,data);
   await send(chatId,'تمت إضافة المادة ✅');
   return true;
  }
@@ -480,7 +505,7 @@ async function handleConversation(chatId:string,admin:any,text:string,conv:any){
   const {error}=await db.from('courses').update({[data.field]:value,updated_at:new Date().toISOString()}).eq('id',data.id);
   if(error)throw error;
   await clearConversation(chatId);
-  await audit(admin,'course_update','courses',data.id,{field:data.field,value});
+  audit(admin,'course_update','courses',data.id,{field:data.field,value});
   await send(chatId,'تم تعديل المادة ✅');
   return true;
  }
@@ -502,7 +527,7 @@ async function handleConversation(chatId:string,admin:any,text:string,conv:any){
   });
   if(error)throw error;
   await clearConversation(chatId);
-  await audit(admin,'useful_site_create','useful_sites','',{title:data.title_ar,url:data.url});
+  audit(admin,'useful_site_create','useful_sites','',{title:data.title_ar,url:data.url});
   await send(chatId,'تمت إضافة الموقع ✅');
   return true;
  }
@@ -515,7 +540,7 @@ async function handleConversation(chatId:string,admin:any,text:string,conv:any){
   }).eq('id',data.id);
   if(error)throw error;
   await clearConversation(chatId);
-  await audit(admin,'useful_site_update','useful_sites',data.id,{field:data.field,value});
+  audit(admin,'useful_site_update','useful_sites',data.id,{field:data.field,value});
   await send(chatId,'تم تعديل الموقع ✅');
   return true;
  }
@@ -529,7 +554,7 @@ async function handleConversation(chatId:string,admin:any,text:string,conv:any){
   const {error}=await db.from('site_notifications').insert({title:data.title,body:text,icon:'🔔',active:true});
   if(error)throw error;
   await clearConversation(chatId);
-  await audit(admin,'notification_create','site_notifications','',{title:data.title});
+  audit(admin,'notification_create','site_notifications','',{title:data.title});
   await send(chatId,'تم نشر الإشعار داخل الموقع ✅');
   return true;
  }
@@ -551,7 +576,7 @@ async function handleConversation(chatId:string,admin:any,text:string,conv:any){
   });
   if(error)throw error;
   await clearConversation(chatId);
-  await audit(admin,'announcement_create','site_announcements','',{title:data.title});
+  audit(admin,'announcement_create','site_announcements','',{title:data.title});
   await send(chatId,'تم نشر الإعلان ✅');
   return true;
  }
@@ -586,7 +611,9 @@ Deno.serve(async req=>{
 
   // Web submissions now notify Telegram admins.
   if(payload?.source==='web-submit'){
-   if(payload.table&&payload.id)await notifyAdmins(String(payload.table),String(payload.id));
+   if(payload.table&&payload.id){
+    background(notifyAdmins(String(payload.table),String(payload.id)));
+   }
    return response({ok:true});
   }
 
@@ -596,6 +623,12 @@ Deno.serve(async req=>{
 
   const callback=payload.callback_query;
   const message=payload.message;
+
+  // Stop Telegram's loading spinner immediately, before any database work.
+  if(callback){
+   background(telegram('answerCallbackQuery',{callback_query_id:callback.id}));
+  }
+
   const chatId=String(callback?.message?.chat?.id||message?.chat?.id||'');
   const admin=await getAdmin(chatId);
   if(!admin)return response({ok:true});
@@ -606,16 +639,17 @@ Deno.serve(async req=>{
 
    if(conv&&await handleConversation(chatId,admin,text,conv))return response({ok:true});
 
-   if(text==='/start'||text==='/menu')await home(chatId,admin);
+   if(text==='/ping'){
+    await send(chatId,'⚡ البوت يعمل');
+   }else if(text==='/start'||text==='/menu')await home(chatId,admin);
    else if(text==='/health'){
     const {data,error}=await db.rpc('uon_public_state');
-    await send(chatId,error?`خطأ: ${error.message}`:`البوت يعمل ✅\nالصيانة: ${data.maintenance_enabled?'مفعلة':'متوقفة'}\nالإصدار: V15`);
+    await send(chatId,error?`خطأ: ${error.message}`:`البوت يعمل ✅\nالصيانة: ${data.maintenance_enabled?'مفعلة':'متوقفة'}\nالإصدار: V18.1`);
    }else await home(chatId,admin);
    return response({ok:true});
   }
 
   if(callback){
-   await telegram('answerCallbackQuery',{callback_query_id:callback.id}).catch(()=>{});
    const data=String(callback.data||'');
    const mid=callback.message.message_id;
 
@@ -629,7 +663,7 @@ Deno.serve(async req=>{
      const [, ,key,status]=data.split(':');
      const {error}=await db.rpc('uon_set_feature_state',{p_key:key,p_status:status});
      if(error)throw error;
-     await audit(admin,'feature_state','platform_features',key,{status});
+     audit(admin,'feature_state','platform_features',key,{status});
      await serviceView(chatId,mid,key);
     }
     else if(data==='maintenance:menu')await maintenanceMenu(chatId,mid);
@@ -638,7 +672,7 @@ Deno.serve(async req=>{
      const enabled=data.endsWith(':on');
      const {error}=await db.rpc('uon_set_maintenance',{p_enabled:enabled});
      if(error)throw error;
-     await audit(admin,'maintenance_toggle','site_settings','maintenance_enabled',{enabled});
+     audit(admin,'maintenance_toggle','site_settings','maintenance_enabled',{enabled});
      await maintenanceMenu(chatId,mid);
     }
     else if(data==='maintenance:message'){
@@ -658,7 +692,7 @@ Deno.serve(async req=>{
      if(!can(admin,'moderate'))throw new Error('ليس لديك صلاحية المراجعة');
      const [, ,table,id,page]=data.split(':');
      await approvePending(table,id);
-     await audit(admin,'pending_approve',table,id);
+     audit(admin,'pending_approve',table,id);
      await pendingList(chatId,mid,table,Number(page)||0);
     }
     else if(data.startsWith('pending:reject:')){
@@ -667,7 +701,7 @@ Deno.serve(async req=>{
      const cfg=pendingConfigs[table];
      const {error}=await db.from(table).update({[cfg.status]:cfg.reject,reviewed_at:new Date().toISOString()}).eq('id',id);
      if(error)throw error;
-     await audit(admin,'pending_reject',table,id);
+     audit(admin,'pending_reject',table,id);
      await pendingList(chatId,mid,table,Number(page)||0);
     }
     else if(data.startsWith('pending:deleteask:')){
@@ -682,7 +716,7 @@ Deno.serve(async req=>{
      const [, ,table,id,page]=data.split(':');
      const {error}=await db.from(table).delete().eq('id',id);
      if(error)throw error;
-     await audit(admin,'pending_delete',table,id);
+     audit(admin,'pending_delete',table,id);
      await pendingList(chatId,mid,table,Number(page)||0);
     }
     else if(data==='courses:menu')await coursesMenu(chatId,mid);
@@ -707,7 +741,7 @@ Deno.serve(async req=>{
      const [, ,id,state,page]=data.split(':');
      const {error}=await db.from('courses').update({active:state==='on',updated_at:new Date().toISOString()}).eq('id',id);
      if(error)throw error;
-     await audit(admin,'course_toggle','courses',id,{active:state==='on'});
+     audit(admin,'course_toggle','courses',id,{active:state==='on'});
      await courseView(chatId,mid,id,Number(page)||0);
     }
     else if(data.startsWith('course:deleteask:')){
@@ -722,7 +756,7 @@ Deno.serve(async req=>{
      const [, ,id,page]=data.split(':');
      const {error}=await db.from('courses').delete().eq('id',id);
      if(error)throw error;
-     await audit(admin,'course_delete','courses',id);
+     audit(admin,'course_delete','courses',id);
      await courseList(chatId,mid,Number(page)||0);
     }
     else if(data==='content:menu')await contentMenu(chatId,mid);
@@ -744,7 +778,7 @@ Deno.serve(async req=>{
     else if(data.startsWith('announcement:toggle:')){
      const [, ,id,state,page]=data.split(':');
      await db.from('site_announcements').update({active:state==='on',updated_at:new Date().toISOString()}).eq('id',id);
-     await audit(admin,'announcement_toggle','site_announcements',id,{active:state==='on'});
+     audit(admin,'announcement_toggle','site_announcements',id,{active:state==='on'});
      const p=Number(page)||0;
      const {data:rows}=await db.from('site_announcements').select('*').order('created_at',{ascending:false}).range(p*7,p*7+6);
      const keyboard=(rows||[]).map((x:any)=>[{text:`${x.active?'🟢':'🔴'} ${x.title}`,callback_data:`announcement:toggle:${x.id}:${x.active?'off':'on'}:${p}`}]);
@@ -761,7 +795,7 @@ Deno.serve(async req=>{
     else if(data.startsWith('notification:toggle:')){
      const [, ,id,state,page]=data.split(':');
      await db.from('site_notifications').update({active:state==='on'}).eq('id',id);
-     await audit(admin,'notification_toggle','site_notifications',id,{active:state==='on'});
+     audit(admin,'notification_toggle','site_notifications',id,{active:state==='on'});
      await contentMenu(chatId,mid);
     }
     else if(data==='useful:menu'){
@@ -801,7 +835,7 @@ Deno.serve(async req=>{
      const [, ,id,state]=data.split(':');
      const {error}=await db.from('useful_sites').update({active:state==='on',updated_at:new Date().toISOString()}).eq('id',id);
      if(error)throw error;
-     await audit(admin,'useful_site_toggle','useful_sites',id,{active:state==='on'});
+     audit(admin,'useful_site_toggle','useful_sites',id,{active:state==='on'});
      const {data:item}=await db.from('useful_sites').select('*').eq('id',id).single();
      await edit(chatId,mid,`${item.title_ar}\nتم تحديث الحالة ✅`,[[{text:'⬅️ المواقع',callback_data:'useful:menu'}]]);
     }
@@ -817,7 +851,7 @@ Deno.serve(async req=>{
      const id=data.split(':')[2];
      const {error}=await db.from('useful_sites').delete().eq('id',id);
      if(error)throw error;
-     await audit(admin,'useful_site_delete','useful_sites',id);
+     audit(admin,'useful_site_delete','useful_sites',id);
      await edit(chatId,mid,'تم حذف الموقع ✅',[[{text:'⬅️ المواقع',callback_data:'useful:menu'}]]);
     }
     else if(data==='settings:menu')await settingsMenu(chatId,mid);
@@ -836,7 +870,7 @@ Deno.serve(async req=>{
       body:JSON.stringify({requested_by:chatId})
      });
      if(!result.ok)throw new Error(await result.text());
-     await audit(admin,'backup_create','backup_runs','');
+     audit(admin,'backup_create','backup_runs','');
      await backupMenu(chatId,mid);
     }
     else if(data.startsWith('backup:view:')){
@@ -868,7 +902,7 @@ Deno.serve(async req=>{
       body:JSON.stringify({backup_run_id:id,requested_by:chatId})
      });
      if(!result.ok)throw new Error(await result.text());
-     await audit(admin,'backup_restore','backup_runs',id);
+     audit(admin,'backup_restore','backup_runs',id);
      await edit(chatId,mid,'اكتملت الاستعادة ✅',[[{text:'⬅️ النسخ',callback_data:'backup:menu'}]]);
     }
     else if(data==='report:send'){
@@ -878,7 +912,7 @@ Deno.serve(async req=>{
       body:JSON.stringify({chat_id:chatId})
      });
      if(!result.ok)throw new Error(await result.text());
-     await telegram('answerCallbackQuery',{callback_query_id:callback.id,text:'تم إرسال التقرير'}).catch(()=>{});
+     background(send(chatId,'تم إرسال التقرير اليومي ✅'));
     }
     else if(data==='admins:menu'){
      if(!can(admin,'admins'))throw new Error('ليس لديك صلاحية إدارة المشرفين');
@@ -904,7 +938,7 @@ Deno.serve(async req=>{
      },{onConflict:'chat_id'});
      if(error)throw error;
      await clearConversation(chatId);
-     await audit(admin,'admin_create','telegram_admins',conv.data.chat_id,{role});
+     audit(admin,'admin_create','telegram_admins',conv.data.chat_id,{role});
      await adminsMenu(chatId,mid);
     }
     else if(data.startsWith('admin:view:')){
@@ -926,7 +960,7 @@ Chat ID: ${item.chat_id}
      const {data:item}=await db.from('telegram_admins').select('*').eq('id',id).single();
      if(item.chat_id===chatId&&state==='off')throw new Error('لا يمكنك إيقاف حسابك الحالي');
      await db.from('telegram_admins').update({active:state==='on',updated_at:new Date().toISOString()}).eq('id',id);
-     await audit(admin,'admin_toggle','telegram_admins',id,{active:state==='on'});
+     audit(admin,'admin_toggle','telegram_admins',id,{active:state==='on'});
      await adminsMenu(chatId,mid);
     }
     else if(data.startsWith('admin:deleteask:')){
@@ -943,7 +977,7 @@ Chat ID: ${item.chat_id}
      const {data:item}=await db.from('telegram_admins').select('*').eq('id',id).single();
      if(item.chat_id===chatId)throw new Error('لا يمكنك حذف حسابك الحالي');
      await db.from('telegram_admins').delete().eq('id',id);
-     await audit(admin,'admin_delete','telegram_admins',id);
+     audit(admin,'admin_delete','telegram_admins',id);
      await adminsMenu(chatId,mid);
     }
     else if(data==='audit:list'){
@@ -954,12 +988,12 @@ Chat ID: ${item.chat_id}
     else await home(chatId,admin,mid);
 
    }catch(error){
-    await audit(admin,'callback_error','telegram',data,{},false,String(error?.message||error));
-    await telegram('answerCallbackQuery',{
+    audit(admin,'callback_error','telegram',data,{},false,String(error?.message||error));
+    background(telegram('answerCallbackQuery',{
      callback_query_id:callback.id,
      text:String(error?.message||error).slice(0,180),
      show_alert:true
-    }).catch(()=>{});
+    }));
    }
    return response({ok:true});
   }
