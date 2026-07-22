@@ -1,6 +1,68 @@
-
 import {createClient} from 'https://esm.sh/@supabase/supabase-js@2';
-const cors={'Access-Control-Allow-Origin':'*','Access-Control-Allow-Headers':'authorization, x-client-info, apikey, content-type','Access-Control-Allow-Methods':'POST,OPTIONS'};const response=(b:any,s=200)=>new Response(typeof b==='string'?b:JSON.stringify(b),{status:s,headers:{...cors,'content-type':'application/json'}});
+
+const cors={
+ 'Access-Control-Allow-Origin':'*',
+ 'Access-Control-Allow-Headers':'authorization, x-client-info, apikey, content-type',
+ 'Access-Control-Allow-Methods':'POST,OPTIONS'
+};
+const reply=(body:any,status=200)=>new Response(JSON.stringify(body),{
+ status,headers:{...cors,'content-type':'application/json'}
+});
 const db=createClient(Deno.env.get('SUPABASE_URL')!,Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!);
-const tables=['summaries','whatsapp_groups','student_projects','rating_submissions','confessions','site_announcements','university_programs','tools_items','platform_features','telegram_admins'];
-Deno.serve(async req=>{if(req.method==='OPTIONS')return response('',204);const {data:run,error}=await db.from('backup_runs').insert({status:'running'}).select().single();if(error)return response({error:error.message},500);try{const data:any={created_at:new Date().toISOString(),tables:{}},counts:any={};for(const t of tables){const {data:r,error:e}=await db.from(t).select('*');if(e)throw e;data.tables[t]=r||[];counts[t]=(r||[]).length}const path=`backups/${new Date().toISOString().replace(/[:.]/g,'-')}.json`;const blob=new Blob([JSON.stringify(data)],{type:'application/json'});const {error:up}=await db.storage.from('uon-backups').upload(path,blob,{contentType:'application/json'});if(up)throw up;await db.from('backup_runs').update({status:'completed',file_path:path,row_counts:counts,completed_at:new Date().toISOString()}).eq('id',run.id);return response({ok:true,path,counts})}catch(e){await db.from('backup_runs').update({status:'failed',error:String(e.message||e),completed_at:new Date().toISOString()}).eq('id',run.id);return response({ok:false,error:String(e.message||e)},500)}});
+
+const tables=[
+ 'site_settings','platform_features','courses','course_resources','course_requests',
+ 'summaries','whatsapp_groups','student_projects','rating_submissions','confessions',
+ 'site_announcements','site_notifications','university_programs','tools_items',
+ 'academic_calendar_events','feature_suggestions','broken_link_reports',
+ 'telegram_admins','admin_roles','import_sources'
+];
+
+Deno.serve(async req=>{
+ if(req.method==='OPTIONS')return new Response('',{status:204,headers:cors});
+ let requested_by='';
+ try{requested_by=(await req.json().catch(()=>({})))?.requested_by||''}catch{}
+
+ const {data:run,error}=await db.from('backup_runs')
+  .insert({status:'running',requested_by}).select().single();
+ if(error)return reply({ok:false,error:error.message},500);
+
+ try{
+  const payload:any={
+   version:'15.0',
+   created_at:new Date().toISOString(),
+   tables:{}
+  };
+  const counts:any={};
+
+  for(const table of tables){
+   const {data,error}=await db.from(table).select('*');
+   if(error){
+    if(error.code==='42P01')continue;
+    throw error;
+   }
+   payload.tables[table]=data||[];
+   counts[table]=(data||[]).length;
+  }
+
+  const path=`backups/v15-${new Date().toISOString().replace(/[:.]/g,'-')}.json`;
+  const blob=new Blob([JSON.stringify(payload)],{type:'application/json'});
+  const {error:uploadError}=await db.storage.from('uon-backups').upload(path,blob,{
+   contentType:'application/json',upsert:false
+  });
+  if(uploadError)throw uploadError;
+
+  await db.from('backup_runs').update({
+   status:'completed',file_path:path,row_counts:counts,
+   completed_at:new Date().toISOString()
+  }).eq('id',run.id);
+
+  return reply({ok:true,run_id:run.id,path,counts});
+ }catch(error){
+  await db.from('backup_runs').update({
+   status:'failed',error:String(error?.message||error),
+   completed_at:new Date().toISOString()
+  }).eq('id',run.id);
+  return reply({ok:false,error:String(error?.message||error)},500);
+ }
+});
