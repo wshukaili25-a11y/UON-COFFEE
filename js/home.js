@@ -58,3 +58,16 @@ function setupHeroSlider(){
 setupHeroSlider();
 
 trackClicks();trackEvent('page_view',{page:'home'});
+
+async function loadWeeklySearches(){
+ const target=document.querySelector('#weeklySearches');if(!target)return;
+ const since=new Date(Date.now()-7*86400000).toISOString();
+ try{
+  const rows=await get('usage_events',`select=event_type,metadata&created_at=gte.${encodeURIComponent(since)}&or=(event_type.eq.search,event_type.eq.assistant_question,event_type.eq.course_view)&limit=5000`);
+  const counts={};
+  rows.forEach(x=>{const q=x.metadata?.query||x.metadata?.code||x.metadata?.feature;if(q)counts[String(q).trim().toUpperCase()]=(counts[String(q).trim().toUpperCase()]||0)+1});
+  const top=Object.entries(counts).sort((a,b)=>b[1]-a[1]).slice(0,8);
+  target.innerHTML=top.length?top.map(([q,n],i)=>`<a class="weekly-search-card" href="search.html?q=${encodeURIComponent(q)}"><span>${i+1}</span><strong>${esc(q)}</strong><small>${n} عملية بحث</small></a>`).join(''):'<div class="empty">تبدأ الإحصائيات بالظهور بعد استخدام الطلاب للبحث.</div>';
+ }catch(e){target.innerHTML='<div class="empty">تعذر تحميل بيانات البحث.</div>'}
+}
+loadWeeklySearches();

@@ -206,3 +206,34 @@ export async function loadNotificationCenter(limit=20){
   </a>`).join(''):'<div class="empty">لا توجد إشعارات جديدة</div>';
  }catch(error){target.innerHTML='<div class="empty">تعذر تحميل الإشعارات</div>'}
 }
+
+
+export function whatsappShare(title,url=location.href){
+ const text=`${title}\n${url}`;
+ return `https://wa.me/?text=${encodeURIComponent(text)}`;
+}
+
+export async function reportBrokenLink({sourceTable,sourceId,title,url}){
+ const reason=prompt('ما المشكلة في الرابط؟','الرابط لا يعمل');
+ if(reason===null)return false;
+ await insert('broken_link_reports',{
+  source_table:sourceTable,
+  source_id:String(sourceId),
+  source_title:title||'',
+  source_url:url||'',
+  reason,
+  status:'pending'
+ });
+ toast('تم إرسال البلاغ للمشرف');
+ try{await notifyPending('broken_link_reports',sourceId)}catch{}
+ return true;
+}
+
+export function installErrorCapture(){
+ window.addEventListener('error',event=>{
+  insert('system_errors',{source:location.pathname,message:event.message||'Browser error',details:{file:event.filename,line:event.lineno}}).catch(()=>{});
+ });
+ window.addEventListener('unhandledrejection',event=>{
+  insert('system_errors',{source:location.pathname,message:String(event.reason?.message||event.reason||'Unhandled rejection')}).catch(()=>{});
+ });
+}

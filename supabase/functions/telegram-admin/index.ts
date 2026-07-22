@@ -31,7 +31,7 @@ function mainMenu(a:any){
   [{text:'🔧 الصيانة',callback_data:'maintenance'}]
  ];
  if(isOwner(a))rows.push([{text:'👥 المشرفون',callback_data:'admins'}]);
- if(isOwner(a))rows.push([{text:'📘 نادي المواد',callback_data:'coursesctl'}]);if(isOwner(a))rows.push([{text:'🔗 الروابط الرسمية',callback_data:'socials'},{text:'🔔 إشعار جديد',callback_data:'newnotify'}]);rows.push([{text:'🌐 لوحة الموقع',url:`${SITE}/admin.html?v=9.3`}]);
+ if(isOwner(a))rows.push([{text:'💾 النسخ والاستعادة',callback_data:'backupsctl'},{text:'📊 تقرير اليوم',callback_data:'dailyreport'}]);if(isOwner(a))rows.push([{text:'📘 نادي المواد',callback_data:'coursesctl'}]);if(isOwner(a))rows.push([{text:'🔗 الروابط الرسمية',callback_data:'socials'},{text:'🔔 إشعار جديد',callback_data:'newnotify'}]);rows.push([{text:'🌐 لوحة الموقع',url:`${SITE}/admin.html?v=9.3`}]);
  return {inline_keyboard:rows};
 }
 async function sendHome(chatId:string,a:any){
@@ -236,6 +236,33 @@ Deno.serve(async req=>{
      await edit(chatId,mid,`تم حذف ${target.name} ✅\n${x.text}`,x.keyboard);
     }
 
+    else if(data==='dailyreport'){
+     const r=await fetch(`${URL}/functions/v1/daily-report`,{method:'POST',headers:{Authorization:`Bearer ${KEY}`,'content-type':'application/json'},body:'{}'});
+     if(!r.ok)throw new Error(await r.text());
+     await edit(chatId,mid,'تم إرسال التقرير اليومي ✅',{inline_keyboard:[[{text:'⬅️ رجوع',callback_data:'home'}]]});
+    }
+    else if(data==='backupsctl'){
+     const {data:rows}=await db.from('backup_runs').select('*').eq('status','completed').order('created_at',{ascending:false}).limit(8);
+     const keys=(rows||[]).map((x:any)=>[{text:`💾 ${new Date(x.created_at).toLocaleDateString('ar')}`,callback_data:`restore:${x.id}`}]);
+     keys.unshift([{text:'➕ إنشاء نسخة الآن',callback_data:'backupnow'}]);keys.push([{text:'⬅️ رجوع',callback_data:'home'}]);
+     await edit(chatId,mid,'النسخ الاحتياطية\nاختر نسخة لعرض خيار الاستعادة',{inline_keyboard:keys});
+    }
+    else if(data==='backupnow'){
+     const r=await fetch(`${URL}/functions/v1/database-backup`,{method:'POST',headers:{Authorization:`Bearer ${KEY}`,'content-type':'application/json'},body:'{}'});if(!r.ok)throw new Error(await r.text());
+     await edit(chatId,mid,'تم إنشاء نسخة احتياطية ✅',{inline_keyboard:[[{text:'⬅️ رجوع',callback_data:'backupsctl'}]]});
+    }
+    else if(data.startsWith('restore:')){
+     const id=data.split(':')[1];const {data:b,error}=await db.from('backup_runs').select('*').eq('id',id).single();if(error)throw error;
+     await edit(chatId,mid,`استعادة النسخة:\n${b.file_path}\n\n⚠️ ستستبدل بيانات الجداول الموجودة.`,{inline_keyboard:[[{text:'تأكيد الاستعادة',callback_data:`restoreconfirm:${id}`}],[{text:'إلغاء',callback_data:'backupsctl'}]]});
+    }
+    else if(data.startsWith('restoreconfirm:')){
+     const id=data.split(':')[1];const {data:b,error}=await db.from('backup_runs').select('*').eq('id',id).single();if(error)throw error;
+     const {data:file,error:down}=await db.storage.from('uon-backups').download(b.file_path);if(down)throw down;
+     const payload=JSON.parse(await file.text());const run=(await db.from('restore_runs').insert({backup_path:b.file_path,status:'running'}).select().single()).data;
+     for(const [table,rows] of Object.entries(payload.tables||{}) as any){if(!Array.isArray(rows)||!rows.length)continue;const {error:e}=await db.from(table).upsert(rows);if(e)throw new Error(`${table}: ${e.message}`)}
+     await db.from('restore_runs').update({status:'completed',completed_at:new Date().toISOString()}).eq('id',run.id);
+     await edit(chatId,mid,'اكتملت الاستعادة ✅',{inline_keyboard:[[{text:'⬅️ رجوع',callback_data:'backupsctl'}]]});
+    }
     else if(data==='coursesctl'){
      const {data:state,error}=await db.rpc('uon_public_state');if(error)throw error;
      const current=state.features?.courses||'active';
