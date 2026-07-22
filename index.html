@@ -1,44 +1,107 @@
-<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>UON Hub</title><link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet"><link rel="stylesheet" href="css/app.css?v=12.2"><link rel="manifest" href="manifest.webmanifest"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="theme-color" content="#060b1b"></head><body><header class="site-header"><div class="container nav"><a class="brand" href="index.html"><span class="brand-mark">U1</span>UON <span>Hub</span></a><ul class="nav-links" id="navLinks"><li><a class="active" href="index.html">الرئيسية</a></li><li><a class="" href="university-guide.html">دليل الجامعة</a></li><li><a class="" href="summaries.html">الملخصات</a></li><li><a class="" href="groups.html">المجموعات</a></li><li><a class="" href="projects.html">مشاريع الطلاب</a></li><li><a class="" href="ratings.html">التقييمات</a></li><li><a class="" href="tools.html">الأدوات</a></li></ul><div class="nav-actions"><button class="icon-btn mobile-menu" id="menuBtn">☰</button></div></div></header><main>
-<section class="hero hero-slider" id="heroSlider" aria-label="مميزات UON Hub">
-<div class="hero-slides">
-<article class="hero-slide active"><div class="hero-slide-bg hero-main"></div><div class="container hero-content"><span class="hero-badge">من الطلاب — للطلاب</span><h1>كل ما يحتاجه طالب <span>جامعة نزوى</span> في مكان واحد</h1><p>ملخصات، مجموعات، دليل البرامج، تقييمات، أدوات ذكية وخدمات طلابية في منصة واحدة.</p><div class="hero-actions"><a class="btn primary" href="#services">استكشف الخدمات</a><a class="btn" href="search.html">البحث الشامل</a></div></div></article>
-<article class="hero-slide"><div class="hero-slide-bg hero-summaries"></div><div class="container hero-content"><span class="hero-badge">مكتبة الطلاب</span><h2>ملخصات واختبارات لكل مادة</h2><p>ابحث حسب الكلية أو المادة وافتح الملفات المعتمدة بسرعة.</p><div class="hero-actions"><a class="btn primary" href="summaries.html">استكشف الملخصات</a></div></div></article>
-<article class="hero-slide"><div class="hero-slide-bg hero-groups"></div><div class="container hero-content"><span class="hero-badge">تواصل أسرع</span><h2>مجموعات واتساب للمواد والتخصصات</h2><p>اعثر على المجموعة المناسبة أو أرسل مجموعة جديدة للمراجعة.</p><div class="hero-actions"><a class="btn primary" href="groups.html">فتح المجموعات</a></div></div></article>
-<article class="hero-slide"><div class="hero-slide-bg hero-gpa"></div><div class="container hero-content"><span class="hero-badge">خطط لمعدلك</span><h2>حاسبة معدل تدعم المواد المعادة</h2><p>احسب المعدل الفصلي والتراكمي وصافي نقاط المادة المعادة.</p><div class="hero-actions"><a class="btn primary" href="gpa.html">احسب معدلك</a></div></div></article>
-<article class="hero-slide"><div class="hero-slide-bg hero-guide"></div><div class="container hero-content"><span class="hero-badge">دليل الجامعة</span><h2>الكليات والبرامج والخطط الدراسية</h2><p>ابحث عن تخصصك وتعرّف على البرنامج وروابط المصادر الرسمية.</p><div class="hero-actions"><a class="btn primary" href="university-guide.html">فتح الدليل</a></div></div></article>
-<article class="hero-slide"><div class="hero-slide-bg hero-projects"></div><div class="container hero-content"><span class="hero-badge">إبداعات الطلاب</span><h2>معرض مشاريع طلاب جامعة نزوى</h2><p>استعرض المشاريع وشارك مشروعك وتعرّف على أعمال الطلبة.</p><div class="hero-actions"><a class="btn primary" href="projects.html">استعرض المشاريع</a></div></div></article>
-</div>
-<button class="hero-arrow hero-prev" id="heroPrev" aria-label="السابق">‹</button>
-<button class="hero-arrow hero-next" id="heroNext" aria-label="التالي">›</button>
-<div class="hero-controls"><div class="hero-dots" id="heroDots"></div><button class="hero-pause" id="heroPause" aria-label="إيقاف الحركة">❚❚</button></div>
-</section>
-<section class="section v10-search-section">
- <div class="container">
-  <div class="card v10-search-card">
-   <div>
-    <span class="badge">بحث سريع</span>
-    <h2>دور على أي شيء في UON Hub</h2>
-    <p>ملخص، مجموعة، مشروع، برنامج أو أداة.</p>
-   </div>
-   <div class="v10-search-box">
-    <input id="quickSearch" placeholder="مثال: STAT101 أو التمريض">
-    <button class="btn primary" id="quickSearchBtn">بحث</button>
-   </div>
+<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>UON Hub</title><link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet"><link rel="stylesheet" href="css/app.css?v=13"><link rel="manifest" href="manifest.webmanifest"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="theme-color" content="#060b1b"></head><body><header class="site-header"><div class="container nav"><a class="brand" href="index.html"><span class="brand-mark">U1</span>UON <span>Hub</span></a><ul class="nav-links" id="navLinks"><li><a class="active" href="index.html">الرئيسية</a></li><li><a class="" href="university-guide.html">دليل الجامعة</a></li><li><a class="" href="summaries.html">الملخصات</a></li><li><a class="" href="groups.html">المجموعات</a></li><li><a class="" href="projects.html">مشاريع الطلاب</a></li><li><a class="" href="ratings.html">التقييمات</a></li><li><a class="" href="tools.html">الأدوات</a></li></ul><div class="nav-actions"><button class="icon-btn mobile-menu" id="menuBtn">☰</button></div></div></header>
+<main class="v13-main">
+<section class="v13-hero">
+ <div class="v13-hero-media"></div>
+ <div class="v13-hero-shade"></div>
+ <div class="container v13-hero-content">
+  <span class="v13-eyebrow">UON HUB</span>
+  <h1>كل ما يحتاجه طالب<br><span>جامعة نزوى</span><br>في مكان واحد</h1>
+  <p>ملخصات، مجموعات، تقييمات، أدوات ذكية، نادي المواد وخدمات طلابية في تجربة واحدة سريعة وواضحة.</p>
+  <div class="v13-actions">
+   <a class="btn primary" href="#v13Services">ابدأ الآن</a>
+   <a class="btn v13-ghost" href="search.html">استكشف المنصة</a>
+  </div>
+  <div class="v13-hero-stats">
+   <div><strong id="heroStatSummaries">0</strong><span>ملخص واختبار</span></div>
+   <div><strong id="heroStatCourses">0</strong><span>مادة</span></div>
+   <div><strong id="heroStatRatings">0</strong><span>تقييم</span></div>
   </div>
  </div>
 </section>
 
-<section class="section"><div class="container"><a id="waChannel" class="card whatsapp-banner" href="https://whatsapp.com/channel/0029Vb9RCFoHgZWkH8X6di1x" target="_blank"><i>◉</i><span><strong>قناة UON Hub الرسمية على واتساب</strong><small>الإعلانات والتحديثات الجديدة أولًا بأول</small></span><span>↗</span></a></div></section>
-<section class="section" id="services"><div class="container"><div class="section-head"><div><h2>خدمات المنصة</h2><p>تتغير حالة كل خدمة مباشرة من لوحة الإدارة أو بوت تلجرام.</p></div></div><div class="grid grid-4"><a class="card feature-card" data-feature="assistant" href="assistant.html"><i>🤖</i><h3>المساعد الذكي</h3><p>مساعد سريع لأسئلة الجامعة والخدمات</p></a><a class="card feature-card" data-feature="university-guide" href="university-guide.html"><i>🏛️</i><h3>دليل الجامعة</h3><p>الكليات والبرامج والخطط الرسمية</p></a><a class="card feature-card" data-feature="gpa" href="gpa.html"><i>🧮</i><h3>حاسبة المعدل</h3><p>المعدل الفصلي والتراكمي والمواد المعادة</p></a><a class="card feature-card" data-feature="schedule" href="schedule.html"><i>📅</i><h3>الجدول الدراسي</h3><p>أنشئ جدولك واكتشف التعارضات</p></a><a class="card feature-card" data-feature="summaries" href="summaries.html"><i>📚</i><h3>الملخصات</h3><p>ملخصات واختبارات بعد المراجعة</p></a><a class="card feature-card" data-feature="groups" href="groups.html"><i class="wa-icon" aria-label="WhatsApp"><svg viewBox="0 0 32 32" width="36" height="36" aria-hidden="true"><path fill="#25D366" d="M16 3a13 13 0 0 0-11.1 19.7L3 29l6.5-1.7A13 13 0 1 0 16 3Z"/><path fill="#fff" d="M23.5 19.1c-.4-.2-2.4-1.2-2.8-1.3-.4-.1-.7-.2-1 .2-.3.4-1 1.3-1.3 1.6-.2.3-.5.3-.9.1-2.5-1.2-4.1-2.2-5.7-5-.4-.7.4-.7 1.2-2.2.1-.3 0-.6-.1-.8-.1-.2-1-2.4-1.4-3.3-.4-.9-.8-.8-1-.8h-.9c-.3 0-.8.1-1.2.6-.4.4-1.6 1.6-1.6 4s1.7 4.6 1.9 4.9c.2.3 3.3 5.1 8.1 7.1 3 1.3 4.2 1.4 5.7 1.2.9-.1 2.4-1 2.7-1.9.3-.9.3-1.7.2-1.9-.1-.2-.4-.3-.8-.5Z"/></svg></i><h3>مجموعات الواتساب</h3><p>ابحث أو أرسل مجموعة للمراجعة</p></a><a class="card feature-card" data-feature="projects" href="projects.html"><i>💻</i><h3>مشاريع الطلاب</h3><p>استعرض مشاريع الطلاب أو أرسل مشروعك للمراجعة</p></a><a class="card feature-card" data-feature="ratings" href="ratings.html"><i>⭐</i><h3>التقييمات</h3><p>قيّم المواد والدكاترة</p></a><a class="card feature-card" data-feature="confessions" href="confessions.html"><i>💬</i><h3>الاعترافات</h3><p>مشاركات مجهولة بعد موافقة المشرف</p></a><a class="card feature-card" data-feature="tools" href="tools.html"><i>🧰</i><h3>مكتبة الأدوات</h3><p>أدوات دراسية وتقنية منتقاة</p></a></div></div></section>
-<section class="section"><div class="container"><div class="section-head"><div><h2>المنصة بالأرقام</h2><p>إحصائيات مباشرة.</p></div></div><div id="liveStats" class="grid grid-4"></div></div></section><section class="section"><div class="container"><div class="section-head"><div><h2>آخر الإعلانات</h2></div></div><div id="announcements" class="grid grid-3"></div></div></section>
-<section class="section"><div class="container"><div class="grid grid-3">
-<a class="card item-card" href="calendar.html"><span class="badge">جديد</span><h3>📅 التقويم الأكاديمي</h3><p>المواعيد المهمة والاختبارات والإجازات.</p></a>
-<a class="card item-card" href="notifications.html"><span class="badge">بدون حساب</span><h3>🔔 تنبيهاتي</h3><p>اختر ما يهمك وتحفظ اختياراتك في جهازك فقط.</p></a>
-<a class="card item-card" href="feedback.html"><span class="badge">شاركنا</span><h3>💡 اقترح ميزة</h3><p>فكرتك تصل مباشرة للمشرف.</p></a>
-</div></div></section><section class="section"><div class="container"><a class="card launch-course-banner" href="courses.html"><div><span class="badge">أقوى ميزة</span><h2>نادي المواد</h2><p>كل ما يخص المادة في صفحة واحدة.</p></div><span class="btn primary">استكشف المواد</span></a></div></section><section class="section weekly-section"><div class="container"><div class="section-head"><div><span class="badge">هذا الأسبوع</span><h2>الأكثر بحثًا</h2><p>المواد والخدمات التي يبحث عنها الطلاب أكثر.</p></div></div><div id="weeklySearches" class="weekly-search-grid"></div></div></section><section class="section support-centers"><div class="container"><div class="section-head"><div><span class="badge">دعم أكاديمي من الجامعة</span><h2>مراكز تساعدك تنجز وتتقدم</h2></div></div><div class="grid grid-2">
-<article class="support-card anjiz-card"><div class="support-overlay"><span class="badge">لطلاب السنة التأسيسية</span><h2>ابدأ أقوى مع مركز أنجز</h2><p>جلسات دعم وإرشاد أكاديمي وأنشطة تطور الإنجليزية والرياضيات والحاسب ومهارات الدراسة والاستقلالية.</p><a class="btn primary" target="_blank" href="https://www.unizwa.edu.om/index.php?contentid=2554&lang=ar">احجز موعدك من موقع الجامعة</a></div></article>
-<article class="support-card lec-card"><div class="support-overlay"><span class="badge">لطلاب التخصص</span><h2>طوّر مستواك مع مركز تعزيز مسالك التعلم</h2><p>دعم أكاديمي عملي في المواد الأساسية عبر جلسات فردية وورش صغيرة يقدمها طلبة إسناد أكاديمي متميزون.</p><a class="btn primary" target="_blank" href="https://www.unizwa.edu.om/?contentid=618">احجز موعدك من موقع الجامعة</a></div></article>
-</div></div></section></main><footer class="site-footer"><div class="container footer-row"><span>© 2026 UON Hub</span><span>منصة طلابية مستقلة لطلاب جامعة نزوى</span></div></footer><div id="toast" class="toast"></div><script type="module" src="js/home.js?v=12.2"></script><script type="module">import {setupPWA} from "./js/pwa.js?v=12.2";setupPWA();</script>
+<section class="v13-section" id="v13Services">
+ <div class="container">
+  <div class="v13-section-head">
+   <div><span class="v13-kicker">الخدمات الرئيسية</span><h2>ابدأ من الشيء الذي تحتاجه</h2></div>
+   <a class="v13-text-link" href="tools.html">عرض كل الخدمات ←</a>
+  </div>
+  <div class="v13-feature-grid">
+   <a class="v13-feature-card feature-large" href="summaries.html" data-feature="summaries">
+    <span class="v13-feature-icon">📚</span><div><small>مكتبة الطلاب</small><h3>الملخصات والاختبارات</h3><p>كل ملفاتك الدراسية مرتبة حسب المادة والكلية.</p></div><span class="v13-arrow">↗</span>
+   </a>
+   <a class="v13-feature-card" href="ratings.html" data-feature="ratings">
+    <span class="v13-feature-icon">⭐</span><div><small>تجارب الطلاب</small><h3>التقييمات</h3><p>اعرف رأي الطلاب قبل التسجيل.</p></div><span class="v13-arrow">↗</span>
+   </a>
+   <a class="v13-feature-card" href="courses.html" data-feature="courses">
+    <span class="v13-feature-icon">📘</span><div><small>كل شيء في صفحة واحدة</small><h3>نادي المواد</h3><p>ملخصات، مجموعات، اختبارات ومصادر لكل مادة.</p></div><span class="v13-arrow">↗</span>
+   </a>
+   <a class="v13-feature-card" href="university-guide.html" data-feature="university-guide">
+    <span class="v13-feature-icon">🎓</span><div><small>دليل شامل</small><h3>دليل الجامعة</h3><p>الكليات والبرامج والخطط الدراسية.</p></div><span class="v13-arrow">↗</span>
+   </a>
+   <a class="v13-feature-card" href="groups.html" data-feature="groups">
+    <span class="v13-feature-icon">💬</span><div><small>تواصل أسرع</small><h3>مجموعات المواد</h3><p>اعثر على مجموعة مادتك بسهولة.</p></div><span class="v13-arrow">↗</span>
+   </a>
+  </div>
+ </div>
+</section>
+
+<section class="v13-section v13-discover">
+ <div class="container">
+  <div class="v13-section-head"><div><span class="v13-kicker">اكتشف</span><h2>الأكثر تداولًا بين الطلاب</h2></div></div>
+  <div id="v13Trending" class="v13-trending-grid"></div>
+ </div>
+</section>
+
+<section class="v13-section">
+ <div class="container">
+  <div class="v13-section-head"><div><span class="v13-kicker">هذا الأسبوع</span><h2>الأكثر بحثًا</h2></div></div>
+  <div id="weeklySearches" class="weekly-search-grid"></div>
+ </div>
+</section>
+
+<section class="v13-section v13-centers">
+ <div class="container">
+  <div class="v13-section-head"><div><span class="v13-kicker">دعم أكاديمي</span><h2>مراكز تساعدك تنجز وتتقدم</h2></div></div>
+  <div class="v13-center-stack">
+   <article class="v13-center-card" id="anjizCard">
+    <div class="v13-center-media"></div>
+    <div class="v13-center-content">
+     <span class="v13-kicker">لطلاب السنة التأسيسية</span>
+     <h2 id="anjizTitle">مركز أنجز</h2>
+     <p id="anjizDescription"></p>
+     <a id="anjizLink" class="btn primary" target="_blank">احجز موعدك</a>
+    </div>
+   </article>
+   <article class="v13-center-card reverse" id="masalikCard">
+    <div class="v13-center-media"></div>
+    <div class="v13-center-content">
+     <span class="v13-kicker">لطلاب التخصص</span>
+     <h2 id="masalikTitle">مركز تعزيز مسالك التعلم</h2>
+     <p id="masalikDescription"></p>
+     <a id="masalikLink" class="btn primary" target="_blank">احجز موعدك</a>
+    </div>
+   </article>
+  </div>
+ </div>
+</section>
+
+<section class="v13-section v13-latest">
+ <div class="container">
+  <div class="v13-section-head"><div><span class="v13-kicker">جديد المنصة</span><h2>آخر ما تمت إضافته</h2></div></div>
+  <div id="v13Latest" class="v13-timeline"></div>
+ </div>
+</section>
+
+<section class="v13-section v13-feedback">
+ <div class="container">
+  <div class="v13-feedback-card">
+   <div><span class="v13-kicker">ساعدنا نطوّرها</span><h2>عندك فكرة تخلي المنصة أفضل؟</h2><p>اقتراحك يوصل مباشرة للمشرف بدون تسجيل دخول.</p></div>
+   <a class="btn primary" href="feedback.html">اقترح ميزة</a>
+  </div>
+ </div>
+</section>
+</main>
+<footer class="site-footer"><div class="container footer-row"><span>© 2026 UON Hub</span><span>منصة طلابية مستقلة لطلاب جامعة نزوى</span></div></footer><div id="toast" class="toast"></div><script type="module" src="js/home.js?v=13"></script><script type="module">import {setupPWA} from "./js/pwa.js?v=13";setupPWA();</script>
 <script>
 (async()=>{try{
  if('serviceWorker' in navigator){
@@ -50,4 +113,4 @@
  }
 }catch(e){console.warn(e)}})();
 </script>
-<button class="floating-notification" id="notificationBtn" aria-label="الإشعارات">🔔</button><aside class="notification-drawer" id="notificationDrawer"><div class="section-head"><h3>الإشعارات</h3><button class="icon-btn" id="closeNotifications">✕</button></div><div id="notificationItems" class="notification-list"></div></aside><script type="module">import {loadNotificationCenter} from "./js/core.js?v=12.2";const d=document.querySelector("#notificationDrawer");document.querySelector("#notificationBtn")?.addEventListener("click",()=>{d.classList.add("open");loadNotificationCenter()});document.querySelector("#closeNotifications")?.addEventListener("click",()=>d.classList.remove("open"));</script></body></html>
+<button class="floating-notification" id="notificationBtn" aria-label="الإشعارات">🔔</button><aside class="notification-drawer" id="notificationDrawer"><div class="section-head"><h3>الإشعارات</h3><button class="icon-btn" id="closeNotifications">✕</button></div><div id="notificationItems" class="notification-list"></div></aside><script type="module">import {loadNotificationCenter} from "./js/core.js?v=13";const d=document.querySelector("#notificationDrawer");document.querySelector("#notificationBtn")?.addEventListener("click",()=>{d.classList.add("open");loadNotificationCenter()});document.querySelector("#closeNotifications")?.addEventListener("click",()=>d.classList.remove("open"));</script></body></html>

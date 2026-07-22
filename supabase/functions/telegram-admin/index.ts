@@ -31,7 +31,7 @@ function mainMenu(a:any){
   [{text:'🔧 الصيانة',callback_data:'maintenance'}]
  ];
  if(isOwner(a))rows.push([{text:'👥 المشرفون',callback_data:'admins'}]);
- if(isOwner(a))rows.push([{text:'💾 النسخ والاستعادة',callback_data:'backupsctl'},{text:'📊 تقرير اليوم',callback_data:'dailyreport'}]);if(isOwner(a))rows.push([{text:'📘 نادي المواد',callback_data:'coursesctl'}]);if(isOwner(a))rows.push([{text:'🔗 الروابط الرسمية',callback_data:'socials'},{text:'🔔 إشعار جديد',callback_data:'newnotify'}]);rows.push([{text:'🌐 لوحة الموقع',url:`${SITE}/admin.html?v=9.3`}]);
+ if(isOwner(a))rows.push([{text:'🏫 مراكز الدعم',callback_data:'centersctl'}]);if(isOwner(a))rows.push([{text:'💾 النسخ والاستعادة',callback_data:'backupsctl'},{text:'📊 تقرير اليوم',callback_data:'dailyreport'}]);if(isOwner(a))rows.push([{text:'📘 نادي المواد',callback_data:'coursesctl'}]);if(isOwner(a))rows.push([{text:'🔗 الروابط الرسمية',callback_data:'socials'},{text:'🔔 إشعار جديد',callback_data:'newnotify'}]);rows.push([{text:'🌐 لوحة الموقع',url:`${SITE}/admin.html?v=9.3`}]);
  return {inline_keyboard:rows};
 }
 async function sendHome(chatId:string,a:any){
@@ -101,6 +101,13 @@ Deno.serve(async req=>{
    const text=String(msg.text||'').trim();
    const {data:conv}=await db.from('telegram_conversations').select('*').eq('chat_id',chatId).maybeSingle();
 
+   if(conv?.state?.startsWith('center_edit_')){
+    const parts=conv.state.split('_');
+    const center=parts[2],field=parts.slice(3).join('_');
+    await db.from('site_settings').upsert({key:`${center}_${field}`,value:text,updated_at:new Date().toISOString()});
+    await db.from('telegram_conversations').delete().eq('chat_id',chatId);
+    await telegram('sendMessage',{chat_id:chatId,text:'تم تحديث بيانات المركز ✅'});return response()
+   }
    if(conv?.state==='course_add_code'){
     await db.from('telegram_conversations').upsert({chat_id:chatId,state:'course_add_name',data:{code:text.toUpperCase()},updated_at:new Date().toISOString()});
     await telegram('sendMessage',{chat_id:chatId,text:'أرسل اسم المادة بالعربي'});return response()
@@ -236,6 +243,29 @@ Deno.serve(async req=>{
      await edit(chatId,mid,`تم حذف ${target.name} ✅\n${x.text}`,x.keyboard);
     }
 
+    else if(data==='centersctl'){
+     await edit(chatId,mid,'اختر المركز',{inline_keyboard:[
+      [{text:'مركز أنجز',callback_data:'center:anjiz'},{text:'مسالك التعلم',callback_data:'center:masalik'}],
+      [{text:'⬅️ رجوع',callback_data:'home'}]
+     ]});
+    }
+    else if(data.startsWith('center:')){
+     const c=data.split(':')[1];
+     const label=c==='anjiz'?'مركز أنجز':'مركز مسالك التعلم';
+     await edit(chatId,mid,label,{inline_keyboard:[
+      [{text:'تعديل العنوان',callback_data:`centeredit:${c}:title`}],
+      [{text:'تعديل الوصف',callback_data:`centeredit:${c}:description`}],
+      [{text:'تعديل رابط الحجز',callback_data:`centeredit:${c}:booking_url`}],
+      [{text:'تعديل رابط الصورة',callback_data:`centeredit:${c}:image_url`}],
+      [{text:'تعديل نص الزر',callback_data:`centeredit:${c}:cta`}],
+      [{text:'⬅️ رجوع',callback_data:'centersctl'}]
+     ]});
+    }
+    else if(data.startsWith('centeredit:')){
+     const[,c,field]=data.split(':');
+     await db.from('telegram_conversations').upsert({chat_id:chatId,state:`center_edit_${c}_${field}`,data:{},updated_at:new Date().toISOString()});
+     await edit(chatId,mid,'أرسل القيمة الجديدة',{inline_keyboard:[[{text:'⬅️ رجوع',callback_data:`center:${c}`}]]});
+    }
     else if(data==='dailyreport'){
      const r=await fetch(`${URL}/functions/v1/daily-report`,{method:'POST',headers:{Authorization:`Bearer ${KEY}`,'content-type':'application/json'},body:'{}'});
      if(!r.ok)throw new Error(await r.text());

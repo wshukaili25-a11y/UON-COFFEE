@@ -71,3 +71,75 @@ async function loadWeeklySearches(){
  }catch(e){target.innerHTML='<div class="empty">تعذر تحميل بيانات البحث.</div>'}
 }
 loadWeeklySearches();
+
+
+async function loadV13Stats(){
+ const specs=[
+  ['summaries','select=id&approved=eq.true','#heroStatSummaries'],
+  ['courses','select=id&active=eq.true','#heroStatCourses'],
+  ['rating_submissions','select=id&status=eq.approved','#heroStatRatings']
+ ];
+ for(const [table,query,target] of specs){
+  try{
+   const rows=await get(table,query);
+   const el=document.querySelector(target);
+   if(el)el.textContent=rows.length;
+  }catch{}
+ }
+}
+
+async function loadV13Trending(){
+ const target=document.querySelector('#v13Trending');if(!target)return;
+ try{
+  const since=new Date(Date.now()-7*86400000).toISOString();
+  const events=await get('usage_events',`select=event_type,metadata&created_at=gte.${encodeURIComponent(since)}&limit=5000`);
+  const counts={};
+  events.forEach(x=>{
+   const key=x.metadata?.code||x.metadata?.feature||x.metadata?.query;
+   if(key)counts[String(key).toUpperCase()]=(counts[String(key).toUpperCase()]||0)+1;
+  });
+  const top=Object.entries(counts).sort((a,b)=>b[1]-a[1]).slice(0,6);
+  target.innerHTML=top.length?top.map(([key,count],i)=>`<a class="v13-trending-card" href="search.html?q=${encodeURIComponent(key)}"><span class="v13-rank">0${i+1}</span><div><small>نشط هذا الأسبوع</small><h3>${esc(key)}</h3><p>${count} تفاعل</p></div><span>↗</span></a>`).join(''):'<div class="empty">ستظهر البيانات بعد بدء استخدام الطلاب للمنصة.</div>';
+ }catch{target.innerHTML='<div class="empty">تعذر تحميل النشاط.</div>'}
+}
+
+async function loadV13Latest(){
+ const target=document.querySelector('#v13Latest');if(!target)return;
+ const all=[];
+ const sources=[
+  ['summaries','select=id,title,created_at,url&approved=eq.true&order=created_at.desc&limit=4','ملخص'],
+  ['student_projects','select=id,title,created_at,url&status=eq.approved&order=created_at.desc&limit=4','مشروع'],
+  ['site_announcements','select=id,title,created_at,button_url&active=eq.true&order=created_at.desc&limit=4','إعلان']
+ ];
+ for(const [table,query,type] of sources){
+  try{
+   const rows=await get(table,query);
+   rows.forEach(x=>all.push({...x,type,url:x.url||x.button_url||'#'}));
+  }catch{}
+ }
+ all.sort((a,b)=>new Date(b.created_at)-new Date(a.created_at));
+ target.innerHTML=all.slice(0,8).map(x=>`<a class="v13-timeline-item" href="${esc(x.url||'#')}" target="${x.url&&x.url!=='#'?'_blank':'_self'}"><span class="v13-timeline-dot"></span><div><small>${esc(x.type)} • ${new Date(x.created_at).toLocaleDateString('ar')}</small><strong>${esc(x.title)}</strong></div><span>↗</span></a>`).join('')||'<div class="empty">لا توجد إضافات حديثة.</div>';
+}
+
+async function loadCenterSettings(){
+ const keys=['anjiz_title','anjiz_description','anjiz_booking_url','anjiz_image_url','anjiz_cta','masalik_title','masalik_description','masalik_booking_url','masalik_image_url','masalik_cta'];
+ try{
+  const rows=await get('site_settings',`select=key,value&key=in.(${keys.join(',')})`);
+  const m=Object.fromEntries(rows.map(x=>[x.key,x.value]));
+  document.querySelector('#anjizTitle').textContent=m.anjiz_title||'ابدأ أقوى مع مركز أنجز';
+  document.querySelector('#anjizDescription').textContent=m.anjiz_description||'';
+  document.querySelector('#anjizLink').href=m.anjiz_booking_url||'#';
+  document.querySelector('#anjizLink').textContent=m.anjiz_cta||'احجز موعدك';
+  document.querySelector('#anjizCard .v13-center-media').style.backgroundImage=`url("${m.anjiz_image_url||'/assets/unizwa-new-gate-v52.jpg'}")`;
+  document.querySelector('#masalikTitle').textContent=m.masalik_title||'طوّر مستواك مع مركز تعزيز مسالك التعلم';
+  document.querySelector('#masalikDescription').textContent=m.masalik_description||'';
+  document.querySelector('#masalikLink').href=m.masalik_booking_url||'#';
+  document.querySelector('#masalikLink').textContent=m.masalik_cta||'احجز موعدك';
+  document.querySelector('#masalikCard .v13-center-media').style.backgroundImage=`url("${m.masalik_image_url||'/assets/unizwa-campus-aerial.jpg'}")`;
+ }catch(error){console.warn(error)}
+}
+
+loadV13Stats();
+loadV13Trending();
+loadV13Latest();
+loadCenterSettings();

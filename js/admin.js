@@ -138,3 +138,27 @@ document.querySelector('[data-section="courses-admin"]')?.addEventListener('clic
 async function loadNotificationsAdmin(){const r=await get('site_notifications','select=*&order=created_at.desc');$('#notificationsAdminList').innerHTML=r.map(x=>`<div class="list-row"><div><strong>${esc(x.icon||'🔔')} ${esc(x.title)}</strong><small>${esc(x.body||'')}</small></div><button class="btn danger" data-notify-del="${x.id}">حذف</button></div>`).join('');$$('[data-notify-del]').forEach(b=>b.onclick=async()=>{await remove('site_notifications',`id=eq.${b.dataset.notifyDel}`);loadNotificationsAdmin()})}
 $('#notificationForm')?.addEventListener('submit',async e=>{e.preventDefault();const body=Object.fromEntries(new FormData(e.target));body.active=true;await insert('site_notifications',body);toast('تم نشر الإشعار');e.target.reset();loadNotificationsAdmin()});
 document.querySelector('[data-section="notifications-admin"]')?.addEventListener('click',loadNotificationsAdmin);
+
+
+async function loadCenterAdmin(){
+ const keys=['anjiz_title','anjiz_description','anjiz_booking_url','anjiz_image_url','anjiz_cta','masalik_title','masalik_description','masalik_booking_url','masalik_image_url','masalik_cta'];
+ const rows=await get('site_settings',`select=key,value&key=in.(${keys.join(',')})`);
+ const m=Object.fromEntries(rows.map(x=>[x.key,x.value]));
+ const a=$('#anjizSettings'),s=$('#masalikSettings');
+ if(a){a.title.value=m.anjiz_title||'';a.description.value=m.anjiz_description||'';a.booking_url.value=m.anjiz_booking_url||'';a.image_url.value=m.anjiz_image_url||'';a.cta.value=m.anjiz_cta||''}
+ if(s){s.title.value=m.masalik_title||'';s.description.value=m.masalik_description||'';s.booking_url.value=m.masalik_booking_url||'';s.image_url.value=m.masalik_image_url||'';s.cta.value=m.masalik_cta||''}
+}
+async function saveCenter(prefix,form){
+ const data=Object.fromEntries(new FormData(form));
+ await Promise.all([
+  upsertSetting(`${prefix}_title`,data.title),
+  upsertSetting(`${prefix}_description`,data.description),
+  upsertSetting(`${prefix}_booking_url`,data.booking_url),
+  upsertSetting(`${prefix}_image_url`,data.image_url),
+  upsertSetting(`${prefix}_cta`,data.cta)
+ ]);
+ toast('تم حفظ بيانات المركز');
+}
+$('#anjizSettings')?.addEventListener('submit',e=>{e.preventDefault();saveCenter('anjiz',e.target)});
+$('#masalikSettings')?.addEventListener('submit',e=>{e.preventDefault();saveCenter('masalik',e.target)});
+document.querySelector('[data-section="centers"]')?.addEventListener('click',loadCenterAdmin);
