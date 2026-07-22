@@ -60,9 +60,26 @@ async function featureMenu(key:string){
 async function adminsMenu(){
  const {data,error}=await db.from('telegram_admins').select('*').order('created_at');
  if(error)throw error;
- const rows=(data||[]).map((x:any)=>[{text:`${x.active?'🟢':'🔴'} ${x.name} — ${x.role}`,callback_data:`admin:${x.id}`}]);
+ const rows=(data||[]).map((x:any)=>[
+  {text:`${x.active?'🟢':'🔴'} ${x.name} — ${x.role}`,callback_data:`admin:${x.id}`}
+ ]);
  rows.push([{text:'➕ إضافة مشرف',callback_data:'adminadd'}],[{text:'⬅️ رجوع',callback_data:'home'}]);
  return {text:'المشرفون',keyboard:{inline_keyboard:rows}};
+}
+async function adminMenu(id:string){
+ const {data,error}=await db.from('telegram_admins').select('*').eq('id',id).single();
+ if(error)throw error;
+ return {
+  text:`الاسم: ${data.name}
+Chat ID: ${data.chat_id}
+الدور: ${data.role}
+الحالة: ${data.active?'نشط':'متوقف'}`,
+  keyboard:{inline_keyboard:[
+   [{text:data.active?'🔴 إيقاف':'🟢 تفعيل',callback_data:`admintoggle:${id}:${data.active?'off':'on'}`}],
+   [{text:'🗑 حذف المشرف',callback_data:`admindelete:${id}`}],
+   [{text:'⬅️ المشرفون',callback_data:'admins'}]
+  ]}
+ };
 }
 
 Deno.serve(async req=>{
@@ -151,6 +168,35 @@ Deno.serve(async req=>{
      await db.from('telegram_conversations').delete().eq('chat_id',chatId);
      const x=await adminsMenu();await edit(chatId,mid,`تمت الإضافة ✅\n${x.text}`,x.keyboard);
     }
+    
+    else if(data.startsWith('admin:')){
+     if(!isOwner(a))throw new Error('للمالك فقط');
+     const x=await adminMenu(data.split(':')[1]);
+     await edit(chatId,mid,x.text,x.keyboard);
+    }
+    else if(data.startsWith('admintoggle:')){
+     if(!isOwner(a))throw new Error('للمالك فقط');
+     const [,id,state]=data.split(':');
+     const {data:target,error:readError}=await db.from('telegram_admins').select('*').eq('id',id).single();
+     if(readError)throw readError;
+     if(target.chat_id===chatId&&state==='off')throw new Error('لا يمكنك إيقاف حسابك الحالي');
+     const {error}=await db.from('telegram_admins').update({active:state==='on',updated_at:new Date().toISOString()}).eq('id',id);
+     if(error)throw error;
+     const x=await adminMenu(id);
+     await edit(chatId,mid,`تم تحديث المشرف ✅\n${x.text}`,x.keyboard);
+    }
+    else if(data.startsWith('admindelete:')){
+     if(!isOwner(a))throw new Error('للمالك فقط');
+     const id=data.split(':')[1];
+     const {data:target,error:readError}=await db.from('telegram_admins').select('*').eq('id',id).single();
+     if(readError)throw readError;
+     if(target.chat_id===chatId)throw new Error('لا يمكنك حذف حسابك الحالي');
+     const {error}=await db.from('telegram_admins').delete().eq('id',id);
+     if(error)throw error;
+     const x=await adminsMenu();
+     await edit(chatId,mid,`تم حذف ${target.name} ✅\n${x.text}`,x.keyboard);
+    }
+
     else if(data==='stats'){
      const {data:state}=await db.rpc('uon_public_state');
      await edit(chatId,mid,`الصيانة: ${state?.maintenance_enabled?'مفعلة':'متوقفة'}\nالخدمات: ${Object.keys(state?.features||{}).length}`,{inline_keyboard:[[{text:'⬅️ رجوع',callback_data:'home'}]]});

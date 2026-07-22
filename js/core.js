@@ -83,7 +83,7 @@ export async function enforceUonMaintenance(){
  const isMaintenance=location.pathname.endsWith('/maintenance.html');
  if(isAdmin)return false;
 
- if(maintenanceInitialCheck)document.documentElement.classList.add('maintenance-check');
+ if(maintenanceInitialCheck && document.readyState==='loading')document.documentElement.classList.add('maintenance-check');
  try{
   const state=await getUonState();
   if(state.maintenance_enabled&&!isMaintenance){
@@ -106,8 +106,12 @@ export async function enforceUonMaintenance(){
 
 export function watchUonMaintenance(){
  if(location.pathname.endsWith('/admin.html'))return;
- const check=()=>enforceUonMaintenance();
- setInterval(check,10000);
+ let checking=false;
+ const check=async()=>{
+  if(checking)return;
+  checking=true;
+  try{await enforceUonMaintenance()}finally{checking=false}
+ };
  window.addEventListener('focus',check);
  document.addEventListener('visibilitychange',()=>{if(!document.hidden)check()});
 }

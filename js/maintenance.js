@@ -6,4 +6,4 @@ async function refresh(){
   $('#message').textContent=state.maintenance_message||'الموقع تحت الصيانة';
  }catch(e){console.error(e)}
 }
-refresh();setInterval(refresh,5000);window.addEventListener('focus',refresh);
+refresh();window.addEventListener('focus',refresh);document.addEventListener('visibilitychange',()=>{if(!document.hidden)refresh()});
