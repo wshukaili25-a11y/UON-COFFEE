@@ -1660,3 +1660,64 @@ input,select,textarea{
  .v175-services>a,.student-service-card,.v16-service-card{min-height:190px!important}
  .feature-state-banner{bottom:88px}
 }
+
+
+/* ==========================================================
+   UON HUB V18 — Final polish
+   ========================================================== */
+.v18-home{background:var(--app-bg);color:var(--app-text)}
+.v18-hero{padding:64px 0 46px;background:linear-gradient(180deg,var(--app-surface),var(--app-bg));text-align:center}
+.v18-label{color:var(--app-primary);font-size:.78rem;font-weight:900;letter-spacing:1.5px}
+.v18-hero h1{max-width:860px;margin:13px auto;font-size:clamp(2.7rem,6vw,5rem);line-height:1.08;letter-spacing:-2px}
+.v18-hero p{margin:0;color:var(--app-muted);font-size:1.05rem}
+.v18-section{padding:54px 0}
+.v18-soft-section{background:var(--app-surface-soft)}
+.v18-section-head{display:flex;align-items:end;justify-content:space-between;gap:16px;margin-bottom:18px}
+.v18-section-head h2{margin:0 0 5px;font-size:1.9rem}.v18-section-head p{margin:0;color:var(--app-muted)}.v18-section-head>a{color:var(--app-primary);font-weight:800}
+.v18-primary-tools{display:grid;grid-template-columns:repeat(3,1fr);gap:13px}
+.v18-primary-tools>a{min-height:220px;padding:19px;border:1px solid var(--app-line);border-radius:20px;background:var(--app-surface);box-shadow:var(--app-shadow);color:var(--app-text);display:flex;flex-direction:column}
+.v18-primary-tools>a:hover{transform:translateY(-3px);border-color:color-mix(in srgb,var(--app-primary) 35%,var(--app-line))}
+.v18-tool-icon{width:54px;height:54px;border-radius:15px;display:grid;place-items:center;background:color-mix(in srgb,var(--app-primary) 10%,var(--app-surface));font-size:1.5rem;font-weight:900;color:var(--app-primary)}
+.v18-primary-tools h3{margin:24px 0 7px;font-size:1.17rem}.v18-primary-tools p{margin:0;color:var(--app-muted);line-height:1.6}
+.v18-wa-icon{color:#25d366;background:color-mix(in srgb,#25d366 10%,var(--app-surface))}.v18-wa-icon svg{width:31px;height:31px}.v18-ai .v18-tool-icon{background:linear-gradient(135deg,#6658f6,#a967f3);color:#fff}
+.v18-secondary-tools{display:grid;grid-template-columns:repeat(6,1fr);gap:9px}.v18-secondary-tools>a{padding:15px;border:1px solid var(--app-line);border-radius:14px;background:var(--app-surface);color:var(--app-text);display:flex;align-items:center;gap:9px}.v18-secondary-tools>a:hover{border-color:color-mix(in srgb,var(--app-primary) 35%,var(--app-line))}.v18-secondary-tools span{font-size:1.2rem}.v18-secondary-tools strong{font-size:.86rem}
+.v18-two-col{display:grid;grid-template-columns:1fr 1fr;gap:13px}.v18-panel{padding:18px;border:1px solid var(--app-line);border-radius:18px;background:var(--app-surface)}.v18-panel-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}.v18-panel-head h2{margin:0;font-size:1.25rem}.v18-panel-head a{color:var(--app-primary)}
+.v18-list>a{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;padding:11px 0;border-bottom:1px solid var(--app-line);color:var(--app-text)}.v18-list>a:last-child{border:0}.v18-list>a>span{font-size:.76rem;color:var(--app-primary)}.v18-list small{color:var(--app-muted)}
+.v18-centers{display:grid;grid-template-columns:1fr 1fr;gap:13px}.v18-centers article{display:grid;grid-template-columns:160px 1fr;overflow:hidden;border:1px solid var(--app-line);border-radius:18px;background:var(--app-surface)}.v18-center-img{background-position:center;background-size:cover}.v18-centers article>div:last-child{padding:18px}.v18-centers span{color:var(--app-primary);font-size:.76rem;font-weight:800}.v18-centers h3{margin:7px 0}.v18-centers p{color:var(--app-muted);line-height:1.6}
+#anjizCard .v18-center-img{background-image:url('../assets/unizwa-new-gate-v52.jpg')}#masalikCard .v18-center-img{background-image:url('../assets/unizwa-campus-aerial.jpg')}
+
+/* Theme coverage for tables, modals, toasts, admin and old pages */
+table,thead,tbody,tr,th,td{border-color:var(--app-line)!important;color:var(--app-text)!important}
+th{background:var(--app-surface-soft)!important}
+.modal,.modal-card,.dialog,.popover,.dropdown,.toast,.notification-item,.admin-sidebar,.admin-main,.admin-section,.toolbar,.course-tabs,.v16-course-tabs{
+ background:var(--app-surface)!important;color:var(--app-text)!important;border-color:var(--app-line)!important
+}
+.toast{box-shadow:var(--app-shadow)!important}
+.modal::backdrop{background:rgba(0,0,0,.5)}
+input::placeholder,textarea::placeholder{color:var(--app-muted)!important}
+select option{background:var(--app-surface);color:var(--app-text)}
+.empty,.muted,small{color:var(--app-muted)}
+.btn:not(.primary){background:var(--app-surface)!important;color:var(--app-text)!important;border-color:var(--app-line)!important}
+.btn.primary{background:var(--app-primary)!important;color:#fff!important}
+.icon-btn{background:var(--app-surface-soft)!important;color:var(--app-text)!important;border-color:var(--app-line)!important}
+
+/* Unavailable remains shaded; banner is top instead of popup */
+.feature-state-banner{top:82px!important;bottom:auto!important;transform:translate(-50%,-130px)!important}
+.feature-state-banner.show{transform:translate(-50%,0)!important}
+
+/* Footer language/theme */
+.footer-row{color:var(--app-muted)!important}
+
+/* English direction spacing */
+[dir="ltr"] .v18-primary-tools,[dir="ltr"] .v18-secondary-tools,[dir="ltr"] .v18-list,[dir="ltr"] .v18-centers{text-align:left}
+
+@media(max-width:1000px){
+ .v18-primary-tools{grid-template-columns:repeat(2,1fr)}
+ .v18-secondary-tools{grid-template-columns:repeat(3,1fr)}
+}
+@media(max-width:720px){
+ .v18-hero{padding-top:48px}.v18-hero h1{font-size:2.7rem;letter-spacing:-1.3px}
+ .v18-primary-tools,.v18-two-col,.v18-centers{grid-template-columns:1fr}
+ .v18-secondary-tools{grid-template-columns:repeat(2,1fr)}
+ .v18-centers article{grid-template-columns:1fr}.v18-center-img{min-height:190px}
+}

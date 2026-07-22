@@ -507,6 +507,19 @@ async function handleConversation(chatId:string,admin:any,text:string,conv:any){
   return true;
  }
 
+ if(state==='useful_edit_value'){
+  let value:any=text;
+  if(data.field==='sort_order')value=Number(text)||100;
+  const {error}=await db.from('useful_sites').update({
+   [data.field]:value,updated_at:new Date().toISOString()
+  }).eq('id',data.id);
+  if(error)throw error;
+  await clearConversation(chatId);
+  await audit(admin,'useful_site_update','useful_sites',data.id,{field:data.field,value});
+  await send(chatId,'تم تعديل الموقع ✅');
+  return true;
+ }
+
  if(state==='notification_title'){
   await setConversation(chatId,'notification_body',{title:text});
   await send(chatId,'أرسل نص الإشعار');
@@ -771,10 +784,18 @@ Deno.serve(async req=>{
      const {data:item,error}=await db.from('useful_sites').select('*').eq('id',id).single();
      if(error)throw error;
      await edit(chatId,mid,`${item.title_ar}\n${item.url}\nالتصنيف: ${item.category}\nالحالة: ${item.active?'نشط':'متوقف'}`,[
-      [{text:item.active?'🔴 إيقاف':'🟢 تفعيل',callback_data:`useful:toggle:${id}:${item.active?'off':'on'}`}],
+      [{text:'✏️ الاسم',callback_data:`useful:edit:${id}:title_ar`},{text:'🔗 الرابط',callback_data:`useful:edit:${id}:url`}],
+      [{text:'🏷 التصنيف',callback_data:`useful:edit:${id}:category`},{text:'🎨 الأيقونة',callback_data:`useful:edit:${id}:icon`}],
+      [{text:'↕️ الترتيب',callback_data:`useful:edit:${id}:sort_order`}],
+      [{text:item.active?'🔴 إخفاء':'🟢 إظهار',callback_data:`useful:toggle:${id}:${item.active?'off':'on'}`}],
       [{text:'🗑 حذف',callback_data:`useful:deleteask:${id}`}],
       [{text:'⬅️ المواقع',callback_data:'useful:menu'}]
      ]);
+    }
+    else if(data.startsWith('useful:edit:')){
+     const [, ,id,field]=data.split(':');
+     await setConversation(chatId,'useful_edit_value',{id,field});
+     await edit(chatId,mid,'أرسل القيمة الجديدة',[[{text:'⬅️ إلغاء',callback_data:`useful:view:${id}`}]]); 
     }
     else if(data.startsWith('useful:toggle:')){
      const [, ,id,state]=data.split(':');
