@@ -1,11 +1,93 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-<url><loc>https://www.uoncoffee.space/</loc></url>
-<url><loc>https://www.uoncoffee.space/features.html</loc></url>
-<url><loc>https://www.uoncoffee.space/summaries.html</loc></url>
-<url><loc>https://www.uoncoffee.space/groups.html</loc></url>
-<url><loc>https://www.uoncoffee.space/marketplace.html</loc></url>
-<url><loc>https://www.uoncoffee.space/tools.html</loc></url>
-<url><loc>https://www.uoncoffee.space/schedule.html</loc></url>
-  <url><loc>https://www.uoncoffee.space/university-guide.html</loc></url>
+  <url>
+    <loc>https://uon-coffee.vercel.app/assistant.html</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://uon-coffee.vercel.app/calendar.html</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://uon-coffee.vercel.app/confessions.html</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://uon-coffee.vercel.app/course.html</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://uon-coffee.vercel.app/courses.html</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://uon-coffee.vercel.app/feedback.html</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://uon-coffee.vercel.app/gpa.html</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://uon-coffee.vercel.app/groups.html</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://uon-coffee.vercel.app/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>https://uon-coffee.vercel.app/notifications.html</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://uon-coffee.vercel.app/projects.html</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://uon-coffee.vercel.app/ratings.html</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://uon-coffee.vercel.app/schedule.html</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://uon-coffee.vercel.app/search.html</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://uon-coffee.vercel.app/summaries.html</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://uon-coffee.vercel.app/tools.html</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://uon-coffee.vercel.app/university-guide.html</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://uon-coffee.vercel.app/useful-sites.html</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
 </urlset>

@@ -1721,3 +1721,43 @@ select option{background:var(--app-surface);color:var(--app-text)}
  .v18-secondary-tools{grid-template-columns:repeat(2,1fr)}
  .v18-centers article{grid-template-columns:1fr}.v18-center-img{min-height:190px}
 }
+
+
+/* V18.2 Stable Launch */
+:focus-visible{
+ outline:3px solid color-mix(in srgb,var(--app-primary) 55%,transparent)!important;
+ outline-offset:3px!important;
+}
+.runtime-guard-message{
+ position:fixed;z-index:2200;left:50%;bottom:22px;
+ width:min(520px,calc(100% - 28px));
+ transform:translate(-50%,120px);
+ opacity:0;visibility:hidden;
+ display:grid;grid-template-columns:auto 1fr;gap:12px;
+ padding:15px 17px;border-radius:14px;
+ background:var(--app-danger-bg);color:var(--app-danger);
+ border:1px solid color-mix(in srgb,var(--app-danger) 45%,var(--app-line));
+ box-shadow:0 18px 50px rgba(0,0,0,.22);
+ transition:.22s ease;
+}
+.runtime-guard-message.show{transform:translate(-50%,0);opacity:1;visibility:visible}
+.runtime-guard-message[data-type="success"]{
+ background:color-mix(in srgb,#16a34a 10%,var(--app-surface));
+ color:#16a34a;border-color:color-mix(in srgb,#16a34a 42%,var(--app-line));
+}
+.runtime-guard-message button{
+ width:32px;height:32px;border-radius:9px;border:1px solid currentColor;
+ background:transparent;color:inherit;cursor:pointer;
+}
+.runtime-guard-message strong{display:block;margin-bottom:3px}
+.runtime-guard-message p{margin:0;line-height:1.55;color:inherit}
+img{max-width:100%;height:auto}
+[hidden]{display:none!important}
+@media(prefers-reduced-motion:reduce){
+ *,*::before,*::after{
+  animation-duration:.01ms!important;
+  animation-iteration-count:1!important;
+  scroll-behavior:auto!important;
+  transition-duration:.01ms!important;
+ }
+}
