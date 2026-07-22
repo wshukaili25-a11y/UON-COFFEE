@@ -1,10 +1,10 @@
-import {startMaintenanceWatcher} from './core.js';
+import {startMaintenanceWatcher,getUonState,enforceUonMaintenance,watchUonMaintenance} from './core.js';
 
 import {setupNav,enforceMaintenance,platformStatuses,get,$$,get as fetchRows,esc} from './core.js';
-setupNav();await enforceMaintenance();startMaintenanceWatcher();
+setupNav();await enforceUonMaintenance();watchUonMaintenance();startMaintenanceWatcher();
 async function refresh(){
  try{
-  const map=await platformStatuses();
+  const state=await getUonState();const map=state.features||{};
   $$('[data-feature]').forEach(card=>{
    const status=map[card.dataset.feature]||'active';card.dataset.status=status;
    card.querySelector('.status-badge')?.remove();

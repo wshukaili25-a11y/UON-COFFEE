@@ -1,27 +1,15 @@
+document.documentElement.classList.remove('maintenance-check');
 
-import {$,$$,get,insert,update,remove,rpc,toast,esc,edge,readPublicState} from './core.js';
+import {$,$$,get,insert,update,remove,rpc,toast,esc,edge} from './core.js';
 let authed=false;
-function showLogin(){
- const login=$('#login'),dash=$('#dashboard');
- if(login){login.hidden=false;login.style.display='grid'}
- if(dash){dash.hidden=true;dash.style.display='none'}
-}
-function showDashboard(){
- const login=$('#login'),dash=$('#dashboard');
- if(login){login.hidden=true;login.style.display='none'}
- if(dash){dash.hidden=false;dash.style.display='grid'}
-}
-window.addEventListener('error',e=>{console.error(e.error||e.message);if(!authed)showLogin()});
-window.addEventListener('unhandledrejection',e=>{console.error(e.reason);if(!authed)showLogin()});
-showLogin();
-$('#loginForm').onsubmit=async e=>{e.preventDefault();try{const r=await rpc('check_admin_password',{p_password:$('#password').value});if(!(r?.ok??r===true))throw new Error('كلمة المرور غير صحيحة');authed=true;sessionStorage.setItem('uon_admin','1');showDashboard();loadAll().catch(e=>toast(e.message,true))}catch(err){toast(err.message,true)}};
-if(sessionStorage.getItem('uon_admin')==='1'){authed=true;showDashboard();loadAll().catch(e=>{toast(e.message,true);showDashboard()})}
+$('#loginForm').onsubmit=async e=>{e.preventDefault();try{const r=await rpc('uon_admin_login',{p_password:$('#password').value});if(!(r?.ok??r===true))throw new Error('كلمة المرور غير صحيحة');authed=true;sessionStorage.setItem('uon_admin','1');$('#login').hidden=true;$('#dashboard').hidden=false;loadAll()}catch(err){toast(err.message,true)}};
+if(sessionStorage.getItem('uon_admin')==='1'){authed=true;$('#login').hidden=true;$('#dashboard').hidden=false;loadAll()}
 $('#logout').onclick=()=>{sessionStorage.clear();location.reload()};$('#menuAdmin').onclick=()=>$('#sidebar').classList.toggle('open');
 $$('[data-section]').forEach(b=>b.onclick=()=>{$$('.admin-section').forEach(x=>x.classList.remove('active'));$('#sec-'+b.dataset.section).classList.add('active');$('#sidebar').classList.remove('open');if(b.dataset.section==='pending')loadPending()});
 async function settings(){const r=await get('site_settings','select=key,value');const m=Object.fromEntries(r.map(x=>[x.key,x.value]));$('#maintenance').checked=m.maintenance_enabled===true||String(m.maintenance_enabled).toLowerCase()==='true';$('#maintenanceMessage').value=m.maintenance_message||'';$('#maintenanceUntil').value=m.maintenance_until?String(m.maintenance_until).slice(0,16):'';$('#whatsappUrl').value=m.whatsapp_channel_url||''}
 async function upsertSetting(key,value){const r=await get('site_settings',`select=key&key=eq.${encodeURIComponent(key)}`);return r.length?update('site_settings',`key=eq.${encodeURIComponent(key)}`,{value,updated_at:new Date().toISOString()}):insert('site_settings',{key,value})}
 $('#saveSite').onclick=async()=>{try{await Promise.all([upsertSetting('maintenance_enabled',$('#maintenance').checked),upsertSetting('maintenance_message',$('#maintenanceMessage').value),upsertSetting('maintenance_until',$('#maintenanceUntil').value||null),upsertSetting('whatsapp_channel_url',$('#whatsappUrl').value)]);toast('تم حفظ إعدادات الموقع');await settings()}catch(e){toast(e.message,true)}};
-async function features(){const r=await get('platform_features','select=*&order=sort_order.asc');$('#featuresList').innerHTML=r.map(x=>`<div class="list-row"><div><strong>${esc(x.name)}</strong><small>${esc(x.key)}</small></div><select data-feature="${esc(x.key)}"><option value="active" ${x.status==='active'?'selected':''}>تشغيل</option><option value="disabled" ${x.status==='disabled'?'selected':''}>إيقاف</option><option value="coming_soon" ${x.status==='coming_soon'?'selected':''}>قريبًا</option><option value="maintenance" ${x.status==='maintenance'?'selected':''}>صيانة</option></select></div>`).join('');$$('[data-feature]').forEach(s=>s.onchange=async()=>{try{await update('platform_features',`key=eq.${encodeURIComponent(s.dataset.feature)}`,{status:s.value,updated_at:new Date().toISOString()});const state=await readPublicState();if(state.features?.[s.dataset.feature]!==s.value)throw new Error('لم تُحفظ الحالة في قاعدة البيانات');toast('تم تحديث الخدمة فعليًا')}catch(e){toast(e.message,true);await features()}})}
+async function features(){const r=await get('platform_features','select=*&order=sort_order.asc');$('#featuresList').innerHTML=r.map(x=>`<div class="list-row"><div><strong>${esc(x.name)}</strong><small>${esc(x.key)}</small></div><select data-feature="${esc(x.key)}"><option value="active" ${x.status==='active'?'selected':''}>تشغيل</option><option value="disabled" ${x.status==='disabled'?'selected':''}>إيقاف</option><option value="coming_soon" ${x.status==='coming_soon'?'selected':''}>قريبًا</option><option value="maintenance" ${x.status==='maintenance'?'selected':''}>صيانة</option></select></div>`).join('');$$('[data-feature]').forEach(s=>s.onchange=async()=>{await update('platform_features',`key=eq.${encodeURIComponent(s.dataset.feature)}`,{status:s.value,updated_at:new Date().toISOString()});toast('تم تحديث الخدمة')})}
 const defs={summaries:['title','approved'],whatsapp_groups:['subject','approved'],student_projects:['title','status'],rating_submissions:['target_name','status'],confessions:['content','status']};
 async function loadPending(){const t=$('#pendingTable').value,[title,col]=defs[t];const q=col==='approved'?`${col}=eq.false`:`${col}=eq.pending`;const r=await get(t,`select=*&${q}&order=created_at.desc`);$('#pendingList').innerHTML=r.length?r.map(x=>`<div class="list-row"><div><strong>${esc(x[title])}</strong><small>${new Date(x.created_at).toLocaleString('ar')}</small></div><div class="actions"><button class="btn success" data-ok="${x.id}">قبول</button><button class="btn danger" data-no="${x.id}">رفض</button></div></div>`).join(''):'<div class="empty">لا توجد طلبات</div>';$$('[data-ok]').forEach(b=>b.onclick=()=>moderate(t,b.dataset.ok,true));$$('[data-no]').forEach(b=>b.onclick=()=>moderate(t,b.dataset.no,false))}
 async function moderate(t,id,ok){const col=defs[t][1];if(!ok&&col==='approved')await remove(t,`id=eq.${id}`);else await update(t,`id=eq.${id}`,col==='approved'?{approved:true}:{status:ok?'approved':'rejected'});toast(ok?'تم القبول':'تم الرفض');loadPending()}
