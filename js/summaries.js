@@ -1,6 +1,7 @@
+import {startMaintenanceWatcher} from './core.js';
 
 import {setupNav,enforceMaintenance,$,get,insert,notifyPending,toast,fillCollege,esc,openModal,closeModal} from './core.js';
-setupNav();await enforceMaintenance();fillCollege($('#collegeFilter'));fillCollege($('#collegeInput'));
+setupNav();await enforceMaintenance();startMaintenanceWatcher();fillCollege($('#collegeFilter'));fillCollege($('#collegeInput'));
 let rows=[];async function load(){try{rows=await get('summaries','select=*&approved=eq.true&order=created_at.desc');render()}catch(e){toast(e.message,true)}}
 function render(){const q=$('#search').value.toLowerCase(),c=$('#collegeFilter').value;const list=rows.filter(x=>(!c||x.college===c)&&`${x.title||''} ${x.subject||''}`.toLowerCase().includes(q));$('#items').innerHTML=list.length?list.map(x=>`<article class="card item-card"><span class="badge">${esc(x.college||'')}</span><h3>${esc(x.title)}</h3><p>${esc(x.subject||'')} — ${esc(x.description||'')}</p><a class="btn" target="_blank" href="${esc(x.url||x.link)}">فتح الملف</a></article>`).join(''):'<div class="empty">لا توجد نتائج</div>'}
 $('#search').oninput=render;$('#collegeFilter').onchange=render;$('#openForm').onclick=()=>openModal('submitModal');$('#closeForm').onclick=()=>closeModal('submitModal');

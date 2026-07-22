@@ -1,6 +1,7 @@
+import {startMaintenanceWatcher} from './core.js';
 
 import {setupNav,enforceMaintenance,platformStatuses,get,$$,get as fetchRows,esc} from './core.js';
-setupNav();await enforceMaintenance();
+setupNav();await enforceMaintenance();startMaintenanceWatcher();
 async function refresh(){
  try{
   const map=await platformStatuses();
@@ -17,3 +18,5 @@ async function ads(){
 }
 try{const rows=await get('site_settings','select=key,value&key=eq.whatsapp_channel_url');if(rows[0]?.value)document.querySelector('#waChannel').href=rows[0].value}catch{}
 refresh();ads();setInterval(refresh,3000);window.addEventListener('focus',refresh);
+
+async function loadLiveStats(){const specs=[['summaries','approved=eq.true','الملخصات','📚'],['whatsapp_groups','approved=eq.true','المجموعات','🟢'],['student_projects','status=eq.approved','المشاريع','💻'],['rating_submissions','status=eq.approved','التقييمات','⭐']];const vals=[];for(const [t,f,l,i] of specs){try{const r=await get(t,`select=id&${f}`);vals.push({l,i,n:r.length})}catch{vals.push({l,i,n:0})}}document.querySelector('#liveStats').innerHTML=vals.map(x=>`<div class="card stat"><span>${x.i} ${x.l}</span><strong>${x.n}</strong></div>`).join('')}loadLiveStats();setInterval(loadLiveStats,30000);

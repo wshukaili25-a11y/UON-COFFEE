@@ -1,6 +1,7 @@
+import {startMaintenanceWatcher} from './core.js';
 
 import {setupNav,enforceMaintenance,$,get,esc,toast} from './core.js';
-await enforceMaintenance();
+await enforceMaintenance();startMaintenanceWatcher();
 const sources=[
  ['summaries','title,subject,college,url','approved=eq.true','ملخص','summaries.html'],
  ['whatsapp_groups','subject,course_code,college,link','approved=eq.true','مجموعة','groups.html'],

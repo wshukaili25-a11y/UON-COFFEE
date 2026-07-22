@@ -1,0 +1,3 @@
+import {createClient} from 'https://esm.sh/@supabase/supabase-js@2';
+const cors={'Access-Control-Allow-Origin':'*','Access-Control-Allow-Headers':'authorization, x-client-info, apikey, content-type','Access-Control-Allow-Methods':'POST,OPTIONS'};const response=(b:any,s=200)=>new Response(typeof b==='string'?b:JSON.stringify(b),{status:s,headers:{...cors,'content-type':'application/json'}});
+const db=createClient(Deno.env.get('SUPABASE_URL')!,Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!);Deno.serve(async req=>{if(req.method==='OPTIONS')return response('',204);try{await db.from('search_index').delete().gte('id',0);return response({ok:true})}catch(e){return response({ok:false,error:String(e.message||e)},500)}});

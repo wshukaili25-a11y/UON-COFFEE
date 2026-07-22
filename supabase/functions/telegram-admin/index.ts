@@ -30,6 +30,7 @@ Deno.serve(async req=>{
   const payload=await req.json();
   const tgHeader=req.headers.get('x-telegram-bot-api-secret-token');
   const dbHeader=req.headers.get('x-database-webhook-secret');
+  if(payload.source==='admin-test'&&payload.channel==='telegram'){const {data:admins}=await db.from('telegram_admins').select('*').eq('active',true);for(const a of admins||[])await tg('sendMessage',{chat_id:a.chat_id,text:'✅ اختبار إشعارات UON Hub'});return res()}
   if(payload.source==='web-submit'){const d=tables[payload.table];if(!d)return res('ignored');const{data}=await db.from(payload.table).select('*').eq('id',payload.id).single();await notify(payload.table,data);return res()}
   if(dbHeader===DB_SECRET&&payload.type==='INSERT'){await notify(payload.table,payload.record);return res()}
   if(tgHeader!==TG_SECRET)return res('unauthorized',401);

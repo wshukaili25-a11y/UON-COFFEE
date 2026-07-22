@@ -1,6 +1,7 @@
+import {startMaintenanceWatcher} from './core.js';
 
 import {setupNav,enforceMaintenance,$,get,insert,notifyPending,toast,fillCollege,esc,openModal,closeModal} from './core.js';
-setupNav();await enforceMaintenance();fillCollege($('#collegeFilter'));fillCollege($('#collegeInput'),{other:true});
+setupNav();await enforceMaintenance();startMaintenanceWatcher();fillCollege($('#collegeFilter'));fillCollege($('#collegeInput'),{other:true});
 let rows=[];async function load(){try{rows=await get('whatsapp_groups','select=*&approved=eq.true&order=created_at.desc');render()}catch(e){toast(e.message,true)}}
 function render(){const q=$('#search').value.toLowerCase(),c=$('#collegeFilter').value;const list=rows.filter(x=>(!c||x.college===c)&&`${x.subject||''} ${x.course_code||''} ${x.college||''}`.toLowerCase().includes(q));$('#items').innerHTML=list.length?list.map(x=>`<article class="card item-card"><span class="badge">${esc(x.college)}</span><h3>${esc(x.subject)}</h3><p>${esc(x.course_code||'')}</p><a class="btn success" target="_blank" href="${esc(x.link)}">دخول المجموعة</a></article>`).join(''):'<div class="empty">لا توجد نتائج</div>'}
 $('#collegeInput').onchange=()=>$('#otherCollegeField').hidden=$('#collegeInput').value!=='أخرى';$('#search').oninput=render;$('#collegeFilter').onchange=render;$('#openForm').onclick=()=>openModal('submitModal');$('#closeForm').onclick=()=>closeModal('submitModal');

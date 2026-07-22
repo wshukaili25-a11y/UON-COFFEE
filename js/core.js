@@ -69,3 +69,5 @@ export async function platformStatuses(){
 export async function notifyPending(table,id){
  try{await edge({source:'web-submit',table,id})}catch(e){console.warn('Notification fallback failed',e)}
 }
+
+export function startMaintenanceWatcher(interval=5000){if(location.pathname.endsWith('/admin.html'))return;const check=()=>enforceMaintenance();setInterval(check,interval);document.addEventListener('visibilitychange',()=>{if(!document.hidden)check()});window.addEventListener('focus',check)}
