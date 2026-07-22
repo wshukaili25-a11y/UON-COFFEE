@@ -143,3 +143,62 @@ loadV13Stats();
 loadV13Trending();
 loadV13Latest();
 loadCenterSettings();
+
+
+document.querySelector('#v16HomeSearch')?.addEventListener('submit',event=>{
+ event.preventDefault();
+ const value=document.querySelector('#v16HomeSearchInput')?.value.trim();
+ if(value)location.href=`search.html?q=${encodeURIComponent(value)}`;
+});
+
+async function loadV16Home(){
+ const topTarget=document.querySelector('#v16TopCourses');
+ const latestTarget=document.querySelector('#v16LatestItems');
+
+ try{
+  const since=new Date(Date.now()-7*86400000).toISOString();
+  const events=await get('usage_events',`select=event_type,metadata&created_at=gte.${encodeURIComponent(since)}&limit=5000`);
+  const counts={};
+  events.forEach(event=>{
+   if(event.event_type==='course_view'&&event.metadata?.code){
+    const code=String(event.metadata.code).toUpperCase();
+    counts[code]=(counts[code]||0)+1;
+   }
+  });
+
+  const top=Object.entries(counts).sort((a,b)=>b[1]-a[1]).slice(0,5);
+  topTarget.innerHTML=top.length?top.map(([code,count],index)=>`
+   <a href="course.html?code=${encodeURIComponent(code)}">
+    <span>${index+1}</span><strong>${esc(code)}</strong><small>${count} زيارة</small>
+   </a>`).join(''):'<div class="empty">تظهر البيانات بعد استخدام الطلاب للمنصة.</div>';
+ }catch{
+  topTarget.innerHTML='<div class="empty">تعذر تحميل النشاط.</div>';
+ }
+
+ const all=[];
+ const sources=[
+  ['summaries','select=id,title,subject,url,created_at&approved=eq.true&order=created_at.desc&limit=4','ملخص'],
+  ['whatsapp_groups','select=id,subject,link,created_at&approved=eq.true&order=created_at.desc&limit=4','مجموعة'],
+  ['site_announcements','select=id,title,button_url,created_at&active=eq.true&order=created_at.desc&limit=4','إعلان']
+ ];
+
+ for(const [table,query,type] of sources){
+  try{
+   const rows=await get(table,query);
+   rows.forEach(item=>all.push({
+    ...item,
+    type,
+    title:item.title||item.subject||'إضافة جديدة',
+    url:item.url||item.link||item.button_url||'#'
+   }));
+  }catch{}
+ }
+
+ all.sort((a,b)=>new Date(b.created_at)-new Date(a.created_at));
+ latestTarget.innerHTML=all.length?all.slice(0,6).map(item=>`
+  <a href="${esc(item.url)}" target="${item.url&&item.url!=='#'?'_blank':'_self'}">
+   <span>${esc(item.type)}</span><strong>${esc(item.title)}</strong><small>${new Date(item.created_at).toLocaleDateString('ar')}</small>
+  </a>`).join(''):'<div class="empty">لا توجد إضافات حديثة.</div>';
+}
+
+loadV16Home();

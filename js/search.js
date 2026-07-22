@@ -1,5 +1,4 @@
-
-import {get,$,esc,toast,debounce,enforceUonMaintenance,watchUonMaintenance} from './core.js';
+import {get,$,esc,debounce,enforceUonMaintenance,watchUonMaintenance,trackEvent} from './core.js';
 
 await enforceUonMaintenance();
 watchUonMaintenance();
@@ -8,59 +7,24 @@ const input=$('#globalSearch');
 const results=$('#searchResults');
 const meta=$('#searchMeta');
 
-const fallbackSources=[
- {table:'summaries',select:'id,title,subject,college,url,description',filter:'approved=eq.true',type:'ملخص',page:'summaries.html'},
- {table:'whatsapp_groups',select:'id,subject,course_code,college,link',filter:'approved=eq.true',type:'مجموعة',page:'groups.html'},
- {table:'student_projects',select:'id,title,major,description,url',filter:'status=eq.approved',type:'مشروع',page:'projects.html'},
- {table:'university_programs',select:'id,name_ar,name_en,college,degree,official_url',filter:'active=eq.true',type:'برنامج',page:'university-guide.html'},
- {table:'tools_items',select:'id,name,description,url,status',filter:'status=eq.active',type:'أداة',page:'tools.html'}
+const sources=[
+ {table:'courses',query:'select=code,name_ar,name_en,college,description&active=eq.true',type:'مقرر',url:x=>`course.html?code=${encodeURIComponent(x.code)}`,title:x=>`${x.code} — ${x.name_ar}`,body:x=>x.college||''},
+ {table:'summaries',query:'select=id,title,subject,course_code,college,url,description&approved=eq.true',type:'ملخص',url:x=>x.url||'#',title:x=>x.title||x.subject||'ملخص',body:x=>[x.course_code,x.college].filter(Boolean).join(' • ')},
+ {table:'whatsapp_groups',query:'select=id,subject,course_code,college,link&approved=eq.true',type:'مجموعة واتساب',url:x=>x.link||'#',title:x=>x.subject||'مجموعة',body:x=>[x.course_code,x.college].filter(Boolean).join(' • ')},
+ {table:'rating_submissions',query:'select=id,target_name,course_code,overall,comment&status=eq.approved',type:'تقييم',url:x=>'ratings.html',title:x=>x.target_name||x.course_code||'تقييم',body:x=>`${x.overall||0}/5 ${x.comment||''}`},
+ {table:'university_programs',query:'select=name_ar,name_en,college,degree,official_url&active=eq.true',type:'برنامج',url:x=>x.official_url||'university-guide.html',title:x=>x.name_ar||x.name_en,body:x=>[x.college,x.degree].filter(Boolean).join(' • ')}
 ];
 
-function card(item){
- return `<a class="list-row search-result" href="${esc(item.page||item.url||'#')}">
-  <div>
-   <span class="badge">${esc(item.type||item.source_table||'نتيجة')}</span>
-   <strong>${esc(item.title||'نتيجة')}</strong>
-   <small>${esc(item.body||item.description||'')}</small>
-  </div>
-  <span>←</span>
+function matches(item,q){
+ return Object.values(item).join(' ').toLowerCase().includes(q.toLowerCase());
+}
+
+function renderCard(item){
+ return `<a class="v16-search-result" href="${esc(item.url)}" target="${item.url.startsWith('http')?'_blank':'_self'}">
+  <span>${esc(item.type)}</span>
+  <div><strong>${esc(item.title)}</strong><small>${esc(item.body||'')}</small></div>
+  <b>←</b>
  </a>`;
-}
-
-async function indexedSearch(q){
- const safe=q.replace(/[%(),]/g,' ').trim();
- if(!safe)return [];
- try{
-  const rows=await get('search_index',`select=*&active=eq.true&or=(title.ilike.*${encodeURIComponent(safe)}*,body.ilike.*${encodeURIComponent(safe)}*)&order=updated_at.desc&limit=80`);
-  return rows.map(x=>({...x,type:x.source_table,page:x.url||'#'}));
- }catch{
-  return [];
- }
-}
-
-async function fallbackSearch(q){
- const needle=q.toLowerCase();
- const all=[];
-
- for(const source of fallbackSources){
-  try{
-   const rows=await get(source.table,`select=${source.select}&${source.filter}&limit=150`);
-   for(const row of rows){
-    const text=Object.values(row).join(' ').toLowerCase();
-    if(!text.includes(needle))continue;
-
-    all.push({
-     type:source.type,
-     page:source.page,
-     title:row.title||row.subject||row.name_ar||row.name||'نتيجة',
-     body:row.college||row.major||row.description||row.degree||''
-    });
-   }
-  }catch(error){
-   console.warn(source.table,error);
-  }
- }
- return all;
 }
 
 async function run(){
@@ -73,13 +37,34 @@ async function run(){
 
  results.innerHTML='<div class="empty">جاري البحث...</div>';
  const start=performance.now();
+ const found=[];
 
- let rows=await indexedSearch(q);
- if(!rows.length)rows=await fallbackSearch(q);
+ for(const source of sources){
+  try{
+   const rows=await get(source.table,source.query+'&limit=300');
+   rows.filter(row=>matches(row,q)).slice(0,12).forEach(row=>found.push({
+    type:source.type,
+    title:source.title(row),
+    body:source.body(row),
+    url:source.url(row)
+   }));
+  }catch{}
+ }
 
- const ms=Math.round(performance.now()-start);
- meta.textContent=`${rows.length} نتيجة خلال ${ms}ms`;
- results.innerHTML=rows.length?rows.map(card).join(''):'<div class="empty">لا توجد نتائج مطابقة</div>';
+ const grouped={};
+ found.forEach(item=>{
+  if(!grouped[item.type])grouped[item.type]=[];
+  grouped[item.type].push(item);
+ });
+
+ meta.textContent=`${found.length} نتيجة خلال ${Math.round(performance.now()-start)}ms`;
+ results.innerHTML=found.length?Object.entries(grouped).map(([type,items])=>`
+  <section class="v16-search-group">
+   <h3>${esc(type)}</h3>
+   <div>${items.map(renderCard).join('')}</div>
+  </section>`).join(''):'<div class="empty">لا توجد نتائج مطابقة</div>';
+
+ trackEvent('search',{query:q,results:found.length});
 }
 
 const params=new URLSearchParams(location.search);
@@ -89,5 +74,5 @@ if(params.get('q')){
 }
 
 $('#searchBtn').onclick=run;
-input.addEventListener('input',debounce(()=>{if(input.value.trim().length>=2)run()},450));
+input.addEventListener('input',debounce(()=>{if(input.value.trim().length>=2)run()},350));
 input.addEventListener('keydown',event=>{if(event.key==='Enter')run()});

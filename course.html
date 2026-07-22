@@ -2,23 +2,50 @@
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>صفحة المادة | UON Hub</title>
 <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/app.css?v=14.2"><link rel="manifest" href="manifest.webmanifest">
+<link rel="stylesheet" href="css/app.css?v=16"><link rel="manifest" href="manifest.webmanifest">
 </head><body>
 <header class="site-header"><div class="container nav">
 <a class="brand" href="index.html"><span class="brand-mark">U1</span>UON <span>Hub</span></a>
 <div class="nav-actions"><a class="btn" href="courses.html">المواد</a></div>
 </div></header>
-<main>
-<section class="course-hero"><div class="container"><span class="badge" id="courseCollege">المادة</span><h1 id="courseTitle">جاري التحميل...</h1><p id="courseMeta"></p></div></section>
-<section class="section"><div class="container">
-<div class="course-tabs">
-<button class="active" data-tab="overview">نظرة عامة</button><button data-tab="summaries">الملخصات</button><button data-tab="groups">المجموعات</button><button data-tab="ratings">التقييمات</button><button data-tab="resources">المصادر</button>
-</div>
-<div id="courseOverview" class="course-panel active"></div>
-<div id="courseSummaries" class="course-panel"></div>
-<div id="courseGroups" class="course-panel"></div>
-<div id="courseRatings" class="course-panel"></div>
-<div id="courseResources" class="course-panel"></div>
-</div></section></main>
-<div id="toast" class="toast"></div><script type="module" src="js/course.js?v=14.2"></script>
-<aside class="notification-drawer" id="notificationDrawer"><div class="section-head"><h3>الإشعارات</h3><button class="icon-btn" id="closeNotifications">✕</button></div><div id="notificationItems" class="notification-list"></div></aside><script type="module">import {setupV14Shell} from "./js/v14-ui.js?v=14.2";setupV14Shell();</script></body></html>
+
+<main class="v16-course-page">
+<section class="v16-course-header">
+ <div class="container">
+  <a href="courses.html" class="v16-back-link">← كل المقررات</a>
+  <div class="v16-course-title-row">
+   <div>
+    <span id="courseCollege" class="student-label">المادة</span>
+    <h1 id="courseTitle">جاري التحميل...</h1>
+    <p id="courseMeta"></p>
+   </div>
+   <a id="courseShare" class="btn" target="_blank">مشاركة المادة</a>
+  </div>
+ </div>
+</section>
+
+<section class="v16-course-content">
+ <div class="container">
+  <div id="courseStats" class="v16-course-stats"></div>
+
+  <div class="v16-course-tabs">
+   <button class="active" data-tab="overview">نظرة عامة</button>
+   <button data-tab="summaries">الملخصات</button>
+   <button data-tab="exams">الاختبارات</button>
+   <button data-tab="groups">الواتساب</button>
+   <button data-tab="ratings">التقييمات</button>
+   <button data-tab="resources">المصادر</button>
+  </div>
+
+  <div id="courseOverview" class="v16-course-panel active"></div>
+  <div id="courseSummaries" class="v16-course-panel"></div>
+  <div id="courseExams" class="v16-course-panel"></div>
+  <div id="courseGroups" class="v16-course-panel"></div>
+  <div id="courseRatings" class="v16-course-panel"></div>
+  <div id="courseResources" class="v16-course-panel"></div>
+ </div>
+</section>
+</main>
+
+<div id="toast" class="toast"></div><script type="module" src="js/course.js?v=16"></script>
+<aside class="notification-drawer" id="notificationDrawer"><div class="section-head"><h3>الإشعارات</h3><button class="icon-btn" id="closeNotifications">✕</button></div><div id="notificationItems" class="notification-list"></div></aside><script type="module">import {setupV14Shell} from "./js/v14-ui.js?v=16";setupV14Shell();</script></body></html>

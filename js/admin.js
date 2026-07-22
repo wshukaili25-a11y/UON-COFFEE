@@ -162,3 +162,55 @@ async function saveCenter(prefix,form){
 $('#anjizSettings')?.addEventListener('submit',e=>{e.preventDefault();saveCenter('anjiz',e.target)});
 $('#masalikSettings')?.addEventListener('submit',e=>{e.preventDefault();saveCenter('masalik',e.target)});
 document.querySelector('[data-section="centers"]')?.addEventListener('click',loadCenterAdmin);
+
+
+async function loadV16AdminDashboard(){
+ const since=new Date(Date.now()-86400000).toISOString();
+ const [
+  events,courses,summaries,groups,ratings,suggestions,reports,errors,features
+ ]=await Promise.all([
+  get('usage_events',`select=event_type,metadata,session_id,created_at&created_at=gte.${encodeURIComponent(since)}&limit=5000`).catch(()=>[]),
+  get('courses','select=id&active=eq.true').catch(()=>[]),
+  get('summaries','select=id&approved=eq.true').catch(()=>[]),
+  get('whatsapp_groups','select=id&approved=eq.true').catch(()=>[]),
+  get('rating_submissions','select=id&status=eq.approved').catch(()=>[]),
+  get('feature_suggestions','select=id,title,created_at&status=eq.pending&order=created_at.desc&limit=5').catch(()=>[]),
+  get('broken_link_reports','select=id,source_title,created_at&status=eq.pending&order=created_at.desc&limit=5').catch(()=>[]),
+  get('system_errors','select=id,message,source,created_at&order=created_at.desc&limit=5').catch(()=>[]),
+  get('platform_features','select=key,name,status&order=sort_order.asc').catch(()=>[])
+ ]);
+
+ const visitors=new Set(events.map(x=>x.session_id).filter(Boolean)).size;
+ const stats=[
+  ['زوار اليوم',visitors],
+  ['المواد',courses.length],
+  ['الملخصات',summaries.length],
+  ['المجموعات',groups.length],
+  ['التقييمات',ratings.length],
+  ['طلبات معلقة',suggestions.length+reports.length]
+ ];
+
+ $('#v16AdminOverview').innerHTML=stats.map(([label,value])=>`<div><span>${label}</span><strong>${value}</strong></div>`).join('');
+
+ const counts={};
+ events.filter(x=>x.event_type==='feature_open').forEach(x=>{
+  const feature=x.metadata?.feature;
+  if(feature)counts[feature]=(counts[feature]||0)+1;
+ });
+
+ $('#v16AdminTopFeatures').innerHTML=Object.entries(counts).sort((a,b)=>b[1]-a[1]).slice(0,8).map(([key,value])=>`<div class="list-row"><strong>${esc(key)}</strong><span>${value}</span></div>`).join('')||'<div class="empty">لا توجد بيانات بعد</div>';
+
+ const pending=[
+  ...suggestions.map(x=>({title:x.title||'اقتراح',type:'اقتراح',created_at:x.created_at})),
+  ...reports.map(x=>({title:x.source_title||'بلاغ رابط',type:'بلاغ',created_at:x.created_at}))
+ ].sort((a,b)=>new Date(b.created_at)-new Date(a.created_at));
+
+ $('#v16AdminPending').innerHTML=pending.map(x=>`<div class="list-row"><div><strong>${esc(x.title)}</strong><small>${esc(x.type)} • ${new Date(x.created_at).toLocaleString('ar')}</small></div></div>`).join('')||'<div class="empty">لا توجد طلبات معلقة</div>';
+
+ $('#v16AdminServices').innerHTML=features.map(x=>`<div class="list-row"><strong>${esc(x.name)}</strong><span>${x.status==='active'?'🟢':x.status==='maintenance'?'🛠':x.status==='coming_soon'?'🟡':'🔴'} ${esc(x.status)}</span></div>`).join('');
+
+ $('#v16AdminErrors').innerHTML=errors.map(x=>`<div class="list-row"><div><strong>${esc(x.source||'الموقع')}</strong><small>${esc(x.message)} • ${new Date(x.created_at).toLocaleString('ar')}</small></div></div>`).join('')||'<div class="empty">لا توجد أخطاء مسجلة</div>';
+}
+
+$('#v16RefreshDashboard')?.addEventListener('click',loadV16AdminDashboard);
+document.querySelector('[data-section="v16-overview"]')?.addEventListener('click',loadV16AdminDashboard);

@@ -1317,3 +1317,60 @@ input:focus,select:focus,textarea:focus{border-color:rgba(24,199,245,.45)!import
   flex-direction:column;
  }
 }
+
+
+/* =====================================================
+   V16 — Student First
+   ===================================================== */
+.v16-home{background:#070c18}
+.v16-hero{padding:72px 0 44px;background:linear-gradient(180deg,#0d1728,#070c18)}
+.v16-hero-inner{max-width:850px}
+.v16-hero h1{font-size:clamp(2.7rem,6vw,5rem);line-height:1.08;letter-spacing:-2px;margin:12px 0 14px}
+.v16-hero p{color:#aab5c8;font-size:1.05rem}
+.v16-home-search{display:grid;grid-template-columns:1fr auto;gap:9px;margin-top:24px;max-width:650px;padding:8px;border-radius:14px;background:#0d1628;border:1px solid rgba(255,255,255,.08)}
+.v16-home-search input{border:0!important;background:transparent!important;box-shadow:none!important}
+.v16-quick-section,.v16-live-section,.v16-support-section{padding:58px 0}
+.v16-section-head{display:flex;justify-content:space-between;align-items:end;gap:20px;margin-bottom:20px}
+.v16-section-head h2{margin:0 0 5px;font-size:2rem}.v16-section-head p{margin:0;color:#98a6ba}.v16-section-head>a{color:#49c5f2;font-weight:800}
+.v16-service-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.v16-service-card{display:grid;grid-template-columns:52px 1fr auto;gap:14px;align-items:center;min-height:112px;padding:17px;border-radius:13px;background:#0d1628;border:1px solid rgba(255,255,255,.08)}
+.v16-service-card:hover{background:#111d31;border-color:rgba(73,197,242,.28)}
+.v16-service-card>span{width:48px;height:48px;border-radius:12px;display:grid;place-items:center;background:#14213a;font-size:1.4rem}
+.v16-service-card h3{margin:0 0 4px}.v16-service-card p{margin:0;color:#98a6ba;font-size:.88rem}.v16-service-card>b{font-size:.8rem;color:#49c5f2}
+.v16-service-card.whatsapp{border-color:rgba(37,211,102,.18)}.v16-service-card .wa-service-logo{background:rgba(37,211,102,.1);color:#25d366}.wa-service-logo svg{width:30px;height:30px}
+.v16-live-section{background:#09111f}.v16-live-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.v16-live-card{padding:18px;border-radius:14px;background:#0d1628;border:1px solid rgba(255,255,255,.08)}.v16-live-card h3{margin-top:0}
+.v16-mini-list{display:grid}.v16-mini-list>a{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;padding:11px 0;border-bottom:1px solid rgba(255,255,255,.07)}.v16-mini-list>a:last-child{border-bottom:0}.v16-mini-list>a>span{color:#49c5f2;font-size:.76rem}.v16-mini-list small{color:#7f8ca1}
+.v16-support-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}.v16-support-card{display:grid;grid-template-columns:160px 1fr;overflow:hidden;border-radius:14px;background:#0d1628;border:1px solid rgba(255,255,255,.08)}.v16-support-image{background-position:center;background-size:cover}.v16-support-card>div:last-child{padding:18px}.v16-support-card span{color:#49c5f2;font-size:.77rem;font-weight:800}.v16-support-card h3{margin:6px 0}.v16-support-card p{color:#98a6ba;line-height:1.6}
+#anjizCard .v16-support-image{background-image:url('../assets/unizwa-new-gate-v52.jpg')}#masalikCard .v16-support-image{background-image:url('../assets/unizwa-campus-aerial.jpg')}
+
+.v16-course-header{padding:72px 0 32px;background:linear-gradient(180deg,#0d1728,#070c18)}.v16-back-link{color:#49c5f2}.v16-course-title-row{display:flex;justify-content:space-between;align-items:end;gap:20px;margin-top:18px}.v16-course-title-row h1{font-size:clamp(2.3rem,5vw,4.5rem);margin:6px 0}.v16-course-title-row p{color:#98a6ba}.v16-course-content{padding:36px 0 70px}
+.v16-course-stats{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:20px}.v16-course-stats>div{padding:14px;border-radius:12px;background:#0d1628;border:1px solid rgba(255,255,255,.08);display:flex;flex-direction:column}.v16-course-stats strong{font-size:1.5rem;color:#49c5f2}.v16-course-stats span{font-size:.8rem;color:#98a6ba}
+.v16-course-tabs{display:flex;gap:7px;overflow:auto;padding:7px;border-radius:13px;background:#0d1628;border:1px solid rgba(255,255,255,.08);margin-bottom:18px}.v16-course-tabs button{white-space:nowrap;padding:9px 12px;border:0;border-radius:9px;background:transparent;color:#98a6ba;cursor:pointer}.v16-course-tabs button.active{background:#49c5f2;color:#04101a;font-weight:900}
+.v16-course-panel{display:none}.v16-course-panel.active{display:grid;gap:10px}
+.v16-course-overview{display:grid;grid-template-columns:1.2fr .8fr;gap:12px}.v16-course-overview>div{padding:18px;border-radius:13px;background:#0d1628;border:1px solid rgba(255,255,255,.08)}.v16-course-overview p{color:#98a6ba;line-height:1.75}.v16-course-quick-links{display:grid;grid-template-columns:1fr 1fr;gap:8px}.v16-course-quick-links button{border:1px solid rgba(255,255,255,.08);border-radius:10px;background:#101b2e;color:white;cursor:pointer}
+.v16-resource-card,.v16-rating-card{padding:16px;border-radius:13px;background:#0d1628;border:1px solid rgba(255,255,255,.08)}.v16-resource-card{display:grid;grid-template-columns:1fr auto;gap:16px}.v16-resource-card span{color:#49c5f2;font-size:.77rem;font-weight:800}.v16-resource-card h3{margin:7px 0}.v16-resource-card p,.v16-rating-card p{color:#98a6ba}.v16-resource-actions{display:flex;align-items:center;gap:6px}.v16-rating-card>div{display:flex;justify-content:space-between}.v16-rating-card span{color:#facc15}
+
+.v16-search-group{margin-bottom:24px}.v16-search-group h3{margin:0 0 10px}.v16-search-result{display:grid;grid-template-columns:110px 1fr auto;gap:12px;align-items:center;padding:13px 0;border-bottom:1px solid rgba(255,255,255,.07)}.v16-search-result>span{color:#49c5f2;font-size:.78rem;font-weight:800}.v16-search-result small{display:block;color:#98a6ba;margin-top:4px}
+
+.v16-admin-stats{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-bottom:18px}.v16-admin-stats>div{padding:16px;border-radius:13px;background:#0d1628;border:1px solid rgba(255,255,255,.08);display:flex;flex-direction:column}.v16-admin-stats strong{font-size:1.7rem;color:#49c5f2}.v16-admin-stats span{color:#98a6ba;font-size:.8rem}.v16-admin-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+
+@media(max-width:850px){
+ .v16-service-grid,.v16-live-grid,.v16-support-row,.v16-course-overview,.v16-admin-grid{grid-template-columns:1fr}
+ .v16-course-stats{grid-template-columns:repeat(3,1fr)}
+ .v16-support-card{grid-template-columns:130px 1fr}
+ .v16-admin-stats{grid-template-columns:repeat(3,1fr)}
+}
+@media(max-width:600px){
+ .v16-home-search{grid-template-columns:1fr}
+ .v16-hero h1{font-size:2.8rem;letter-spacing:-1.3px}
+ .v16-service-grid{grid-template-columns:1fr}
+ .v16-section-head{align-items:flex-start;flex-direction:column}
+ .v16-support-card{grid-template-columns:1fr}.v16-support-image{min-height:180px}
+ .v16-course-title-row{align-items:flex-start;flex-direction:column}
+ .v16-course-stats{grid-template-columns:repeat(2,1fr)}
+ .v16-resource-card{grid-template-columns:1fr}
+ .v16-resource-actions{flex-wrap:wrap}
+ .v16-search-result{grid-template-columns:1fr auto}
+ .v16-search-result>span{grid-column:1/-1}
+ .v16-admin-stats{grid-template-columns:repeat(2,1fr)}
+}
