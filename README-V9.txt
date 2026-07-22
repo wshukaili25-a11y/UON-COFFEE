@@ -1,0 +1,1 @@
+Run UON_HUB_V9_MIGRATION.sql, upload all files, deploy telegram-admin google-drive-import dropbox-import database-backup search-reindex. Add DROPBOX_ACCESS_TOKEN only if Dropbox import is needed. WhatsApp excluded.
