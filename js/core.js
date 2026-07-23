@@ -1,6 +1,6 @@
 const SUPABASE_URL='https://irkhvydgxpseflggbeqq.supabase.co';
 const SUPABASE_KEY='sb_publishable_gZ9tyM1udrkuQIXHqDtToQ_FyFmePgH';
-const headers={apikey:SUPABASE_KEY,Authorization:`Bearer ${SUPABASE_KEY}`,'Content-Type':'application/json'};
+const headers={apikey:SUPABASE_KEY,'Content-Type':'application/json'};
 
 export const $=(s,r=document)=>r.querySelector(s);
 export const $$=(s,r=document)=>[...r.querySelectorAll(s)];
@@ -16,7 +16,13 @@ export async function api(table,{method='GET',query='',body,prefer='return=repre
  return data;
 }
 export const get=(t,q='')=>api(t,{query:q,prefer:''});
-export const insert=(t,b)=>api(t,{method:'POST',body:b});
+export const insert=(t,b,{returning=true}={})=>api(t,{method:'POST',body:b,prefer:returning?'return=representation':'return=minimal'});
+export async function submitPending(table,body){
+ const payload={...body};
+ if(!payload.id)payload.id=crypto.randomUUID();
+ await insert(table,payload,{returning:false});
+ return payload;
+}
 export const update=(t,q,b)=>api(t,{method:'PATCH',query:q,body:b});
 export const remove=(t,q)=>api(t,{method:'DELETE',query:q,prefer:''});
 export async function rpc(name,body){
@@ -158,7 +164,7 @@ export async function trackEvent(eventType,metadata={}){
    session_id:sessionId,
    metadata,
    user_agent:navigator.userAgent.slice(0,300)
-  });
+  },{returning:false});
  }catch(error){console.warn('Usage tracking skipped',error)}
 }
 
@@ -216,7 +222,7 @@ export function whatsappShare(title,url=location.href){
 export async function reportBrokenLink({sourceTable,sourceId,title,url}){
  const reason=prompt('ما المشكلة في الرابط؟','الرابط لا يعمل');
  if(reason===null)return false;
- await insert('broken_link_reports',{
+ const report=await submitPending('broken_link_reports',{
   source_table:sourceTable,
   source_id:String(sourceId),
   source_title:title||'',
@@ -225,16 +231,16 @@ export async function reportBrokenLink({sourceTable,sourceId,title,url}){
   status:'pending'
  });
  toast('تم إرسال البلاغ للمشرف');
- try{await notifyPending('broken_link_reports',sourceId)}catch{}
+ try{await notifyPending('broken_link_reports',report.id)}catch{}
  return true;
 }
 
 export function installErrorCapture(){
  window.addEventListener('error',event=>{
-  insert('system_errors',{source:location.pathname,message:event.message||'Browser error',details:{file:event.filename,line:event.lineno}}).catch(()=>{});
+  insert('system_errors',{source:location.pathname,message:event.message||'Browser error',details:{file:event.filename,line:event.lineno}},{returning:false}).catch(()=>{});
  });
  window.addEventListener('unhandledrejection',event=>{
-  insert('system_errors',{source:location.pathname,message:String(event.reason?.message||event.reason||'Unhandled rejection')}).catch(()=>{});
+  insert('system_errors',{source:location.pathname,message:String(event.reason?.message||event.reason||'Unhandled rejection')},{returning:false}).catch(()=>{});
  });
 }
 

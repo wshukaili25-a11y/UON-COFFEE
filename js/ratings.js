@@ -1,5 +1,5 @@
 
-import {$,get,insert,esc,toast,openModal,closeModal,notifyPending,enforceUonMaintenance,watchUonMaintenance,trackEvent} from './core.js';
+import {$,get,insert,submitPending,esc,toast,openModal,closeModal,notifyPending,enforceUonMaintenance,watchUonMaintenance,trackEvent} from './core.js';
 await enforceUonMaintenance();watchUonMaintenance();
 let rows=[];
 async function load(){
@@ -47,8 +47,8 @@ $('#ratingForm').onsubmit=async event=>{
    submitButton.textContent='جاري الإرسال...';
   }
 
-  const result=await insert('rating_submissions',body);
-  if(result?.[0]?.id)await notifyPending('rating_submissions',result[0].id);
+  const result=await submitPending('rating_submissions',body);
+  await notifyPending('rating_submissions',result.id);
 
   trackEvent('rating_submit',{target_type:body.target_type});
   toast('تم إرسال التقييم للمراجعة');

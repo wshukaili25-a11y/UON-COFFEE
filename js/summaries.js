@@ -8,6 +8,7 @@ import {
  $,
  get,
  insert,
+ submitPending,
  notifyPending,
  toast,
  fillCollege,
@@ -124,8 +125,8 @@ form?.addEventListener('submit',async event=>{
    submitButton.textContent='جاري الإرسال...';
   }
 
-  const data=await insert('summaries',body);
-  if(data?.[0]?.id)await notifyPending('summaries',data[0].id);
+  const data=await submitPending('summaries',body);
+  await notifyPending('summaries',data.id);
 
   toast('تم إرسال الملف للمراجعة');
   form.reset();

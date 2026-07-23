@@ -5,6 +5,7 @@ import {
  $,
  get,
  insert,
+ submitPending,
  notifyPending,
  toast,
  fillCollege,
@@ -84,8 +85,8 @@ $('#submitForm').onsubmit=async event=>{
  body.approved=false;
 
  try{
-  const result=await insert('whatsapp_groups',body);
-  await notifyPending('whatsapp_groups',result[0].id);
+  const result=await submitPending('whatsapp_groups',body);
+  await notifyPending('whatsapp_groups',result.id);
   toast('تم إرسال المجموعة للمراجعة');
   event.target.reset();
   closeModal('submitModal');
