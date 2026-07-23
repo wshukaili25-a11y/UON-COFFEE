@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>اقترح ميزة | UON Hub</title>
 <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/app.css?v=18.8">
+<link rel="stylesheet" href="css/app.css?v=18.9">
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#060b1b">
 
@@ -45,15 +45,15 @@
 <option value="bug">مشكلة</option>
 <option value="content">محتوى ناقص</option>
 </select></div>
-<div class="field"><label>الكلية — اختياري</label><select id="feedbackCollege" name="college"></select></div>
+<div class="field"><label>الكلية — اختياري</label><select id="feedbackCollege" name="college"><option value="">اختر الكلية</option></select></div>
 <div class="field wide"><label>عنوان الفكرة</label><input name="title" required maxlength="120"></div>
 <div class="field wide"><label>التفاصيل</label><textarea name="details" rows="7" required maxlength="2000"></textarea></div>
-<div class="field wide"><label>وسيلة تواصل — اختياري</label><input name="contact" placeholder="رقم أو معرف تيليجرام، ويترك فارغًا إذا تفضل"></div>
-<button class="btn primary field wide">إرسال الاقتراح</button>
+<div class="field wide"><label>وسيلة تواصل — اختياري</label><input name="contact" type="text" autocomplete="tel" inputmode="text" placeholder="رقم هاتفك أو حسابك على إنستجرام، ويُترك فارغًا إذا تفضل"></div>
+<button class="btn primary field wide" type="submit">إرسال الاقتراح</button>
 </form>
 </div></section>
 </main>
 <div id="toast" class="toast"></div>
-<script type="module" src="js/feedback.js?v=18.8"></script>
-<aside class="notification-drawer" id="notificationDrawer"><div class="section-head"><h3>الإشعارات</h3><button class="icon-btn" id="closeNotifications">✕</button></div><div id="notificationItems" class="notification-list"></div></aside><script type="module">import {setupV14Shell} from "./js/v14-ui.js?v=18.8";setupV14Shell();</script><script type="module">import {applyFeatureStates} from "./js/core.js?v=18.8";applyFeatureStates(document);</script><script type="module" src="js/runtime-guard.js?v=18.8"></script></body>
+<script type="module" src="js/feedback.js?v=18.9"></script>
+<aside class="notification-drawer" id="notificationDrawer"><div class="section-head"><h3>الإشعارات</h3><button class="icon-btn" id="closeNotifications">✕</button></div><div id="notificationItems" class="notification-list"></div></aside><script type="module">import {setupV14Shell} from "./js/v14-ui.js?v=18.9";setupV14Shell();</script><script type="module">import {applyFeatureStates} from "./js/core.js?v=18.9";applyFeatureStates(document);</script><script type="module" src="js/runtime-guard.js?v=18.9"></script></body>
 </html>
