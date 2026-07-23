@@ -1,5 +1,5 @@
 
-const CACHE='uon-hub-v10';
+const CACHE='uon-hub-v18-10';
 const SHELL=['/index.html','/css/app.css','/js/core.js','/manifest.webmanifest'];
 
 self.addEventListener('install',event=>{
