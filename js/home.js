@@ -1,5 +1,5 @@
 import {
- get,esc,enforceUonMaintenance,watchUonMaintenance,
+ get,esc,count,loadSocialLinks,enforceUonMaintenance,watchUonMaintenance,
  trackEvent,trackClicks,applyFeatureStates
 } from './core.js';
 
@@ -96,6 +96,28 @@ async function loadActivity(){
  }
 }
 
+async function loadStats(){
+ const el={
+  summaries:qs('#statSummaries'),
+  groups:qs('#statGroups'),
+  courses:qs('#statCourses'),
+  activity:qs('#statActivity')
+ };
+ if(!el.summaries&&!el.groups&&!el.courses&&!el.activity)return;
+
+ const [summaries,groups,courses,activity]=await Promise.all([
+  count('summaries','approved=eq.true'),
+  count('whatsapp_groups','approved=eq.true'),
+  count('courses','active=eq.true'),
+  count('usage_events','')
+ ]);
+
+ if(el.summaries)el.summaries.textContent=summaries?`+${summaries}`:'—';
+ if(el.groups)el.groups.textContent=groups?`+${groups}`:'—';
+ if(el.courses)el.courses.textContent=courses?`+${courses}`:'—';
+ if(el.activity)el.activity.textContent=activity?`+${activity}`:'—';
+}
+
 async function loadCenters(){
  const anjizCard=qs('#anjizCard');
  const masalikCard=qs('#masalikCard');
@@ -143,7 +165,9 @@ translateStatic();
 await Promise.allSettled([
  loadFeatureStates(),
  loadActivity(),
- loadCenters()
+ loadStats(),
+ loadCenters(),
+ loadSocialLinks()
 ]);
 
 trackClicks();
