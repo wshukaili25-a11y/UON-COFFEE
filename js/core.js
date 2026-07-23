@@ -16,15 +16,6 @@ export async function api(table,{method='GET',query='',body,prefer='return=repre
  return data;
 }
 export const get=(t,q='')=>api(t,{query:q,prefer:''});
-export async function count(table,query=''){
- try{
-  const res=await fetch(`${SUPABASE_URL}/rest/v1/${table}${query?`?${query}`:''}`,{
-   method:'HEAD',headers:{...headers,Prefer:'count=exact'},cache:'no-store'
-  });
-  const range=res.headers.get('content-range');
-  return range?Number(range.split('/')[1]||0):0;
- }catch{return 0}
-}
 export const insert=(t,b)=>api(t,{method:'POST',body:b});
 export const update=(t,q,b)=>api(t,{method:'PATCH',query:q,body:b});
 export const remove=(t,q)=>api(t,{method:'DELETE',query:q,prefer:''});
