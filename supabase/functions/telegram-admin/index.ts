@@ -118,13 +118,13 @@ function mainMenu(admin:any){
  if(can(admin,'admins'))rows.push([{text:'👥 المشرفون والصلاحيات',callback_data:'admins:menu'}]);
  rows.push(
   [{text:'📋 سجل العمليات',callback_data:'audit:list'}],
-  [{text:'🌐 فتح لوحة الموقع',url:`${SITE}/admin.html?v=18.1`}],
+  [{text:'🌐 فتح لوحة الموقع',url:`${SITE}/admin.html?v=18.6`}],
  );
  return rows;
 }
 
 async function home(chatId:string,admin:any,messageId?:number){
- const text=`لوحة إدارة UON Hub V18.1\nمرحبًا ${admin.name||'مشرف'} 👋\nاختر القسم الذي تريد إدارته.`;
+ const text=`لوحة إدارة UON Hub V18.6\nمرحبًا ${admin.name||'مشرف'} 👋\nاختر القسم الذي تريد إدارته.`;
  if(messageId)await edit(chatId,messageId,text,mainMenu(admin));
  else await send(chatId,text,mainMenu(admin));
 }
@@ -364,51 +364,141 @@ async function centerView(chatId:string,mid:number,center:string){
 }
 
 async function dashboard(chatId:string,mid:number){
- const since=new Date(Date.now()-86400000).toISOString();
- const week=new Date(Date.now()-7*86400000).toISOString();
+ const now=new Date();
+ const todayStart=new Date(now); todayStart.setHours(0,0,0,0);
+ const yesterdayStart=new Date(todayStart.getTime()-86400000);
+ const todayISO=todayStart.toISOString();
+ const yesterdayISO=yesterdayStart.toISOString();
+
  const [
-  {data:events},{count:courses},{count:summaries},{count:groups},{count:ratings},
-  {count:errors},{count:reports},{count:suggestions},{data:backup},{data:state}
+  {data:todayEvents},{data:yesterdayEvents},{count:courses},
+  {count:summaries},{count:pendingSummaries},{count:groups},{count:pendingGroups},
+  {count:ratings},{count:pendingRatings},{count:errors},{count:reports},{count:suggestions},
+  {data:backup},{data:state}
  ]=await Promise.all([
-  db.from('usage_events').select('event_type,session_id,metadata').gte('created_at',since),
+  db.from('usage_events').select('event_type,session_id,metadata,created_at').gte('created_at',todayISO),
+  db.from('usage_events').select('event_type,session_id,metadata,created_at').gte('created_at',yesterdayISO).lt('created_at',todayISO),
   db.from('courses').select('id',{count:'exact',head:true}).eq('active',true),
   db.from('summaries').select('id',{count:'exact',head:true}).eq('approved',true),
+  db.from('summaries').select('id',{count:'exact',head:true}).eq('approved',false),
   db.from('whatsapp_groups').select('id',{count:'exact',head:true}).eq('approved',true),
+  db.from('whatsapp_groups').select('id',{count:'exact',head:true}).eq('approved',false),
   db.from('rating_submissions').select('id',{count:'exact',head:true}).eq('status','approved'),
-  db.from('system_errors').select('id',{count:'exact',head:true}).gte('created_at',since),
+  db.from('rating_submissions').select('id',{count:'exact',head:true}).eq('status','pending'),
+  db.from('system_errors').select('id',{count:'exact',head:true}).gte('created_at',todayISO),
   db.from('broken_link_reports').select('id',{count:'exact',head:true}).eq('status','pending'),
   db.from('feature_suggestions').select('id',{count:'exact',head:true}).eq('status','pending'),
   db.from('backup_runs').select('status,created_at').order('created_at',{ascending:false}).limit(1).maybeSingle(),
   db.rpc('uon_public_state')
  ]);
- const visitors=new Set((events||[]).map((x:any)=>x.session_id).filter(Boolean)).size;
- const courseCounts:any={};
- (events||[]).filter((x:any)=>x.event_type==='course_view').forEach((x:any)=>{
-  const code=x.metadata?.code;
-  if(code)courseCounts[code]=(courseCounts[code]||0)+1;
- });
- const top=Object.entries(courseCounts).sort((a:any,b:any)=>b[1]-a[1]).slice(0,5)
-  .map(([code,count])=>`${code}: ${count}`).join('\n')||'لا توجد بيانات بعد';
- const text=`📊 إحصائيات UON Hub
 
-👥 الزوار التقريبيون اليوم: ${visitors}
-🧭 الأحداث اليوم: ${(events||[]).length}
-📘 المواد النشطة: ${courses||0}
-📚 الملخصات: ${summaries||0}
-💬 المجموعات: ${groups||0}
-⭐ التقييمات: ${ratings||0}
+ const todayVisitors=new Set((todayEvents||[]).map((x:any)=>x.session_id).filter(Boolean)).size;
+ const yesterdayVisitors=new Set((yesterdayEvents||[]).map((x:any)=>x.session_id).filter(Boolean)).size;
+ const diff=todayVisitors-yesterdayVisitors;
+ const percent=yesterdayVisitors?Math.round((diff/yesterdayVisitors)*100):(todayVisitors?100:0);
+ const trend=diff>0?`📈 +${diff} (+${percent}%)`:diff<0?`📉 ${diff} (${percent}%)`:'➖ بدون تغيير';
+
+ const featureLabels:any={
+  'assistant':'UON AI','ai':'UON AI','uon-ai':'UON AI',
+  'summaries':'الملخصات','groups':'المجموعات','whatsapp':'المجموعات',
+  'gpa':'حاسبة المعدل','ratings':'التقييمات','courses':'المقررات',
+  'projects':'المشاريع الطلابية','useful-sites':'المواقع والبرامج','university-guide':'دليل الجامعة',
+  'schedule':'الجدول الدراسي','calendar':'التقويم الأكاديمي'
+ };
+ const featureCounts:any={};
+ (todayEvents||[]).filter((x:any)=>x.event_type==='feature_open').forEach((x:any)=>{
+  const key=String(x.metadata?.feature||'').trim();
+  if(key)featureCounts[key]=(featureCounts[key]||0)+1;
+ });
+ const medals=['🥇','🥈','🥉'];
+ const topFeatures=Object.entries(featureCounts).sort((a:any,b:any)=>b[1]-a[1]).slice(0,3)
+  .map(([key,count],i)=>`${medals[i]} ${featureLabels[key]||key}: ${count}`).join('\n')||'لا توجد بيانات بعد';
+
+ const pendingTotal=(pendingSummaries||0)+(pendingGroups||0)+(pendingRatings||0)+(suggestions||0)+(reports||0);
+ const backupText=backup?`${backup.status==='completed'?'✅':backup.status==='failed'?'❌':'⏳'} ${new Date(backup.created_at).toLocaleString('ar-OM')}`:'لا توجد';
+ const text=`📊 لوحة إحصائيات UON Hub
+
+👥 الزوار اليوم: ${todayVisitors}
+👤 الزوار أمس: ${yesterdayVisitors}
+${trend}
+🧭 الأحداث اليوم: ${(todayEvents||[]).length}
+
+📚 الملخصات
+✅ المعتمدة: ${summaries||0}
+⏳ بانتظار المراجعة: ${pendingSummaries||0}
+
+💬 المجموعات
+✅ المعتمدة: ${groups||0}
+⏳ بانتظار المراجعة: ${pendingGroups||0}
+
+⭐ التقييمات
+✅ المعتمدة: ${ratings||0}
+⏳ بانتظار المراجعة: ${pendingRatings||0}
+
 💡 الاقتراحات المعلقة: ${suggestions||0}
 🔗 بلاغات الروابط: ${reports||0}
-⚠️ الأخطاء اليوم: ${errors||0}
-🛠 صيانة الموقع: ${state?.maintenance_enabled?'مفعلة':'متوقفة'}
-💾 آخر نسخة: ${backup?`${backup.status} — ${new Date(backup.created_at).toLocaleString('ar')}`:'لا توجد'}
+🕓 إجمالي الطلبات المعلقة: ${pendingTotal}
 
-🔥 أكثر المواد استخدامًا:
-${top}`;
+🔥 أكثر الأدوات استخدامًا اليوم
+${topFeatures}
+
+📘 المواد النشطة: ${courses||0}
+⚠️ الأخطاء اليوم: ${errors||0}
+🛠 صيانة الموقع: ${state?.maintenance_enabled?'مفعلة 🔴':'متوقفة ✅'}
+💾 آخر نسخة: ${backupText}`;
  await edit(chatId,mid,text,[
   [{text:'🔄 تحديث',callback_data:'dashboard'},{text:'📨 إرسال تقرير اليوم',callback_data:'report:send'}],
+  [{text:'📈 إحصائيات آخر 7 أيام',callback_data:'dashboard:details'}],
+  [{text:'🕓 فتح الطلبات المعلقة',callback_data:'pending:menu'}],
   [{text:'⬅️ الرئيسية',callback_data:'home'}]
  ]);
+}
+
+async function dashboardDetails(chatId:string,mid:number){
+ const start=new Date(); start.setHours(0,0,0,0); start.setDate(start.getDate()-6);
+ const {data:events,error}=await db.from('usage_events')
+  .select('event_type,session_id,metadata,created_at')
+  .gte('created_at',start.toISOString()).order('created_at',{ascending:true});
+ if(error)throw error;
+
+ const days:any={};
+ const featureCounts:any={};
+ const featureLabels:any={
+  'assistant':'UON AI','ai':'UON AI','uon-ai':'UON AI','summaries':'الملخصات',
+  'groups':'المجموعات','whatsapp':'المجموعات','gpa':'حاسبة المعدل','ratings':'التقييمات',
+  'courses':'المقررات','projects':'المشاريع الطلابية','useful-sites':'المواقع والبرامج',
+  'university-guide':'دليل الجامعة','schedule':'الجدول الدراسي','calendar':'التقويم الأكاديمي'
+ };
+ for(let i=0;i<7;i++){
+  const d=new Date(start); d.setDate(start.getDate()+i);
+  const key=d.toISOString().slice(0,10);
+  days[key]={label:d.toLocaleDateString('ar-OM',{weekday:'short',day:'numeric',month:'numeric'}),sessions:new Set(),events:0};
+ }
+ for(const event of events||[]){
+  const key=String(event.created_at||'').slice(0,10);
+  if(days[key]){
+   days[key].events++;
+   if(event.session_id)days[key].sessions.add(event.session_id);
+  }
+  if(event.event_type==='feature_open'&&event.metadata?.feature){
+   const feature=String(event.metadata.feature);
+   featureCounts[feature]=(featureCounts[feature]||0)+1;
+  }
+ }
+ const daily=Object.values(days).map((d:any)=>`${d.label}: 👥 ${d.sessions.size} | 🧭 ${d.events}`).join('\n');
+ const top=Object.entries(featureCounts).sort((a:any,b:any)=>b[1]-a[1]).slice(0,8)
+  .map(([key,value],i)=>`${i+1}. ${featureLabels[key]||key}: ${value}`).join('\n')||'لا توجد بيانات بعد';
+ const totalVisitors=new Set((events||[]).map((x:any)=>x.session_id).filter(Boolean)).size;
+
+ await edit(chatId,mid,`📈 إحصائيات آخر 7 أيام
+
+${daily}
+
+👥 الزوار الفريدون خلال الفترة: ${totalVisitors}
+🧭 إجمالي الأحداث: ${(events||[]).length}
+
+🔥 أكثر الأدوات استخدامًا
+${top}`,[[{text:'🔄 تحديث',callback_data:'dashboard:details'}],[{text:'⬅️ لوحة الإحصائيات',callback_data:'dashboard'}]]);
 }
 
 async function backupMenu(chatId:string,mid:number){
@@ -644,7 +734,7 @@ Deno.serve(async req=>{
    }else if(text==='/start'||text==='/menu')await home(chatId,admin);
    else if(text==='/health'){
     const {data,error}=await db.rpc('uon_public_state');
-    await send(chatId,error?`خطأ: ${error.message}`:`البوت يعمل ✅\nالصيانة: ${data.maintenance_enabled?'مفعلة':'متوقفة'}\nالإصدار: V18.1`);
+    await send(chatId,error?`خطأ: ${error.message}`:`البوت يعمل ✅\nالصيانة: ${data.maintenance_enabled?'مفعلة':'متوقفة'}\nالإصدار: V18.6`);
    }else await home(chatId,admin);
    return response({ok:true});
   }
@@ -656,6 +746,7 @@ Deno.serve(async req=>{
    try{
     if(data==='home')await home(chatId,admin,mid);
     else if(data==='dashboard')await dashboard(chatId,mid);
+    else if(data==='dashboard:details')await dashboardDetails(chatId,mid);
     else if(data==='services')await servicesMenu(chatId,mid);
     else if(data.startsWith('service:view:'))await serviceView(chatId,mid,data.split(':')[2]);
     else if(data.startsWith('service:set:')){
