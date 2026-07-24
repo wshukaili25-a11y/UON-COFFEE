@@ -42,6 +42,13 @@ function addMessage(role,content,links=[]){
   article.appendChild(linksBox);
  }
 
+ if(role==='bot' && Array.isArray(links) && links.some(item=>item?.official)){
+  const note=document.createElement('div');
+  note.className='assistant-source-note';
+  note.textContent='المصادر الرسمية مرفقة مع الإجابة. تحقّق منها عند القرارات الأكاديمية أو المالية.';
+  article.appendChild(note);
+ }
+
  chat.appendChild(article);
  chat.scrollTop=chat.scrollHeight;
  return article;
@@ -207,7 +214,7 @@ function localAnswer(question,context){
  }
 
  return {
-  answer:'ما حصلت معلومة مباشرة داخل بيانات المنصة. جرّب كتابة رمز المادة، اسم التخصص، أو اسم الخدمة بصورة أوضح.',
+  answer:'ما حصلت معلومة مؤكدة في بيانات المنصة أو المصادر الرسمية المتاحة. جرّب كتابة اسم الخدمة أو التخصص بصورة أوضح.',
   links:[
    {type:'خدمة',title:'مركز المقررات',url:'courses.html'},
    {type:'دليل',title:'دليل الجامعة',url:'university-guide.html'},

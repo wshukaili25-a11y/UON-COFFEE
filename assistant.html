@@ -1,4 +1,4 @@
-<!doctype html><html lang="ar" dir="rtl"><head><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#060b1b"><title>مساعد UON AI | UON Hub</title><link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet"><link rel="stylesheet" href="css/app.css?v=18.8"><link rel="manifest" href="manifest.webmanifest"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="theme-color" content="#060b1b">
+<!doctype html><html lang="ar" dir="rtl"><head><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#060b1b"><title>مساعد UON AI | UON Hub</title><link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet"><link rel="stylesheet" href="css/app.css?v=18.11"><link rel="manifest" href="manifest.webmanifest"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="theme-color" content="#060b1b">
 <meta name="description" content="مساعد ذكي للإجابة عن أسئلة خدمات المنصة والمقررات ودليل الجامعة.">
 <meta name="robots" content="index,follow,max-image-preview:large">
 <link rel="canonical" href="https://uon-coffee.vercel.app/assistant.html">
@@ -18,15 +18,25 @@
 <section class="v175-section"><div class="container">
  <div class="v175-ai-layout">
   <aside class="v175-ai-info">
-   <h2>أسئلة جاهزة</h2>
-   <button data-prompt="كيف أحسب المعدل التراكمي؟">كيف أحسب المعدل؟</button>
-   <button data-prompt="أين أجد ملخصات STAT101؟">ملخصات STAT101</button>
-   <button data-prompt="ما هي كليات جامعة نزوى؟">كليات جامعة نزوى</button>
-   <button data-prompt="كيف أصل إلى مجموعة مادة؟">مجموعات المواد</button>
-   <a href="useful-sites.html">مواقع مهمة ومفيدة ←</a>
+   <div class="assistant-side-head">
+    <span class="assistant-status-dot" aria-hidden="true"></span>
+    <div><h2>اسأل UON AI</h2><p>إجابات مدعومة من موقع جامعة نزوى الرسمي وبيانات UON Hub.</p></div>
+   </div>
+   <div class="assistant-quick-grid" aria-label="أسئلة جاهزة">
+    <button data-prompt="ما شروط القبول والتسجيل في جامعة نزوى؟"><span>🎓</span><strong>القبول والتسجيل</strong></button>
+    <button data-prompt="ما كليات جامعة نزوى وما التخصصات المتاحة؟"><span>🏛️</span><strong>الكليات والتخصصات</strong></button>
+    <button data-prompt="ما أهم مواعيد التقويم الأكاديمي الحالية في جامعة نزوى؟"><span>📅</span><strong>التقويم الأكاديمي</strong></button>
+    <button data-prompt="أين أجد الأنظمة واللوائح الأكاديمية في جامعة نزوى؟"><span>📖</span><strong>الأنظمة واللوائح</strong></button>
+    <button data-prompt="ما الخدمات الإلكترونية المتاحة لطلاب جامعة نزوى؟"><span>💻</span><strong>الخدمات الإلكترونية</strong></button>
+    <button data-prompt="ما خدمات الدعم الطلابي المتاحة في جامعة نزوى؟"><span>🤝</span><strong>الدعم الطلابي</strong></button>
+    <button data-prompt="كيف أحسب المعدل التراكمي؟"><span>🧮</span><strong>حاسبة المعدل</strong></button>
+    <button data-prompt="أين أجد ملخصات واختبارات المقررات؟"><span>📚</span><strong>الملخصات</strong></button>
+    <button data-prompt="كيف أصل إلى مجموعة واتساب لمادة؟"><span>💬</span><strong>مجموعات المواد</strong></button>
+   </div>
+   <a href="useful-sites.html">المواقع والبرامج المهمة ←</a>
   </aside>
   <section class="v175-ai-chat">
-   <div id="chat" class="chat-list" role="log" aria-live="polite" aria-label="محادثة مساعد UON AI"><div class="message bot">مرحبًا! اسألني عن خدمات المنصة أو جامعة نزوى.</div></div>
+   <div id="chat" class="chat-list" role="log" aria-live="polite" aria-label="محادثة مساعد UON AI"><div class="message bot">مرحبًا! اختر سؤالًا جاهزًا أو اكتب سؤالك. عند الإجابة عن الجامعة أعتمد على موقع جامعة نزوى الرسمي، وأعرض لك المصادر.</div></div>
    <form id="chatForm" class="chat-form" action="javascript:void(0)" method="post" novalidate onsubmit="return false;"><textarea id="question" placeholder="اكتب سؤالك هنا..." maxlength="800" required></textarea><button type="submit" class="btn primary">إرسال</button></form>
   </section>
  </div>
@@ -55,4 +65,4 @@
   });
 })();
 </script>
-<script type="module" src="js/assistant.js?v=18.8"></script><aside class="notification-drawer" id="notificationDrawer"><div class="section-head"><h3>الإشعارات</h3><button class="icon-btn" id="closeNotifications">✕</button></div><div id="notificationItems" class="notification-list"></div></aside><script type="module">import {setupV14Shell} from "./js/v14-ui.js?v=18.8";setupV14Shell();</script><script type="module">import {applyFeatureStates} from "./js/core.js?v=18.8";applyFeatureStates(document);</script><script type="module" src="js/runtime-guard.js?v=18.8"></script></body></html>
+<script type="module" src="js/assistant.js?v=18.11"></script><aside class="notification-drawer" id="notificationDrawer"><div class="section-head"><h3>الإشعارات</h3><button class="icon-btn" id="closeNotifications">✕</button></div><div id="notificationItems" class="notification-list"></div></aside><script type="module">import {setupV14Shell} from "./js/v14-ui.js?v=18.11";setupV14Shell();</script><script type="module">import {applyFeatureStates} from "./js/core.js?v=18.11";applyFeatureStates(document);</script><script type="module" src="js/runtime-guard.js?v=18.11"></script></body></html>
