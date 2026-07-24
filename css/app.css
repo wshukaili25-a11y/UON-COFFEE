@@ -1910,3 +1910,40 @@ img{max-width:100%;height:auto}
 :root[data-theme="dark"] .v1813-slide-icon{
  background:linear-gradient(145deg,var(--app-primary),#16a34a)!important;
 }
+
+
+/* V18.13.4 — Hero is part of the page, not a separate colored card */
+.v1813-hero{
+  background:var(--app-bg)!important;
+  color:var(--app-text)!important;
+  padding:26px 0 18px!important;
+}
+.v1813-slider{min-height:300px!important}
+.v1813-slide{
+  min-height:300px!important;
+  background:transparent!important;
+  color:var(--app-text)!important;
+  border:0!important;
+  border-radius:0!important;
+  box-shadow:none!important;
+  padding:38px 0!important;
+}
+.v1813-slide h1{color:var(--app-text)!important}
+.v1813-slide p{color:var(--app-muted)!important}
+.v1813-slide .v18-label{
+  color:var(--app-primary)!important;
+  background:var(--app-surface-soft)!important;
+  border-color:var(--app-line)!important;
+}
+.v1813-slide-icon{
+  background:var(--app-surface-soft)!important;
+  color:var(--app-primary)!important;
+  border:1px solid var(--app-line)!important;
+  box-shadow:none!important;
+}
+.v1813-dots button{background:var(--app-line)!important}
+.v1813-dots button.active{background:var(--app-primary)!important}
+@media(max-width:760px){
+ .v1813-slider{min-height:365px!important}
+ .v1813-slide{min-height:365px!important;padding:24px 0!important}
+}

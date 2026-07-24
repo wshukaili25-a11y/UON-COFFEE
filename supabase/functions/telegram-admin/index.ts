@@ -8,7 +8,7 @@ const SITE=Deno.env.get('SITE_URL')||'https://uon-coffee.vercel.app';
 const db=createClient(URL,KEY);
 
 const adminCache=new Map<string,{admin:any,expires:number}>();
-const ADMIN_CACHE_TTL=60_000;
+const ADMIN_CACHE_TTL=300_000;
 
 function background(task:Promise<any>){
  try{
@@ -34,7 +34,8 @@ async function telegram(method:string,body:any){
  const result=await fetch(`https://api.telegram.org/bot${TOKEN}/${method}`,{
   method:'POST',
   headers:{'content-type':'application/json'},
-  body:JSON.stringify(body)
+  body:JSON.stringify(body),
+  signal:AbortSignal.timeout(10_000)
  });
  const text=await result.text();
  if(!result.ok)throw new Error(text);
@@ -124,7 +125,7 @@ function mainMenu(admin:any){
 }
 
 async function home(chatId:string,admin:any,messageId?:number){
- const text=`لوحة إدارة UON Hub V18.7\nمرحبًا ${admin.name||'مشرف'} 👋\nاختر القسم الذي تريد إدارته.`;
+ const text=`لوحة إدارة UON Hub V18.13.4\nمرحبًا ${admin.name||'مشرف'} 👋\nاختر القسم الذي تريد إدارته.`;
  if(messageId)await edit(chatId,messageId,text,mainMenu(admin));
  else await send(chatId,text,mainMenu(admin));
 }
@@ -791,7 +792,8 @@ Deno.serve(async req=>{
 
   // Stop Telegram's loading spinner immediately, before any database work.
   if(callback){
-   background(telegram('answerCallbackQuery',{callback_query_id:callback.id}));
+   // Acknowledge immediately so Telegram never leaves the button spinning.
+   try{await telegram('answerCallbackQuery',{callback_query_id:callback.id});}catch{}
   }
 
   const chatId=String(callback?.message?.chat?.id||message?.chat?.id||'');
@@ -812,11 +814,11 @@ Deno.serve(async req=>{
      const {count,error}=await db.from(table).select('id',{count:'exact',head:true}).eq(cfg.status,cfg.pending);
      return `${error?'❌':'✅'} ${cfg.title}: ${error?error.message:(count||0)+' معلق'}`;
     }));
-    await send(chatId,`فحص أزرار وجداول المراجعة V18.7\n\n${checks.join('\n')}\n\n✅ callback_data تم ضغطها لتوافق حد Telegram.`);
+    await send(chatId,`فحص أزرار وجداول المراجعة V18.13.4\n\n${checks.join('\n')}\n\n✅ callback_data تم ضغطها لتوافق حد Telegram.`);
    }
    else if(text==='/health'){
     const {data,error}=await db.rpc('uon_public_state');
-    await send(chatId,error?`خطأ: ${error.message}`:`البوت يعمل ✅\nالصيانة: ${data.maintenance_enabled?'مفعلة':'متوقفة'}\nالإصدار: V18.7`);
+    await send(chatId,error?`خطأ: ${error.message}`:`البوت يعمل ✅\nالصيانة: ${data.maintenance_enabled?'مفعلة':'متوقفة'}\nالإصدار: V18.13.4`);
    }else await home(chatId,admin);
    return response({ok:true});
   }
