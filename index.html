@@ -1,4 +1,4 @@
-<!doctype html><html lang="ar" dir="rtl"><head><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>UON Hub | منصة طلاب جامعة نزوى</title><link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet"><link rel="stylesheet" href="css/app.css?v=18.8"><link rel="manifest" href="manifest.webmanifest"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="theme-color" content="#060b1b">
+<!doctype html><html lang="ar" dir="rtl"><head><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>UON Hub | منصة طلاب جامعة نزوى</title><link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet"><link rel="stylesheet" href="css/app.css?v=18.13"><link rel="manifest" href="manifest.webmanifest"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="theme-color" content="#060b1b">
 <meta name="description" content="كل ما يحتاجه طالب جامعة نزوى في مكان واحد: ملخصات، اختبارات، مجموعات واتساب، دليل الجامعة، التقييمات وأدوات الطالب.">
 <meta name="robots" content="index,follow,max-image-preview:large">
 <link rel="canonical" href="https://uon-coffee.vercel.app/">
@@ -18,11 +18,10 @@
 
 
 <main class="v18-home">
-<section class="v18-hero">
+<section class="v1813-hero" id="homeHero">
  <div class="container">
-  <span class="v18-label">UON HUB</span>
-  <h1 data-ar="كل ما يحتاجه طالب جامعة نزوى في مكان واحد" data-en="Everything a University of Nizwa student needs in one place">كل ما يحتاجه طالب جامعة نزوى في مكان واحد</h1>
-  <p data-ar="خدمات طلابية واضحة وسهلة، بدون تسجيل دخول وبدون تعقيد." data-en="Clear and simple student services, with no account and no complexity.">خدمات طلابية واضحة وسهلة، بدون تسجيل دخول وبدون تعقيد.</p>
+  <div id="homeSlides" class="v1813-slider" aria-live="polite"></div>
+  <div id="homeSlideDots" class="v1813-dots" aria-label="شرائح الواجهة"></div>
  </div>
 </section>
 
@@ -95,7 +94,14 @@
  </div>
 </section>
 
-<section class="v18-section v18-soft-section">
+<section class="v18-section">
+ <div class="container">
+  <div class="v18-section-head"><div><h2>روابط الجامعة المهمة</h2><p>وصول سريع إلى الخدمات الرسمية الأكثر استخدامًا.</p></div><a href="useful-sites.html">كل المواقع</a></div>
+  <div id="officialUniversityLinks" class="v1813-official-links"></div>
+ </div>
+</section>
+
+<section class="v18-section v18-soft-section" data-feature="support-centers">
  <div class="container">
   <div class="v18-section-head"><div><h2 data-ar="مراكز الجامعة" data-en="University centers">مراكز الجامعة</h2></div></div>
   <div class="v18-centers">
@@ -109,7 +115,7 @@
 
 
 
-<footer class="site-footer"><div class="container footer-row"><span>UON Hub · 2026</span><span>منصة طلابية مستقلة لطلاب جامعة نزوى</span></div></footer><div id="toast" class="toast"></div><script type="module" src="js/home.js?v=18.8"></script>
+<footer class="site-footer"><div class="container footer-row"><span id="footerRights">© 2026 UON Hub — جميع الحقوق محفوظة</span><span id="footerSubtitle">منصة طلابية مستقلة لخدمة طلاب جامعة نزوى</span></div></footer><div id="toast" class="toast"></div><script type="module" src="js/home.js?v=18.13"></script>
 <script>
 (async()=>{try{
  if('serviceWorker' in navigator){

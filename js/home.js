@@ -139,13 +139,54 @@ async function loadCenters(){
  }
 }
 
+
+let slideTimer=null;
+async function loadHomeSlides(){
+ const target=qs('#homeSlides'),dots=qs('#homeSlideDots');
+ if(!target)return;
+ let slides=[];
+ try{slides=await get('home_slides','select=*&active=eq.true&order=sort_order.asc')}catch(error){console.warn('Home slides skipped',error)}
+ if(!slides.length)slides=[{title_ar:'كل ما يحتاجه طالب جامعة نزوى في مكان واحد',description_ar:'خدمات طلابية واضحة وسهلة، بدون تسجيل دخول وبدون تعقيد.',icon:'🎓',button_text_ar:'ابدأ الآن',button_url:'tools.html'}];
+ let current=0;
+ const render=()=>{
+  const x=slides[current],language=localStorage.getItem('uon_language')||'ar';
+  target.innerHTML=`<article class="v1813-slide"><div><span class="v18-label">UON HUB</span><h1>${esc(language==='en'?(x.title_en||x.title_ar):x.title_ar)}</h1><p>${esc(language==='en'?(x.description_en||x.description_ar||''):x.description_ar||'')}</p><a class="btn primary" href="${esc(x.button_url||'#')}">${esc(language==='en'?(x.button_text_en||x.button_text_ar||'Open'):x.button_text_ar||'افتح الخدمة')}</a></div><span class="v1813-slide-icon">${esc(x.icon||'🎓')}</span></article>`;
+  if(dots)dots.innerHTML=slides.map((_,i)=>`<button class="${i===current?'active':''}" data-slide="${i}" aria-label="الشريحة ${i+1}"></button>`).join('');
+  dots?.querySelectorAll('[data-slide]').forEach(b=>b.onclick=()=>{current=Number(b.dataset.slide);render();restart()});
+ };
+ const restart=()=>{clearInterval(slideTimer);if(slides.length>1)slideTimer=setInterval(()=>{current=(current+1)%slides.length;render()},5500)};
+ render();restart();
+}
+
+async function loadOfficialLinks(){
+ const target=qs('#officialUniversityLinks'); if(!target)return;
+ try{
+  const rows=await get('useful_sites','select=title_ar,title_en,description_ar,url,icon&active=eq.true&category=eq.university&order=sort_order.asc&limit=8');
+  target.innerHTML=rows.map(x=>`<a href="${esc(x.url)}" target="_blank" rel="noopener"><span>${esc(x.icon||'🔗')}</span><div><strong>${esc(x.title_ar)}</strong><small>${esc(x.description_ar||'رابط رسمي لجامعة نزوى')}</small></div><b>↗</b></a>`).join('')||'<div class="empty">لا توجد روابط مضافة حاليًا.</div>';
+ }catch(error){console.warn('Official links skipped',error);target.innerHTML='<div class="empty">تعذر تحميل الروابط حاليًا.</div>'}
+}
+
+async function loadFooter(){
+ try{
+  const rows=await get('site_settings','select=key,value&key=in.(footer_rights,footer_subtitle)');
+  const m=Object.fromEntries(rows.map(x=>[x.key,x.value]));
+  if(qs('#footerRights')&&m.footer_rights)qs('#footerRights').textContent=m.footer_rights;
+  if(qs('#footerSubtitle')&&m.footer_subtitle)qs('#footerSubtitle').textContent=m.footer_subtitle;
+ }catch(error){console.warn('Footer settings skipped',error)}
+}
+
+
 translateStatic();
 await Promise.allSettled([
  loadFeatureStates(),
  loadActivity(),
- loadCenters()
+ loadCenters(),
+ loadHomeSlides(),
+ loadOfficialLinks(),
+ loadFooter()
 ]);
 
 trackClicks();
 trackEvent('page_view',{page:'home'});
 window.addEventListener('focus',loadFeatureStates);
+

@@ -369,3 +369,19 @@ async function initializeAssistant(){
 }
 
 initializeAssistant();
+
+
+async function loadOfficialQuickActions(){
+ const target=document.querySelector('#officialQuickActions');if(!target)return;
+ const defaults=[
+  ['🎓','كيف أدخل EduWave؟'],['🖥️','أين رابط Moodle؟'],['🩺','كيف أقدم عذرًا طبيًا؟'],['📄','كيف أقدم عذرًا غير طبي؟'],['🗓️','أين التقويم الأكاديمي الرسمي؟']
+ ];
+ let actions=defaults;
+ try{
+  const rows=await get('useful_sites','select=title_ar,icon&active=eq.true&category=eq.university&order=sort_order.asc&limit=8');
+  if(rows.length)actions=rows.map(x=>[x.icon||'🔗',`أعطني رابط ${x.title_ar} الرسمي`]);
+ }catch{}
+ target.innerHTML=actions.map(([icon,q])=>`<button type="button" data-official-question="${esc(q)}"><span>${esc(icon)}</span>${esc(q)}</button>`).join('');
+ target.querySelectorAll('[data-official-question]').forEach(b=>b.onclick=()=>submitQuestion(b.dataset.officialQuestion));
+}
+loadOfficialQuickActions();

@@ -399,6 +399,11 @@ async function settingsMenu(chatId:string,mid:number){
   [{text:'💬 قناة واتساب',callback_data:'setting:edit:whatsapp_channel_url'}],
   [{text:'📷 حساب إنستغرام',callback_data:'setting:edit:instagram_url'}],
   [{text:'🌐 رابط الموقع',callback_data:'setting:edit:site_url'}],
+  [{text:'🖼 شرائح الواجهة',callback_data:'slides:menu'}],
+  [{text:'©️ حقوق الموقع',callback_data:'setting:edit:footer_rights'}],
+  [{text:'📝 وصف الحقوق',callback_data:'setting:edit:footer_subtitle'}],
+  [{text:'🗓 رابط التقويم الرسمي',callback_data:'setting:edit:official_calendar_url'}],
+  [{text:'⚙️ حالة مراكز الدعم',callback_data:'service:view:support-centers'}],
   [{text:'⬅️ الرئيسية',callback_data:'home'}]
  ]);
 }
@@ -650,6 +655,24 @@ async function handleConversation(chatId:string,admin:any,text:string,conv:any){
   audit(admin,'course_update','courses',data.id,{field:data.field,value});
   await send(chatId,'تم تعديل المادة ✅');
   return true;
+ }
+
+ if(state==='slide_add_title'){
+  await setConversation(chatId,'slide_add_description',{title_ar:text});
+  await send(chatId,'أرسل وصف الشريحة');return true;
+ }
+ if(state==='slide_add_description'){
+  await setConversation(chatId,'slide_add_url',{...data,description_ar:text});
+  await send(chatId,'أرسل رابط زر الشريحة، مثل tools.html');return true;
+ }
+ if(state==='slide_add_url'){
+  const {error}=await db.from('home_slides').insert({...data,button_url:text,icon:'🎓',active:true,sort_order:100});
+  if(error)throw error;await clearConversation(chatId);audit(admin,'slide_create','home_slides','',data);await send(chatId,'تمت إضافة الشريحة ✅');return true;
+ }
+ if(state==='slide_edit_value'){
+  let value:any=text;if(data.field==='sort_order')value=Number(text)||100;
+  const {error}=await db.from('home_slides').update({[data.field]:value,updated_at:new Date().toISOString()}).eq('id',data.id);
+  if(error)throw error;await clearConversation(chatId);audit(admin,'slide_update','home_slides',data.id,{field:data.field,value});await send(chatId,'تم تعديل الشريحة ✅');return true;
  }
 
  if(state==='useful_add_title'){
@@ -1101,6 +1124,34 @@ Deno.serve(async req=>{
      if(error)throw error;
      audit(admin,'useful_site_delete','useful_sites',id);
      await edit(chatId,mid,'تم حذف الموقع ✅',[[{text:'⬅️ المواقع',callback_data:'useful:menu'}]]);
+    }
+    else if(data==='slides:menu'){
+     const {data:rows,error}=await db.from('home_slides').select('*').order('sort_order');if(error)throw error;
+     const kb=(rows||[]).map((x:any)=>[{text:`${x.active?'🟢':'🔴'} ${x.title_ar}`,callback_data:`sl:v:${x.id}`}]);
+     kb.unshift([{text:'➕ إضافة شريحة',callback_data:'sl:add'}]);kb.push([{text:'⬅️ الإعدادات',callback_data:'settings:menu'}]);
+     await edit(chatId,mid,'شرائح الواجهة الرئيسية',kb);
+    }
+    else if(data==='sl:add'){
+     await setConversation(chatId,'slide_add_title',{});await edit(chatId,mid,'أرسل عنوان الشريحة',[[{text:'⬅️ إلغاء',callback_data:'slides:menu'}]]);
+    }
+    else if(data.startsWith('sl:')){
+     const [,action,id,arg]=data.split(':');
+     if(action==='v'){
+      const {data:item,error}=await db.from('home_slides').select('*').eq('id',id).single();if(error)throw error;
+      await edit(chatId,mid,`${item.title_ar}\n${item.description_ar||''}\n${item.button_url||'#'}\nالحالة: ${item.active?'ظاهر':'مخفي'}`,[
+       [{text:'✏️ العنوان',callback_data:`sl:e:${id}:title_ar`},{text:'📝 الوصف',callback_data:`sl:e:${id}:description_ar`}],
+       [{text:'🔗 الرابط',callback_data:`sl:e:${id}:button_url`},{text:'🎨 الأيقونة',callback_data:`sl:e:${id}:icon`}],
+       [{text:'🔘 نص الزر',callback_data:`sl:e:${id}:button_text_ar`},{text:'↕️ الترتيب',callback_data:`sl:e:${id}:sort_order`}],
+       [{text:item.active?'🔴 إخفاء':'🟢 إظهار',callback_data:`sl:t:${id}:${item.active?'0':'1'}`}],
+       [{text:'🗑 حذف',callback_data:`sl:d:${id}`}],[{text:'⬅️ الشرائح',callback_data:'slides:menu'}]
+      ]);
+     }else if(action==='e'){
+      await setConversation(chatId,'slide_edit_value',{id,field:arg});await edit(chatId,mid,'أرسل القيمة الجديدة',[[{text:'⬅️ إلغاء',callback_data:`sl:v:${id}`}]]);
+     }else if(action==='t'){
+      await db.from('home_slides').update({active:arg==='1',updated_at:new Date().toISOString()}).eq('id',id);await edit(chatId,mid,'تم تحديث حالة الشريحة ✅',[[{text:'⬅️ الشرائح',callback_data:'slides:menu'}]]);
+     }else if(action==='d'){
+      if(!isOwner(admin))throw new Error('الحذف للمالك فقط');await db.from('home_slides').delete().eq('id',id);await edit(chatId,mid,'تم حذف الشريحة ✅',[[{text:'⬅️ الشرائح',callback_data:'slides:menu'}]]);
+     }
     }
     else if(data==='settings:menu')await settingsMenu(chatId,mid);
     else if(data.startsWith('center:view:'))await centerView(chatId,mid,data.split(':')[2]);
