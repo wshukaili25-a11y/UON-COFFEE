@@ -1958,3 +1958,20 @@ img{max-width:100%;height:auto}
 .v1813-slide .v18-label{background:transparent!important;color:var(--app-primary)!important;border-color:var(--app-line)!important}
 .v1813-dots button{background:var(--app-line)!important}.v1813-dots button.active{background:var(--app-primary)!important}
 @media(max-width:760px){.v1813-slide{padding:24px 0!important;min-height:365px!important}.v1813-slide-icon{width:96px!important;height:96px!important}}
+
+
+/* ===== V20 Student Experience ===== */
+.v20-platform-stats{padding:70px 0;background:var(--app-bg);color:var(--app-text)}
+.v20-stats-head{text-align:center;margin-bottom:30px}.v20-stats-head h2{font-size:clamp(28px,4vw,46px);margin:0}.v20-stats-head p{color:var(--app-muted)}
+.v20-stats-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:18px}
+.v20-stat-card{background:var(--app-card);border:1px solid var(--app-line);border-radius:22px;padding:27px 18px;text-align:center;box-shadow:var(--shadow)}
+.v20-stat-card strong{display:block;font-size:clamp(27px,4vw,43px);color:var(--app-primary);margin-bottom:7px}.v20-stat-card span{color:var(--app-muted);font-weight:700}
+.v20-stat-card.university strong{font-size:30px;color:#f07d00}.v20-stat-card:nth-child(2) strong{color:#0aa76c}.v20-stat-card:nth-child(3) strong{color:#7d43d4}.v20-stat-card:nth-child(4) strong{color:#0797c6}
+.v20-utility-dock{position:fixed;z-index:900;left:16px;bottom:18px;display:flex;gap:8px;padding:7px;border:1px solid var(--app-line);border-radius:18px;background:color-mix(in srgb,var(--app-card) 90%,transparent);backdrop-filter:blur(16px);box-shadow:var(--shadow)}
+.v20-utility-dock button{width:43px;height:43px;border:0;border-radius:13px;background:var(--app-soft);color:var(--app-text);font-size:24px;cursor:pointer}.v20-utility-dock button:hover{transform:translateY(-2px)}
+.v20-modal{position:fixed;inset:0;display:grid;place-items:center;background:#0009;z-index:1200;padding:20px}.v20-modal-card{position:relative;width:min(430px,100%);background:var(--app-card);color:var(--app-text);border:1px solid var(--app-line);border-radius:24px;padding:28px;text-align:center}.v20-close{position:absolute;top:10px;left:12px;border:0;background:transparent;color:var(--app-text);font-size:28px}.v20-modal-card img{display:block;margin:18px auto;border-radius:14px;background:white;padding:8px}.v20-modal-card textarea{width:100%;min-height:100px;margin:15px 0}.v20-stars{direction:ltr;display:flex;justify-content:center;gap:8px}.v20-stars button{border:0;background:transparent;color:#f4b400;font-size:39px;cursor:pointer}
+.v20-update-badge{position:fixed;right:16px;bottom:20px;z-index:850;background:var(--app-primary);color:white;padding:10px 16px;border-radius:999px;font-weight:800;box-shadow:var(--shadow)}
+.v20-dashboard-grid,.v20-status-grid,.v20-updates-list{display:grid;gap:16px}.v20-dashboard-grid{grid-template-columns:repeat(3,1fr)}.v20-dash-card,.v20-status-card,.v20-update-card{background:var(--app-card);border:1px solid var(--app-line);border-radius:20px;padding:22px}.v20-dash-card strong{font-size:30px;color:var(--app-primary)}
+.v20-favorites-list a{display:flex;justify-content:space-between;padding:13px;border-bottom:1px solid var(--app-line)}
+@media(max-width:900px){.v20-stats-grid{grid-template-columns:repeat(2,1fr)}.v20-dashboard-grid{grid-template-columns:1fr}.v20-stat-card.university{grid-column:1/-1}}
+@media(max-width:520px){.v20-stats-grid{grid-template-columns:1fr 1fr}.v20-stat-card{padding:20px 8px}.v20-utility-dock{left:8px;bottom:8px}.v20-update-badge{right:8px;bottom:72px}}

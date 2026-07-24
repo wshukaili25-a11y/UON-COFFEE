@@ -125,7 +125,7 @@ function mainMenu(admin:any){
 }
 
 async function home(chatId:string,admin:any,messageId?:number){
- const text=`لوحة إدارة UON Hub V19 Stable\nمرحبًا ${admin.name||'مشرف'} 👋\nاختر القسم الذي تريد إدارته.`;
+ const text=`لوحة إدارة UON Hub V20 Experience\nمرحبًا ${admin.name||'مشرف'} 👋\nاختر القسم الذي تريد إدارته.`;
  if(messageId)await edit(chatId,messageId,text,mainMenu(admin));
  else await send(chatId,text,mainMenu(admin));
 }
@@ -401,6 +401,7 @@ async function settingsMenu(chatId:string,mid:number){
   [{text:'📷 حساب إنستغرام',callback_data:'setting:edit:instagram_url'}],
   [{text:'🌐 رابط الموقع',callback_data:'setting:edit:site_url'}],
   [{text:'🖼 شرائح الواجهة',callback_data:'slides:menu'}],
+  [{text:'📊 قسم أرقام المنصة',callback_data:'stats:menu'}],
   [{text:'©️ حقوق الموقع',callback_data:'setting:edit:footer_rights'}],
   [{text:'📝 وصف الحقوق',callback_data:'setting:edit:footer_subtitle'}],
   [{text:'🗓 رابط التقويم الرسمي',callback_data:'setting:edit:official_calendar_url'}],
@@ -814,11 +815,11 @@ Deno.serve(async req=>{
      const {count,error}=await db.from(table).select('id',{count:'exact',head:true}).eq(cfg.status,cfg.pending);
      return `${error?'❌':'✅'} ${cfg.title}: ${error?error.message:(count||0)+' معلق'}`;
     }));
-    await send(chatId,`فحص أزرار وجداول المراجعة V19 Stable\n\n${checks.join('\n')}\n\n✅ callback_data تم ضغطها لتوافق حد Telegram.`);
+    await send(chatId,`فحص أزرار وجداول المراجعة V20 Experience\n\n${checks.join('\n')}\n\n✅ callback_data تم ضغطها لتوافق حد Telegram.`);
    }
    else if(text==='/health'){
     const {data,error}=await db.rpc('uon_public_state');
-    await send(chatId,error?`خطأ: ${error.message}`:`البوت يعمل ✅\nالصيانة: ${data.maintenance_enabled?'مفعلة':'متوقفة'}\nالإصدار: V19 Stable`);
+    await send(chatId,error?`خطأ: ${error.message}`:`البوت يعمل ✅\nالصيانة: ${data.maintenance_enabled?'مفعلة':'متوقفة'}\nالإصدار: V20 Experience`);
    }else await home(chatId,admin);
    return response({ok:true});
   }
@@ -1155,6 +1156,25 @@ Deno.serve(async req=>{
      }else if(action==='d'){
       if(!isOwner(admin))throw new Error('الحذف للمالك فقط');await db.from('home_slides').delete().eq('id',id);await edit(chatId,mid,'تم حذف الشريحة ✅',[[{text:'⬅️ الشرائح',callback_data:'slides:menu'}]]);
      }
+    }
+    else if(data==='stats:menu'){
+     const keys=['stats_section_enabled','stats_title','stats_tools_label','stats_summaries_label','stats_ratings_label','stats_groups_label','stats_university_name'];
+     const {data:rows}=await db.from('site_settings').select('key,value').in('key',keys);
+     const m=Object.fromEntries((rows||[]).map((x:any)=>[x.key,x.value]));
+     const enabled=m.stats_section_enabled===true||m.stats_section_enabled==='true';
+     await edit(chatId,mid,`قسم أرقام المنصة\nالحالة: ${enabled?'ظاهر':'مخفي'}\nالعنوان: ${m.stats_title||'UON Hub بالأرقام'}`,[
+      [{text:enabled?'🔴 إخفاء القسم':'🟢 إظهار القسم',callback_data:`stats:toggle:${enabled?'0':'1'}`}],
+      [{text:'✏️ العنوان',callback_data:'setting:edit:stats_title'}],
+      [{text:'🛠 تسمية الأدوات',callback_data:'setting:edit:stats_tools_label'},{text:'📚 تسمية الملخصات',callback_data:'setting:edit:stats_summaries_label'}],
+      [{text:'⭐ تسمية الآراء',callback_data:'setting:edit:stats_ratings_label'},{text:'💬 تسمية المجموعات',callback_data:'setting:edit:stats_groups_label'}],
+      [{text:'🏫 اسم الجامعة',callback_data:'setting:edit:stats_university_name'}],
+      [{text:'⬅️ الإعدادات',callback_data:'settings:menu'}]
+     ]);
+    }
+    else if(data.startsWith('stats:toggle:')){
+     const enabled=data.endsWith(':1');
+     await db.from('site_settings').upsert({key:'stats_section_enabled',value:enabled,updated_at:new Date().toISOString()});
+     await edit(chatId,mid,`تم ${enabled?'إظهار':'إخفاء'} قسم أرقام المنصة ✅`,[[{text:'⬅️ قسم الأرقام',callback_data:'stats:menu'}]]);
     }
     else if(data==='settings:menu')await settingsMenu(chatId,mid);
     else if(data.startsWith('center:view:'))await centerView(chatId,mid,data.split(':')[2]);

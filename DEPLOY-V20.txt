@@ -1,0 +1,6 @@
+UON Hub V20
+1) نفّذ UON_HUB_V20_EXPERIENCE.sql في Supabase SQL Editor.
+2) ارفع ملفات الموقع كاملة إلى GitHub/Vercel.
+3) انشر telegram-admin:
+supabase functions deploy telegram-admin --project-ref irkhvydgxpseflggbeqq --no-verify-jwt
+4) لا يحتاج uon-ai إعادة نشر لأن البحث الهجين موجود أصلًا في assistant.js.

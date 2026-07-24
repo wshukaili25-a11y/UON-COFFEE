@@ -12,6 +12,8 @@ const sources=[
  {table:'summaries',query:'select=id,title,subject,course_code,college,url,description&approved=eq.true',type:'ملخص',url:x=>x.url||'#',title:x=>x.title||x.subject||'ملخص',body:x=>[x.course_code,x.college].filter(Boolean).join(' • ')},
  {table:'whatsapp_groups',query:'select=id,subject,course_code,college,link&approved=eq.true',type:'مجموعة واتساب',url:x=>x.link||'#',title:x=>x.subject||'مجموعة',body:x=>[x.course_code,x.college].filter(Boolean).join(' • ')},
  {table:'rating_submissions',query:'select=id,target_name,course_code,overall,comment&status=eq.approved',type:'تقييم',url:x=>'ratings.html',title:x=>x.target_name||x.course_code||'تقييم',body:x=>`${x.overall||0}/5 ${x.comment||''}`},
+ {table:'student_projects',query:'select=id,title,description,category,status&status=eq.approved',type:'مشروع طلابي',url:x=>'projects.html',title:x=>x.title||'مشروع',body:x=>x.description||x.category||''},
+ {table:'useful_sites',query:'select=title_ar,description_ar,category,url&active=eq.true',type:'موقع أو برنامج',url:x=>x.url||'useful-sites.html',title:x=>x.title_ar,body:x=>x.description_ar||x.category||''},
  {table:'university_programs',query:'select=name_ar,name_en,college,degree,official_url&active=eq.true',type:'برنامج',url:x=>x.official_url||'university-guide.html',title:x=>x.name_ar||x.name_en,body:x=>[x.college,x.degree].filter(Boolean).join(' • ')}
 ];
 
