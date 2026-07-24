@@ -35,7 +35,7 @@ async function telegram(method:string,body:any){
   method:'POST',
   headers:{'content-type':'application/json'},
   body:JSON.stringify(body),
-  signal:AbortSignal.timeout(10_000)
+  signal:AbortSignal.timeout(5_000)
  });
  const text=await result.text();
  if(!result.ok)throw new Error(text);
@@ -125,7 +125,7 @@ function mainMenu(admin:any){
 }
 
 async function home(chatId:string,admin:any,messageId?:number){
- const text=`لوحة إدارة UON Hub V18.13.4\nمرحبًا ${admin.name||'مشرف'} 👋\nاختر القسم الذي تريد إدارته.`;
+ const text=`لوحة إدارة UON Hub V19 Stable\nمرحبًا ${admin.name||'مشرف'} 👋\nاختر القسم الذي تريد إدارته.`;
  if(messageId)await edit(chatId,messageId,text,mainMenu(admin));
  else await send(chatId,text,mainMenu(admin));
 }
@@ -814,16 +814,17 @@ Deno.serve(async req=>{
      const {count,error}=await db.from(table).select('id',{count:'exact',head:true}).eq(cfg.status,cfg.pending);
      return `${error?'❌':'✅'} ${cfg.title}: ${error?error.message:(count||0)+' معلق'}`;
     }));
-    await send(chatId,`فحص أزرار وجداول المراجعة V18.13.4\n\n${checks.join('\n')}\n\n✅ callback_data تم ضغطها لتوافق حد Telegram.`);
+    await send(chatId,`فحص أزرار وجداول المراجعة V19 Stable\n\n${checks.join('\n')}\n\n✅ callback_data تم ضغطها لتوافق حد Telegram.`);
    }
    else if(text==='/health'){
     const {data,error}=await db.rpc('uon_public_state');
-    await send(chatId,error?`خطأ: ${error.message}`:`البوت يعمل ✅\nالصيانة: ${data.maintenance_enabled?'مفعلة':'متوقفة'}\nالإصدار: V18.13.4`);
+    await send(chatId,error?`خطأ: ${error.message}`:`البوت يعمل ✅\nالصيانة: ${data.maintenance_enabled?'مفعلة':'متوقفة'}\nالإصدار: V19 Stable`);
    }else await home(chatId,admin);
    return response({ok:true});
   }
 
   if(callback){
+   background((async()=>{
    const data=String(callback.data||'');
    const mid=callback.message.message_id;
 
@@ -1335,6 +1336,7 @@ Chat ID: ${item.chat_id}
      show_alert:true
     }));
    }
+   })());
    return response({ok:true});
   }
 

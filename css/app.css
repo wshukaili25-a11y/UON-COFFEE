@@ -1947,3 +1947,14 @@ img{max-width:100%;height:auto}
  .v1813-slider{min-height:365px!important}
  .v1813-slide{min-height:365px!important;padding:24px 0!important}
 }
+
+
+/* V19 STABLE — definitive home hero theme inheritance */
+.v18-home,.v1813-hero,.v1813-slider,.v1813-slide{background:transparent!important;color:var(--app-text)!important}
+.v1813-hero{padding:26px 0 18px!important}
+.v1813-slide{border:0!important;border-radius:0!important;box-shadow:none!important;padding:38px 0!important;min-height:300px!important}
+.v1813-slide h1{color:var(--app-text)!important}.v1813-slide p{color:var(--app-muted)!important}
+.v1813-slide-icon{background:transparent!important;border:0!important;box-shadow:none!important;color:var(--app-primary)!important;width:150px!important;height:150px!important}
+.v1813-slide .v18-label{background:transparent!important;color:var(--app-primary)!important;border-color:var(--app-line)!important}
+.v1813-dots button{background:var(--app-line)!important}.v1813-dots button.active{background:var(--app-primary)!important}
+@media(max-width:760px){.v1813-slide{padding:24px 0!important;min-height:365px!important}.v1813-slide-icon{width:96px!important;height:96px!important}}

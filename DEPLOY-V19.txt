@@ -1,0 +1,8 @@
+V19 Stable
+
+1) ارفع محتويات هذا المجلد إلى جذر المشروع، وليس المجلد نفسه.
+2) تأكد أن index.html الجديد في جذر Vercel.
+3) انشر telegram-admin:
+   supabase functions deploy telegram-admin --project-ref irkhvydgxpseflggbeqq --no-verify-jwt
+4) افتح الموقع بنافذة خاصة.
+5) تحقق من View Source أن app.css?v=19.0.0 موجود.
