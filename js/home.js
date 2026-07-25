@@ -172,21 +172,33 @@ async function loadFooter(){
 
 
 async function fetchPublicPlatformStats(){
- const response=await fetch(`${window._sbURL}/rest/v1/rpc/get_uonhub_public_stats`,{
-  method:'POST',
-  headers:{
-   apikey:window._sbKEY,
-   Authorization:`Bearer ${window._sbKEY}`,
-   'Content-Type':'application/json'
-  },
-  body:'{}',
-  cache:'no-store'
- });
- if(!response.ok){
-  const message=await response.text().catch(()=>`HTTP ${response.status}`);
-  throw new Error(message||`HTTP ${response.status}`);
+ const endpoints=[
+  `${window._sbURL}/functions/v1/platform-stats`,
+  `${window._sbURL}/rest/v1/rpc/get_uonhub_public_stats`
+ ];
+ let lastError=null;
+ for(const endpoint of endpoints){
+  try{
+   const response=await fetch(endpoint,{
+    method:'POST',
+    headers:{
+     apikey:window._sbKEY,
+     Authorization:`Bearer ${window._sbKEY}`,
+     'Content-Type':'application/json'
+    },
+    body:'{}',
+    cache:'no-store'
+   });
+   if(!response.ok){
+    const message=await response.text().catch(()=>`HTTP ${response.status}`);
+    throw new Error(message||`HTTP ${response.status}`);
+   }
+   const data=await response.json();
+   if(data?.ok===false)throw new Error(data.error||'تعذر تحميل الإحصائيات');
+   return data;
+  }catch(error){lastError=error}
  }
- return await response.json();
+ throw lastError||new Error('تعذر تحميل الإحصائيات');
 }
 
 async function loadPlatformStats(){

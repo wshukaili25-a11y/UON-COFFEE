@@ -1,0 +1,10 @@
+UON Hub V23.1 - Platform Stats Edge Function
+
+1) Deploy the new Edge Function from PowerShell:
+   supabase functions deploy platform-stats --project-ref irkhvydgxpseflggbeqq --no-verify-jwt
+
+2) Upload the website files to GitHub/Vercel.
+
+3) Open the site with Ctrl+Shift+R.
+
+No SQL is required for this fix. The function uses the service role internally and returns counts only.
