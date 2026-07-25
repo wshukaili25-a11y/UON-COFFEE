@@ -174,6 +174,7 @@ async function loadFooter(){
 async function fetchPublicPlatformStats(){
  const endpoints=[
   `${window._sbURL}/functions/v1/platform-stats`,
+  `${window._sbURL}/rest/v1/rpc/uon_platform_stats`,
   `${window._sbURL}/rest/v1/rpc/get_uonhub_public_stats`
  ];
  let lastError=null;
@@ -193,9 +194,15 @@ async function fetchPublicPlatformStats(){
     const message=await response.text().catch(()=>`HTTP ${response.status}`);
     throw new Error(message||`HTTP ${response.status}`);
    }
-   const data=await response.json();
-   if(data?.ok===false)throw new Error(data.error||'تعذر تحميل الإحصائيات');
-   return data;
+   const raw=await response.json();
+   if(raw?.ok===false)throw new Error(raw.error||'تعذر تحميل الإحصائيات');
+   const data=Array.isArray(raw)?raw[0]:raw;
+   return {
+    tools:data?.tools ?? data?.tools_count ?? 0,
+    summaries:data?.summaries ?? data?.summaries_count ?? 0,
+    ratings:data?.ratings ?? data?.ratings_count ?? 0,
+    groups:data?.groups ?? data?.groups_count ?? 0
+   };
   }catch(error){lastError=error}
  }
  throw lastError||new Error('تعذر تحميل الإحصائيات');

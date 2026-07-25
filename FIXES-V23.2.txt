@@ -1,0 +1,14 @@
+UON Hub V23.2 fixes
+===================
+1. Fixed home counters staying at zero.
+2. Added the correct RPC endpoint: uon_platform_stats.
+3. Kept compatibility with get_uonhub_public_stats.
+4. Normalised both old (*_count) and new counter response fields.
+5. Edge Function now fails on database query errors, allowing the website to use the RPC fallback instead of silently displaying zeros.
+6. Added a cache-busting version to home.js.
+
+Required deployment step
+------------------------
+Run UON_HUB_V21_2_STATS_RPC.sql once in Supabase SQL Editor.
+Deploy supabase/functions/platform-stats if you use Supabase CLI.
+Then upload the website files to Vercel.

@@ -36,6 +36,7 @@ Deno.serve(async (req) => {
     const errors = [tools.error, summaries.error, ratings.error, groups.error].filter(Boolean)
     if (errors.length) {
       console.error('platform-stats query errors', errors)
+      throw new Error(errors.map((e: any) => e?.message || String(e)).join(' | '))
     }
 
     return json({
@@ -44,8 +45,7 @@ Deno.serve(async (req) => {
       summaries: summaries.count ?? 0,
       ratings: ratings.count ?? 0,
       groups: groups.count ?? 0,
-      generated_at: new Date().toISOString(),
-      warnings: errors.map((e: any) => e?.message || String(e))
+      generated_at: new Date().toISOString()
     })
   } catch (error) {
     console.error('platform-stats failed', error)
