@@ -6,20 +6,7 @@
 <title>إضافة ملخص</title>
 <link rel="stylesheet" href="site-enhancements.css">
 <link rel="stylesheet" href="brand.css">
-<script>
-(function(){
-  try{
-    if('serviceWorker' in navigator){
-      navigator.serviceWorker.getRegistrations().then(function(regs){
-        regs.forEach(function(reg){reg.unregister();});
-      }).catch(function(){});
-    }
-    if('caches' in window){
-      caches.keys().then(function(keys){keys.forEach(function(key){caches.delete(key);});}).catch(function(){});
-    }
-  }catch(e){}
-})();
-</script></head>
+</head>
 <body>
 <h2>إضافة ملخص جديد</h2>
 <p>نموذج أولي لربط رفع الملفات مع Supabase Storage.</p>

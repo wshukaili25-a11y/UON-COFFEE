@@ -6,7 +6,7 @@
 <title>UON Hub</title>
 <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/app.css?v=18.8">
-
+<link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#060b1b">
 
 <meta name="description" content="كل ما يحتاجه طالب جامعة نزوى في مكان واحد: ملخصات، اختبارات، مجموعات واتساب، دليل الجامعة، التقييمات وأدوات الطالب.">
@@ -22,20 +22,7 @@
 <meta name="twitter:title" content="UON Hub">
 <meta name="twitter:description" content="كل ما يحتاجه طالب جامعة نزوى في مكان واحد: ملخصات، اختبارات، مجموعات واتساب، دليل الجامعة، التقييمات وأدوات الطالب.">
 <meta name="twitter:image" content="https://uon-coffee.vercel.app/assets/unizwa-new-gate-v52.jpg">
-<script>
-(function(){
-  try{
-    if('serviceWorker' in navigator){
-      navigator.serviceWorker.getRegistrations().then(function(regs){
-        regs.forEach(function(reg){reg.unregister();});
-      }).catch(function(){});
-    }
-    if('caches' in window){
-      caches.keys().then(function(keys){keys.forEach(function(key){caches.delete(key);});}).catch(function(){});
-    }
-  }catch(e){}
-})();
-</script></head>
+</head>
 <body>
 <header class="site-header">
  <div class="container nav">
