@@ -110,6 +110,7 @@ function mainMenu(admin:any){
   [{text:'📊 لوحة الإحصائيات',callback_data:'dashboard'}],
   [{text:'🛠 الخدمات والصيانة',callback_data:'services'}],
   [{text:'🕓 الطلبات المعلقة',callback_data:'pending:menu'}],
+  [{text:'🗂 إدارة كل المحتوى',callback_data:'manage:menu'}],
   [{text:'📘 مركز المقررات',callback_data:'courses:menu'}],
   [{text:'📢 الإعلانات والإشعارات',callback_data:'content:menu'}],
   [{text:'🏫 مراكز الدعم والروابط',callback_data:'settings:menu'}],
@@ -305,6 +306,88 @@ async function approvePending(table:string,id:string){
   }
  }
  await updateWithOptionalReviewedAt(table,id,{[cfg.status]:cfg.approve});
+}
+
+
+const manageOnlyConfigs:any={
+ tools_items:{title:'الأدوات',fields:['title_ar','title_en','description_ar','description_en','url','icon','active','sort_order'],activeField:'active'},
+ site_announcements:{title:'الإعلانات',fields:['title','body','button_text','button_url','active','starts_at','ends_at'],activeField:'active'},
+ site_notifications:{title:'الإشعارات',fields:['title','body','icon','active'],activeField:'active'},
+ academic_calendar_events:{title:'التقويم الأكاديمي',fields:['title_ar','title_en','description_ar','description_en','start_date','end_date','category','active'],activeField:'active'},
+ university_programs:{title:'برامج الجامعة',fields:['college_ar','college_en','program_ar','program_en','degree_ar','degree_en','url','active'],activeField:'active'}
+};
+const getManageCfg=(table:string)=>pendingConfigs[table]||manageOnlyConfigs[table];
+
+const manageEditableFields:Record<string,string[]>={
+ summaries:['title','subject','course_code','college','resource_type','description','url'],
+ whatsapp_groups:['subject','course_code','college','description','link'],
+ rating_submissions:['target_type','target_name','course_code','overall','teaching','interaction','exam_difficulty','recommended','comment'],
+ confessions:['text','content'],
+ student_projects:['title','major','owner_name','description','url'],
+ feature_suggestions:['category','title','details','college','contact'],
+ broken_link_reports:['source_title','source_url','reason'],
+ course_requests:['request_type','code','name_ar','name_en','college','department','description'],
+ tools_items:['title_ar','title_en','description_ar','description_en','url','icon','sort_order'],
+ site_announcements:['title','body','button_text','button_url','starts_at','ends_at'],
+ site_notifications:['title','body','icon'],
+ academic_calendar_events:['title_ar','title_en','description_ar','description_en','start_date','end_date','category'],
+ university_programs:['college_ar','college_en','program_ar','program_en','degree_ar','degree_en','url']
+};
+
+async function manageMenu(chatId:string,mid:number){
+ const all={...pendingConfigs,...manageOnlyConfigs};
+ const rows=Object.entries(all).map(([table,cfg]:any)=>[{
+  text:`🗂 ${cfg.title}`,callback_data:`m:l:${pendingCode(table)}:0`
+ }]);
+ rows.push([{text:'📘 المقررات',callback_data:'courses:menu'}]);
+ rows.push([{text:'🔗 المواقع والبرامج',callback_data:'useful:menu'}]);
+ rows.push([{text:'⬅️ الرئيسية',callback_data:'home'}]);
+ await edit(chatId,mid,'إدارة جميع محتويات المنصة\nيمكنك العرض والتعديل وتغيير الحالة والحذف.',rows);
+}
+
+async function manageList(chatId:string,mid:number,table:string,page=0){
+ const cfg=getManageCfg(table);
+ if(!cfg)throw new Error('نوع المحتوى غير معروف');
+ const from=page*8;
+ const {data,error}=await db.from(table).select('*').order('created_at',{ascending:false}).range(from,from+7);
+ if(error)throw error;
+ const rows=(data||[]).map((item:any)=>[{
+  text:`${displayValue(item[cfg.fields[0]]||item.title||item.subject||item.id)}`,
+  callback_data:`m:v:${pendingCode(table)}:${item.id}:${page}`
+ }]);
+ if(page>0)rows.push([{text:'السابق',callback_data:`m:l:${pendingCode(table)}:${page-1}`}]);
+ if((data||[]).length===8)rows.push([{text:'التالي',callback_data:`m:l:${pendingCode(table)}:${page+1}`}]);
+ rows.push([{text:'⬅️ إدارة المحتوى',callback_data:'manage:menu'}]);
+ await edit(chatId,mid,(data||[]).length?`إدارة ${cfg.title}`:`لا توجد عناصر في ${cfg.title}`,rows);
+}
+
+async function manageView(chatId:string,mid:number,table:string,id:string,page=0){
+ const cfg=getManageCfg(table);
+ if(!cfg)throw new Error('نوع المحتوى غير معروف');
+ const {data,error}=await db.from(table).select('*').eq('id',id).single();
+ if(error)throw error;
+ const fields=(manageEditableFields[table]||cfg.fields||[]).filter((f:string)=>Object.prototype.hasOwnProperty.call(data,f));
+ const lines=fields.filter((f:string)=>data[f]!==null&&data[f]!==undefined&&data[f]!=='')
+  .map((f:string)=>`${f}: ${displayValue(data[f])}`).join('\n');
+ const keyboard:any[]=[];
+ const external=(cfg.urlFields||[]).map((f:string)=>validExternalUrl(data[f])).find(Boolean);
+ if(external)keyboard.push([{text:table==='whatsapp_groups'?'🔗 فتح المجموعة':'📎 فتح الرابط/الملف',url:external}]);
+ const editButtons=fields.slice(0,10).map((f:string)=>({text:`✏️ ${f}`,callback_data:`m:e:${pendingCode(table)}:${id}:${f}:${page}`}));
+ for(let i=0;i<editButtons.length;i+=2)keyboard.push(editButtons.slice(i,i+2));
+ if(cfg.booleanModeration){
+  keyboard.push([{text:data[cfg.status]?'🔴 إلغاء الاعتماد':'🟢 اعتماد',callback_data:`m:t:${pendingCode(table)}:${id}:${page}`}]);
+ }else if(cfg.activeField){
+  keyboard.push([{text:data[cfg.activeField]?'🔴 إيقاف':'🟢 تشغيل',callback_data:`m:t:${pendingCode(table)}:${id}:${page}`}]);
+ }else if(cfg.status){
+  keyboard.push([
+   {text:'✅ معتمد',callback_data:`m:s:${pendingCode(table)}:${id}:${String(cfg.approve)}:${page}`},
+   {text:'⏳ معلق',callback_data:`m:s:${pendingCode(table)}:${id}:${String(cfg.pending)}:${page}`}
+  ]);
+  keyboard.push([{text:'❌ مرفوض',callback_data:`m:s:${pendingCode(table)}:${id}:${String(cfg.reject)}:${page}`}]);
+ }
+ keyboard.push([{text:'🗑 حذف نهائي',callback_data:`m:x:${pendingCode(table)}:${id}:${page}`}]);
+ keyboard.push([{text:'⬅️ القائمة',callback_data:`m:l:${pendingCode(table)}:${page}`}]);
+ await edit(chatId,mid,`${cfg.title}\n\n${lines||'لا توجد تفاصيل'}`,keyboard);
 }
 
 async function servicesMenu(chatId:string,mid:number){
@@ -712,6 +795,19 @@ async function handleConversation(chatId:string,admin:any,text:string,conv:any){
   return true;
  }
 
+
+ if(state==='manage_edit_value'){
+  let value:any=text;
+  if(['overall','teaching','interaction','exam_difficulty'].includes(data.field))value=Number(text)||0;
+  if(data.field==='recommended')value=['1','true','نعم','yes'].includes(text.trim().toLowerCase());
+  const {error}=await db.from(data.table).update({[data.field]:value,updated_at:new Date().toISOString()}).eq('id',data.id);
+  if(error)throw error;
+  await clearConversation(chatId);
+  audit(admin,'content_update',data.table,data.id,{field:data.field,value});
+  await send(chatId,'تم تعديل المحتوى ✅',[[{text:'فتح العنصر',callback_data:`m:v:${pendingCode(data.table)}:${data.id}:${data.page||0}`}]]);
+  return true;
+ }
+
  if(state==='notification_title'){
   await setConversation(chatId,'notification_body',{title:text});
   await send(chatId,'أرسل نص الإشعار');
@@ -926,6 +1022,47 @@ Deno.serve(async req=>{
      if(error)throw error;
      audit(admin,'pending_delete',table,id);
      await pendingList(chatId,mid,table,Number(page)||0);
+    }
+
+    else if(data==='manage:menu')await manageMenu(chatId,mid);
+    else if(data.startsWith('m:')){
+     const parts=data.split(':');
+     const action=parts[1], table=pendingTable(parts[2]);
+     if(action==='l')await manageList(chatId,mid,table,Number(parts[3])||0);
+     else if(action==='v')await manageView(chatId,mid,table,parts[3],Number(parts[4])||0);
+     else if(action==='e'){
+      if(!can(admin,'moderate'))throw new Error('ليس لديك صلاحية التعديل');
+      const id=parts[3],field=parts[4],page=Number(parts[5])||0;
+      if(!(manageEditableFields[table]||[]).includes(field))throw new Error('هذا الحقل غير قابل للتعديل');
+      await setConversation(chatId,'manage_edit_value',{table,id,field,page});
+      await edit(chatId,mid,`أرسل القيمة الجديدة للحقل: ${field}`,[[{text:'⬅️ إلغاء',callback_data:`m:v:${pendingCode(table)}:${id}:${page}`}]]);
+     }else if(action==='t'){
+      if(!can(admin,'moderate'))throw new Error('ليس لديك صلاحية التعديل');
+      const id=parts[3],page=Number(parts[4])||0,cfg=getManageCfg(table);
+      const {data:item,error}=await db.from(table).select('*').eq('id',id).single();if(error)throw error;
+      const field=cfg.activeField||cfg.status;
+      const patch={[field]:!item[field]};
+      if(cfg.activeField){const {error:e}=await db.from(table).update({...patch,updated_at:new Date().toISOString()}).eq('id',id);if(e)throw e;}
+      else await updateWithOptionalReviewedAt(table,id,patch);
+      audit(admin,'content_toggle',table,id,patch);
+      await manageView(chatId,mid,table,id,page);
+     }else if(action==='s'){
+      if(!can(admin,'moderate'))throw new Error('ليس لديك صلاحية التعديل');
+      const id=parts[3],status=parts[4],page=Number(parts[5])||0,cfg=getManageCfg(table);
+      let value:any=status;if(status==='true')value=true;if(status==='false')value=false;
+      await updateWithOptionalReviewedAt(table,id,{[cfg.status]:value});
+      audit(admin,'content_status',table,id,{status:value});
+      await manageView(chatId,mid,table,id,page);
+     }else if(action==='x'){
+      const id=parts[3],page=Number(parts[4])||0;
+      await edit(chatId,mid,'⚠️ هل تريد حذف هذا العنصر نهائيًا؟',[ [{text:'نعم، حذف',callback_data:`m:d:${pendingCode(table)}:${id}:${page}`}], [{text:'إلغاء',callback_data:`m:v:${pendingCode(table)}:${id}:${page}`}] ]);
+     }else if(action==='d'){
+      if(!isOwner(admin))throw new Error('الحذف النهائي للمالك فقط');
+      const id=parts[3],page=Number(parts[4])||0;
+      const {error}=await db.from(table).delete().eq('id',id);if(error)throw error;
+      audit(admin,'content_delete',table,id);
+      await manageList(chatId,mid,table,page);
+     }
     }
     else if(data==='courses:menu')await coursesMenu(chatId,mid);
     else if(data==='course:add:start'){
@@ -1208,7 +1345,7 @@ Deno.serve(async req=>{
       ]);
      }else if(action==='r'){
       if(!isOwner(admin))throw new Error('الاستعادة للمالك فقط');
-      const r=await fetch(`${URL}/functions/v1/database-restore`,{method:'POST',headers:{'content-type':'application/json','authorization':`Bearer ${KEY}`},body:JSON.stringify({backup_id:id})});
+      const r=await fetch(`${URL}/functions/v1/database-restore`,{method:'POST',headers:{'content-type':'application/json','authorization':`Bearer ${KEY}`},body:JSON.stringify({backup_run_id:id,requested_by:chatId})});
       if(!r.ok)throw new Error(await r.text()); audit(admin,'backup_restore','backup_runs',id);
       await edit(chatId,mid,'اكتملت الاستعادة ✅',[[{text:'⬅️ النسخ',callback_data:'backup:menu'}]]);
      }
