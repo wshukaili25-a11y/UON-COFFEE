@@ -1,5 +1,5 @@
 import {
- get,esc,enforceUonMaintenance,watchUonMaintenance,
+ get,rpc,esc,enforceUonMaintenance,watchUonMaintenance,
  trackEvent,trackClicks,applyFeatureStates
 } from './core.js';
 
@@ -178,35 +178,31 @@ async function loadFooter(){
 
 async function loadPlatformStats(){
  const section=qs('#platformStatsSection');if(!section)return;
+ const put=(selector,value)=>{const el=qs(selector);if(el)el.textContent=String(Number(value)||0)};
  try{
   const [statsResult,settings]=await Promise.all([
-   rpc('uon_platform_stats',{}).catch(async()=>{
-    // Fallback فقط إذا لم يُنفّذ ملف SQL الجديد بعد.
-    const [tools,summaries,ratings,groups]=await Promise.all([
-     get('tools_items','select=id&status=eq.active').catch(()=>[]),
-     get('summaries','select=id&approved=eq.true').catch(()=>[]),
-     get('rating_submissions','select=id&status=eq.approved').catch(()=>[]),
-     get('whatsapp_groups','select=id&approved=eq.true').catch(()=>[])
-    ]);
-    return {tools:tools.length,summaries:summaries.length,ratings:ratings.length,groups:groups.length};
-   }),
+   rpc('uon_platform_stats',{}),
    get('site_settings','select=key,value&key=in.(stats_section_enabled,stats_title,stats_tools_label,stats_summaries_label,stats_ratings_label,stats_groups_label,stats_university_name)').catch(()=>[])
   ]);
   const stats=Array.isArray(statsResult)?(statsResult[0]||{}):(statsResult||{});
   const m=Object.fromEntries(settings.map(x=>[x.key,x.value]));
   const bool=v=>v===true||v==='true'||v===1||v==='1';
   if(m.stats_section_enabled!==undefined&&!bool(m.stats_section_enabled)){section.hidden=true;return}
-  qs('#statTools').textContent=Number(stats.tools||0);
-  qs('#statSummaries').textContent=Number(stats.summaries||0);
-  qs('#statRatings').textContent=Number(stats.ratings||0);
-  qs('#statGroups').textContent=Number(stats.groups||0);
+  section.hidden=false;
+  put('#statTools',stats.tools_count);
+  put('#statSummaries',stats.summaries_count);
+  put('#statRatings',stats.ratings_count);
+  put('#statGroups',stats.groups_count);
   if(m.stats_title)qs('#platformStatsTitle').textContent=m.stats_title;
   if(m.stats_tools_label)qs('#statToolsLabel').textContent=m.stats_tools_label;
   if(m.stats_summaries_label)qs('#statSummariesLabel').textContent=m.stats_summaries_label;
   if(m.stats_ratings_label)qs('#statRatingsLabel').textContent=m.stats_ratings_label;
   if(m.stats_groups_label)qs('#statGroupsLabel').textContent=m.stats_groups_label;
-  if(m.stats_university_name)qs('#statUniversity').textContent=m.stats_university_name;
- }catch(error){console.warn('Stats skipped',error)}
+  if(m.stats_university_name)qs('#statUniversity').textContent='UON';
+ }catch(error){
+  console.error('Platform stats failed',error);
+  put('#statTools',0);put('#statSummaries',0);put('#statRatings',0);put('#statGroups',0);
+ }
 }
 
 translateStatic();
