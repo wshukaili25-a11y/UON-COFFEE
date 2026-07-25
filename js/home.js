@@ -172,40 +172,20 @@ async function loadFooter(){
 
 
 async function fetchPublicPlatformStats(){
- const endpoints=[
-  `${window._sbURL}/functions/v1/platform-stats`,
-  `${window._sbURL}/rest/v1/rpc/uon_platform_stats`,
-  `${window._sbURL}/rest/v1/rpc/get_uonhub_public_stats`
- ];
- let lastError=null;
- for(const endpoint of endpoints){
-  try{
-   const response=await fetch(endpoint,{
-    method:'POST',
-    headers:{
-     apikey:window._sbKEY,
-     Authorization:`Bearer ${window._sbKEY}`,
-     'Content-Type':'application/json'
-    },
-    body:'{}',
-    cache:'no-store'
-   });
-   if(!response.ok){
-    const message=await response.text().catch(()=>`HTTP ${response.status}`);
-    throw new Error(message||`HTTP ${response.status}`);
-   }
-   const raw=await response.json();
-   if(raw?.ok===false)throw new Error(raw.error||'تعذر تحميل الإحصائيات');
-   const data=Array.isArray(raw)?raw[0]:raw;
-   return {
-    tools:data?.tools ?? data?.tools_count ?? 0,
-    summaries:data?.summaries ?? data?.summaries_count ?? 0,
-    ratings:data?.ratings ?? data?.ratings_count ?? 0,
-    groups:data?.groups ?? data?.groups_count ?? 0
-   };
-  }catch(error){lastError=error}
- }
- throw lastError||new Error('تعذر تحميل الإحصائيات');
+ // Count the same public rows used by the website pages.
+ // This avoids relying on window._sbURL/window._sbKEY, which are not loaded on index.html.
+ const [tools,summaries,ratings,groups]=await Promise.all([
+  get('tools_items','select=id,status'),
+  get('summaries','select=id&approved=eq.true'),
+  get('rating_submissions','select=id&status=eq.approved'),
+  get('whatsapp_groups','select=id&approved=eq.true')
+ ]);
+ return {
+  tools:(tools||[]).filter(item=>(item.status||'active')==='active').length,
+  summaries:(summaries||[]).length,
+  ratings:(ratings||[]).length,
+  groups:(groups||[]).length
+ };
 }
 
 async function loadPlatformStats(){
@@ -232,7 +212,7 @@ async function loadPlatformStats(){
   if(m.stats_university_name)qs('#statUniversity').textContent=m.stats_university_name;
  }catch(error){
   console.warn('Public platform stats failed',error);
-  ['#statTools','#statSummaries','#statRatings','#statGroups'].forEach(id=>{const el=qs(id);if(el)el.textContent='0'});
+  ['#statTools','#statSummaries','#statRatings','#statGroups'].forEach(id=>{const el=qs(id);if(el)el.textContent='—'});
  }
 }
 
