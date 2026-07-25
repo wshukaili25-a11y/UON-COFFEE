@@ -171,27 +171,50 @@ async function loadFooter(){
 }
 
 
+async function fetchPublicPlatformStats(){
+ const response=await fetch(`${window._sbURL}/rest/v1/rpc/get_uonhub_public_stats`,{
+  method:'POST',
+  headers:{
+   apikey:window._sbKEY,
+   Authorization:`Bearer ${window._sbKEY}`,
+   'Content-Type':'application/json'
+  },
+  body:'{}',
+  cache:'no-store'
+ });
+ if(!response.ok){
+  const message=await response.text().catch(()=>`HTTP ${response.status}`);
+  throw new Error(message||`HTTP ${response.status}`);
+ }
+ return await response.json();
+}
+
 async function loadPlatformStats(){
  const section=qs('#platformStatsSection');if(!section)return;
+ const number=(value)=>Number.isFinite(Number(value))?Number(value):0;
  try{
-  const [features,summaries,ratings,groups,settings]=await Promise.all([
-   get('feature_controls','select=feature_key&status=eq.active').catch(()=>[]),
-   get('summaries','select=id&approved=eq.true').catch(()=>[]),
-   get('rating_submissions','select=id&status=eq.approved').catch(()=>[]),
-   get('whatsapp_groups','select=id&approved=eq.true').catch(()=>[]),
+  const [stats,settings]=await Promise.all([
+   fetchPublicPlatformStats(),
    get('site_settings','select=key,value&key=in.(stats_section_enabled,stats_title,stats_tools_label,stats_summaries_label,stats_ratings_label,stats_groups_label,stats_university_name)').catch(()=>[])
   ]);
   const m=Object.fromEntries(settings.map(x=>[x.key,x.value]));
   const bool=v=>v===true||v==='true'||v===1||v==='1';
   if(m.stats_section_enabled!==undefined&&!bool(m.stats_section_enabled)){section.hidden=true;return}
-  qs('#statTools').textContent=features.length;qs('#statSummaries').textContent=summaries.length;qs('#statRatings').textContent=ratings.length;qs('#statGroups').textContent=groups.length;
+  section.hidden=false;
+  qs('#statTools').textContent=number(stats?.tools);
+  qs('#statSummaries').textContent=number(stats?.summaries);
+  qs('#statRatings').textContent=number(stats?.ratings);
+  qs('#statGroups').textContent=number(stats?.groups);
   if(m.stats_title)qs('#platformStatsTitle').textContent=m.stats_title;
   if(m.stats_tools_label)qs('#statToolsLabel').textContent=m.stats_tools_label;
   if(m.stats_summaries_label)qs('#statSummariesLabel').textContent=m.stats_summaries_label;
   if(m.stats_ratings_label)qs('#statRatingsLabel').textContent=m.stats_ratings_label;
   if(m.stats_groups_label)qs('#statGroupsLabel').textContent=m.stats_groups_label;
   if(m.stats_university_name)qs('#statUniversity').textContent=m.stats_university_name;
- }catch(error){console.warn('Stats skipped',error)}
+ }catch(error){
+  console.warn('Public platform stats failed',error);
+  ['#statTools','#statSummaries','#statRatings','#statGroups'].forEach(id=>{const el=qs(id);if(el)el.textContent='0'});
+ }
 }
 
 translateStatic();
