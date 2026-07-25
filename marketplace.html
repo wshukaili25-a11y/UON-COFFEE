@@ -139,20 +139,7 @@ body.has-exam-banner .navbar{top:40px!important}
 </style>
 <link rel="stylesheet" href="site-enhancements.css">
 <link rel="stylesheet" href="brand.css">
-<script>
-(function(){
-  try{
-    if('serviceWorker' in navigator){
-      navigator.serviceWorker.getRegistrations().then(function(regs){
-        regs.forEach(function(reg){reg.unregister();});
-      }).catch(function(){});
-    }
-    if('caches' in window){
-      caches.keys().then(function(keys){keys.forEach(function(key){caches.delete(key);});}).catch(function(){});
-    }
-  }catch(e){}
-})();
-</script></head>
+</head>
 <body>
 <div class="page-bg"><div class="c c1"></div><div class="c c2"></div></div>
 <div class="loading-overlay" id="loadingOverlay"><div class="spinner"></div>
