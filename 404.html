@@ -17,7 +17,20 @@
 <meta name="twitter:title" content="UON Hub">
 <meta name="twitter:description" content="كل ما يحتاجه طالب جامعة نزوى في مكان واحد: ملخصات، اختبارات، مجموعات واتساب، دليل الجامعة، التقييمات وأدوات الطالب.">
 <meta name="twitter:image" content="https://uon-coffee.vercel.app/assets/unizwa-new-gate-v52.jpg">
-</head><body class="v14-404-body">
+<script>
+(function(){
+  try{
+    if('serviceWorker' in navigator){
+      navigator.serviceWorker.getRegistrations().then(function(regs){
+        regs.forEach(function(reg){reg.unregister();});
+      }).catch(function(){});
+    }
+    if('caches' in window){
+      caches.keys().then(function(keys){keys.forEach(function(key){caches.delete(key);});}).catch(function(){});
+    }
+  }catch(e){}
+})();
+</script></head><body class="v14-404-body">
 <main class="v14-404">
 <div class="v14-404-orb"></div><span class="v14-logo big">U1</span>
 <strong>404</strong><h1>الصفحة اللي تدور عليها ما حصلناها</h1>
