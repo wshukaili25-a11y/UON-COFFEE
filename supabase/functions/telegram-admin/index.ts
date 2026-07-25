@@ -494,20 +494,43 @@ async function settingsMenu(chatId:string,mid:number){
 
 
 async function footerMenu(chatId:string,mid:number){
- const keys=['footer_top_text','footer_credit_prefix','footer_credit_label','footer_credit_url','footer_rights'];
+ const keys=['footer_top_text','footer_credit_prefix','footer_rights'];
  const {data:rows}=await db.from('site_settings').select('key,value').in('key',keys);
  const m=Object.fromEntries((rows||[]).map((x:any)=>[x.key,x.value]));
+ const {count:accountsCount}=await db.from('footer_social_links').select('id',{count:'exact',head:true});
  await edit(chatId,mid,`إعدادات حقوق الموقع
 
-${m.footer_top_text||'رب اغفر لي ولوالدي'}
-${m.footer_credit_prefix||'Designed with ❤️ By'} ${m.footer_credit_label||'@uonhub'}
+${m.footer_top_text||'رَبِّ زِدْنِي عِلْمًا'}
+${m.footer_credit_prefix||'صُمم بحب من طلاب جامعة نزوى ❤️'}
+الحسابات: ${accountsCount||0}
 ${m.footer_rights||'جميع الحقوق محفوظة © 2026 UON Hub'}`,[
   [{text:'🤲 النص العلوي',callback_data:'setting:edit:footer_top_text'}],
-  [{text:'✍️ عبارة التصميم',callback_data:'setting:edit:footer_credit_prefix'}],
-  [{text:'👤 اسم/منشن الحساب',callback_data:'setting:edit:footer_credit_label'}],
-  [{text:'🔗 رابط الحساب',callback_data:'setting:edit:footer_credit_url'}],
+  [{text:'✍️ عبارة صُمم بحب',callback_data:'setting:edit:footer_credit_prefix'}],
+  [{text:'🔗 إدارة الحسابات والروابط',callback_data:'footerlinks:list'}],
   [{text:'©️ نص الحقوق',callback_data:'setting:edit:footer_rights'}],
   [{text:'⬅️ الإعدادات',callback_data:'settings:menu'}]
+ ]);
+}
+
+async function footerLinksMenu(chatId:string,mid:number){
+ const {data:rows,error}=await db.from('footer_social_links').select('*').order('sort_order',{ascending:true}).order('created_at',{ascending:true}).limit(40);
+ if(error)throw error;
+ const buttons=(rows||[]).map((item:any)=>[{text:`${item.active?'🟢':'🔴'} ${item.label}`,callback_data:`fl:v:${item.id}`}]);
+ buttons.push([{text:'➕ إضافة حساب ورابط',callback_data:'fl:add'}]);
+ buttons.push([{text:'⬅️ إعدادات الحقوق',callback_data:'footer:menu'}]);
+ await edit(chatId,mid,rows?.length?'الحسابات الظاهرة تحت عبارة «صُمم بحب»':'لا توجد حسابات بعد.',buttons);
+}
+
+async function footerLinkView(chatId:string,mid:number,id:string){
+ const {data:item,error}=await db.from('footer_social_links').select('*').eq('id',id).single();
+ if(error)throw error;
+ await edit(chatId,mid,`الحساب: ${item.label}\nالرابط: ${item.url||'غير مضاف'}\nالترتيب: ${item.sort_order||0}\nالحالة: ${item.active?'ظاهر':'مخفي'}`,[
+  [{text:'✏️ تعديل الاسم/المنشن',callback_data:`fl:e:label:${id}`}],
+  [{text:'🔗 تعديل الرابط',callback_data:`fl:e:url:${id}`}],
+  [{text:'↕️ تعديل الترتيب',callback_data:`fl:e:sort_order:${id}`}],
+  [{text:item.active?'🔴 إخفاء':'🟢 إظهار',callback_data:`fl:t:${id}`}],
+  [{text:'🗑 حذف',callback_data:`fl:d:${id}`}],
+  [{text:'⬅️ الحسابات',callback_data:'footerlinks:list'}]
  ]);
 }
 
@@ -715,6 +738,35 @@ async function handleConversation(chatId:string,admin:any,text:string,conv:any){
   await clearConversation(chatId);
   audit(admin,'setting_update','site_settings',data.key,{value:text});
   await send(chatId,'تم حفظ الإعداد ✅',data.key?.startsWith('footer_')?[[{text:'🧾 الرجوع لإعدادات الحقوق',callback_data:'footer:menu'}]]:undefined);
+  return true;
+ }
+
+
+ if(state==='footer_link_add_label'){
+  await setConversation(chatId,'footer_link_add_url',{label:text});
+  await send(chatId,'أرسل الرابط الكامل، مثل:\nhttps://www.instagram.com/uonhub\n\nيمكنك أيضًا إرسال www.example.com');
+  return true;
+ }
+ if(state==='footer_link_add_url'){
+  const raw=text.trim();
+  const url=/^https?:\/\//i.test(raw)?raw:(/^www\./i.test(raw)?`https://${raw}`:raw);
+  const {count}=await db.from('footer_social_links').select('id',{count:'exact',head:true});
+  const {error}=await db.from('footer_social_links').insert({label:data.label,url,sort_order:count||0,active:true});
+  if(error)throw error;
+  await clearConversation(chatId);
+  audit(admin,'footer_link_add','footer_social_links','',{label:data.label,url});
+  await send(chatId,'تمت إضافة الحساب والرابط ✅',[[{text:'🔗 عرض الحسابات',callback_data:'footerlinks:list'}]]);
+  return true;
+ }
+ if(state==='footer_link_edit'){
+  let value:any=text.trim();
+  if(data.field==='sort_order')value=Number.parseInt(value,10)||0;
+  if(data.field==='url' && /^www\./i.test(value))value=`https://${value}`;
+  const {error}=await db.from('footer_social_links').update({[data.field]:value,updated_at:new Date().toISOString()}).eq('id',data.id);
+  if(error)throw error;
+  await clearConversation(chatId);
+  audit(admin,'footer_link_edit','footer_social_links',data.id,{field:data.field,value});
+  await send(chatId,'تم التعديل ✅',[[{text:'⬅️ فتح الحساب',callback_data:`fl:v:${data.id}`}]]);
   return true;
  }
 
@@ -1333,14 +1385,37 @@ Deno.serve(async req=>{
     }
     else if(data==='settings:menu')await settingsMenu(chatId,mid);
     else if(data==='footer:menu')await footerMenu(chatId,mid);
+    else if(data==='footerlinks:list')await footerLinksMenu(chatId,mid);
+    else if(data==='fl:add'){
+     await setConversation(chatId,'footer_link_add_label',{});
+     await edit(chatId,mid,'أرسل اسم الحساب أو المنشن، مثل: @uonhub',[[{text:'⬅️ إلغاء',callback_data:'footerlinks:list'}]]);
+    }
+    else if(data.startsWith('fl:v:'))await footerLinkView(chatId,mid,data.split(':')[2]);
+    else if(data.startsWith('fl:e:')){
+     const [, ,field,id]=data.split(':');
+     const labels:any={label:'الاسم أو المنشن',url:'الرابط الكامل',sort_order:'رقم الترتيب'};
+     await setConversation(chatId,'footer_link_edit',{id,field});
+     await edit(chatId,mid,`أرسل ${labels[field]||field} الجديد`,[[{text:'⬅️ إلغاء',callback_data:`fl:v:${id}`}]]);
+    }
+    else if(data.startsWith('fl:t:')){
+     const id=data.split(':')[2];
+     const {data:item,error}=await db.from('footer_social_links').select('active').eq('id',id).single();if(error)throw error;
+     await db.from('footer_social_links').update({active:!item.active,updated_at:new Date().toISOString()}).eq('id',id);
+     await footerLinkView(chatId,mid,id);
+    }
+    else if(data.startsWith('fl:d:')){
+     if(!isOwner(admin))throw new Error('الحذف للمالك فقط');
+     const id=data.split(':')[2];
+     await db.from('footer_social_links').delete().eq('id',id);
+     audit(admin,'footer_link_delete','footer_social_links',id);
+     await footerLinksMenu(chatId,mid);
+    }
     else if(data.startsWith('center:view:'))await centerView(chatId,mid,data.split(':')[2]);
     else if(data.startsWith('setting:edit:')){
      const key=data.split(':').slice(2).join(':');
      const labels:any={
       footer_top_text:'النص العلوي في الحقوق',
-      footer_credit_prefix:'عبارة التصميم قبل اسم الحساب',
-      footer_credit_label:'اسم الحساب أو المنشن الظاهر',
-      footer_credit_url:'الرابط الكامل للحساب (Instagram / X / أي موقع)',
+      footer_credit_prefix:'عبارة صُمم بحب',
       footer_rights:'نص جميع الحقوق محفوظة'
      };
      await setConversation(chatId,'setting_value',{key});

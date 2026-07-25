@@ -46,12 +46,21 @@ async function updateBadge(){
 
 
 
+function normalizeFooterUrl(value=''){
+ const raw=String(value||'').trim();
+ if(!raw)return '';
+ if(/^https?:\/\//i.test(raw))return raw;
+ if(/^www\./i.test(raw))return `https://${raw}`;
+ if(/^instagram\.com\//i.test(raw)||/^x\.com\//i.test(raw)||/^twitter\.com\//i.test(raw)||/^tiktok\.com\//i.test(raw)||/^linkedin\.com\//i.test(raw))return `https://${raw}`;
+ return '';
+}
+
 async function applyManagedFooter(){
  const footer=document.querySelector('.site-footer');
  if(!footer)return;
  const defaults={
-  footer_top_text:'رب اغفر لي ولوالدي',
-  footer_credit_prefix:'Designed with ❤️ By',
+  footer_top_text:'رَبِّ زِدْنِي عِلْمًا',
+  footer_credit_prefix:'صُمم بحب من طلاب جامعة نزوى ❤️',
   footer_credit_label:'@uonhub',
   footer_credit_url:'',
   footer_rights:'جميع الحقوق محفوظة © 2026 UON Hub'
@@ -62,13 +71,26 @@ async function applyManagedFooter(){
   const rows=await get('site_settings',`select=key,value&key=in.(${keys})`);
   for(const row of rows||[]) if(row?.key && row.value!==null && row.value!==undefined) m[row.key]=String(row.value);
  }catch{}
+ let accounts=[];
+ try{
+  accounts=await get('footer_social_links','select=id,label,url,sort_order,active&active=eq.true&order=sort_order.asc,created_at.asc');
+ }catch{}
+ // Compatibility: show the old single account when the new table is still empty.
+ if(!accounts.length && m.footer_credit_label){
+  accounts=[{label:m.footer_credit_label,url:m.footer_credit_url||'',active:true}];
+ }
+ const accountHtml=accounts.map(item=>{
+  const label=esc(item.label||'');
+  const url=normalizeFooterUrl(item.url||'');
+  return url?`<a class="footer-social-link" href="${esc(url)}" target="_blank" rel="noopener noreferrer">${label}</a>`:`<span class="footer-social-link is-disabled">${label}</span>`;
+ }).join('');
  const container=footer.querySelector('.container')||footer;
- const safeUrl=/^https?:\/\//i.test(m.footer_credit_url||'')?m.footer_credit_url:'';
  container.classList.remove('footer-row');
  container.classList.add('footer-managed');
  container.innerHTML=`
   <p class="footer-top-text">${esc(m.footer_top_text)}</p>
-  <p class="footer-credit"><span>${esc(m.footer_credit_prefix)}</span> ${safeUrl?`<a href="${esc(safeUrl)}" target="_blank" rel="noopener noreferrer">${esc(m.footer_credit_label)}</a>`:`<span class="footer-credit-label">${esc(m.footer_credit_label)}</span>`}</p>
+  <p class="footer-credit"><span>${esc(m.footer_credit_prefix)}</span></p>
+  ${accountHtml?`<div class="footer-social-links" aria-label="حسابات المنصة">${accountHtml}</div>`:''}
   <p class="footer-rights-text">${esc(m.footer_rights)}</p>`;
 }
 
