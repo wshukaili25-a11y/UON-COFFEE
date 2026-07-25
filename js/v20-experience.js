@@ -44,5 +44,33 @@ async function updateBadge(){
  try{const rows=await get('site_updates','select=id&active=eq.true&order=created_at.desc&limit=20');const seen=Number(localStorage.getItem('uon_updates_seen')||0);if(rows.length>seen){const a=document.createElement('a');a.href='updates.html';a.className='v20-update-badge';a.textContent=`${rows.length-seen} تحديث جديد`;document.body.append(a)}}catch{}
 }
 
-addUtilityDock();updateBadge();
+
+
+async function applyManagedFooter(){
+ const footer=document.querySelector('.site-footer');
+ if(!footer)return;
+ const defaults={
+  footer_top_text:'رب اغفر لي ولوالدي',
+  footer_credit_prefix:'Designed with ❤️ By',
+  footer_credit_label:'@uonhub',
+  footer_credit_url:'',
+  footer_rights:'جميع الحقوق محفوظة © 2026 UON Hub'
+ };
+ let m={...defaults};
+ try{
+  const keys=Object.keys(defaults).join(',');
+  const rows=await get('site_settings',`select=key,value&key=in.(${keys})`);
+  for(const row of rows||[]) if(row?.key && row.value!==null && row.value!==undefined) m[row.key]=String(row.value);
+ }catch{}
+ const container=footer.querySelector('.container')||footer;
+ const safeUrl=/^https?:\/\//i.test(m.footer_credit_url||'')?m.footer_credit_url:'';
+ container.classList.remove('footer-row');
+ container.classList.add('footer-managed');
+ container.innerHTML=`
+  <p class="footer-top-text">${esc(m.footer_top_text)}</p>
+  <p class="footer-credit"><span>${esc(m.footer_credit_prefix)}</span> ${safeUrl?`<a href="${esc(safeUrl)}" target="_blank" rel="noopener noreferrer">${esc(m.footer_credit_label)}</a>`:`<span class="footer-credit-label">${esc(m.footer_credit_label)}</span>`}</p>
+  <p class="footer-rights-text">${esc(m.footer_rights)}</p>`;
+}
+
+addUtilityDock();updateBadge();applyManagedFooter();
 window.UON_V20={favorites,toggleFavorite,contributions:()=>readJson(contributionKey,[])};

@@ -167,12 +167,7 @@ async function loadOfficialLinks(){
 }
 
 async function loadFooter(){
- try{
-  const rows=await get('site_settings','select=key,value&key=in.(footer_rights,footer_subtitle)');
-  const m=Object.fromEntries(rows.map(x=>[x.key,x.value]));
-  if(qs('#footerRights')&&m.footer_rights)qs('#footerRights').textContent=m.footer_rights;
-  if(qs('#footerSubtitle')&&m.footer_subtitle)qs('#footerSubtitle').textContent=m.footer_subtitle;
- }catch(error){console.warn('Footer settings skipped',error)}
+ // تتم إدارة الحقوق عالميًا من js/v20-experience.js لضمان ظهورها في جميع الصفحات.
 }
 
 

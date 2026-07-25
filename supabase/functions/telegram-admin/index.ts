@@ -485,11 +485,29 @@ async function settingsMenu(chatId:string,mid:number){
   [{text:'🌐 رابط الموقع',callback_data:'setting:edit:site_url'}],
   [{text:'🖼 شرائح الواجهة',callback_data:'slides:menu'}],
   [{text:'📊 قسم أرقام المنصة',callback_data:'stats:menu'}],
-  [{text:'©️ حقوق الموقع',callback_data:'setting:edit:footer_rights'}],
-  [{text:'📝 وصف الحقوق',callback_data:'setting:edit:footer_subtitle'}],
+  [{text:'🧾 إعدادات الحقوق',callback_data:'footer:menu'}],
   [{text:'🗓 رابط التقويم الرسمي',callback_data:'setting:edit:official_calendar_url'}],
   [{text:'⚙️ حالة مراكز الدعم',callback_data:'service:view:support-centers'}],
   [{text:'⬅️ الرئيسية',callback_data:'home'}]
+ ]);
+}
+
+
+async function footerMenu(chatId:string,mid:number){
+ const keys=['footer_top_text','footer_credit_prefix','footer_credit_label','footer_credit_url','footer_rights'];
+ const {data:rows}=await db.from('site_settings').select('key,value').in('key',keys);
+ const m=Object.fromEntries((rows||[]).map((x:any)=>[x.key,x.value]));
+ await edit(chatId,mid,`إعدادات حقوق الموقع
+
+${m.footer_top_text||'رب اغفر لي ولوالدي'}
+${m.footer_credit_prefix||'Designed with ❤️ By'} ${m.footer_credit_label||'@uonhub'}
+${m.footer_rights||'جميع الحقوق محفوظة © 2026 UON Hub'}`,[
+  [{text:'🤲 النص العلوي',callback_data:'setting:edit:footer_top_text'}],
+  [{text:'✍️ عبارة التصميم',callback_data:'setting:edit:footer_credit_prefix'}],
+  [{text:'👤 اسم/منشن الحساب',callback_data:'setting:edit:footer_credit_label'}],
+  [{text:'🔗 رابط الحساب',callback_data:'setting:edit:footer_credit_url'}],
+  [{text:'©️ نص الحقوق',callback_data:'setting:edit:footer_rights'}],
+  [{text:'⬅️ الإعدادات',callback_data:'settings:menu'}]
  ]);
 }
 
@@ -696,7 +714,7 @@ async function handleConversation(chatId:string,admin:any,text:string,conv:any){
   await db.from('site_settings').upsert({key:data.key,value:text,updated_at:new Date().toISOString()});
   await clearConversation(chatId);
   audit(admin,'setting_update','site_settings',data.key,{value:text});
-  await send(chatId,'تم حفظ الإعداد ✅');
+  await send(chatId,'تم حفظ الإعداد ✅',data.key?.startsWith('footer_')?[[{text:'🧾 الرجوع لإعدادات الحقوق',callback_data:'footer:menu'}]]:undefined);
   return true;
  }
 
@@ -1314,11 +1332,20 @@ Deno.serve(async req=>{
      await edit(chatId,mid,`تم ${enabled?'إظهار':'إخفاء'} قسم أرقام المنصة ✅`,[[{text:'⬅️ قسم الأرقام',callback_data:'stats:menu'}]]);
     }
     else if(data==='settings:menu')await settingsMenu(chatId,mid);
+    else if(data==='footer:menu')await footerMenu(chatId,mid);
     else if(data.startsWith('center:view:'))await centerView(chatId,mid,data.split(':')[2]);
     else if(data.startsWith('setting:edit:')){
      const key=data.split(':').slice(2).join(':');
+     const labels:any={
+      footer_top_text:'النص العلوي في الحقوق',
+      footer_credit_prefix:'عبارة التصميم قبل اسم الحساب',
+      footer_credit_label:'اسم الحساب أو المنشن الظاهر',
+      footer_credit_url:'الرابط الكامل للحساب (Instagram / X / أي موقع)',
+      footer_rights:'نص جميع الحقوق محفوظة'
+     };
      await setConversation(chatId,'setting_value',{key});
-     await edit(chatId,mid,`أرسل القيمة الجديدة لـ ${key}`,[[{text:'⬅️ إلغاء',callback_data:'settings:menu'}]]);
+     const back=key.startsWith('footer_')?'footer:menu':'settings:menu';
+     await edit(chatId,mid,`أرسل القيمة الجديدة لـ ${labels[key]||key}`,[[{text:'⬅️ إلغاء',callback_data:back}]]);
     }
     else if(data==='backup:menu')await backupMenu(chatId,mid);
     else if(data==='backup:create'){

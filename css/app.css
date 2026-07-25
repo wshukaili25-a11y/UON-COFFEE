@@ -2004,3 +2004,14 @@ img{max-width:100%;height:auto}
   .site-footer{padding-bottom:92px}
   .v20-stat-card.university{min-height:132px}
 }
+
+
+/* V22.2 managed footer */
+.site-footer .footer-managed{display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;text-align:center!important;gap:7px!important}
+.site-footer .footer-managed p{margin:0!important;line-height:1.7!important}
+.site-footer .footer-top-text{font-size:.95rem;color:var(--app-muted,var(--muted))!important}
+.site-footer .footer-credit{font-size:.95rem;color:var(--app-muted,var(--muted))!important}
+.site-footer .footer-credit a{color:var(--primary,#2563eb)!important;text-decoration:underline;text-underline-offset:3px;font-weight:700}
+.site-footer .footer-credit a:hover{opacity:.8}
+.site-footer .footer-rights-text{font-weight:700;color:var(--app-text,var(--text))!important}
+@media(max-width:640px){.site-footer .footer-managed{gap:5px!important}.site-footer .footer-credit,.site-footer .footer-top-text{font-size:.88rem}.site-footer .footer-rights-text{font-size:.92rem}}
