@@ -1975,3 +1975,32 @@ img{max-width:100%;height:auto}
 .v20-favorites-list a{display:flex;justify-content:space-between;padding:13px;border-bottom:1px solid var(--app-line)}
 @media(max-width:900px){.v20-stats-grid{grid-template-columns:repeat(2,1fr)}.v20-dashboard-grid{grid-template-columns:1fr}.v20-stat-card.university{grid-column:1/-1}}
 @media(max-width:520px){.v20-stats-grid{grid-template-columns:1fr 1fr}.v20-stat-card{padding:20px 8px}.v20-utility-dock{left:8px;bottom:8px}.v20-update-badge{right:8px;bottom:72px}}
+
+/* V22.1 — Restore UON university identity card */
+.v20-stat-card.university{
+  display:flex;
+  min-height:150px;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+}
+.v20-stat-card.university .v20-university-code{
+  display:block;
+  margin:0;
+  color:#0aa76c;
+  font-size:clamp(38px,5vw,58px);
+  font-weight:900;
+  letter-spacing:.04em;
+  line-height:1;
+}
+.v20-stat-card.university #statUniversity{
+  color:var(--app-muted);
+  font-size:clamp(20px,2.4vw,28px);
+  font-weight:700;
+}
+@media(max-width:520px){
+  body{padding-bottom:86px}
+  .site-footer{padding-bottom:92px}
+  .v20-stat-card.university{min-height:132px}
+}
