@@ -17,9 +17,11 @@ export async function api(table,{method='GET',query='',body,prefer='return=repre
 }
 export const get=(t,q='')=>api(t,{query:q,prefer:''});
 export const insert=(t,b,{returning=true}={})=>api(t,{method:'POST',body:b,prefer:returning?'return=representation':'return=minimal'});
-export async function submitPending(table, body){
+export async function submitPending(table,body){
  const payload={...body};
 
+ // whatsapp_groups.id is an auto-generated INTEGER in PostgreSQL.
+ // Never send a UUID for this table, even if another caller supplied one.
  if(table==='whatsapp_groups'){
   delete payload.id;
  }else if(!payload.id){
