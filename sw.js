@@ -1,6 +1,6 @@
-const CACHE_NAME='uonhub-pwa-v25-5';
+const CACHE_NAME='uonhub-pwa-v25-6';
 const OFFLINE_URL='/offline.html';
-const CORE_ASSETS=['/','/index.html','/offline.html','/manifest.webmanifest','/css/app.css','/css/ui-refresh-v24.css','/css/pwa.css','/js/pwa-init.js','/assets/icons/icon-192.png','/assets/icons/icon-512.png'];
+const CORE_ASSETS=['/','/index.html','/offline.html','/manifest.webmanifest','/css/app.css','/css/ui-refresh-v24.css','/css/pwa.css?v=25.6.0','/js/pwa-init.js?v=25.6.0','/assets/icons/icon-192.png','/assets/icons/icon-512.png'];
 self.addEventListener('install',event=>{event.waitUntil(caches.open(CACHE_NAME).then(cache=>cache.addAll(CORE_ASSETS)).then(()=>self.skipWaiting()));});
 self.addEventListener('activate',event=>{event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==CACHE_NAME).map(k=>caches.delete(k)))).then(()=>self.clients.claim()));});
 self.addEventListener('fetch',event=>{
