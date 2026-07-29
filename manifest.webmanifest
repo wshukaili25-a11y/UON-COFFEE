@@ -1,26 +1,27 @@
 {
-  "name": "UON Hub",
+  "id": "/",
+  "name": "UON Hub - منصة طلاب جامعة نزوى",
   "short_name": "UON Hub",
-  "description": "منصة طلابية لطلاب جامعة نزوى",
-  "start_url": "/index.html",
+  "description": "مشروع طلابي مستقل يسهل وصول طلبة جامعة نزوى إلى الخدمات والمعلومات.",
+  "start_url": "/index.html?source=pwa",
   "scope": "/",
   "display": "standalone",
-  "background_color": "#f7f8fb",
-  "theme_color": "#ffffff",
+  "display_override": ["window-controls-overlay", "standalone", "minimal-ui"],
+  "orientation": "portrait-primary",
+  "background_color": "#f8fafc",
+  "theme_color": "#060b1b",
   "lang": "ar",
   "dir": "rtl",
+  "categories": ["education", "productivity", "utilities"],
   "icons": [
-    {
-      "src": "/assets/icons/icon-192.svg",
-      "sizes": "192x192",
-      "type": "image/svg+xml",
-      "purpose": "any maskable"
-    },
-    {
-      "src": "/assets/icons/icon-512.svg",
-      "sizes": "512x512",
-      "type": "image/svg+xml",
-      "purpose": "any maskable"
-    }
+    {"src":"/assets/icons/icon-192.png","sizes":"192x192","type":"image/png","purpose":"any"},
+    {"src":"/assets/icons/icon-192-maskable.png","sizes":"192x192","type":"image/png","purpose":"maskable"},
+    {"src":"/assets/icons/icon-512.png","sizes":"512x512","type":"image/png","purpose":"any"},
+    {"src":"/assets/icons/icon-512-maskable.png","sizes":"512x512","type":"image/png","purpose":"maskable"}
+  ],
+  "shortcuts": [
+    {"name":"الملخصات والاختبارات","short_name":"الملخصات","url":"/summaries.html","icons":[{"src":"/assets/icons/icon-192.png","sizes":"192x192"}]},
+    {"name":"دليل الجامعة","short_name":"الدليل","url":"/university-guide.html","icons":[{"src":"/assets/icons/icon-192.png","sizes":"192x192"}]},
+    {"name":"أدوات الطالب","short_name":"الأدوات","url":"/tools.html","icons":[{"src":"/assets/icons/icon-192.png","sizes":"192x192"}]}
   ]
 }

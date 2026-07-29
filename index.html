@@ -13,16 +13,13 @@
 <meta name="twitter:description" content="كل ما يحتاجه طالب جامعة نزوى في مكان واحد: ملخصات، اختبارات، مجموعات واتساب، دليل الجامعة، التقييمات وأدوات الطالب.">
 <meta name="twitter:image" content="https://uon-coffee.vercel.app/assets/unizwa-new-gate-v52.jpg">
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebSite", "name": "UON Hub", "url": "https://uon-coffee.vercel.app", "description": "كل ما يحتاجه طالب جامعة نزوى في مكان واحد: ملخصات، اختبارات، مجموعات واتساب، دليل الجامعة، التقييمات وأدوات الطالب.", "inLanguage": ["ar", "en"], "potentialAction": {"@type": "SearchAction", "target": "https://uon-coffee.vercel.app/search.html?q={search_term_string}", "query-input": "required name=search_term_string"}}</script><script type="application/ld+json">{"@context": "https://schema.org", "@type": "Organization", "name": "UON Hub", "url": "https://uon-coffee.vercel.app", "logo": "https://uon-coffee.vercel.app/assets/icon-512.png"}</script>
-<script>
-(function(){
-  try{
-    if('serviceWorker' in navigator){
-      navigator.serviceWorker.getRegistrations().then(function(regs){regs.forEach(function(reg){reg.unregister();});}).catch(function(){});
-    }
-    if('caches' in window){caches.keys().then(function(keys){keys.forEach(function(key){caches.delete(key);});}).catch(function(){});}
-  }catch(e){}
-})();
-</script></head><body><header class="site-header"><div class="container nav"><a class="brand" href="index.html"><span class="brand-mark" aria-hidden="true">U</span><span class="brand-name">UON <b>Hub</b></span></a><ul class="nav-links" id="navLinks"><li><a class="active" href="index.html">الرئيسية</a></li><li><a class="" href="university-guide.html">دليل الجامعة</a></li><li><a class="" href="summaries.html">الملخصات</a></li><li><a class="" href="groups.html">المجموعات</a></li><li><a class="" href="projects.html">مشاريع الطلاب</a></li><li><a class="" href="ratings.html">التقييمات</a></li><li><a class="" href="tools.html">الأدوات</a></li></ul><div class="nav-actions"><button class="icon-btn mobile-menu" id="menuBtn">☰</button></div></div></header>
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="apple-touch-icon" href="/assets/icons/icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="UON Hub">
+<link rel="stylesheet" href="/css/pwa.css?v=25.5.0">
+</head><body><header class="site-header"><div class="container nav"><a class="brand" href="index.html"><span class="brand-mark" aria-hidden="true">U</span><span class="brand-name">UON <b>Hub</b></span></a><ul class="nav-links" id="navLinks"><li><a class="active" href="index.html">الرئيسية</a></li><li><a class="" href="university-guide.html">دليل الجامعة</a></li><li><a class="" href="summaries.html">الملخصات</a></li><li><a class="" href="groups.html">المجموعات</a></li><li><a class="" href="projects.html">مشاريع الطلاب</a></li><li><a class="" href="ratings.html">التقييمات</a></li><li><a class="" href="tools.html">الأدوات</a></li></ul><div class="nav-actions"><button class="icon-btn mobile-menu" id="menuBtn">☰</button></div></div></header>
 
 
 
@@ -148,15 +145,6 @@
 
 
 <footer class="site-footer"><div class="container footer-managed"><p class="footer-top-text">رب اغفر لي ولوالدي</p><p class="footer-credit"><span>Designed with ❤️ By</span> <span class="footer-credit-label">@uonhub</span></p><p class="footer-rights-text">جميع الحقوق محفوظة © 2026 UON Hub</p></div></footer><div id="toast" class="toast"></div><script type="module" src="js/home.js?v=23.3.0"></script>
-<script>
-(async()=>{try{
- if('serviceWorker' in navigator){
-  const regs=await navigator.serviceWorker.getRegistrations();
-  for(const r of regs)await r.unregister();
- }
- if('caches' in window){
-  for(const k of await caches.keys())await caches.delete(k);
- }
-}catch(e){console.warn(e)}})();
-</script>
-<aside class="notification-drawer" id="notificationDrawer"><div class="section-head"><h3>الإشعارات</h3><button class="icon-btn" id="closeNotifications">✕</button></div><div id="notificationItems" class="notification-list"></div></aside><script type="module">import {setupV14Shell} from "./js/v14-ui.js?v=18.8";setupV14Shell();</script><script type="module">import {applyFeatureStates} from "./js/core.js?v=18.8";applyFeatureStates(document);</script><script type="module" src="js/runtime-guard.js?v=18.8"></script><script type="module" src="js/v20-experience.js?v=22.3.0"></script></body></html>
+
+<aside class="notification-drawer" id="notificationDrawer"><div class="section-head"><h3>الإشعارات</h3><button class="icon-btn" id="closeNotifications">✕</button></div><div id="notificationItems" class="notification-list"></div></aside><script type="module">import {setupV14Shell} from "./js/v14-ui.js?v=18.8";setupV14Shell();</script><script type="module">import {applyFeatureStates} from "./js/core.js?v=18.8";applyFeatureStates(document);</script><script type="module" src="js/runtime-guard.js?v=18.8"></script><script type="module" src="js/v20-experience.js?v=22.3.0"></script><script type="module" src="/js/pwa-init.js?v=25.5.0"></script>
+</body></html>
