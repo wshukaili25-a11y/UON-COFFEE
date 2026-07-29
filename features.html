@@ -535,19 +535,24 @@ const supabase = {
     }
 }
 
-// ===== PASSWORD CHECK =====
-const FALLBACK_PASS = 'UoN@Coffee#2026!'
+// ===== SECURE ADMIN CHECK =====
+// Passwords are never stored or queried from the browser.
 async function checkPassword(password) {
-    if (password === FALLBACK_PASS) return { role: 'admin', label: 'المشرف الرئيسي' }
     try {
-        const { data } = await supabase.from('admin_passwords').select('*')
-        if (data) {
-            for (const row of data) {
-                if (row.password_plain === password) return { role: row.role, label: row.label }
-            }
-        }
-    } catch(e) {}
-    return null
+        const response = await fetch(`${window._sbURL}/functions/v1/admin-login`, {
+            method: 'POST',
+            headers: {
+                'apikey': window._sbKEY,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ password })
+        })
+        if (!response.ok) return null
+        const result = await response.json()
+        return result?.ok ? { role: result.role || 'admin', label: result.label || 'المشرف' } : null
+    } catch (_) {
+        return null
+    }
 }
 
 // ===== DEFAULT RESTAURANTS =====

@@ -1,9 +1,0 @@
-UON Hub V22 — Telegram Full Content Control + Restore Fix
-
-انشر الدوال التالية من PowerShell داخل مجلد المشروع:
-
-supabase functions deploy telegram-admin --project-ref irkhvydgxpseflggbeqq --no-verify-jwt
-supabase functions deploy database-restore --project-ref irkhvydgxpseflggbeqq --no-verify-jwt
-supabase functions deploy database-backup --project-ref irkhvydgxpseflggbeqq --no-verify-jwt
-
-بعد النشر افتح البوت واكتب /start، ثم افتح «إدارة كل المحتوى».

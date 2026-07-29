@@ -312,14 +312,19 @@ const supabase = {
     }
 }
 
-const FALLBACK = 'UoN@Coffee#2026!'
-async function checkPass(p) {
-    if (p === FALLBACK) return { role:'admin', label:'المشرف الرئيسي' }
+async function checkPass(password) {
     try {
-        const { data } = await supabase.from('admin_passwords').select('*')
-        if (data) for (const r of data) if (r.password_plain === p) return { role:r.role, label:r.label }
-    } catch(e) {}
-    return null
+        const response = await fetch(`${window._sbURL}/functions/v1/admin-login`, {
+            method: 'POST',
+            headers: { 'apikey': window._sbKEY, 'Content-Type': 'application/json' },
+            body: JSON.stringify({ password })
+        })
+        if (!response.ok) return null
+        const result = await response.json()
+        return result?.ok ? { role: result.role || 'admin', label: result.label || 'المشرف' } : null
+    } catch (_) {
+        return null
+    }
 }
 
 let items = []
