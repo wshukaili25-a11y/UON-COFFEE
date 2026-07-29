@@ -12,7 +12,7 @@ import {
  esc,
  openModal,
  closeModal
-} from './core.js';
+} from './core.js?v=26.1';
 
 setupNav();
 await enforceUonMaintenance();
@@ -84,9 +84,12 @@ $('#submitForm').onsubmit=async event=>{
 
  body.approved=false;
 
+ // Defensive guard: this table uses an auto-generated INTEGER id.
+ delete body.id;
+
  try{
   const result=await submitPending('whatsapp_groups',body);
-  await notifyPending('whatsapp_groups',result.id);
+  if(result?.id)await notifyPending('whatsapp_groups',result.id);
   toast('تم إرسال المجموعة للمراجعة');
   event.target.reset();
   closeModal('submitModal');
