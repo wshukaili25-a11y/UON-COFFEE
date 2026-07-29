@@ -1,1 +1,0 @@
-استبدل index.html و css/app.css و js/home.js. العرض يتبدل تلقائيًا كل 6 ثوانٍ.
