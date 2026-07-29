@@ -141,12 +141,12 @@ document.querySelector('[data-section="notifications-admin"]')?.addEventListener
 
 
 async function loadCenterAdmin(){
- const keys=['anjiz_title','anjiz_description','anjiz_booking_url','anjiz_image_url','anjiz_cta','masalik_title','masalik_description','masalik_booking_url','masalik_image_url','masalik_cta'];
+ const keys=['anjiz_title','anjiz_description','anjiz_booking_url','anjiz_cta','masalik_title','masalik_description','masalik_booking_url','masalik_cta'];
  const rows=await get('site_settings',`select=key,value&key=in.(${keys.join(',')})`);
  const m=Object.fromEntries(rows.map(x=>[x.key,x.value]));
  const a=$('#anjizSettings'),s=$('#masalikSettings');
- if(a){a.title.value=m.anjiz_title||'';a.description.value=m.anjiz_description||'';a.booking_url.value=m.anjiz_booking_url||'';a.image_url.value=m.anjiz_image_url||'';a.cta.value=m.anjiz_cta||''}
- if(s){s.title.value=m.masalik_title||'';s.description.value=m.masalik_description||'';s.booking_url.value=m.masalik_booking_url||'';s.image_url.value=m.masalik_image_url||'';s.cta.value=m.masalik_cta||''}
+ if(a){a.title.value=m.anjiz_title||'';a.description.value=m.anjiz_description||'';a.booking_url.value=m.anjiz_booking_url||'';a.cta.value=m.anjiz_cta||''}
+ if(s){s.title.value=m.masalik_title||'';s.description.value=m.masalik_description||'';s.booking_url.value=m.masalik_booking_url||'';s.cta.value=m.masalik_cta||''}
 }
 async function saveCenter(prefix,form){
  const data=Object.fromEntries(new FormData(form));
@@ -154,7 +154,6 @@ async function saveCenter(prefix,form){
   upsertSetting(`${prefix}_title`,data.title),
   upsertSetting(`${prefix}_description`,data.description),
   upsertSetting(`${prefix}_booking_url`,data.booking_url),
-  upsertSetting(`${prefix}_image_url`,data.image_url),
   upsertSetting(`${prefix}_cta`,data.cta)
  ]);
  toast('تم حفظ بيانات المركز');

@@ -88,3 +88,19 @@ body{background:var(--ui-bg)!important;color:var(--ui-text)!important}
  .v18-section{padding:30px 0!important}.v18-section-head{align-items:flex-start!important;gap:12px!important}.v18-section-head>a{font-size:.8rem!important}.v18-primary-tools{grid-template-columns:1fr!important;gap:12px!important}.v18-primary-tools>a{min-height:166px!important;padding:19px!important}.v18-primary-tools h3{margin-top:18px!important}.v18-secondary-tools{grid-template-columns:repeat(2,minmax(0,1fr))!important}.v18-secondary-tools>a{min-height:92px!important}.v18-two-col,.v18-centers{grid-template-columns:1fr!important}.v18-panel{padding:17px!important}.v20-stats-grid{grid-template-columns:repeat(2,1fr)!important}
 }
 @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
+
+/* University guide V25.1 */
+.guide-contact-section{margin-top:42px}.guide-contact-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}.guide-contact-card{display:flex;flex-direction:column;gap:7px;padding:20px;border:1px solid rgba(148,163,184,.18);border-radius:20px;background:rgba(15,23,42,.55);text-decoration:none;transition:.2s ease}.guide-contact-card:hover{transform:translateY(-3px);border-color:rgba(56,189,248,.45)}.guide-contact-card span{font-size:.86rem;color:var(--muted,#94a3b8)}.guide-contact-card strong{font-size:1.12rem;color:var(--text,#fff)}.guide-contact-card small{color:var(--muted,#94a3b8)}.guide-sync-note{display:inline-flex;align-items:center;gap:7px;font-size:.85rem;color:var(--muted,#94a3b8)}@media(max-width:850px){.guide-contact-grid{grid-template-columns:1fr 1fr}}@media(max-width:560px){.guide-contact-grid{grid-template-columns:1fr}}
+
+
+/* V25.2 — Support centers without photos */
+.v251-centers-no-images{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:18px!important}
+.v251-centers-no-images .v251-support-card{display:flex!important;align-items:flex-start;gap:16px;padding:22px!important;overflow:visible!important;min-height:210px;position:relative}
+.v251-support-icon{width:58px;height:58px;min-width:58px;border-radius:18px;display:grid;place-items:center;font-size:1.65rem;background:linear-gradient(145deg,rgba(57,189,248,.16),rgba(123,97,255,.16));border:1px solid rgba(123,97,255,.18);box-shadow:inset 0 1px 0 rgba(255,255,255,.18)}
+.v251-support-content{padding:0!important;display:flex;flex-direction:column;align-items:flex-start;min-width:0;height:100%}
+.v251-support-content span{display:inline-flex;padding:5px 10px;border-radius:999px;background:rgba(57,189,248,.10);margin-bottom:8px}
+.v251-support-content h3{font-size:1.18rem;margin:2px 0 8px!important}
+.v251-support-content p{margin:0 0 18px;min-height:48px}
+.v251-booking-btn{margin-top:auto;min-width:132px;justify-content:center}
+.v251-booking-btn.is-disabled{opacity:.58;cursor:not-allowed;pointer-events:none;filter:grayscale(.25)}
+@media(max-width:760px){.v251-centers-no-images{grid-template-columns:1fr!important}.v251-centers-no-images .v251-support-card{min-height:190px;padding:19px!important}.v251-support-icon{width:52px;height:52px;min-width:52px;border-radius:16px}}

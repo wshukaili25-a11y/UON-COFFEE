@@ -672,8 +672,7 @@ async function centerView(chatId:string,mid:number,center:string){
  await edit(chatId,mid,label,[
   [{text:'✏️ العنوان',callback_data:`setting:edit:${center}_title`}],
   [{text:'📝 الوصف',callback_data:`setting:edit:${center}_description`}],
-  [{text:'🔗 رابط الحجز',callback_data:`setting:edit:${center}_booking_url`}],
-  [{text:'🖼 رابط الصورة',callback_data:`setting:edit:${center}_image_url`}],
+  [{text:'🔗 رابط الحجز الظاهر بالموقع',callback_data:`setting:edit:${center}_booking_url`}],
   [{text:'🔘 نص الزر',callback_data:`setting:edit:${center}_cta`}],
   [{text:'⬅️ مراكز الدعم',callback_data:'settings:menu'}]
  ]);

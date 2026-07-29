@@ -29,15 +29,24 @@ async function load(){
   databaseRows.forEach(item=>merged.set(keyOf(item),{...merged.get(keyOf(item)),...item}));
 
   rows=[...merged.values()];
+  updateSummary();
   renderTabs();
   render();
  }catch(error){
   rows=[...officialPrograms];
+  updateSummary();
   renderTabs();
   render();
   console.warn(error);
  }
 }
+
+function updateSummary(){
+ const colleges=new Set(rows.map(item=>item.college).filter(Boolean));
+ const degrees=new Set(rows.map(item=>item.degree).filter(Boolean));
+ if($('#collegeCount')) $('#collegeCount').textContent=colleges.size;
+ if($('#degreeCount')) $('#degreeCount').textContent=degrees.size;
+ if($('#programCount'))}
 
 function renderTabs(){
  const colleges=[
@@ -74,7 +83,6 @@ function render(){
          (!query||text.includes(query));
  });
 
- $('#programCount').textContent=rows.length;
 
  const groups=new Map();
  list.forEach(item=>{
@@ -99,7 +107,7 @@ function render(){
       <h3>${esc(item.name_ar||item.name_en)}</h3>
       <div class="guide-program-actions">
        ${item.study_plan_url?`<a class="btn" target="_blank" href="${esc(item.study_plan_url)}">الخطة الدراسية</a>`:''}
-       <a class="btn primary" target="_blank" rel="noopener" href="${esc(item.official_url||'https://www.unizwa.edu.om/index.php?contentid=619&lang=en')}">المصدر الرسمي</a>
+       <a class="btn primary" target="_blank" rel="noopener" href="${esc(item.official_url||'https://www.unizwa.edu.om/program_details.php?comingfrom=1378')}">المصدر الرسمي</a>
       </div>
      </article>
     `).join('')}

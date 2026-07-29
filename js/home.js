@@ -102,8 +102,8 @@ async function loadCenters(){
  if(!anjizCard&&!masalikCard)return;
 
  const keys=[
-  'anjiz_title','anjiz_description','anjiz_booking_url','anjiz_image_url','anjiz_cta',
-  'masalik_title','masalik_description','masalik_booking_url','masalik_image_url','masalik_cta'
+  'anjiz_title','anjiz_description','anjiz_booking_url','anjiz_cta',
+  'masalik_title','masalik_description','masalik_booking_url','masalik_cta'
  ];
 
  try{
@@ -114,26 +114,33 @@ async function loadCenters(){
    const element=qs(selector);
    if(element&&value!==undefined&&value!==null&&value!=='')element.textContent=value;
   };
-  const setHref=(selector,value)=>{
+  const setBookingLink=(selector,value)=>{
    const element=qs(selector);
-   if(element&&value)element.href=value;
-  };
-  const setBackground=(cardSelector,value,fallback)=>{
-   const element=qs(`${cardSelector} .v18-center-img, ${cardSelector} .v175-support-image, ${cardSelector} .support-thumb`);
-   if(element)element.style.backgroundImage=`url("${value||fallback}")`;
+   if(!element)return;
+   const url=String(value||'').trim();
+   if(/^https?:\/\//i.test(url)){
+    element.href=url;
+    element.classList.remove('is-disabled');
+    element.removeAttribute('aria-disabled');
+    element.removeAttribute('tabindex');
+   }else{
+    element.removeAttribute('href');
+    element.classList.add('is-disabled');
+    element.setAttribute('aria-disabled','true');
+    element.setAttribute('tabindex','-1');
+    element.textContent=document.documentElement.lang==='en'?'Booking link coming soon':'رابط الحجز قريبًا';
+   }
   };
 
   setText('#anjizTitle',values.anjiz_title||'مركز أنجز');
   setText('#anjizDescription',values.anjiz_description||'دعم طلاب السنة التأسيسية.');
   setText('#anjizLink',values.anjiz_cta||'احجز الآن');
-  setHref('#anjizLink',values.anjiz_booking_url||'#');
-  setBackground('#anjizCard',values.anjiz_image_url,'assets/unizwa-new-gate-v52.jpg');
+  setBookingLink('#anjizLink',values.anjiz_booking_url);
 
   setText('#masalikTitle',values.masalik_title||'مركز مسالك التعلم');
   setText('#masalikDescription',values.masalik_description||'دعم أكاديمي لطلاب التخصص.');
   setText('#masalikLink',values.masalik_cta||'احجز الآن');
-  setHref('#masalikLink',values.masalik_booking_url||'#');
-  setBackground('#masalikCard',values.masalik_image_url,'assets/unizwa-campus-aerial.jpg');
+  setBookingLink('#masalikLink',values.masalik_booking_url);
  }catch(error){
   console.warn('Centers settings skipped',error);
  }
