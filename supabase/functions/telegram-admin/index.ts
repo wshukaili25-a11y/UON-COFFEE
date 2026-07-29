@@ -110,6 +110,7 @@ function mainMenu(admin:any){
   [{text:'📊 لوحة الإحصائيات',callback_data:'dashboard'}],
   [{text:'🛠 الخدمات والصيانة',callback_data:'services'}],
   [{text:'🕓 الطلبات المعلقة',callback_data:'pending:menu'}],
+  [{text:'🤖 مركز المشرف الذكي',callback_data:'ai:menu'}],
   [{text:'🗂 إدارة كل المحتوى',callback_data:'manage:menu'}],
   [{text:'📘 مركز المقررات',callback_data:'courses:menu'}],
   [{text:'📢 الإعلانات والإشعارات',callback_data:'content:menu'}],
@@ -126,7 +127,7 @@ function mainMenu(admin:any){
 }
 
 async function home(chatId:string,admin:any,messageId?:number){
- const text=`لوحة إدارة UON Hub V20 Experience\nمرحبًا ${admin.name||'مشرف'} 👋\nاختر القسم الذي تريد إدارته.`;
+ const text=`لوحة إدارة UON Hub V24 AI Supervisor\nمرحبًا ${admin.name||'مشرف'} 👋\nاختر القسم الذي تريد إدارته.`;
  if(messageId)await edit(chatId,messageId,text,mainMenu(admin));
  else await send(chatId,text,mainMenu(admin));
 }
@@ -204,6 +205,127 @@ function displayValue(value:any){
  return String(value).slice(0,700);
 }
 
+// UON_AI_SUPERVISOR_V24
+type AiAssessment={score:number;recommendation:'approve'|'review'|'reject';reasons:string[];flags:string[]};
+
+function aiText(item:any,cfg:any){
+ const fields=[...(cfg?.fields||[]),'text','content','description','details','comment','title','subject','course_code','college','major'];
+ return fields.map((f:string)=>item?.[f]).filter((v:any)=>v!==null&&v!==undefined)
+  .map((v:any)=>typeof v==='object'?JSON.stringify(v):String(v)).join(' ').trim();
+}
+
+function aiAssess(table:string,item:any,cfg:any):AiAssessment{
+ const source=aiText(item,cfg);
+ let score=72;
+ const reasons:string[]=[];
+ const flags:string[]=[];
+ const external=(cfg?.urlFields||[]).map((f:string)=>validExternalUrl(item?.[f])).find(Boolean);
+ if(source.length>=18){score+=7;reasons.push('المحتوى واضح وكافٍ');}
+ else{score-=22;flags.push('short_content');reasons.push('المحتوى قصير أو ناقص');}
+ if(['summaries','whatsapp_groups','student_projects'].includes(table)){
+  if(external){score+=11;reasons.push('الرابط أو الملف صالح');}
+  else{score-=28;flags.push('missing_link');reasons.push('الرابط أو الملف غير موجود');}
+ }
+ if(item?.course_code){score+=5;reasons.push('رمز المادة محدد');}
+ if(item?.college){score+=3;reasons.push('الكلية محددة');}
+ const personal=[/\b(?:\+?968)?[79]\d{7}\b/,/\b[\w.+-]+@[\w.-]+\.[a-z]{2,}\b/i,/@[A-Za-z0-9_]{3,}/];
+ if(personal.some((x)=>x.test(source))){score-=18;flags.push('personal_data');reasons.push('قد يحتوي بيانات شخصية');}
+ if(/(https?:\/\/){2,}|(?:www\.){2,}/i.test(source)||/(خصم|ربح سريع|تحويل مالي|استثمار مضمون)/i.test(source)){
+  score-=24;flags.push('spam');reasons.push('مؤشرات محتوى مزعج أو دعائي');
+ }
+ if(/(تهديد|ابتزاز|قذف|تشهير|انتحار|إيذاء النفس)/i.test(source)){
+  score-=40;flags.push('sensitive');reasons.push('محتوى حساس يحتاج مراجعة بشرية');
+ }
+ score=Math.max(0,Math.min(100,score));
+ const recommendation=score>=86?'approve':score>=55?'review':'reject';
+ return {score,recommendation,reasons:[...new Set(reasons)].slice(0,6),flags:[...new Set(flags)]};
+}
+
+const aiRecommendationLabel=(x:string)=>x==='approve'?'🟢 مقترح قبول':x==='reject'?'🔴 مقترح رفض':'🟡 مراجعة بشرية';
+
+async function saveAiReview(table:string,id:string,a:AiAssessment){
+ const {error}=await db.from('ai_supervisor_reviews').upsert({
+  source_table:table,source_id:String(id),score:a.score,recommendation:a.recommendation,
+  reasons:a.reasons,flags:a.flags,reviewed_by_ai_at:new Date().toISOString()
+ },{onConflict:'source_table,source_id'});
+ if(error&&!/relation .* does not exist/i.test(error.message||''))throw error;
+}
+
+async function recordDecision(admin:any,table:string,id:string,action:string,oldState:any,newState:any,note=''){
+ const {error}=await db.from('moderation_decisions').insert({
+  source_table:table,source_id:String(id),action,old_state:oldState||{},new_state:newState||{},
+  admin_chat_id:String(admin?.chat_id||''),admin_name:admin?.name||'',note:note||null
+ });
+ if(error&&!/relation .* does not exist/i.test(error.message||''))throw error;
+}
+
+async function markNeedsChanges(table:string,id:string,admin:any){
+ const cfg=pendingConfigs[table];
+ const {data:item,error}=await db.from(table).select('*').eq('id',id).single();
+ if(error)throw error;
+ let patch:any=cfg.booleanModeration?{approved:false,moderation_status:'needs_changes'}:{[cfg.status]:'needs_changes'};
+ let r=await db.from(table).update({...patch,reviewed_at:new Date().toISOString()}).eq('id',id);
+ if(r.error&&/moderation_status|reviewed_at|column/i.test(r.error.message||'')){
+  patch=cfg.booleanModeration?{approved:false}:{[cfg.status]:'needs_changes'};
+  r=await db.from(table).update(patch).eq('id',id);
+ }
+ if(r.error)throw r.error;
+ await recordDecision(admin,table,id,'needs_changes',item,patch);
+ audit(admin,'pending_needs_changes',table,id);
+}
+
+async function assignToSelf(table:string,id:string,admin:any){
+ const {error}=await db.from('moderation_assignments').insert({
+  source_table:table,source_id:String(id),assigned_to_chat_id:String(admin.chat_id),
+  assigned_by_chat_id:String(admin.chat_id),status:'assigned'
+ });
+ if(error&&error.code!=='23505')throw error;
+ audit(admin,'pending_assign_self',table,id);
+}
+
+async function aiMenu(chatId:string,mid:number,admin:any){
+ if(!can(admin,'moderate'))throw new Error('ليس لديك صلاحية الإشراف');
+ const counts=await pendingCounts();
+ const total=Object.values(counts).reduce((a:any,b:any)=>Number(a)+Number(b),0);
+ const {data:s}=await db.from('ai_supervisor_settings').select('*').eq('id',true).maybeSingle();
+ await edit(chatId,mid,`🤖 مركز المشرف الذكي\n\nالحالة: ${s?.enabled!==false?'🟢 يعمل':'🔴 متوقف'}\nالطلبات المعلقة: ${total}\nالقبول التلقائي: ${s?.auto_approve_enabled?'مفعل':'متوقف'}\nحد الثقة: ${s?.auto_approve_threshold||97}%`,[
+  [{text:'🧠 تحليل الطلبات المعلقة',callback_data:'ai:scan'}],
+  [{text:'📊 تقرير المشرف الذكي',callback_data:'ai:report'}],
+  [{text:'📥 الطلبات المسندة لي',callback_data:'ai:mine'}],
+  [{text:s?.enabled!==false?'🔴 إيقاف المشرف الذكي':'🟢 تشغيل المشرف الذكي',callback_data:`ai:toggle:${s?.enabled!==false?'0':'1'}`}],
+  [{text:'⚙️ إعدادات القبول التلقائي',callback_data:'ai:auto:menu'}],
+  [{text:'⬅️ الرئيسية',callback_data:'home'}]
+ ]);
+}
+
+async function aiScanPending(chatId:string,mid:number,admin:any){
+ let scanned=0,approve=0,review=0,reject=0;
+ for(const [table,cfg] of Object.entries(pendingConfigs) as any[]){
+  const {data}=await db.from(table).select('*').eq(cfg.status,cfg.pending).order('created_at',{ascending:true}).limit(40);
+  for(const item of data||[]){
+   const a=aiAssess(table,item,cfg); await saveAiReview(table,item.id,a); scanned++;
+   if(a.recommendation==='approve')approve++; else if(a.recommendation==='reject')reject++; else review++;
+  }
+ }
+ audit(admin,'ai_scan_pending','ai_supervisor_reviews','',{scanned,approve,review,reject});
+ await edit(chatId,mid,`اكتمل التحليل الذكي ✅\n\nتم تحليل: ${scanned}\n🟢 مقترح قبول: ${approve}\n🟡 مراجعة بشرية: ${review}\n🔴 مقترح رفض: ${reject}`,[[{text:'🤖 العودة للمركز',callback_data:'ai:menu'}],[{text:'🕓 فتح الطلبات',callback_data:'pending:menu'}]]);
+}
+
+async function aiReport(chatId:string,mid:number){
+ const {data:rows}=await db.from('ai_supervisor_reviews').select('*').order('reviewed_by_ai_at',{ascending:false}).limit(250);
+ const st={approve:0,review:0,reject:0,flagged:0};
+ for(const x of rows||[]){if(x.recommendation==='approve')st.approve++;else if(x.recommendation==='reject')st.reject++;else st.review++;if((x.flags||[]).length)st.flagged++;}
+ await edit(chatId,mid,`📊 تقرير المشرف الذكي\n\nآخر التحليلات: ${(rows||[]).length}\n🟢 مقترح قبول: ${st.approve}\n🟡 مراجعة بشرية: ${st.review}\n🔴 مقترح رفض: ${st.reject}\n🚩 تحتوي مؤشرات: ${st.flagged}`,[[{text:'🧠 تحليل الآن',callback_data:'ai:scan'}],[{text:'⬅️ مركز AI',callback_data:'ai:menu'}]]);
+}
+
+async function assignedToMe(chatId:string,mid:number,admin:any){
+ const {data:rows,error}=await db.from('moderation_assignments').select('*').eq('assigned_to_chat_id',String(admin.chat_id)).eq('status','assigned').order('created_at',{ascending:false}).limit(20);
+ if(error)throw error;
+ const keys=(rows||[]).map((x:any)=>[{text:`${pendingConfigs[x.source_table]?.title||x.source_table} — ${String(x.source_id).slice(0,10)}`,callback_data:pendingCb('v',x.source_table,x.source_id,0)}]);
+ keys.push([{text:'⬅️ مركز AI',callback_data:'ai:menu'}]);
+ await edit(chatId,mid,(rows||[]).length?'📥 الطلبات المسندة لك':'لا توجد طلبات مسندة لك',keys);
+}
+
 async function pendingCounts(){
  const entries=Object.entries(pendingConfigs) as any[];
  const values=await Promise.all(entries.map(async([table,cfg])=>{
@@ -269,15 +391,26 @@ async function pendingView(chatId:string,mid:number,table:string,id:string,page=
  const keyboard:any[]=[];
  const external=(cfg.urlFields||[]).map((f:string)=>validExternalUrl(data[f])).find(Boolean);
  if(external)keyboard.push([{text:table==='whatsapp_groups'?'🔗 فتح المجموعة':'📎 فتح الرابط/الملف',url:external}]);
+ const ai=aiAssess(table,data,cfg);
+ await saveAiReview(table,id,ai);
  keyboard.push([
   {text:'✅ قبول',callback_data:pendingCb('a',table,id,page)},
   {text:'❌ رفض',callback_data:pendingCb('r',table,id,page)}
+ ]);
+ keyboard.push([
+  {text:'🟡 يحتاج تعديل',callback_data:pendingCb('n',table,id,page)},
+  {text:'👤 إسناد لي',callback_data:pendingCb('u',table,id,page)}
  ]);
  keyboard.push([{text:'🗑 حذف نهائي',callback_data:pendingCb('x',table,id,page)}]);
  keyboard.push([{text:'⬅️ القائمة',callback_data:pendingCb('l',table,page)}]);
  await edit(chatId,mid,`${cfg.title}
 
-${lines||'لا توجد تفاصيل إضافية'}`,keyboard);
+${lines||'لا توجد تفاصيل إضافية'}
+
+🤖 تقييم المشرف الذكي
+النتيجة: ${ai.score}/100
+التوصية: ${aiRecommendationLabel(ai.recommendation)}
+${ai.reasons.map((x:string)=>`• ${x}`).join('\n')}`,keyboard);
 }
 
 async function approvePending(table:string,id:string){
@@ -1033,6 +1166,14 @@ Deno.serve(async req=>{
       if(!can(admin,'moderate'))throw new Error('ليس لديك صلاحية المراجعة');
       await approvePending(table,idOrPage); audit(admin,'pending_approve',table,idOrPage);
       await pendingList(chatId,mid,table,page);
+     }else if(action==='n'){
+      if(!can(admin,'moderate'))throw new Error('ليس لديك صلاحية المراجعة');
+      await markNeedsChanges(table,idOrPage,admin);
+      await pendingList(chatId,mid,table,page);
+     }else if(action==='u'){
+      if(!can(admin,'moderate'))throw new Error('ليس لديك صلاحية المراجعة');
+      await assignToSelf(table,idOrPage,admin);
+      await pendingView(chatId,mid,table,idOrPage,page);
      }else if(action==='r'){
       if(!can(admin,'moderate'))throw new Error('ليس لديك صلاحية المراجعة');
       const cfg=pendingConfigs[table];
@@ -1579,6 +1720,37 @@ Chat ID: ${item.chat_id}
      await db.from('telegram_admins').delete().eq('id',id);
      audit(admin,'admin_delete','telegram_admins',id);
      await adminsMenu(chatId,mid);
+    }
+    else if(data==='ai:menu')await aiMenu(chatId,mid,admin);
+    else if(data==='ai:scan')await aiScanPending(chatId,mid,admin);
+    else if(data==='ai:report')await aiReport(chatId,mid);
+    else if(data==='ai:mine')await assignedToMe(chatId,mid,admin);
+    else if(data.startsWith('ai:toggle:')){
+     if(!isOwner(admin))throw new Error('إعدادات الذكاء الاصطناعي للمالك فقط');
+     const enabled=data.endsWith(':1');
+     const {error}=await db.from('ai_supervisor_settings').upsert({id:true,enabled,updated_by:chatId,updated_at:new Date().toISOString()});
+     if(error)throw error; audit(admin,'ai_toggle','ai_supervisor_settings','',{enabled}); await aiMenu(chatId,mid,admin);
+    }
+    else if(data==='ai:auto:menu'){
+     if(!isOwner(admin))throw new Error('إعدادات القبول التلقائي للمالك فقط');
+     const {data:s}=await db.from('ai_supervisor_settings').select('*').eq('id',true).single();
+     await edit(chatId,mid,`⚙️ إعدادات القبول التلقائي\n\nالحالة: ${s.auto_approve_enabled?'🟢 مفعل':'🔴 متوقف'}\nحد الثقة: ${s.auto_approve_threshold}%`,[
+      [{text:s.auto_approve_enabled?'🔴 إيقاف':'🟢 تشغيل',callback_data:`ai:auto:toggle:${s.auto_approve_enabled?'0':'1'}`}],
+      [{text:'95%',callback_data:'ai:auto:threshold:95'},{text:'97%',callback_data:'ai:auto:threshold:97'},{text:'99%',callback_data:'ai:auto:threshold:99'}],
+      [{text:'⬅️ مركز AI',callback_data:'ai:menu'}]
+     ]);
+    }
+    else if(data.startsWith('ai:auto:toggle:')){
+     if(!isOwner(admin))throw new Error('للمالك فقط');
+     const enabled=data.endsWith(':1');
+     const {error}=await db.from('ai_supervisor_settings').update({auto_approve_enabled:enabled,updated_by:chatId,updated_at:new Date().toISOString()}).eq('id',true);
+     if(error)throw error; audit(admin,'ai_auto_toggle','ai_supervisor_settings','',{enabled}); await aiMenu(chatId,mid,admin);
+    }
+    else if(data.startsWith('ai:auto:threshold:')){
+     if(!isOwner(admin))throw new Error('للمالك فقط');
+     const threshold=Number(data.split(':')[3]);
+     const {error}=await db.from('ai_supervisor_settings').update({auto_approve_threshold:threshold,updated_by:chatId,updated_at:new Date().toISOString()}).eq('id',true);
+     if(error)throw error; audit(admin,'ai_threshold','ai_supervisor_settings','',{threshold}); await aiMenu(chatId,mid,admin);
     }
     else if(data==='audit:list'){
      const {data:rows}=await db.from('bot_audit_log').select('*').order('created_at',{ascending:false}).limit(12);
