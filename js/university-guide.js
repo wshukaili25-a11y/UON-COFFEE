@@ -46,7 +46,7 @@ function updateSummary(){
  const degrees=new Set(rows.map(item=>item.degree).filter(Boolean));
  if($('#collegeCount')) $('#collegeCount').textContent=colleges.size;
  if($('#degreeCount')) $('#degreeCount').textContent=degrees.size;
- if($('#programCount'))}
+ if($('#programCount')) $('#programCount').textContent=rows.length;
 
 function renderTabs(){
  const colleges=[
