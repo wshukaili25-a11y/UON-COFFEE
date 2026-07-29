@@ -1,1 +1,1 @@
-23.3.0
+25.5.0 - PWA preview + independent student project notice
