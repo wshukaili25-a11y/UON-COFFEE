@@ -1,1 +1,0 @@
-Run UON_HUB_V7_1_FINAL_CONTROL_FIX.sql, upload all files, redeploy telegram-admin, then test maintenance and feature status in a private window.
