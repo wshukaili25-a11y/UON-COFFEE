@@ -53,7 +53,8 @@ function htmlToLines(html: string) {
       .replace(/<style\b[\s\S]*?<\/style>/gi, '')
       .replace(/<br\s*\/?>/gi, '\n')
       .replace(/<\/?(?:p|div|li|tr|td|th|h[1-6]|section|article|option|a)\b[^>]*>/gi, '\n')
-      .replace(/<[^>]+>/g, ' '),
+      // Split every HTML text node onto its own line. The official page uses many inline tags.
+      .replace(/<[^>]+>/g, '\n'),
   )
     .split(/\r?\n/)
     .map((line) => line.replace(/\u00a0/g, ' ').replace(/\s+/g, ' ').trim())
@@ -98,8 +99,9 @@ function detectDegree(title: string) {
 
 function looksLikeProgramTitle(value: string) {
   const t = normalizeArabic(value);
-  return /^(?:برنامج\s+)?(?:دبلوم|بكالوريوس|ماجستير|دكتوراه)\b/.test(t)
-    || /(?:diploma|bachelor|master|ph\.?d)/i.test(value);
+  // Do not use \b here: JavaScript word boundaries are ASCII-oriented and fail with Arabic text.
+  return /^(?:برنامج\s+)?(?:دبلوم|بكالوريوس|ماجستير|دكتوراه)(?:\s|$)/.test(t)
+    || /^(?:program\s+)?(?:diploma|bachelor|master|ph\.?d)(?:\s|$)/i.test(value);
 }
 
 function cleanProgramName(title: string) {
@@ -185,11 +187,12 @@ Deno.serve(async (req) => {
       lines: lines.length,
       arabic_chars: scoreArabic(html),
       programs: programs.length,
-      sample: lines.filter(looksLikeProgramTitle).slice(0, 5),
+      sample: lines.filter(looksLikeProgramTitle).slice(0, 10),
+      college_sample: lines.filter((line) => canonicalCollege(line)).slice(0, 10),
     }));
 
     if (programs.length < 50) {
-      throw new Error(`Parser returned only ${programs.length} programs (lines=${lines.length}, arabic=${scoreArabic(html)})`);
+      throw new Error(`Parser returned only ${programs.length} programs (lines=${lines.length}, arabic=${scoreArabic(html)}). Check function logs for title and college samples`);
     }
 
     const { error: upsertError } = await supabase
