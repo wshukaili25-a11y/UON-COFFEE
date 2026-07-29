@@ -1,0 +1,7 @@
+/* UoN Coffee v2 enhancements */
+:root { color-scheme: dark; }
+.skip-link{position:absolute;top:-40px;right:12px;background:#00d4ff;color:#0a0e27;padding:.6rem 1rem;border-radius:10px;z-index:100000;font-weight:800;text-decoration:none}.skip-link:focus{top:12px}
+.tool-card-disabled,.tool-disabled{cursor:not-allowed!important}.tool-card-disabled .tool-link{cursor:not-allowed!important;opacity:.85}.empty-state,.error-state{grid-column:1/-1;text-align:center;padding:2rem;border-radius:18px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.03);color:var(--text-dim)}
+.retry-btn{margin-top:.8rem;padding:.55rem 1rem;border:1px solid rgba(0,212,255,.25);background:rgba(0,212,255,.08);color:var(--primary);border-radius:10px;font-family:Tajawal,sans-serif;font-weight:800;cursor:pointer}
+@media (max-width:768px){.nav-links{max-height:calc(100vh - 72px);overflow:auto}.tool-card{min-height:auto}.hero-title{font-size:clamp(2rem,10vw,3.5rem)!important}}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important;transition-duration:.01ms!important}}

@@ -1,0 +1,23 @@
+
+:root{
+  --hub-primary:#22d3ee;
+  --hub-secondary:#8b5cf6;
+  --hub-accent:#34d399;
+}
+.logo-icon,.sidebar-logo-icon,.login-logo{
+  background:linear-gradient(135deg,var(--hub-primary),var(--hub-secondary))!important;
+}
+.logo-text span,.sidebar-logo-text span{color:var(--hub-primary)!important}
+.hub-language-toggle{
+  display:inline-flex;align-items:center;gap:7px;min-height:38px;padding:0 12px;
+  border-radius:11px;border:1px solid rgba(255,255,255,.13);
+  background:rgba(255,255,255,.055);color:#e2e8f0;font-family:inherit;
+  font-size:.8rem;font-weight:800;cursor:pointer;transition:.2s;white-space:nowrap;
+}
+.hub-language-toggle:hover{border-color:rgba(34,211,238,.55);color:#22d3ee;transform:translateY(-1px)}
+.hub-brand-mark{font-weight:900;letter-spacing:.2px}
+.hub-brand-mark span{color:var(--hub-primary)}
+html[dir="ltr"] body{text-align:left}
+html[dir="ltr"] .navbar,html[dir="ltr"] .nav-actions,html[dir="ltr"] .hero-buttons{direction:ltr}
+html[dir="ltr"] .fa-arrow-left{transform:rotate(180deg)}
+@media(max-width:768px){.hub-language-toggle{padding:0 9px;font-size:.72rem}}

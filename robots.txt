@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /admin.html
+Disallow: /maintenance.html
+
+Sitemap: https://uon-coffee.vercel.app/sitemap.xml
