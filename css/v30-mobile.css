@@ -1,0 +1,34 @@
+/* UON Hub V30 mobile hardening */
+html,body{max-width:100%;overflow-x:hidden}
+img,svg,video,canvas{max-width:100%}
+button,a,input,select,textarea{touch-action:manipulation}
+.notification-drawer{position:fixed;inset:0 0 0 auto;width:min(390px,100vw);height:100dvh;z-index:9998;transform:translateX(105%);transition:transform .22s ease;overflow:auto;padding:18px;background:var(--panel,#0b1226);box-shadow:0 0 40px rgba(0,0,0,.35)}
+.notification-drawer.open{transform:translateX(0)}
+.uon-notification-button{position:relative;min-width:44px;min-height:44px}
+.uon-notification-badge{position:absolute;top:-3px;left:-3px;min-width:18px;height:18px;border-radius:999px;padding:0 5px;display:grid;place-items:center;font-size:11px;font-weight:800;background:#ef4444;color:#fff}
+.notification-list{display:grid;gap:10px}
+.notification-list a,.notification-list article{display:grid;grid-template-columns:auto 1fr;gap:10px;padding:13px;border:1px solid rgba(148,163,184,.18);border-radius:14px;text-decoration:none;color:inherit;background:rgba(255,255,255,.035)}
+@media(max-width:760px){
+ .container{width:min(100% - 24px,1180px)}
+ .v1813-slide{min-height:auto;padding:28px 20px;grid-template-columns:1fr}
+ .v1813-slide-icon{font-size:64px;order:-1}
+ .v18-primary-tools,.v18-secondary-tools,.v18-centers,.v18-two-col,.v20-stats-grid,.grid,.grid-2,.grid-3,.grid-4{grid-template-columns:1fr!important}
+ .v18-section{padding-block:34px}
+ .v18-section-head{align-items:flex-start;gap:10px}
+ .v18-section-head h2{font-size:clamp(1.35rem,7vw,2rem)}
+ .v20-utility-dock{bottom:max(14px,env(safe-area-inset-bottom));left:12px;right:auto}
+ .v176-side-menu{width:min(88vw,360px)}
+ .admin-layout{display:block}
+ .sidebar{position:fixed;inset:0 auto 0 0;width:min(88vw,330px);z-index:9999;transform:translateX(-105%);transition:transform .2s ease;overflow:auto}
+ .sidebar.open{transform:translateX(0)}
+ .admin-main{padding:16px}
+ .form-grid{grid-template-columns:1fr!important}
+ table{display:block;overflow-x:auto;white-space:nowrap}
+ input,select,textarea,button,.btn{font-size:16px;min-height:44px}
+}
+@media(max-width:390px){
+ .container{width:min(100% - 18px,1180px)}
+ .v1813-slide{padding:22px 16px}
+ .notification-drawer{padding:14px}
+}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition-duration:.01ms!important;animation-duration:.01ms!important;animation-iteration-count:1!important}}
