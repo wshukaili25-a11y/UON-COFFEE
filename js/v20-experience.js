@@ -1,4 +1,4 @@
-import {get,insert,esc,toast,trackEvent} from './core.js';
+import {get,insert,esc,toast,trackEvent,rpc} from './core.js';
 
 const PAGE_KEY='uon_favorites_v20';
 const contributionKey='uon_contributions_v20';
@@ -44,8 +44,6 @@ async function updateBadge(){
  try{const rows=await get('site_updates','select=id&active=eq.true&order=created_at.desc&limit=20');const seen=Number(localStorage.getItem('uon_updates_seen')||0);if(rows.length>seen){const a=document.createElement('a');a.href='updates.html';a.className='v20-update-badge';a.textContent=`${rows.length-seen} تحديث جديد`;document.body.append(a)}}catch{}
 }
 
-
-
 function normalizeFooterUrl(value=''){
  const raw=String(value||'').trim();
  if(!raw)return '';
@@ -58,41 +56,66 @@ function normalizeFooterUrl(value=''){
 async function applyManagedFooter(){
  const footer=document.querySelector('.site-footer');
  if(!footer)return;
- const defaults={
-  footer_top_text:'رَبِّ زِدْنِي عِلْمًا',
-  footer_credit_prefix:'صُمم بحب من طلاب جامعة نزوى ❤️',
-  footer_credit_label:'@uonhub',
-  footer_credit_url:'',
-  footer_rights:'جميع الحقوق محفوظة © 2026 UON Hub'
- };
+ const defaults={footer_top_text:'رَبِّ زِدْنِي عِلْمًا',footer_credit_prefix:'صُمم بحب من طلاب جامعة نزوى ❤️',footer_credit_label:'@uonhub',footer_credit_url:'',footer_rights:'جميع الحقوق محفوظة © 2026 UON Hub'};
  let m={...defaults};
- try{
-  const keys=Object.keys(defaults).join(',');
-  const rows=await get('site_settings',`select=key,value&key=in.(${keys})`);
-  for(const row of rows||[]) if(row?.key && row.value!==null && row.value!==undefined) m[row.key]=String(row.value);
- }catch{}
+ try{const keys=Object.keys(defaults).join(',');const rows=await get('site_settings',`select=key,value&key=in.(${keys})`);for(const row of rows||[])if(row?.key&&row.value!==null&&row.value!==undefined)m[row.key]=String(row.value)}catch{}
  let accounts=[];
- try{
-  accounts=await get('footer_social_links','select=id,label,url,sort_order,active&active=eq.true&order=sort_order.asc,created_at.asc');
- }catch{}
- // Compatibility: show the old single account when the new table is still empty.
- if(!accounts.length && m.footer_credit_label){
-  accounts=[{label:m.footer_credit_label,url:m.footer_credit_url||'',active:true}];
- }
- const accountHtml=accounts.map(item=>{
-  const label=esc(item.label||'');
-  const url=normalizeFooterUrl(item.url||'');
-  return url?`<a class="footer-social-link" href="${esc(url)}" target="_blank" rel="noopener noreferrer">${label}</a>`:`<span class="footer-social-link is-disabled">${label}</span>`;
- }).join('');
- const container=footer.querySelector('.container')||footer;
- container.classList.remove('footer-row');
- container.classList.add('footer-managed');
- container.innerHTML=`
-  <p class="footer-top-text">${esc(m.footer_top_text)}</p>
-  <p class="footer-credit"><span>${esc(m.footer_credit_prefix)}</span></p>
-  ${accountHtml?`<div class="footer-social-links" aria-label="حسابات المنصة">${accountHtml}</div>`:''}
-  <p class="footer-rights-text">${esc(m.footer_rights)}</p>`;
+ try{accounts=await get('footer_social_links','select=id,label,url,sort_order,active&active=eq.true&order=sort_order.asc,created_at.asc')}catch{}
+ if(!accounts.length&&m.footer_credit_label)accounts=[{label:m.footer_credit_label,url:m.footer_credit_url||'',active:true}];
+ const accountHtml=accounts.map(item=>{const label=esc(item.label||'');const url=normalizeFooterUrl(item.url||'');return url?`<a class="footer-social-link" href="${esc(url)}" target="_blank" rel="noopener noreferrer">${label}</a>`:`<span class="footer-social-link is-disabled">${label}</span>`}).join('');
+ const container=footer.querySelector('.container')||footer;container.classList.remove('footer-row');container.classList.add('footer-managed');
+ container.innerHTML=`<p class="footer-top-text">${esc(m.footer_top_text)}</p><p class="footer-credit"><span>${esc(m.footer_credit_prefix)}</span></p>${accountHtml?`<div class="footer-social-links" aria-label="حسابات المنصة">${accountHtml}</div>`:''}<p class="footer-rights-text">${esc(m.footer_rights)}</p>`;
 }
 
-addUtilityDock();updateBadge();applyManagedFooter();
-window.UON_V20={favorites,toggleFavorite,contributions:()=>readJson(contributionKey,[])};
+function safeNotificationUrl(value=''){
+ const raw=String(value||'').trim();
+ if(!raw)return '';
+ if(/^https?:\/\//i.test(raw))return raw;
+ if(/^[a-z0-9_-]+\.html(?:[?#].*)?$/i.test(raw))return raw;
+ return '';
+}
+
+async function setupNotifications(){
+ const drawer=document.querySelector('#notificationDrawer');
+ const items=document.querySelector('#notificationItems');
+ if(!drawer||!items)return;
+ let opener=document.querySelector('[data-notifications-open],#openNotifications,#notificationButton');
+ if(!opener){
+  opener=document.createElement('button');
+  opener.type='button';opener.className='icon-btn v30-notification-button';opener.dataset.notificationsOpen='1';opener.setAttribute('aria-label','الإشعارات');opener.innerHTML='🔔<span class="v30-notification-count" hidden></span>';
+  const actions=document.querySelector('.nav-actions,.v176-nav-actions');
+  actions?.prepend(opener);
+ }
+ const close=document.querySelector('#closeNotifications');
+ const setOpen=value=>{drawer.classList.toggle('open',value);document.body.classList.toggle('notification-open',value)};
+ opener?.addEventListener('click',()=>setOpen(true));close?.addEventListener('click',()=>setOpen(false));
+ document.addEventListener('keydown',e=>{if(e.key==='Escape')setOpen(false)});
+ try{
+  const rows=await get('site_notifications','select=id,title,body,icon,url,created_at&active=eq.true&order=created_at.desc&limit=50');
+  const lastSeen=localStorage.getItem('uon_notifications_seen_at')||'';
+  const unread=(rows||[]).filter(x=>!lastSeen||String(x.created_at)>lastSeen).length;
+  const badge=opener?.querySelector('.v30-notification-count');
+  if(badge){badge.hidden=!unread;badge.textContent=unread>99?'99+':String(unread)}
+  items.innerHTML=(rows||[]).length?(rows||[]).map(x=>{const url=safeNotificationUrl(x.url);const body=`<article class="notification-item"><span>${esc(x.icon||'🔔')}</span><div><strong>${esc(x.title||'إشعار')}</strong>${x.body?`<p>${esc(x.body)}</p>`:''}<small>${new Date(x.created_at).toLocaleDateString('ar-OM')}</small></div></article>`;return url?`<a href="${esc(url)}" class="notification-link" ${url.startsWith('http')?'target="_blank" rel="noopener"':''}>${body}</a>`:body}).join(''):'<div class="empty">لا توجد إشعارات حاليًا.</div>';
+  opener?.addEventListener('click',()=>{const newest=rows?.[0]?.created_at;if(newest)localStorage.setItem('uon_notifications_seen_at',newest);if(badge)badge.hidden=true},{once:true});
+ }catch(error){items.innerHTML='<div class="empty">تعذر تحميل الإشعارات حاليًا.</div>';reportClientError(error,'notifications')}
+}
+
+let lastReported='';
+async function reportClientError(error,source='browser'){
+ try{
+  const message=String(error?.message||error||'Unknown browser error').slice(0,500);
+  const signature=`${source}:${message}`;
+  if(signature===lastReported)return;
+  lastReported=signature;
+  await rpc('uon_report_client_error',{p_message:message,p_source:source,p_details:{page:location.pathname,user_agent:navigator.userAgent.slice(0,300),stack:String(error?.stack||'').slice(0,1500)}});
+ }catch{}
+}
+window.addEventListener('error',event=>reportClientError(event.error||event.message,'window.error'));
+window.addEventListener('unhandledrejection',event=>reportClientError(event.reason,'unhandledrejection'));
+
+addUtilityDock();
+updateBadge();
+applyManagedFooter();
+setupNotifications();
+window.UON_V20={favorites,toggleFavorite,contributions:()=>readJson(contributionKey,[]),reportClientError};
