@@ -5,6 +5,29 @@ const passwordKey='uon_admin_password';
 const getPassword=()=>sessionStorage.getItem(passwordKey)||'';
 const reload=()=>location.reload();
 
+function normalizeAdminLayout(){
+ const legacyOverview=document.querySelector('#sec-v16-overview');
+ const overview=document.querySelector('#sec-overview');
+ legacyOverview?.classList.remove('active');
+ overview?.classList.add('active');
+
+ const instagram=document.querySelector('#instagramUrl');
+ const siteCard=document.querySelector('#sec-site .form-card');
+ const saveButton=document.querySelector('#saveSite');
+ if(instagram&&siteCard&&instagram.parentElement!==siteCard){
+  const label=document.createElement('label');
+  label.textContent='حساب إنستغرام';
+  siteCard.insertBefore(label,saveButton||null);
+  siteCard.insertBefore(instagram,saveButton||null);
+ }
+
+ const duplicateWhatsappLabels=[...document.querySelectorAll('#sec-site label')]
+  .filter(label=>label.textContent?.trim()==='رابط قناة واتساب'||label.textContent?.trim()==='قناة واتساب');
+ if(duplicateWhatsappLabels.length>1)duplicateWhatsappLabels[1].remove();
+}
+
+normalizeAdminLayout();
+
 const loginForm=document.querySelector('#loginForm');
 loginForm?.addEventListener('submit',()=>{
  const value=document.querySelector('#password')?.value||'';
