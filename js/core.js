@@ -1,13 +1,38 @@
 const SUPABASE_URL='https://irkhvydgxpseflggbeqq.supabase.co';
 const SUPABASE_KEY='sb_publishable_gZ9tyM1udrkuQIXHqDtToQ_FyFmePgH';
 const headers={apikey:SUPABASE_KEY,'Content-Type':'application/json'};
+const ADMIN_SESSION_TTL=30*60*1000;
 
 export const $=(s,r=document)=>r.querySelector(s);
 export const $$=(s,r=document)=>[...r.querySelectorAll(s)];
 export const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 export const uid=()=>crypto.randomUUID();
 
+function onAdminPage(){
+ return /\/admin(?:\.html)?\/?$/.test(location.pathname)||document.body?.classList.contains('admin-page');
+}
+
+async function adminRead(table,query){
+ const password=sessionStorage.getItem('uon_admin_password')||'';
+ const session=adminSession();
+ if(!password||!session?.created_at||Date.now()-session.created_at>ADMIN_SESSION_TTL){
+  clearAdminSession();
+  throw new Error('انتهت جلسة الإدارة، سجّل الدخول مرة ثانية');
+ }
+ const res=await fetch(`${SUPABASE_URL}/functions/v1/admin-api`,{
+  method:'POST',
+  headers:{...headers,'x-admin-password':password},
+  body:JSON.stringify({action:'read',table,query}),
+  cache:'no-store'
+ });
+ const text=await res.text();let data=null;try{data=text?JSON.parse(text):null}catch{data=text}
+ if(res.status===401)clearAdminSession();
+ if(!res.ok||data?.ok===false)throw new Error(data?.error||data?.message||data||`HTTP ${res.status}`);
+ return data?.data||[];
+}
+
 export async function api(table,{method='GET',query='',body,prefer='return=representation'}={}){
+ if(method==='GET'&&onAdminPage())return adminRead(table,query);
  const res=await fetch(`${SUPABASE_URL}/rest/v1/${table}${query?`?${query}`:''}`,{
   method,headers:{...headers,Prefer:prefer},body:body===undefined?undefined:JSON.stringify(body),cache:'no-store'
  });
@@ -158,6 +183,7 @@ export function saveAdminSession(data){
 export function clearAdminSession(){
  sessionStorage.removeItem('uon_admin_session');
  sessionStorage.removeItem('uon_admin');
+ sessionStorage.removeItem('uon_admin_password');
 }
 
 
@@ -256,11 +282,13 @@ export function installErrorCapture(){
 export function featureStatusLabel(status){
  const lang=localStorage.getItem('uon_language')||'ar';
  const labels={
-  ar:{active:'متاحة',disabled:'متوقفة',maintenance:'صيانة',coming_soon:'قريبًا'},
-  en:{active:'Available',disabled:'Unavailable',maintenance:'Maintenance',coming_soon:'Coming soon'}
+  ar:{active:'متاحة',disabled:'قريبًا · Coming Soon',maintenance:'تحت الصيانة',coming_soon:'قريبًا · Coming Soon'},
+  en:{active:'Available',disabled:'Coming Soon',maintenance:'Maintenance',coming_soon:'Coming Soon'}
  };
  return labels[lang]?.[status]||status;
 }
+
+const featureStateHandlers=new WeakMap();
 
 export async function applyFeatureStates(root=document){
  try{
@@ -273,16 +301,29 @@ export async function applyFeatureStates(root=document){
    card.dataset.status=status;
    card.classList.toggle('feature-unavailable',status!=='active');
 
+   const previousHandler=featureStateHandlers.get(card);
+   if(previousHandler){
+    card.removeEventListener('click',previousHandler,true);
+    featureStateHandlers.delete(card);
+   }
    card.querySelector('.feature-state')?.remove();
 
    if(status!=='active'){
     card.setAttribute('aria-disabled','true');
-    card.addEventListener('click',event=>{
+    const label=document.createElement('span');
+    label.className=`feature-state ${status}`;
+    label.setAttribute('role','status');
+    label.innerHTML=`<span aria-hidden="true">${status==='maintenance'?'⚙':'⏳'}</span><b>${esc(featureStatusLabel(status))}</b>`;
+    card.append(label);
+
+    const handler=event=>{
      event.preventDefault();
-     event.stopPropagation();
-     const title=card.querySelector('h3')?.textContent?.trim()||'';
+     event.stopImmediatePropagation();
+     const title=card.querySelector('h3,strong')?.textContent?.trim()||'';
      showFeatureStateBanner(status,title);
-    },true);
+    };
+    featureStateHandlers.set(card,handler);
+    card.addEventListener('click',handler,true);
    }else{
     card.removeAttribute('aria-disabled');
    }

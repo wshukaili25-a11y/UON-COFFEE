@@ -3,4 +3,4 @@ Allow: /
 Disallow: /admin.html
 Disallow: /maintenance.html
 
-Sitemap: https://uon-coffee.vercel.app/sitemap.xml
+Sitemap: https://uonhub.space/sitemap.xml

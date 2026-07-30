@@ -1560,7 +1560,7 @@ h1,h2,h3,h4,p,span,strong,small,b,
  text-decoration:none!important;
 }
 
-/* Unavailable tools are shaded only */
+/* Unavailable tools stay visibly shaded and carry a compact state label. */
 [data-feature].feature-unavailable,
 [data-feature][data-status="maintenance"],
 [data-feature][data-status="disabled"],
@@ -1585,7 +1585,23 @@ h1,h2,h3,h4,p,span,strong,small,b,
  pointer-events:none;
 }
 
-.feature-state{display:none!important}
+.feature-state{
+ display:flex!important;
+ position:relative;
+ z-index:1;
+ width:max-content;
+ max-width:100%;
+ margin-top:auto;
+ align-items:center;
+ gap:7px;
+ overflow-wrap:anywhere;
+}
+.v18-secondary-tools .feature-state{
+ margin-inline-start:auto;
+ padding:5px 8px;
+ white-space:nowrap;
+ font-size:.68rem;
+}
 .v175-unavailable{display:none!important}
 
 /* Banner appears only after clicking unavailable tool */
