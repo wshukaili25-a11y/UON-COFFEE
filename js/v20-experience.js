@@ -30,5 +30,5 @@ let lastReported='';async function reportClientError(error,source='browser'){try
 window.addEventListener('error',event=>reportClientError(event.error||event.message,'window.error'));
 window.addEventListener('unhandledrejection',event=>reportClientError(event.reason,'unhandledrejection'));
 const isAdminPage=document.body.classList.contains('admin-page')||/\/admin(?:\.html)?\/?$/.test(location.pathname);
-if(!isAdminPage){addUtilityDock();updateBadge();applyManagedFooter();setupNotifications()}
+if(!isAdminPage){applyManagedFooter();setupNotifications()}
 window.UON_V20={favorites,toggleFavorite,contributions:()=>readJson(contributionKey,[]),reportClientError};
