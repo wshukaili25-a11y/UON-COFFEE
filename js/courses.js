@@ -1,4 +1,4 @@
-import {$,get,esc,enforceUonMaintenance,watchUonMaintenance,trackEvent,debounce,installErrorCapture} from './core.js?v=32.1.0';
+import {$,get,esc,enforceUonMaintenance,watchUonMaintenance,trackEvent,debounce,installErrorCapture} from './core.js?v=32.2.0';
 
 await enforceUonMaintenance();
 watchUonMaintenance();
@@ -9,9 +9,11 @@ const text=value=>String(value??'').trim();
 const normalize=value=>text(value).toLowerCase();
 const nameAr=row=>text(row?.name_ar||row?.name_en||row?.name);
 const nameEn=row=>text(row?.name_en||row?.name_ar||row?.name);
+const programLabel=row=>text(row?.degree_ar)?`${nameAr(row)} — ${text(row.degree_ar)}`:nameAr(row);
+const requirementLabels={university:'متطلب جامعة',college:'متطلب كلية',major:'متطلب تخصص',elective:'اختياري',service:'مقرر خدمة'};
 const byOrder=(a,b)=>(Number(a.sort_order)||999)-(Number(b.sort_order)||999)||nameAr(a).localeCompare(nameAr(b),'ar');
 
-function optionList(rows,label){return `<option value="">${esc(label)}</option>`+rows.map(row=>`<option value="${esc(row.id)}">${esc(nameAr(row))}</option>`).join('')}
+function optionList(rows,label){return `<option value="">${esc(label)}</option>`+rows.map(row=>`<option value="${esc(row.id)}">${esc(programLabel(row))}</option>`).join('')}
 async function read(table,query){const rows=await get(table,query);return Array.isArray(rows)?rows:[]}
 function selectedCollege(){return state.colleges.find(row=>row.id===state.collegeId)}
 function selectedDepartment(){return state.departments.find(row=>row.id===state.departmentId)}
@@ -54,7 +56,7 @@ function visibleCourses(){
  const query=normalize(state.search),linked=linkedCourseCodes(),academicFilter=Boolean(state.collegeId||state.departmentId||state.programId);
  return state.courses.filter(course=>{
   const code=text(course.code).toUpperCase();
-  const searchMatch=!query||normalize([code,course.name_ar,course.name_en,course.description].join(' ')).includes(query);
+  const searchMatch=!query||normalize([code,course.name_ar,course.name_en,course.description,requirementLabels[course.requirement_type]].join(' ')).includes(query);
   const academicMatch=!academicFilter||Boolean(linked?.has(code))||(!state.programId&&directAcademicMatch(course));
   return searchMatch&&academicMatch;
  }).sort((a,b)=>state.sort==='name'?nameAr(a).localeCompare(nameAr(b),'ar'):state.sort==='hours'?Number(b.credit_hours||0)-Number(a.credit_hours||0):text(a.code).localeCompare(text(b.code),'en'));
@@ -66,7 +68,7 @@ function render(){
  const context=[];
  if(selectedCollege())context.push(nameAr(selectedCollege()));
  if(selectedDepartment())context.push(nameAr(selectedDepartment()));
- if(selectedProgram())context.push(nameAr(selectedProgram()));
+ if(selectedProgram())context.push(programLabel(selectedProgram()));
  if(academicFilter&&linked?.size===0)context.push('لا توجد مقررات مربوطة بهذا الاختيار حتى الآن');
  $('#courseHint').textContent=context.length?` · ${context.join(' — ')}`:'';
  const catalog=$('#courseCards');
@@ -74,8 +76,8 @@ function render(){
  $('#gridView').classList.toggle('active',state.view==='grid');
  $('#listView').classList.toggle('active',state.view==='list');
  catalog.innerHTML=rows.length?rows.map(course=>{
-  const code=text(course.code).toUpperCase(),title=nameAr(course)||nameEn(course)||code,subtitle=nameEn(course)!==title?nameEn(course):'';
-  return `<article class="v31-course-card"><a href="course.html?code=${encodeURIComponent(code)}"><div class="v31-course-card-head"><span class="v31-course-code">${esc(code)}</span><span class="v31-course-hours">${esc(course.credit_hours||'—')} ساعات</span></div><h2>${esc(title)}</h2>${subtitle?`<p>${esc(subtitle)}</p>`:''}</a><footer><a class="btn primary" href="course.html?code=${encodeURIComponent(code)}">فتح المقرر</a></footer></article>`;
+  const code=text(course.code).toUpperCase(),title=nameAr(course)||nameEn(course)||code,subtitle=nameEn(course)!==title?nameEn(course):'',type=requirementLabels[course.requirement_type]||'';
+  return `<article class="v31-course-card"><a href="course.html?code=${encodeURIComponent(code)}"><div class="v31-course-card-head"><span class="v31-course-code">${esc(code)}</span><span class="v31-course-hours">${esc(course.credit_hours||'—')} ساعات</span></div>${type?`<span class="v31-course-college">${esc(type)}</span>`:''}<h2>${esc(title)}</h2>${subtitle?`<p>${esc(subtitle)}</p>`:''}</a><footer><a class="btn primary" href="course.html?code=${encodeURIComponent(code)}">فتح المقرر</a></footer></article>`;
  }).join(''):`<div class="course-empty"><strong>ما حصلنا مقررات مطابقة</strong><span>${academicFilter?'ما تم ربط مقررات بهذا الاختيار حتى الآن.':'غيّر البحث أو الفلاتر وجرب مرة ثانية.'}</span></div>`;
 }
 
