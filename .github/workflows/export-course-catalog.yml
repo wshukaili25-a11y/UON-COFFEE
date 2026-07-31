@@ -1,0 +1,35 @@
+name: Export Course Catalog
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'scripts/export-course-catalog.mjs'
+      - '.github/workflows/export-course-catalog.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  export:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Export public catalog
+        run: node scripts/export-course-catalog.mjs
+      - name: Commit snapshot
+        run: |
+          if git diff --quiet -- data/course-catalog-v32.json; then
+            echo "Snapshot is unchanged"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/course-catalog-v32.json
+          git commit -m "Update verified course catalog snapshot"
+          git push
