@@ -195,6 +195,10 @@ const pendingConfigs:any={
   title:'الاقتراحات',status:'status',pending:'pending',approve:'reviewed',reject:'rejected',
   fields:['category','title','details','college','contact','created_at']
  },
+ content_reports:{
+  title:'بلاغات المحتوى',status:'status',pending:'pending',approve:'resolved',reject:'rejected',
+  fields:['reason','content_title','details','page_url','page_title']
+ },
  broken_link_reports:{
   title:'بلاغات الروابط',status:'status',pending:'pending',approve:'reviewed',reject:'rejected',
   fields:['source_table','source_title','source_url','reason','created_at'],
@@ -205,7 +209,7 @@ const pendingConfigs:any={
 // Telegram callback_data is limited to 64 bytes. Compact aliases prevent UUID buttons from silently failing.
 const pendingTableAliases:Record<string,string>={
  s:'summaries',g:'whatsapp_groups',r:'rating_submissions',c:'confessions',
- p:'student_projects',q:'course_requests',f:'feature_suggestions',b:'broken_link_reports'
+ p:'student_projects',q:'course_requests',f:'feature_suggestions',b:'broken_link_reports',x:'content_reports'
 };
 const pendingTableCodes=Object.fromEntries(Object.entries(pendingTableAliases).map(([code,table])=>[table,code]));
 const pendingCode=(table:string)=>pendingTableCodes[table]||table;
@@ -487,6 +491,7 @@ const manageEditableFields:Record<string,string[]>={
  confessions:['text','content'],
  student_projects:['title','major','owner_name','description','url'],
  feature_suggestions:['category','title','details','college','contact'],
+ content_reports:['reason','content_title','details','page_url','page_title'],
  broken_link_reports:['source_title','source_url','reason'],
  course_requests:['request_type','code','name_ar','name_en','college','department','description'],
  tools_items:['title_ar','title_en','description_ar','description_en','url','icon','sort_order'],

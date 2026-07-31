@@ -1,23 +1,10 @@
-
-import {get,$,esc,enforceUonMaintenance,watchUonMaintenance,trackEvent} from './core.js';
+import {get,$,esc,enforceUonMaintenance,watchUonMaintenance,trackEvent,toast} from './core.js';
 await enforceUonMaintenance();watchUonMaintenance();
-let rows=[];
-const labels={registration:'التسجيل',study:'الدراسة',exam:'الاختبارات',holiday:'إجازة',other:'موعد'};
-async function load(){
- rows=await get('academic_calendar_events','select=*&active=eq.true&order=start_date.asc').catch(()=>[]);
- await loadOfficialCalendar();render();trackEvent('page_view',{page:'calendar'});
-}
-async function loadOfficialCalendar(){
- let url='https://www.unizwa.edu.om/index.php?contentid=1071&lang=ar';
- try{const r=await get('site_settings','select=value&key=eq.official_calendar_url&limit=1');if(r[0]?.value)url=r[0].value}catch{}
- const card=$('#officialCalendarCard');if(card)card.innerHTML=`<div class="section-head"><div><span class="badge">المصدر الرسمي</span><h3>التقويم الأكاديمي لجامعة نزوى</h3><p>راجع النسخة الرسمية المحدثة للعام الأكاديمي الحالي.</p></div><a class="btn primary" target="_blank" rel="noopener" href="${esc(url)}">فتح التقويم الرسمي ↗</a></div>`;
-}
-function render(){
- const type=$('#calendarType').value;
- const list=rows.filter(x=>!type||x.event_type===type);
- $('#calendarList').innerHTML=list.length?list.map(x=>`<article class="timeline-item card">
- <div class="timeline-date"><strong>${new Date(x.start_date).toLocaleDateString('ar',{day:'numeric',month:'short'})}</strong><small>${x.end_date&&x.end_date!==x.start_date?'إلى '+new Date(x.end_date).toLocaleDateString('ar',{day:'numeric',month:'short'}):''}</small></div>
- <div><span class="badge">${esc(labels[x.event_type]||'موعد')}</span><h3>${esc(x.title)}</h3><p>${esc(x.description||'')}</p></div>
- </article>`).join(''):'<div class="empty">لا توجد مواعيد محلية مضافة. استخدم رابط التقويم الرسمي أعلاه.</div>';
-}
-$('#calendarType').onchange=render;load();
+let rows=[];const labels={registration:'التسجيل',study:'الدراسة',exam:'الاختبارات',holiday:'إجازة',other:'موعد'};
+async function load(){rows=await get('academic_calendar_events','select=*&active=eq.true&order=start_date.asc').catch(()=>[]);await loadOfficialCalendar();render();trackEvent('page_view',{page:'calendar'})}
+async function loadOfficialCalendar(){let url='https://www.unizwa.edu.om/index.php?contentid=1071&lang=ar';try{const r=await get('site_settings','select=value&key=eq.official_calendar_url&limit=1');if(r[0]?.value)url=r[0].value}catch{}const card=$('#officialCalendarCard');if(card)card.innerHTML=`<div class="section-head"><div><span class="badge">المصدر الرسمي</span><h3>التقويم الأكاديمي لجامعة نزوى</h3><p>راجع النسخة الرسمية المحدثة للعام الأكاديمي الحالي.</p></div><a class="btn primary" target="_blank" rel="noopener" href="${esc(url)}">فتح التقويم الرسمي ↗</a></div>`}
+function dateValue(v){const d=new Date(v);return Number.isNaN(d.getTime())?null:d}
+function icsDate(v){const d=dateValue(v)||new Date();return d.toISOString().replace(/[-:]/g,'').replace(/\.\d{3}/,'')}
+function downloadEvent(row){const start=icsDate(row.start_date),end=icsDate(row.end_date||row.start_date);const content=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//UON Hub//AR','BEGIN:VEVENT',`UID:${row.id||crypto.randomUUID()}@uonhub.space`,`DTSTAMP:${icsDate(new Date())}`,`DTSTART:${start}`,`DTEND:${end}`,`SUMMARY:${String(row.title||'موعد أكاديمي').replace(/\n/g,' ')}`,`DESCRIPTION:${String(row.description||'').replace(/\n/g,' ')}`,'END:VEVENT','END:VCALENDAR'].join('\r\n');const blob=new Blob([content],{type:'text/calendar;charset=utf-8'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`uon-event-${String(row.start_date||'date').slice(0,10)}.ics`;a.click();URL.revokeObjectURL(a.href);toast('تم تجهيز الموعد للتقويم')}
+function render(){const type=$('#calendarType')?.value||'';const period=$('#calendarPeriod')?.value||'upcoming';const q=($('#calendarSearch')?.value||'').toLowerCase().trim();const today=new Date();today.setHours(0,0,0,0);const list=rows.filter(x=>{const d=dateValue(x.end_date||x.start_date);const upcoming=d?d>=today:true;const periodOk=period==='all'||(period==='upcoming'&&upcoming)||(period==='past'&&!upcoming);const text=`${x.title||''} ${x.description||''}`.toLowerCase();return (!type||x.event_type===type)&&periodOk&&(!q||text.includes(q))});$('#calendarList').innerHTML=list.length?list.map((x,i)=>`<article class="timeline-item card"><div class="timeline-date"><strong>${dateValue(x.start_date)?.toLocaleDateString('ar',{day:'numeric',month:'short'})||'—'}</strong><small>${x.end_date&&x.end_date!==x.start_date?'إلى '+dateValue(x.end_date)?.toLocaleDateString('ar',{day:'numeric',month:'short'}):''}</small></div><div><span class="badge">${esc(labels[x.event_type]||'موعد')}</span><h3>${esc(x.title)}</h3><p>${esc(x.description||'')}</p><button class="btn calendar-add" data-index="${i}">إضافة للتقويم</button></div></article>`).join(''):'<div class="empty">لا توجد مواعيد مطابقة.</div>';document.querySelectorAll('.calendar-add').forEach((b,i)=>b.onclick=()=>downloadEvent(list[Number(b.dataset.index)||i]))}
+['calendarType','calendarPeriod'].forEach(id=>$('#'+id)?.addEventListener('change',render));$('#calendarSearch')?.addEventListener('input',render);load();
