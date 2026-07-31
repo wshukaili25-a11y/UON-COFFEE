@@ -1,4 +1,4 @@
-import {whatsappShare,reportBrokenLink,installErrorCapture,$,$$,get,esc,toast,enforceUonMaintenance,watchUonMaintenance,trackEvent} from './core.js?v=32.0.0';
+import {whatsappShare,reportBrokenLink,installErrorCapture,$,$$,get,esc,toast,enforceUonMaintenance,watchUonMaintenance,trackEvent} from './core.js?v=32.2.0';
 
 await enforceUonMaintenance();
 watchUonMaintenance();
@@ -8,8 +8,10 @@ const code=(new URLSearchParams(location.search).get('code')||'').trim().toUpper
 if(!code)location.replace('courses.html');
 
 let course=null,summaries=[],exams=[],groups=[],ratings=[],resources=[],prerequisites=[],programLinks=[],programs=[];
+const requirementLabels={university:'متطلب جامعة',college:'متطلب كلية',major:'متطلب تخصص',elective:'مقرر اختياري',service:'مقرر خدمة'};
 const empty=message=>`<div class="course-empty"><strong>${esc(message)}</strong><span>يُعرض المحتوى بعد اعتماده من المشرف.</span></div>`;
 const optionalGet=async(table,query)=>{try{const rows=await get(table,query);return Array.isArray(rows)?rows:[]}catch(error){console.warn(`[course] ${table}`,error);return[]}};
+const programLabel=program=>[program?.name_ar||program?.name_en,program?.degree_ar||program?.degree_en].filter(Boolean).join(' — ');
 
 function resourceCard(item,type,table){
  const title=item.title||item.subject||item.target_name||'محتوى';
@@ -35,17 +37,19 @@ function bind(){
 function render(){
  const title=course.name_ar||course.name_en||course.code;
  const english=course.name_en&&course.name_en!==title?course.name_en:'';
- const linkedPrograms=programLinks.map(link=>programs.find(program=>program.id===link.program_id)).filter(Boolean);
+ const linkedDetails=programLinks.map(link=>({link,program:programs.find(program=>program.id===link.program_id)})).filter(item=>item.program);
+ const linkedPrograms=linkedDetails.map(item=>item.program);
+ const courseType=requirementLabels[course.requirement_type]||'';
  document.title=`${course.code} — ${title} | UON Hub`;
  $('#courseTitle').textContent=`${course.code} — ${title}`;
- $('#courseCollege').textContent=linkedPrograms[0]?.college_name_ar||course.college_ar||course.college||'مقرر جامعي';
- $('#courseMeta').innerHTML=[english,course.credit_hours?`${course.credit_hours} ساعات معتمدة`:null,course.level?`المستوى ${course.level}`:null,linkedPrograms.length?`${linkedPrograms.length} تخصص مرتبط`:null].filter(Boolean).map(value=>`<span>${esc(value)}</span>`).join('');
+ $('#courseCollege').textContent=course.college_ar||course.college||linkedPrograms[0]?.college_name_ar||'مقرر جامعي';
+ $('#courseMeta').innerHTML=[english,course.credit_hours?`${course.credit_hours} ساعات معتمدة`:null,course.level?`المستوى ${course.level}`:null,courseType,linkedPrograms.length?`${linkedPrograms.length} برنامج مرتبط`:course.requirement_type==='service'?'بدون ربط بخطة محددة':null].filter(Boolean).map(value=>`<span>${esc(value)}</span>`).join('');
  $('#courseShare').href=whatsappShare(`${course.code} — ${title}`,location.href);
  $('#tabSummaryCount').textContent=summaries.length?`(${summaries.length})`:'';
  $('#tabExamCount').textContent=exams.length?`(${exams.length})`:'';
  $('#courseStats').innerHTML=[['الملخصات',summaries.length],['الاختبارات',exams.length],['المجموعات',groups.length],['التقييمات',ratings.length],['المصادر',resources.length]].map(([label,value])=>`<div><strong>${Number(value).toLocaleString('ar')}</strong><span>${label}</span></div>`).join('');
  $('#coursePrerequisites').innerHTML=prerequisites.length?prerequisites.map(item=>`<a href="course.html?code=${encodeURIComponent(item.prerequisite_code)}">${esc(item.prerequisite_code)}</a>`).join(''):'<span>لا توجد متطلبات مسجلة</span>';
- const programsHtml=linkedPrograms.length?`<article class="course-panel-card"><h3>التخصصات المرتبطة</h3><div class="course-prereq-list">${linkedPrograms.map(program=>`<span>${esc(program.name_ar||program.name_en)}</span>`).join('')}</div></article>`:'';
+ const programsHtml=linkedDetails.length?`<article class="course-panel-card"><h3>البرامج المرتبطة</h3><div class="course-prereq-list">${linkedDetails.map(({program,link})=>`<span>${esc(programLabel(program))} • ${esc(requirementLabels[link.requirement_type]||link.requirement_type||'مقرر')}</span>`).join('')}</div></article>`:course.requirement_type==='service'?`<article class="course-panel-card"><h3>تصنيف المقرر</h3><p>هذا مقرر خدمة يُطرح لطلاب من برامج مختلفة، ولم يُربط بخطة واحدة محددة.</p></article>`:'';
  $('#courseOverview').innerHTML=`<article class="course-panel-card"><h2>عن المقرر</h2><p>${esc(course.description||'لم تتم إضافة وصف لهذا المقرر بعد.')}</p>${course.learning_outcomes?`<h3>مخرجات التعلم</h3><p>${esc(course.learning_outcomes)}</p>`:''}</article>${programsHtml}<article class="course-panel-card"><h3>الوصول السريع</h3><div class="course-prereq-list"><button class="btn" data-open-tab="summaries">📚 الملخصات</button><button class="btn" data-open-tab="exams">📝 الاختبارات</button><button class="btn" data-open-tab="groups">💬 المجموعات</button><button class="btn" data-open-tab="ratings">⭐ التقييمات</button></div></article>`;
  $('#courseSummaries').innerHTML=summaries.length?summaries.map(item=>resourceCard(item,'ملخص','summaries')).join(''):empty('لا توجد ملخصات معتمدة بعد');
  $('#courseExams').innerHTML=exams.length?exams.map(item=>resourceCard(item,'اختبار سابق','summaries')).join(''):empty('لا توجد اختبارات معتمدة بعد');
@@ -67,7 +71,7 @@ async function load(){
    optionalGet('course_resources',`select=*&course_code=eq.${encodeURIComponent(code)}&active=eq.true&order=sort_order.asc`),
    optionalGet('course_prerequisites',`select=prerequisite_code&course_code=eq.${encodeURIComponent(code)}`),
    optionalGet('course_programs',`select=program_id,requirement_type,semester_no&course_code=eq.${encodeURIComponent(code)}`),
-   optionalGet('academic_programs','select=id,name_ar,name_en,college_id,department_id&active=eq.true')
+   optionalGet('academic_programs','select=id,name_ar,name_en,degree_ar,degree_en,college_id,department_id&active=eq.true')
   ]);
   [summaries,groups,ratings,resources,prerequisites,programLinks,programs]=results;
   exams=summaries.filter(item=>item.content_type==='exam'||item.resource_type==='exam'||/exam|اختبار|فاينل|ميد/i.test(`${item.title||''} ${item.subject||''}`));
