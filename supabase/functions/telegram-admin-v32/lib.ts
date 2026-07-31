@@ -14,7 +14,7 @@ export type Admin={id:string;chat_id:string;name:string;role:string;permissions:
 export type Conversation={chat_id:string;state:string;data:any};
 export type Choice={mode:'create'|'edit';course_id?:string;page?:number;code?:string;name_ar?:string;name_en?:string|null;college_id?:string;college_ar?:string;college_en?:string;department_id?:string;department_ar?:string;department_en?:string;program_ids?:string[];requirement_type?:string};
 
-export const requirements:Record<string,string>={university:'متطلب جامعة',college:'متطلب كلية',major:'متطلب تخصص',elective:'اختياري'};
+export const requirements:Record<string,string>={university:'متطلب جامعة',college:'متطلب كلية',major:'متطلب تخصص',elective:'اختياري',service:'مقرر خدمة'};
 export const json=(body:any,status=200)=>new Response(JSON.stringify(body),{status,headers:{'content-type':'application/json; charset=utf-8'}});
 
 export async function telegram(method:string,body:any){
