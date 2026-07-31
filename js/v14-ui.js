@@ -31,6 +31,67 @@ const currentTheme=()=>localStorage.getItem('uon_theme')||'dark';
 const activePage=()=>pageMap[location.pathname]||'';
 const tr=key=>dictionary[currentLanguage()]?.[key]||key;
 
+
+const FEATURE_STATE_URL='https://irkhvydgxpseflggbeqq.supabase.co/rest/v1/rpc/uon_public_state';
+const FEATURE_STATE_KEY='sb_publishable_gZ9tyM1udrkuQIXHqDtToQ_FyFmePgH';
+let featureStatePromise=null;
+let featureStateMap={};
+const featureByPage={
+ 'courses.html':'courses','course.html':'courses','summaries.html':'summaries','groups.html':'groups',
+ 'ratings.html':'ratings','university-guide.html':'university_guide','tools.html':'tools','gpa.html':'gpa',
+ 'schedule.html':'schedule','calendar.html':'calendar','projects.html':'projects','useful-sites.html':'useful_sites',
+ 'assistant.html':'assistant','feedback.html':'feedback','confessions.html':'confessions'
+};
+
+async function loadFeatureState(){
+ if(featureStatePromise)return featureStatePromise;
+ featureStatePromise=fetch(FEATURE_STATE_URL,{method:'POST',headers:{apikey:FEATURE_STATE_KEY,'Content-Type':'application/json'},body:'{}',cache:'no-store'})
+  .then(async r=>{if(!r.ok)throw new Error(`feature state ${r.status}`);return r.json()})
+  .then(state=>{featureStateMap=state?.features||{};return state})
+  .catch(error=>{featureStatePromise=null;console.warn('Feature guard state failed',error);return null});
+ return featureStatePromise;
+}
+
+function targetFeature(link){
+ if(link?.dataset?.feature)return link.dataset.feature;
+ try{return featureByPage[new URL(link.href,location.href).pathname.split('/').pop()]||''}catch{return ''}
+}
+
+function installFeatureNavigationGuard(){
+ if(document.documentElement.dataset.featureGuardInstalled==='1')return;
+ document.documentElement.dataset.featureGuardInstalled='1';
+ document.addEventListener('click',async event=>{
+  const link=event.target.closest('a[href]');
+  if(!link||link.target==='_blank'||event.ctrlKey||event.metaKey||event.shiftKey||event.altKey)return;
+  const feature=targetFeature(link);if(!feature)return;
+  event.preventDefault();event.stopImmediatePropagation();
+  if(!featureStateMap[feature])await loadFeatureState();
+  const status=featureStateMap[feature]||'active';
+  if(status!=='active'){
+   showFeatureStateBanner(status,link.textContent?.trim()||'');
+   return;
+  }
+  location.href=link.href;
+ },true);
+
+ loadFeatureState().then(()=>{
+  document.querySelectorAll('a[href]').forEach(link=>{
+   const feature=targetFeature(link);if(!feature)return;
+   const status=featureStateMap[feature]||'active';
+   link.dataset.status=status;
+   link.classList.toggle('feature-unavailable',status!=='active');
+   if(status!=='active')link.setAttribute('aria-disabled','true');else link.removeAttribute('aria-disabled');
+  });
+  const page=location.pathname.split('/').pop()||'index.html';
+  const feature=featureByPage[page];
+  const status=feature?featureStateMap[feature]:'active';
+  if(feature&&status&&status!=='active'&&page!=='coming-soon.html'){
+   const q=new URLSearchParams({feature,status});
+   location.replace(`coming-soon.html?${q}`);
+  }
+ });
+}
+
 const featureKeys={
  courses:'courses',summaries:'summaries',groups:'groups',ratings:'ratings',guide:'university_guide',
  tools:'tools',gpa:'gpa',schedule:'schedule',calendar:'calendar',projects:'projects',
@@ -71,6 +132,7 @@ export function setupV14Shell(){
  document.body.classList.add('v176-app');
  applyTheme();
  applyLanguage();
+ installFeatureNavigationGuard();
 
  const header=document.querySelector('.site-header');
  if(header){

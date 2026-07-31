@@ -596,6 +596,7 @@ async function coursesMenu(chatId:string,mid:number){
  const {count:pending}=await db.from('course_requests').select('id',{count:'exact',head:true}).eq('status','pending');
  await edit(chatId,mid,`مركز المقررات\nالمواد: ${count||0}\nالطلبات المعلقة: ${pending||0}`,[
   [{text:'➕ إضافة مادة',callback_data:'course:add:start'}],
+  [{text:'🔄 مزامنة الخطط الرسمية',callback_data:'course:sync:official'}],
   [{text:'📚 عرض وإدارة المواد',callback_data:'course:list:0'}],
   [{text:'🕓 طلبات المقررات',callback_data:pendingCb('l','course_requests',0)}],
   [{text:'⚙️ حالة مركز المقررات',callback_data:'service:view:courses'}],
@@ -626,8 +627,11 @@ async function courseView(chatId:string,mid:number,id:string,page=0){
 القسم: ${data.department||'—'}
 الساعات: ${data.credit_hours||'—'}
 الحالة: ${data.active?'نشطة':'متوقفة'}`,[
-  [{text:'✏️ تعديل الاسم',callback_data:`c:e:${id}:n:${page}`},{text:'🏷 تعديل الرمز',callback_data:`c:e:${id}:c:${page}`}],
-  [{text:'🏫 تعديل الكلية',callback_data:`c:e:${id}:g:${page}`},{text:'⏱ تعديل الساعات',callback_data:`c:e:${id}:h:${page}`}],
+  [{text:'✏️ الاسم العربي',callback_data:`c:e:${id}:n:${page}`},{text:'🌐 الاسم الإنجليزي',callback_data:`c:e:${id}:e:${page}`}],
+  [{text:'🏷 تعديل الرمز',callback_data:`c:e:${id}:c:${page}`},{text:'🏫 تعديل الكلية',callback_data:`c:e:${id}:g:${page}`}],
+  [{text:'🏫 تعديل الكلية',callback_data:`c:e:${id}:g:${page}`},{text:'🏢 تعديل القسم',callback_data:`c:e:${id}:d:${page}`}],
+  [{text:'🇬🇧 الاسم الإنجليزي',callback_data:`c:e:${id}:e:${page}`},{text:'⏱ تعديل الساعات',callback_data:`c:e:${id}:h:${page}`}],
+  [{text:'📶 المستوى',callback_data:`c:e:${id}:l:${page}`},{text:'📝 الوصف',callback_data:`c:e:${id}:x:${page}`}],
   [{text:data.active?'🔴 إيقاف المادة':'🟢 تفعيل المادة',callback_data:`course:toggle:${id}:${data.active?'off':'on'}:${page}`}],
   [{text:'🗑 حذف المادة',callback_data:`course:deleteask:${id}:${page}`}],
   [{text:'⬅️ المواد',callback_data:`course:list:${page}`}]
@@ -1024,7 +1028,12 @@ async function handleConversation(chatId:string,admin:any,text:string,conv:any){
   return true;
  }
  if(state==='course_add_college'){
-  await setConversation(chatId,'course_add_hours',{...data,college:text});
+  await setConversation(chatId,'course_add_department',{...data,college:text});
+  await send(chatId,'أرسل اسم القسم، أو اكتب - للتخطي');
+  return true;
+ }
+ if(state==='course_add_department'){
+  await setConversation(chatId,'course_add_hours',{...data,department:text==='-'?null:text});
   await send(chatId,'أرسل عدد الساعات، أو 0 إذا غير معروف');
   return true;
  }
@@ -1041,7 +1050,7 @@ async function handleConversation(chatId:string,admin:any,text:string,conv:any){
  }
 
  if(state==='course_edit_value'){
-  const value=data.field==='credit_hours'?Number(text)||null:data.field==='code'?text.toUpperCase().replace(/\s+/g,''):text;
+  const value=['credit_hours','level'].includes(data.field)?Number(text)||null:data.field==='code'?text.toUpperCase().replace(/\s+/g,''):text==='-'?null:text;
   const {error}=await db.from('courses').update({[data.field]:value,updated_at:new Date().toISOString()}).eq('id',data.id);
   if(error)throw error;
   await clearConversation(chatId);
@@ -1413,6 +1422,12 @@ Deno.serve(async (req:Request)=>{
      await setConversation(chatId,'course_add_code',{});
      await edit(chatId,mid,'أرسل رمز المادة مثل STAT101',[[{text:'⬅️ إلغاء',callback_data:'courses:menu'}]]);
     }
+    else if(data==='course:sync:official'){
+     if(!isOwner(admin))throw new Error('مزامنة الخطط للمالك فقط');
+     const result=await fetch(`${SUPABASE_URL}/functions/v1/sync-study-plans`,{method:'POST',headers:{Authorization:`Bearer ${KEY}`,'content-type':'application/json'},body:JSON.stringify({source:'telegram',requested_by:chatId})});
+     const payload=await result.json().catch(()=>({}));if(!result.ok)throw new Error(payload.error||'فشلت المزامنة');
+     audit(admin,'courses_official_sync','courses','',payload);await edit(chatId,mid,`تمت المزامنة ✅\nالمقررات الجديدة: ${payload.inserted||0}\nالمحدثة: ${payload.updated||0}\nالمكررة المتجاهلة: ${payload.duplicates||0}`,[[{text:'⬅️ مركز المقررات',callback_data:'courses:menu'}]]);
+    }
     else if(data.startsWith('course:list:'))await courseList(chatId,mid,Number(data.split(':')[2])||0);
     else if(data.startsWith('course:view:')){
      const [, ,id,page]=data.split(':');
@@ -1421,7 +1436,7 @@ Deno.serve(async (req:Request)=>{
     else if(data.startsWith('c:e:')){
      if(!can(admin,'courses'))throw new Error('ليس لديك صلاحية إدارة المقررات');
      const [, ,id,fieldCode,page]=data.split(':');
-     const fieldMap:any={n:'name_ar',c:'code',g:'college',h:'credit_hours'};
+     const fieldMap:any={n:'name_ar',c:'code',g:'college',d:'department',e:'name_en',h:'credit_hours',l:'level',x:'description'};
      const field=fieldMap[fieldCode];
      if(!field)throw new Error('حقل التعديل غير معروف');
      await setConversation(chatId,'course_edit_value',{id,field,page});
