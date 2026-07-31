@@ -1,4 +1,4 @@
-import {whatsappShare,reportBrokenLink,installErrorCapture,$,$$,get,esc,toast,enforceUonMaintenance,watchUonMaintenance,trackEvent} from './core.js?v=32.2.0';
+import {whatsappShare,reportBrokenLink,installErrorCapture,$,$$,get,esc,toast,enforceUonMaintenance,watchUonMaintenance,trackEvent} from './core.js?v=32.4.0';
 
 await enforceUonMaintenance();
 watchUonMaintenance();
@@ -8,7 +8,7 @@ const code=(new URLSearchParams(location.search).get('code')||'').trim().toUpper
 if(!code)location.replace('courses.html');
 
 let course=null,summaries=[],exams=[],groups=[],ratings=[],resources=[],prerequisites=[],programLinks=[],programs=[];
-const requirementLabels={university:'متطلب جامعة',college:'متطلب كلية',major:'متطلب تخصص',elective:'مقرر اختياري',service:'مقرر خدمة'};
+const requirementLabels={university:'متطلب جامعة',college:'متطلب كلية',major:'متطلب تخصص',elective:'مقرر اختياري',service:'مقرر خدمة',multiple:'يختلف حسب البرنامج'};
 const empty=message=>`<div class="course-empty"><strong>${esc(message)}</strong><span>يُعرض المحتوى بعد اعتماده من المشرف.</span></div>`;
 const optionalGet=async(table,query)=>{try{const rows=await get(table,query);return Array.isArray(rows)?rows:[]}catch(error){console.warn(`[course] ${table}`,error);return[]}};
 const programLabel=program=>[program?.name_ar||program?.name_en,program?.degree_ar||program?.degree_en].filter(Boolean).join(' — ');
@@ -39,7 +39,8 @@ function render(){
  const english=course.name_en&&course.name_en!==title?course.name_en:'';
  const linkedDetails=programLinks.map(link=>({link,program:programs.find(program=>program.id===link.program_id)})).filter(item=>item.program);
  const linkedPrograms=linkedDetails.map(item=>item.program);
- const courseType=requirementLabels[course.requirement_type]||'';
+ const linkedTypes=new Set(linkedDetails.map(item=>item.link.requirement_type).filter(Boolean));
+ const courseType=requirementLabels[linkedTypes.size>1?'multiple':linkedTypes.size===1?[...linkedTypes][0]:course.requirement_type]||'';
  document.title=`${course.code} — ${title} | UON Hub`;
  $('#courseTitle').textContent=`${course.code} — ${title}`;
  $('#courseCollege').textContent=course.college_ar||course.college||linkedPrograms[0]?.college_name_ar||'مقرر جامعي';
