@@ -1,4 +1,4 @@
-import {whatsappShare,reportBrokenLink,installErrorCapture,$,$$,get,esc,toast,enforceUonMaintenance,watchUonMaintenance,trackEvent} from './core.js?v=32.4.0';
+import {whatsappShare,reportBrokenLink,installErrorCapture,$,$$,get,esc,toast,enforceUonMaintenance,watchUonMaintenance,trackEvent} from './core.js?v=32.4.1';
 
 await enforceUonMaintenance();
 watchUonMaintenance();
@@ -41,10 +41,11 @@ function render(){
  const linkedPrograms=linkedDetails.map(item=>item.program);
  const linkedTypes=new Set(linkedDetails.map(item=>item.link.requirement_type).filter(Boolean));
  const courseType=requirementLabels[linkedTypes.size>1?'multiple':linkedTypes.size===1?[...linkedTypes][0]:course.requirement_type]||'';
+ const hasCreditHours=course.credit_hours!==null&&course.credit_hours!==undefined&&course.credit_hours!=='';
  document.title=`${course.code} — ${title} | UON Hub`;
  $('#courseTitle').textContent=`${course.code} — ${title}`;
  $('#courseCollege').textContent=course.college_ar||course.college||linkedPrograms[0]?.college_name_ar||'مقرر جامعي';
- $('#courseMeta').innerHTML=[english,course.credit_hours?`${course.credit_hours} ساعات معتمدة`:null,course.level?`المستوى ${course.level}`:null,courseType,linkedPrograms.length?`${linkedPrograms.length} برنامج مرتبط`:course.requirement_type==='service'?'بدون ربط بخطة محددة':null].filter(Boolean).map(value=>`<span>${esc(value)}</span>`).join('');
+ $('#courseMeta').innerHTML=[english,hasCreditHours?`${course.credit_hours} ساعات معتمدة`:null,course.level?`المستوى ${course.level}`:null,courseType,linkedPrograms.length?`${linkedPrograms.length} برنامج مرتبط`:course.requirement_type==='service'?'بدون ربط بخطة محددة':null].filter(Boolean).map(value=>`<span>${esc(value)}</span>`).join('');
  $('#courseShare').href=whatsappShare(`${course.code} — ${title}`,location.href);
  $('#tabSummaryCount').textContent=summaries.length?`(${summaries.length})`:'';
  $('#tabExamCount').textContent=exams.length?`(${exams.length})`:'';
