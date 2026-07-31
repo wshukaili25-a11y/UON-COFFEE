@@ -21,7 +21,9 @@ function addMessage(role,content,links=[],meta={}){
   const evidence=document.createElement('div');
   evidence.className='assistant-source-note';
   const confidence=Math.round(Number(meta.confidence||0)*100);
-  evidence.textContent=`إجابة من قاعدة معرفة UON AI${confidence?` • الثقة ${confidence}%`:''}${meta.sources_count!=null?` • ${meta.sources_count} نتيجة مطابقة`:''}`;
+  const totalMs=Number(meta?.timing?.total_ms||0);
+  const timing=totalMs?` • ${(totalMs/1000).toFixed(totalMs<1000?2:1)} ث`:'';
+  evidence.textContent=`إجابة من قاعدة معرفة UON AI${confidence?` • الثقة ${confidence}%`:''}${meta.sources_count!=null?` • ${meta.sources_count} نتيجة مطابقة`:''}${timing}`;
   article.appendChild(evidence);
  }
  if(Array.isArray(links)&&links.length){
@@ -62,9 +64,9 @@ async function ask(question){
  const response=await fetch(`${SUPABASE_URL}/functions/v1/uon-ai`,{
   method:'POST',
   headers:{apikey:SUPABASE_KEY,Authorization:`Bearer ${SUPABASE_KEY}`,'Content-Type':'application/json'},
-  body:JSON.stringify({question,history:history.slice(-6)}),
+  body:JSON.stringify({question,history:history.slice(-4)}),
   cache:'no-store',
-  signal:AbortSignal.timeout(45000)
+  signal:AbortSignal.timeout(11000)
  });
  const raw=await response.text();
  let data={};try{data=raw?JSON.parse(raw):{}}catch{data={error:raw}}
@@ -80,7 +82,7 @@ async function submitQuestion(question){
  input.value='';
  const typing=addTyping();
  const original=submitButton?.textContent||'إرسال';
- if(submitButton){submitButton.disabled=true;submitButton.textContent='يبحث في بيانات الجامعة...'}
+ if(submitButton){submitButton.disabled=true;submitButton.textContent='جاري البحث...'}
  trackEvent('assistant_question',{query:question.slice(0,100)});
  try{
   const result=await ask(question);
@@ -91,7 +93,7 @@ async function submitQuestion(question){
   console.error(error);
   typing.remove();
   const timeout=/timeout|abort/i.test(String(error?.message||error));
-  addMessage('bot',timeout?'استغرق البحث وقتًا أطول من المتوقع. جرّب السؤال مرة ثانية بصياغة أقصر.':'تعذر الوصول إلى قاعدة معرفة UON AI الآن. جرّب مرة أخرى بعد قليل.');
+  addMessage('bot',timeout?'تأخر الاتصال أكثر من 11 ثانية. جرّب السؤال مرة ثانية بصياغة أقصر.':'تعذر الوصول إلى قاعدة معرفة UON AI الآن. جرّب مرة أخرى بعد قليل.');
  }finally{
   sending=false;
   if(submitButton){submitButton.disabled=false;submitButton.textContent=original}
@@ -126,7 +128,7 @@ async function initialize(){
  try{await enforceUonMaintenance()}catch{}
  try{watchUonMaintenance()}catch{}
  try{await applyFeatureStates(document)}catch{}
- try{trackEvent('page_view',{page:'assistant-v33'})}catch{}
+ try{trackEvent('page_view',{page:'assistant-v34-fast'})}catch{}
  loadOfficialQuickActions();
 }
 initialize();
