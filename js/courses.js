@@ -1,4 +1,4 @@
-import {$,get,esc,enforceUonMaintenance,watchUonMaintenance,trackEvent,debounce,installErrorCapture} from './core.js?v=32.4.0';
+import {$,get,esc,enforceUonMaintenance,watchUonMaintenance,trackEvent,debounce,installErrorCapture} from './core.js?v=32.4.1';
 
 await enforceUonMaintenance();
 watchUonMaintenance();
@@ -85,7 +85,7 @@ function render(){
  $('#listView').classList.toggle('active',state.view==='list');
  catalog.innerHTML=rows.length?rows.map(course=>{
   const code=text(course.code).toUpperCase(),title=nameAr(course)||nameEn(course)||code,subtitle=nameEn(course)!==title?nameEn(course):'',type=requirementLabels[requirementTypeFor(course)]||'';
-  return `<article class="v31-course-card"><a href="course.html?code=${encodeURIComponent(code)}"><div class="v31-course-card-head"><span class="v31-course-code">${esc(code)}</span><span class="v31-course-hours">${esc(course.credit_hours||'—')} ساعات</span></div>${type?`<span class="v31-course-college">${esc(type)}</span>`:''}<h2>${esc(title)}</h2>${subtitle?`<p>${esc(subtitle)}</p>`:''}</a><footer><a class="btn primary" href="course.html?code=${encodeURIComponent(code)}">فتح المقرر</a></footer></article>`;
+  return `<article class="v31-course-card"><a href="course.html?code=${encodeURIComponent(code)}"><div class="v31-course-card-head"><span class="v31-course-code">${esc(code)}</span><span class="v31-course-hours">${esc(course.credit_hours??'—')} ساعات</span></div>${type?`<span class="v31-course-college">${esc(type)}</span>`:''}<h2>${esc(title)}</h2>${subtitle?`<p>${esc(subtitle)}</p>`:''}</a><footer><a class="btn primary" href="course.html?code=${encodeURIComponent(code)}">فتح المقرر</a></footer></article>`;
  }).join(''):`<div class="course-empty"><strong>ما حصلنا مقررات مطابقة</strong><span>${academicFilter?'ما تم ربط مقررات بهذا الاختيار حتى الآن.':'غيّر البحث أو الفلاتر وجرب مرة ثانية.'}</span></div>`;
 }
 
