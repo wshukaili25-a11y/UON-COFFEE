@@ -1,4 +1,4 @@
-import {toast,esc} from './core.js?v=32.2.0';
+import {toast,esc} from './core.js?v=32.2.1';
 
 const $=selector=>document.querySelector(selector);
 const API='https://irkhvydgxpseflggbeqq.supabase.co/functions/v1/course-admin-api-v32';
@@ -9,6 +9,7 @@ const text=value=>String(value??'').trim();
 const norm=value=>text(value).toLowerCase();
 const codeOf=value=>text(value).toUpperCase();
 const byOrder=(a,b)=>(Number(a.sort_order)||999)-(Number(b.sort_order)||999)||text(a.name_ar).localeCompare(text(b.name_ar),'ar');
+const quarantineReasonLabel=reason=>({invalid_course_code:'رمز لا يطابق صيغة المقررات',corrupted_import_text:'نص تالف من ملف مستورد',invalid_imported_course:'بيانات استيراد غير صالحة'}[text(reason)]||text(reason)||'سجل غير صالح');
 
 async function api(action,payload={}){
  const response=await fetch(API,{
@@ -92,7 +93,7 @@ function refreshPrograms(){
 
 function renderMetrics(){
  const m=state.metrics||{};
- const cards=[['كل المقررات',m.total||0],['النشطة',m.active||0],['غير المرتبطة',m.unlinked||0],['السجلات المعزولة',m.quarantined||state.quarantine.length||0]];
+ const cards=[['كل المقررات',m.total||0],['النشطة',m.active||0],['المرتبطة',m.linked||0],['غير المرتبطة',m.unlinked||0],['السجلات المعزولة',m.quarantined||state.quarantine.length||0]];
  $('#courseAdminMetrics').innerHTML=cards.map(([label,value])=>`<div class="card"><small>${esc(label)}</small><strong style="display:block;font-size:1.7rem;margin-top:6px">${esc(value)}</strong></div>`).join('');
 }
 
@@ -123,7 +124,7 @@ function renderQuarantine(){
  $('#courseQuarantineCount').textContent=String(state.quarantine.length);
  $('#courseQuarantineList').innerHTML=state.quarantine.length?state.quarantine.map(item=>{
   const snapshot=item.snapshot||{};
-  return `<div class="list-item"><div><strong>${esc(item.course_code||snapshot.code||'بدون رمز')}</strong><small>${esc(item.reason||'سجل غير صالح')}</small><small>${esc(snapshot.name_ar||snapshot.name_en||'بيانات استيراد قديمة')} • ${esc(new Date(item.quarantined_at).toLocaleDateString('ar-OM'))}</small></div></div>`;
+  return `<div class="list-item"><div><strong>${esc(item.course_code||snapshot.code||'بدون رمز')}</strong><small>${esc(quarantineReasonLabel(item.reason))}</small><small>${esc(snapshot.name_ar||snapshot.name_en||'بيانات استيراد قديمة')} • ${esc(new Date(item.quarantined_at).toLocaleDateString('ar-OM'))}</small></div></div>`;
  }).join(''):'<div class="empty">لا توجد سجلات معزولة</div>';
 }
 
@@ -179,7 +180,7 @@ async function load(){
 }
 
 function parseCsv(value){
- const lines=value.replace(/^\uFEFF/,'').split(/\r?\n/).filter(line=>line.trim());if(lines.length<2)return[];
+ const lines=value.replace(/^﻿/,'').split(/\r?\n/).filter(line=>line.trim());if(lines.length<2)return[];
  const split=line=>{const out=[];let current='',quoted=false;for(let index=0;index<line.length;index++){const char=line[index];if(char==='"'){if(quoted&&line[index+1]==='"'){current+='"';index++;}else quoted=!quoted;}else if(char===','&&!quoted){out.push(current.trim());current='';}else current+=char;}out.push(current.trim());return out;};
  const headers=split(lines.shift()).map(item=>item.toLowerCase());return lines.map(line=>Object.fromEntries(split(line).map((item,index)=>[headers[index],item])));
 }
