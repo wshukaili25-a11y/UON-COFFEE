@@ -17,7 +17,7 @@ const PHONE_ID=Deno.env.get('WHATSAPP_PHONE_NUMBER_ID');
 const TEMPLATE=Deno.env.get('WHATSAPP_TEMPLATE_NAME')||'uon_hub_notification';
 const LANG=Deno.env.get('WHATSAPP_TEMPLATE_LANGUAGE')||'ar';
 Deno.serve(async req=>{
- if(req.method==='OPTIONS')return response('',204);
+ if(req.method==='OPTIONS')return new Response(null,{status:204,headers:cors});
  if(req.method!=='POST')return response({ok:false,error:'method not allowed'},405);
  if(!(await authorized(req)))return response({ok:false,error:'unauthorized'},401);
  try{

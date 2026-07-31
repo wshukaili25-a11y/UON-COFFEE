@@ -1,11 +1,11 @@
 import {createClient} from 'https://esm.sh/@supabase/supabase-js@2.110.8';
 
 const TOKEN=Deno.env.get('TELEGRAM_BOT_TOKEN')!;
-const URL=Deno.env.get('SUPABASE_URL')!;
+const SUPABASE_URL=Deno.env.get('SUPABASE_URL')!;
 const KEY=Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
 const SECRET=Deno.env.get('TELEGRAM_WEBHOOK_SECRET')!;
 const SITE=Deno.env.get('SITE_URL')||'https://uonhub.space';
-const db=createClient(URL,KEY,{auth:{persistSession:false,autoRefreshToken:false}});
+const db=createClient(SUPABASE_URL,KEY,{auth:{persistSession:false,autoRefreshToken:false}});
 
 const adminCache=new Map<string,{admin:any,expires:number}>();
 const ADMIN_CACHE_TTL=300_000;
@@ -865,7 +865,7 @@ async function validateBackupRestore(
  admin:any
 ){
  if(!can(admin,'backups'))throw new Error('ليس لديك صلاحية فحص النسخ');
- const result=await fetch(`${URL}/functions/v1/database-restore`,{
+ const result=await fetch(`${SUPABASE_URL}/functions/v1/database-restore`,{
   method:'POST',
   headers:{Authorization:`Bearer ${KEY}`,'content-type':'application/json'},
   body:JSON.stringify({
@@ -1693,7 +1693,7 @@ Deno.serve(async (req:Request)=>{
     else if(data==='backup:menu')await backupMenu(chatId,mid);
     else if(data==='backup:create'){
      if(!can(admin,'backups'))throw new Error('ليس لديك صلاحية النسخ');
-     const result=await fetch(`${URL}/functions/v1/database-backup`,{
+     const result=await fetch(`${SUPABASE_URL}/functions/v1/database-backup`,{
       method:'POST',
       headers:{Authorization:`Bearer ${KEY}`,'content-type':'application/json'},
       body:JSON.stringify({requested_by:chatId})
@@ -1738,7 +1738,7 @@ Deno.serve(async (req:Request)=>{
      await validateBackupRestore(chatId,mid,id,admin);
     }
     else if(data==='report:send'){
-     const result=await fetch(`${URL}/functions/v1/daily-report`,{
+     const result=await fetch(`${SUPABASE_URL}/functions/v1/daily-report`,{
       method:'POST',
       headers:{Authorization:`Bearer ${KEY}`,'content-type':'application/json'},
       body:JSON.stringify({chat_id:chatId})

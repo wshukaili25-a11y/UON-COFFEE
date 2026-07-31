@@ -116,9 +116,16 @@ document.addEventListener('click',event=>{
    description:'استيراد تجريبي عبر لوحة UON Hub'
   }));
   setLog(log,'جاري استيراد ملفات Telegram...');
-  runButton(telegramBulk,()=>callAdminEdge('telegram-bulk-import',{
-   college,subject,content_type:'summary',items
-  }),'أضيفت ملفات Telegram كمعلقة للمراجعة',{log}).catch(()=>{});
+  runButton(telegramBulk,async()=>{
+   const result=await callAdminEdge('telegram-bulk-import',{
+    college,subject,content_type:'summary',items
+   });
+   if(Number(result?.imported||0)<1){
+    const failure=result?.results?.find(item=>item?.ok===false)?.error;
+    throw new Error(failure||'لم يتم استيراد أي ملف Telegram');
+   }
+   return result;
+  },'أضيفت ملفات Telegram كمعلقة للمراجعة',{log}).catch(()=>{});
   return;
  }
 

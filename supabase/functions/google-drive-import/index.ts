@@ -114,7 +114,7 @@ async function accessToken() {
 
 Deno.serve(async (req: Request) => {
   if (req.method === 'OPTIONS') {
-    return new Response('', { status: 204, headers: corsHeaders(req) });
+    return new Response(null, { status: 204, headers: corsHeaders(req) });
   }
   if (req.method !== 'POST') return response(req, { ok: false, error: 'METHOD_NOT_ALLOWED' }, 405);
 

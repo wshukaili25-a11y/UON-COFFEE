@@ -118,7 +118,7 @@ async function telegramFile(fileId: string) {
 
 Deno.serve(async (req: Request) => {
   if (req.method === 'OPTIONS') {
-    return new Response('', { status: 204, headers: corsHeaders(req) });
+    return new Response(null, { status: 204, headers: corsHeaders(req) });
   }
   if (req.method !== 'POST') return reply(req, { ok: false, error: 'method_not_allowed' }, 405);
   if (!(await authorized(req))) return reply(req, { ok: false, error: 'unauthorized' }, 401);
