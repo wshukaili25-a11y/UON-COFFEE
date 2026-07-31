@@ -623,8 +623,11 @@ async function courseView(chatId:string,mid:number,id:string,page=0){
  if(error)throw error;
  await edit(chatId,mid,`${data.code} — ${data.name_ar}
 الاسم الإنجليزي: ${data.name_en||'—'}
-الكلية: ${data.college||'—'}
-القسم: ${data.department||'—'}
+الكلية: ${data.college_ar||data.college||'—'}
+College: ${data.college_en||'—'}
+القسم: ${data.department_ar||data.department||'—'}
+Department: ${data.department_en||'—'}
+نوع المتطلب: ${data.requirement_type||'major'}
 الساعات: ${data.credit_hours||'—'}
 الحالة: ${data.active?'نشطة':'متوقفة'}`,[
   [{text:'✏️ الاسم العربي',callback_data:`c:e:${id}:n:${page}`},{text:'🌐 الاسم الإنجليزي',callback_data:`c:e:${id}:e:${page}`}],
@@ -632,6 +635,7 @@ async function courseView(chatId:string,mid:number,id:string,page=0){
   [{text:'🏫 تعديل الكلية',callback_data:`c:e:${id}:g:${page}`},{text:'🏢 تعديل القسم',callback_data:`c:e:${id}:d:${page}`}],
   [{text:'🇬🇧 الاسم الإنجليزي',callback_data:`c:e:${id}:e:${page}`},{text:'⏱ تعديل الساعات',callback_data:`c:e:${id}:h:${page}`}],
   [{text:'📶 المستوى',callback_data:`c:e:${id}:l:${page}`},{text:'📝 الوصف',callback_data:`c:e:${id}:x:${page}`}],
+  [{text:'🧩 نوع المتطلب',callback_data:`c:e:${id}:r:${page}`}],
   [{text:data.active?'🔴 إيقاف المادة':'🟢 تفعيل المادة',callback_data:`course:toggle:${id}:${data.active?'off':'on'}:${page}`}],
   [{text:'🗑 حذف المادة',callback_data:`course:deleteask:${id}:${page}`}],
   [{text:'⬅️ المواد',callback_data:`course:list:${page}`}]
@@ -1436,7 +1440,7 @@ Deno.serve(async (req:Request)=>{
     else if(data.startsWith('c:e:')){
      if(!can(admin,'courses'))throw new Error('ليس لديك صلاحية إدارة المقررات');
      const [, ,id,fieldCode,page]=data.split(':');
-     const fieldMap:any={n:'name_ar',c:'code',g:'college',d:'department',e:'name_en',h:'credit_hours',l:'level',x:'description'};
+     const fieldMap:any={n:'name_ar',c:'code',g:'college_ar',d:'department_ar',e:'name_en',h:'credit_hours',l:'level',x:'description',r:'requirement_type'};
      const field=fieldMap[fieldCode];
      if(!field)throw new Error('حقل التعديل غير معروف');
      await setConversation(chatId,'course_edit_value',{id,field,page});
