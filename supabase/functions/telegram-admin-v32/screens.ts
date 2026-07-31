@@ -19,6 +19,7 @@ export async function programScreen(chatId:string,mid:number,c:Choice){
   callback_data:`v32c:prog:${x.id}`
  }]);
  if(rows.length)keyboard.push([{text:visibleSelected===rows.length?'☐ إلغاء تحديد برامج القسم':'✅ تحديد كل برامج القسم',callback_data:'v32c:all'}]);
+ if(selected.size)keyboard.push([{text:'🧹 مسح جميع روابط البرامج',callback_data:'v32c:clear'}]);
  keyboard.push([{text:'🧰 مقرر خدمة بدون خطة محددة',callback_data:'v32c:service'}]);
  keyboard.push([{text:'متابعة ➡️',callback_data:'v32c:programs:done'}]);
  keyboard.push([{text:'⬅️ تغيير القسم',callback_data:'v32c:back:dept'}]);
