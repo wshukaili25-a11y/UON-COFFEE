@@ -41,7 +41,11 @@ function corsHeaders(req: Request) {
 function response(req: Request, body: unknown, status = 200) {
   return new Response(JSON.stringify(body), {
     status,
-    headers: { ...corsHeaders(req), 'content-type': 'application/json' },
+    headers: {
+      ...corsHeaders(req),
+      'content-type': 'application/json',
+      'cache-control': 'no-store',
+    },
   });
 }
 
@@ -107,9 +111,47 @@ async function accessToken() {
   });
   const tokenPayload = await tokenResponse.json();
   if (!tokenResponse.ok || !tokenPayload.access_token) {
-    throw new Error(JSON.stringify(tokenPayload));
+    throw new Error('GOOGLE_AUTH_FAILED');
   }
   return tokenPayload.access_token as string;
+}
+
+function serviceAccountEmail() {
+  if (!GOOGLE_SERVICE_ACCOUNT_JSON) throw new Error('GOOGLE_SERVICE_ACCOUNT_JSON is missing');
+  const serviceAccount = JSON.parse(GOOGLE_SERVICE_ACCOUNT_JSON);
+  if (!serviceAccount.client_email) {
+    throw new Error('Google service account configuration is incomplete');
+  }
+  return String(serviceAccount.client_email);
+}
+
+function parseDriveSource(value: unknown) {
+  const source = String(value || '').trim();
+  if (!source) throw new Error('drive source is required');
+
+  if (/^[A-Za-z0-9_-]{10,200}$/.test(source)) {
+    return { id: source, kind: 'folder' as const, resourceKey: '' };
+  }
+
+  let url: URL;
+  try {
+    url = new URL(source);
+  } catch {
+    throw new Error('Google Drive link is invalid');
+  }
+  if (!['drive.google.com', 'docs.google.com'].includes(url.hostname.toLowerCase())) {
+    throw new Error('Google Drive link is invalid');
+  }
+
+  const folderMatch = url.pathname.match(/\/folders\/([A-Za-z0-9_-]{10,200})/);
+  const resourceKey = String(url.searchParams.get('resourcekey') || '').slice(0, 500);
+  if (folderMatch) return { id: folderMatch[1], kind: 'folder' as const, resourceKey };
+
+  const fileMatch = url.pathname.match(/\/(?:file\/d|document\/d|spreadsheets\/d|presentation\/d)\/([A-Za-z0-9_-]{10,200})/);
+  const queryId = url.searchParams.get('id');
+  const id = fileMatch?.[1] || queryId || '';
+  if (!/^[A-Za-z0-9_-]{10,200}$/.test(id)) throw new Error('Google Drive link is invalid');
+  return { id, kind: 'file' as const, resourceKey };
 }
 
 Deno.serve(async (req: Request) => {
@@ -122,14 +164,17 @@ Deno.serve(async (req: Request) => {
   try {
     await requireAdmin(req);
     const body = await req.json().catch(() => ({}));
-    const folderId = String(body.folder_id || '').trim();
+    if (body.action === 'connection-info') {
+      return response(req, { ok: true, service_account_email: serviceAccountEmail() });
+    }
+
+    const source = parseDriveSource(body.source || body.drive_url || body.folder_id);
     const college = String(body.college || '').trim();
-    if (!/^[A-Za-z0-9_-]{10,200}$/.test(folderId)) throw new Error('folder_id is invalid');
     if (!COLLEGES.has(college)) throw new Error('college is invalid');
 
     const { data: run, error: runError } = await db
       .from('drive_import_runs')
-      .insert({ folder_id: folderId, college, status: 'running' })
+      .insert({ folder_id: source.id, college, status: 'running' })
       .select()
       .single();
     if (runError) throw runError;
@@ -141,27 +186,12 @@ Deno.serve(async (req: Request) => {
     let skipped = 0;
     let examined = 0;
 
-    do {
-      const query = new URLSearchParams({
-        q: `'${folderId}' in parents and trashed=false`,
-        fields: 'nextPageToken,files(id,name,mimeType,webViewLink)',
-        pageSize: '1000',
-      });
-      if (pageToken) query.set('pageToken', pageToken);
-
-      const driveResponse = await fetch(`https://www.googleapis.com/drive/v3/files?${query}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      const drivePayload = await driveResponse.json();
-      if (!driveResponse.ok) throw new Error(JSON.stringify(drivePayload));
-
-      pageToken = drivePayload.nextPageToken || '';
-      for (const file of drivePayload.files || []) {
+    async function importFile(file: any) {
         examined++;
         if (examined > 10_000) throw new Error('Drive import safety limit exceeded');
         if (file.mimeType === 'application/vnd.google-apps.folder' || !file.webViewLink) {
           skipped++;
-          continue;
+          return;
         }
 
         const { data: existing } = await db
@@ -171,7 +201,7 @@ Deno.serve(async (req: Request) => {
           .maybeSingle();
         if (existing) {
           skipped++;
-          continue;
+          return;
         }
 
         const { data: item, error: itemError } = await db
@@ -188,7 +218,7 @@ Deno.serve(async (req: Request) => {
           .single();
         if (itemError) {
           skipped++;
-          continue;
+          return;
         }
 
         const { data: summary, error: summaryError } = await db
@@ -207,13 +237,58 @@ Deno.serve(async (req: Request) => {
         if (summaryError) {
           skipped++;
           await db.from('drive_import_items').delete().eq('id', item.id);
-          continue;
+          return;
         }
 
         await db.from('drive_import_items').update({ summary_id: summary.id }).eq('id', item.id);
         imported++;
+    }
+
+    if (source.kind === 'file') {
+      const fields = encodeURIComponent('id,name,mimeType,webViewLink,trashed');
+      const headers: Record<string, string> = { Authorization: `Bearer ${token}` };
+      if (source.resourceKey) {
+        headers['X-Goog-Drive-Resource-Keys'] = `${source.id}/${source.resourceKey}`;
       }
-    } while (pageToken);
+      const driveResponse = await fetch(
+        `https://www.googleapis.com/drive/v3/files/${encodeURIComponent(source.id)}?fields=${fields}&supportsAllDrives=true`,
+        { headers },
+      );
+      const file = await driveResponse.json();
+      if (driveResponse.status === 403 || driveResponse.status === 404) {
+        throw new Error('DRIVE_ACCESS_DENIED');
+      }
+      if (!driveResponse.ok) throw new Error('GOOGLE_DRIVE_REQUEST_FAILED');
+      if (file.trashed) throw new Error('Google Drive file is in trash');
+      await importFile(file);
+    } else {
+      do {
+        const query = new URLSearchParams({
+          q: `'${source.id}' in parents and trashed=false`,
+          fields: 'nextPageToken,files(id,name,mimeType,webViewLink)',
+          pageSize: '1000',
+          supportsAllDrives: 'true',
+          includeItemsFromAllDrives: 'true',
+        });
+        if (pageToken) query.set('pageToken', pageToken);
+
+        const headers: Record<string, string> = { Authorization: `Bearer ${token}` };
+        if (source.resourceKey) {
+          headers['X-Goog-Drive-Resource-Keys'] = `${source.id}/${source.resourceKey}`;
+        }
+        const driveResponse = await fetch(`https://www.googleapis.com/drive/v3/files?${query}`, {
+          headers,
+        });
+        const drivePayload = await driveResponse.json();
+        if (driveResponse.status === 403 || driveResponse.status === 404) {
+          throw new Error('DRIVE_ACCESS_DENIED');
+        }
+        if (!driveResponse.ok) throw new Error('GOOGLE_DRIVE_REQUEST_FAILED');
+
+        pageToken = drivePayload.nextPageToken || '';
+        for (const file of drivePayload.files || []) await importFile(file);
+      } while (pageToken);
+    }
 
     await db
       .from('drive_import_runs')
@@ -225,7 +300,13 @@ Deno.serve(async (req: Request) => {
       })
       .eq('id', run.id);
 
-    return response(req, { ok: true, run_id: run.id, imported, skipped });
+    return response(req, {
+      ok: true,
+      run_id: run.id,
+      source_type: source.kind,
+      imported,
+      skipped,
+    });
   } catch (error) {
     const message = String((error as Error)?.message || error);
     if (runId) {
@@ -234,7 +315,13 @@ Deno.serve(async (req: Request) => {
         .update({ status: 'failed', error: message, completed_at: new Date().toISOString() })
         .eq('id', runId);
     }
-    const status = message.startsWith('ADMIN_AUTH_') ? 401 : /invalid|required/i.test(message) ? 400 : 500;
+    const status = message.startsWith('ADMIN_AUTH_')
+      ? 401
+      : message === 'DRIVE_ACCESS_DENIED'
+      ? 403
+      : /invalid|required/i.test(message)
+      ? 400
+      : 500;
     return response(req, { ok: false, error: message }, status);
   }
 });

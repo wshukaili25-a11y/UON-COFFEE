@@ -30,6 +30,30 @@ async function callAdminEdge(slug,payload={}){
  return data;
 }
 
+async function callAdminMultipart(slug,formData){
+ const password=getPassword();
+ if(!password)throw new Error('انتهت جلسة الإدارة، سجّل الدخول مرة ثانية');
+ const response=await fetch(`${SUPABASE_URL}/functions/v1/${slug}`,{
+  method:'POST',
+  headers:{
+   apikey:PUBLISHABLE_KEY,
+   'x-admin-password':password
+  },
+  body:formData,
+  cache:'no-store'
+ });
+ const text=await response.text();
+ let data;
+ try{data=text?JSON.parse(text):{}}catch{data={error:text}}
+ if(response.status===401){
+  sessionStorage.removeItem(passwordKey);
+  sessionStorage.removeItem('uon_admin');
+  sessionStorage.removeItem('uon_admin_session');
+ }
+ if(!response.ok||data?.ok===false)throw new Error(data?.error||`HTTP ${response.status}`);
+ return data;
+}
+
 function setLog(element,value){
  if(element)element.textContent=typeof value==='string'?value:JSON.stringify(value,null,2);
 }
@@ -68,25 +92,68 @@ async function waitForCompletedBackup(startedAt){
 
 document.addEventListener('click',event=>{
  const drive=event.target.closest('#runDriveImport');
+ const driveInfo=event.target.closest('#loadDriveConnectionInfo');
  const dropbox=event.target.closest('#runDropboxImport');
  const telegramBulk=event.target.closest('#runTelegramBulkImport');
+ const telegramLocal=event.target.closest('#runTelegramLocalImport');
  const backup=event.target.closest('#runBackup');
  const validateRestore=event.target.closest('#validateRestore');
  const testTelegram=event.target.closest('#testTelegram');
  const testWhatsapp=event.target.closest('#testWhatsapp');
- const target=drive||dropbox||telegramBulk||backup||validateRestore||testTelegram||testWhatsapp;
+ const target=drive||driveInfo||dropbox||telegramBulk||telegramLocal||backup||validateRestore||testTelegram||testWhatsapp;
  if(!target)return;
 
  event.preventDefault();
  event.stopImmediatePropagation();
 
+ if(driveInfo){
+  const output=document.querySelector('#driveServiceAccountEmail');
+  runButton(driveInfo,async()=>{
+   const result=await callAdminEdge('google-drive-import',{action:'connection-info'});
+   if(output)output.value=result.service_account_email||'';
+   return result;
+  },'تم تحميل بريد المشاركة').catch(()=>{});
+  return;
+ }
+
  if(drive){
   const log=document.querySelector('#importLog');
   setLog(log,'جاري الاستيراد الآمن...');
   runButton(drive,()=>callAdminEdge('google-drive-import',{
-   folder_id:document.querySelector('#driveFolderId')?.value.trim()||'',
+   source:document.querySelector('#driveFolderId')?.value.trim()||'',
    college:document.querySelector('#driveCollege')?.value||''
   }),'اكتمل استيراد Google Drive',{log}).catch(()=>{});
+  return;
+ }
+
+ if(telegramLocal){
+  const log=document.querySelector('#telegramImportLog');
+  const input=document.querySelector('#telegramLocalPdf');
+  const file=input?.files?.[0];
+  const college=document.querySelector('#telegramBulkCollege')?.value||'';
+  const subject=document.querySelector('#telegramBulkSubject')?.value.trim()||'';
+  if(!file||!college){
+   toast('اختر ملف PDF والكلية',true);
+   return;
+  }
+  if(file.size<1||file.size>5*1024*1024||!/\.pdf$/i.test(file.name)||file.type!=='application/pdf'){
+   toast('اختر ملف PDF صالحًا بحجم لا يتجاوز 5 MB',true);
+   return;
+  }
+  const formData=new FormData();
+  formData.set('file',file,file.name);
+  formData.set('college',college);
+  formData.set('subject',subject||'ملف اختبار Telegram V30');
+  formData.set('title',file.name);
+  setLog(log,'جاري رفع ملف PDF عبر Telegram Admin...');
+  runButton(telegramLocal,async()=>{
+   const result=await callAdminMultipart('telegram-admin-upload',formData);
+   if(Number(result?.imported||0)!==1||result?.status!=='pending'){
+    throw new Error('لم تتم إضافة ملف Telegram إلى المراجعة');
+   }
+   input.value='';
+   return result;
+  },'أضيف ملف PDF كمعلق للمراجعة',{log}).catch(()=>{});
   return;
  }
 
