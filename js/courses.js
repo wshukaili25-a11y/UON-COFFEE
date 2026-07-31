@@ -1,4 +1,4 @@
-import {$,get,esc,enforceUonMaintenance,watchUonMaintenance,trackEvent,debounce,installErrorCapture} from './core.js?v=32.0.0';
+import {$,get,esc,enforceUonMaintenance,watchUonMaintenance,trackEvent,debounce,installErrorCapture} from './core.js?v=32.1.0';
 
 await enforceUonMaintenance();
 watchUonMaintenance();
@@ -30,26 +30,44 @@ function refreshAcademicFilters(){
  $('#courseProgram').value=state.programId;
 }
 
-function linkedCourseCodes(){if(!state.programId)return null;return new Set(state.links.filter(row=>row.program_id===state.programId).map(row=>text(row.course_code).toUpperCase()))}
+function academicProgramIds(){
+ if(state.programId)return new Set([state.programId]);
+ if(state.departmentId)return new Set(state.programs.filter(row=>row.department_id===state.departmentId).map(row=>row.id));
+ if(state.collegeId)return new Set(state.programs.filter(row=>row.college_id===state.collegeId).map(row=>row.id));
+ return null;
+}
+function linkedCourseCodes(){
+ const ids=academicProgramIds();
+ if(!ids)return null;
+ return new Set(state.links.filter(row=>ids.has(row.program_id)).map(row=>text(row.course_code).toUpperCase()));
+}
+function directAcademicMatch(course){
+ const college=selectedCollege(),department=selectedDepartment();
+ const collegeValues=[course.college_ar,course.college,course.college_en].map(normalize).filter(Boolean);
+ const departmentValues=[course.department_ar,course.department,course.department_en].map(normalize).filter(Boolean);
+ const collegeMatch=!college||collegeValues.includes(normalize(college.name_ar))||collegeValues.includes(normalize(college.name_en));
+ const departmentMatch=!department||departmentValues.includes(normalize(department.name_ar))||departmentValues.includes(normalize(department.name_en));
+ return collegeMatch&&departmentMatch&&(collegeValues.length>0||departmentValues.length>0);
+}
 
 function visibleCourses(){
- const query=normalize(state.search),linked=linkedCourseCodes();
+ const query=normalize(state.search),linked=linkedCourseCodes(),academicFilter=Boolean(state.collegeId||state.departmentId||state.programId);
  return state.courses.filter(course=>{
   const code=text(course.code).toUpperCase();
   const searchMatch=!query||normalize([code,course.name_ar,course.name_en,course.description].join(' ')).includes(query);
-  const programMatch=!state.programId||!linked?.size||linked.has(code);
-  return searchMatch&&programMatch;
+  const academicMatch=!academicFilter||Boolean(linked?.has(code))||(!state.programId&&directAcademicMatch(course));
+  return searchMatch&&academicMatch;
  }).sort((a,b)=>state.sort==='name'?nameAr(a).localeCompare(nameAr(b),'ar'):state.sort==='hours'?Number(b.credit_hours||0)-Number(a.credit_hours||0):text(a.code).localeCompare(text(b.code),'en'));
 }
 
 function render(){
- const rows=visibleCourses(),linked=linkedCourseCodes();
+ const rows=visibleCourses(),linked=linkedCourseCodes(),academicFilter=Boolean(state.collegeId||state.departmentId||state.programId);
  $('#courseCount').textContent=`${rows.length} مقرر`;
  const context=[];
  if(selectedCollege())context.push(nameAr(selectedCollege()));
  if(selectedDepartment())context.push(nameAr(selectedDepartment()));
  if(selectedProgram())context.push(nameAr(selectedProgram()));
- if(state.programId&&linked&&!linked.size)context.push('لم يتم ربط مقررات بهذا التخصص بعد');
+ if(academicFilter&&linked?.size===0)context.push('لا توجد مقررات مربوطة بهذا الاختيار حتى الآن');
  $('#courseHint').textContent=context.length?` · ${context.join(' — ')}`:'';
  const catalog=$('#courseCards');
  catalog.classList.toggle('list-view',state.view==='list');
@@ -58,7 +76,7 @@ function render(){
  catalog.innerHTML=rows.length?rows.map(course=>{
   const code=text(course.code).toUpperCase(),title=nameAr(course)||nameEn(course)||code,subtitle=nameEn(course)!==title?nameEn(course):'';
   return `<article class="v31-course-card"><a href="course.html?code=${encodeURIComponent(code)}"><div class="v31-course-card-head"><span class="v31-course-code">${esc(code)}</span><span class="v31-course-hours">${esc(course.credit_hours||'—')} ساعات</span></div><h2>${esc(title)}</h2>${subtitle?`<p>${esc(subtitle)}</p>`:''}</a><footer><a class="btn primary" href="course.html?code=${encodeURIComponent(code)}">فتح المقرر</a></footer></article>`;
- }).join(''):'<div class="course-empty"><strong>ما حصلنا مقررات مطابقة</strong><span>غيّر البحث أو الفلاتر وجرب مرة ثانية.</span></div>';
+ }).join(''):`<div class="course-empty"><strong>ما حصلنا مقررات مطابقة</strong><span>${academicFilter?'ما تم ربط مقررات بهذا الاختيار حتى الآن.':'غيّر البحث أو الفلاتر وجرب مرة ثانية.'}</span></div>`;
 }
 
 async function load(){
