@@ -1,4 +1,4 @@
-const CACHE_NAME='uonhub-pwa-v32-5-0';
+const CACHE_NAME='uonhub-pwa-v32-5-1';
 const OFFLINE_URL='/offline.html';
 const CORE_ASSETS=['/','/index.html','/tools.html','/offline.html','/manifest.webmanifest','/css/app.css','/css/ui-refresh-v24.css','/css/pwa.css','/js/core.js','/js/v14-ui.js','/js/v20-experience.js','/js/pwa-init.js','/assets/icons/icon-192.png','/assets/icons/icon-512.png'];
 self.addEventListener('install',event=>{event.waitUntil(caches.open(CACHE_NAME).then(cache=>Promise.allSettled(CORE_ASSETS.map(asset=>cache.add(asset)))).then(()=>self.skipWaiting()))});
