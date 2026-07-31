@@ -36,6 +36,13 @@ if(collegeInput)fillCollege(collegeInput);
 
 let rows=[];
 
+function safeResourceUrl(value){
+ try{
+  const url=new URL(String(value||''),location.origin);
+  return ['https:','http:'].includes(url.protocol)?url.href:'';
+ }catch{return ''}
+}
+
 async function load(){
  try{
   rows=await get('summaries','select=*&approved=eq.true&order=created_at.desc');
@@ -63,7 +70,7 @@ function render(){
  items.innerHTML=list.length
   ?list.map(item=>{
    const title=item.title||'ملخص أو اختبار';
-   const url=item.url||item.link||'';
+   const url=safeResourceUrl(item.url||item.link||item.pdf_url||'');
    const type=item.resource_type||item.content_type||'ملف';
 
    return `<article class="card item-card">

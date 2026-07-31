@@ -1,7 +1,8 @@
 document.documentElement.classList.remove('maintenance-check');
 
-import {$,$$,get,insert,update,remove,rpc,toast,esc,edge,fillCollege,saveAdminSession,clearAdminSession,formatDate} from './core.js';
+import {$,$$,get,insert,update,remove,rpc,toast,esc,edge,fillCollege,saveAdminSession,clearAdminSession,adminSession,formatDate} from './core.js?v=30.0.1';
 let authed=false;
+const ADMIN_SESSION_TTL=30*60*1000;
 
 function showLogin(){
  const login=$('#login');
@@ -14,14 +15,29 @@ function showDashboard(){
  const login=$('#login');
  const dashboard=$('#dashboard');
  if(login){login.hidden=true;login.style.display='none'}
- if(dashboard){dashboard.hidden=false;dashboard.style.display='grid'}
+ if(dashboard){dashboard.hidden=false;dashboard.style.display=''}
 }
 
 showLogin();
-$('#loginForm').onsubmit=async e=>{e.preventDefault();try{const r=await rpc('uon_admin_login',{p_password:$('#password').value});if(!(r?.ok??r===true))throw new Error('كلمة المرور غير صحيحة');authed=true;sessionStorage.setItem('uon_admin','1');saveAdminSession(r);showDashboard();loadAll().catch(err=>toast(err.message,true))}catch(err){toast(err.message,true)}};
-if(sessionStorage.getItem('uon_admin')==='1'){authed=true;showDashboard();loadAll().catch(err=>toast(err.message,true))}
+$('#loginForm').onsubmit=async e=>{e.preventDefault();try{const password=$('#password').value;const r=await rpc('uon_admin_login',{p_password:password});if(!(r?.ok??r===true))throw new Error('كلمة المرور غير صحيحة');authed=true;sessionStorage.setItem('uon_admin','1');sessionStorage.setItem('uon_admin_password',password);saveAdminSession(r);showDashboard();loadAll().catch(err=>toast(err.message,true))}catch(err){clearAdminSession();toast(err.message,true)}};
+async function resumeAdminSession(){
+ const session=adminSession();
+ const password=sessionStorage.getItem('uon_admin_password')||'';
+ if(sessionStorage.getItem('uon_admin')!=='1'||!password||!session?.created_at||Date.now()-session.created_at>ADMIN_SESSION_TTL){
+  clearAdminSession();showLogin();return;
+ }
+ try{
+  const r=await rpc('uon_admin_login',{p_password:password});
+  if(!(r?.ok??r===true))throw new Error('unauthorized');
+  authed=true;saveAdminSession(r);showDashboard();
+  await loadAll();
+ }catch(error){
+  clearAdminSession();showLogin();toast('انتهت جلسة الإدارة، سجّل الدخول مرة ثانية',true);
+ }
+}
+resumeAdminSession();
 $('#logout').onclick=()=>{clearAdminSession();location.href='admin.html'};$('#menuAdmin').onclick=()=>$('#sidebar').classList.toggle('open');
-$$('[data-section]').forEach(b=>b.onclick=()=>{$$('.admin-section').forEach(x=>x.classList.remove('active'));$('#sec-'+b.dataset.section).classList.add('active');$('#sidebar').classList.remove('open');if(b.dataset.section==='pending')loadPending()});
+$$('[data-section]').forEach(b=>b.onclick=()=>{const target=$('#sec-'+b.dataset.section);if(!target)return;$$('.admin-section').forEach(x=>x.classList.remove('active'));$$('[data-section]').forEach(x=>x.classList.toggle('active',x===b));target.classList.add('active');$('#sidebar').classList.remove('open');if(b.dataset.section==='pending')loadPending()});
 async function settings(){const r=await get('site_settings','select=key,value');const m=Object.fromEntries(r.map(x=>[x.key,x.value]));$('#maintenance').checked=m.maintenance_enabled===true||String(m.maintenance_enabled).toLowerCase()==='true';$('#maintenanceMessage').value=m.maintenance_message||'';$('#maintenanceUntil').value=m.maintenance_until?String(m.maintenance_until).slice(0,16):'';$('#whatsappUrl').value=m.whatsapp_channel_url||'';if($('#instagramUrl'))$('#instagramUrl').value=m.instagram_url||''}
 async function upsertSetting(key,value){const r=await get('site_settings',`select=key&key=eq.${encodeURIComponent(key)}`);return r.length?update('site_settings',`key=eq.${encodeURIComponent(key)}`,{value,updated_at:new Date().toISOString()}):insert('site_settings',{key,value})}
 $('#saveSite').onclick=async()=>{try{await Promise.all([upsertSetting('maintenance_enabled',$('#maintenance').checked),upsertSetting('maintenance_message',$('#maintenanceMessage').value),upsertSetting('maintenance_until',$('#maintenanceUntil').value||null),upsertSetting('whatsapp_channel_url',$('#whatsappUrl').value),upsertSetting('instagram_url',$('#instagramUrl')?.value||'')]);toast('تم حفظ إعدادات الموقع');await settings()}catch(e){toast(e.message,true)}};
@@ -54,11 +70,31 @@ async function audit(action,entity,entityId=null,details={}){
 $('#testTelegram').onclick=async()=>{try{await edge({source:'admin-test',channel:'telegram'});toast('تم إرسال اختبار Telegram')}catch(e){toast(e.message,true)}};
 $('#testWhatsapp').onclick=async()=>{try{await fetch('https://irkhvydgxpseflggbeqq.supabase.co/functions/v1/whatsapp-notify',{method:'POST',headers:{apikey:'sb_publishable_gZ9tyM1udrkuQIXHqDtToQ_FyFmePgH','Content-Type':'application/json'},body:JSON.stringify({type:'test',to:$('#waTestPhone').value})}).then(async r=>{if(!r.ok)throw new Error(await r.text())});toast('تم إرسال طلب الاختبار')}catch(e){toast(e.message,true)}};
 $('#runDriveImport').onclick=async()=>{try{$('#importLog').textContent='جاري الاستيراد...';const r=await fetch('https://irkhvydgxpseflggbeqq.supabase.co/functions/v1/google-drive-import',{method:'POST',headers:{apikey:'sb_publishable_gZ9tyM1udrkuQIXHqDtToQ_FyFmePgH','Content-Type':'application/json'},body:JSON.stringify({folder_id:$('#driveFolderId').value,college:$('#driveCollege').value})});const text=await r.text();if(!r.ok)throw new Error(text);$('#importLog').textContent=text;toast('اكتمل الاستيراد')}catch(e){$('#importLog').textContent=e.message;toast(e.message,true)}};
-async function loadBackups(){try{const r=await get('backup_runs','select=*&order=created_at.desc&limit=20');$('#backupList').innerHTML=r.map(x=>`<div class="list-row"><div><strong>${esc(x.status)}</strong><small>${new Date(x.created_at).toLocaleString('ar')} • ${esc(x.file_path||'')}</small></div></div>`).join('')}catch{}}
+function formatBytes(value){const n=Number(value||0);if(!Number.isFinite(n)||n<=0)return '—';if(n<1024)return `${n} B`;if(n<1024*1024)return `${(n/1024).toFixed(1)} KB`;return `${(n/1024/1024).toFixed(2)} MB`}
+function backupCounts(x){return x.row_counts||x.record_counts||x.metadata?.row_counts||x.metadata?.record_counts||{}}
+async function loadBackups(){
+ try{
+  const rows=await get('backup_runs','select=*&order=created_at.desc&limit=20');
+  $('#backupList').innerHTML=rows.length?rows.map(x=>{
+   const counts=backupCounts(x);
+   const size=x.size_bytes||x.file_size||x.metadata?.size_bytes;
+   return `<div class="list-row"><div><strong>${esc(x.status)}</strong><small>${new Date(x.created_at).toLocaleString('ar')} • ${esc(x.file_path||x.backup_path||'')}</small><small>الحجم: ${esc(formatBytes(size))} • السجلات: ${esc(JSON.stringify(counts))}</small></div></div>`;
+  }).join(''):'<div class="empty">لا توجد نسخ احتياطية</div>';
+  const select=$('#restoreBackupId');
+  if(select){
+   const selected=select.value;
+   select.innerHTML='<option value="">اختر نسخة مكتملة للفحص</option>'+rows.filter(x=>x.status==='completed').map(x=>`<option value="${esc(x.id)}">${new Date(x.created_at).toLocaleString('ar')} — ${esc(x.file_path||x.backup_path||'')}</option>`).join('');
+   if([...select.options].some(x=>x.value===selected))select.value=selected;
+  }
+ }catch(error){
+  $('#backupList').innerHTML=`<div class="empty">${esc(error.message)}</div>`;
+ }
+}
 $('#runBackup').onclick=async()=>{try{const r=await fetch('https://irkhvydgxpseflggbeqq.supabase.co/functions/v1/database-backup',{method:'POST',headers:{apikey:'sb_publishable_gZ9tyM1udrkuQIXHqDtToQ_FyFmePgH','Content-Type':'application/json'},body:'{}'});const text=await r.text();if(!r.ok)throw new Error(text);toast('تم إنشاء النسخة الاحتياطية');loadBackups()}catch(e){toast(e.message,true)}};
 async function loadAudit(){try{const r=await get('admin_audit_log','select=*&order=created_at.desc&limit=100');$('#auditList').innerHTML=r.map(x=>`<div class="list-row"><div><strong>${esc(x.action)} — ${esc(x.entity)}</strong><small>${new Date(x.created_at).toLocaleString('ar')} • ${esc(JSON.stringify(x.details||{}))}</small></div></div>`).join('')}catch{}}
 document.querySelector('[data-section="backups"]')?.addEventListener('click',loadBackups);
 document.querySelector('[data-section="audit"]')?.addEventListener('click',loadAudit);
+window.addEventListener('uon:backups-refresh',loadBackups);
 
 async function loadWeeklyChart(){const tables=['summaries','whatsapp_groups','student_projects','rating_submissions','confessions'];const days=[...Array(7)].map((_,i)=>{const d=new Date();d.setDate(d.getDate()-(6-i));return d});const totals=days.map(()=>0);for(const t of tables){try{const since=days[0].toISOString().slice(0,10);const rows=await get(t,`select=created_at&created_at=gte.${since}T00:00:00Z`);rows.forEach(r=>{const k=new Date(r.created_at).toISOString().slice(0,10),i=days.findIndex(d=>d.toISOString().slice(0,10)===k);if(i>=0)totals[i]++})}catch{}}const max=Math.max(...totals,1);$('#weeklyChart').innerHTML=totals.map((n,i)=>`<div class="chart-bar" style="height:${Math.max(5,n/max*145)}px"><span>${days[i].toLocaleDateString('ar',{weekday:'short'})}</span></div>`).join('')}async function loadRecentActivity(){try{const r=await get('admin_audit_log','select=*&order=created_at.desc&limit=8');$('#recentActivity').innerHTML=r.length?r.map(x=>`<div class="list-row"><div><strong>${esc(x.action)}</strong><small>${esc(x.entity)} • ${new Date(x.created_at).toLocaleString('ar')}</small></div></div>`).join(''):'<div class="empty">لا توجد نشاطات</div>'}catch{}}$('#runDropboxImport').onclick=async()=>{try{$('#importLog').textContent='جاري الاستيراد...';const r=await fetch('https://irkhvydgxpseflggbeqq.supabase.co/functions/v1/dropbox-import',{method:'POST',headers:{apikey:'sb_publishable_gZ9tyM1udrkuQIXHqDtToQ_FyFmePgH','Content-Type':'application/json'},body:JSON.stringify({path:$('#dropboxPath').value,college:$('#dropboxCollege').value})});const txt=await r.text();if(!r.ok)throw new Error(txt);$('#importLog').textContent=txt;toast('اكتمل استيراد Dropbox')}catch(e){toast(e.message,true)}};const _old=loadAll;loadAll=async function(){await _old();await Promise.allSettled([loadWeeklyChart(),loadRecentActivity()])};
 
@@ -70,7 +106,7 @@ async function loadHealth(){
  const checks=[
   ['قاعدة البيانات',async()=>{await get('platform_features','select=key&limit=1');return 'متصلة'}],
   ['حالة الموقع',async()=>{const s=await rpc('uon_public_state',{});return s.maintenance_enabled?'صيانة':'يعمل'}],
-  ['Telegram',async()=>{await edge({source:'admin-test',channel:'telegram'});return 'يعمل'}],
+  ['Telegram',async()=>{const r=await get('telegram_admins','select=id&active=eq.true');return `${r.length} مشرف نشط`}],
   ['النسخ الاحتياطي',async()=>{const r=await get('backup_runs','select=status,created_at&order=created_at.desc&limit=1');return r[0]?`${r[0].status} — ${formatDate(r[0].created_at)}`:'لا توجد نسخة'}],
   ['Google Drive',async()=>{const r=await get('drive_import_runs','select=status,created_at&order=created_at.desc&limit=1');return r[0]?`${r[0].status} — ${formatDate(r[0].created_at)}`:'لم يُستخدم'}],
   ['فهرس البحث',async()=>{const r=await get('search_index','select=id&limit=5000');return `${r.length} عنصر`}],
