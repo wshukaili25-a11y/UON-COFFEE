@@ -1,6 +1,32 @@
 const UON_PWA_TEST_KEY = 'uonhub_pwa_test_mode';
 let deferredInstallPrompt = null;
 
+function removeLegacyActionDock(){
+  const selectors = [
+    '.v20-utility-dock',
+    '.page-action-dock',
+    '.floating-action-dock',
+    '[data-v20-favorite]',
+    '[data-v20-qr]',
+    '[data-v20-feedback]'
+  ];
+  document.querySelectorAll(selectors.join(',')).forEach(element=>{
+    const dock = element.closest('.v20-utility-dock,.page-action-dock,.floating-action-dock') || element;
+    dock.remove();
+  });
+}
+
+function installLegacyDockBlocker(){
+  if(document.querySelector('#uonLegacyDockBlocker')) return;
+  const style = document.createElement('style');
+  style.id = 'uonLegacyDockBlocker';
+  style.textContent = '.v20-utility-dock,.page-action-dock,.floating-action-dock,[data-v20-favorite],[data-v20-qr],[data-v20-feedback]{display:none!important;visibility:hidden!important;pointer-events:none!important}';
+  document.head.appendChild(style);
+  removeLegacyActionDock();
+  const observer = new MutationObserver(()=>removeLegacyActionDock());
+  observer.observe(document.documentElement,{childList:true,subtree:true});
+}
+
 function isPwaTestMode(){
   const params = new URLSearchParams(location.search);
   if(params.get('admin-pwa') === '1') localStorage.setItem(UON_PWA_TEST_KEY,'1');
@@ -66,4 +92,5 @@ async function registerPwa(){
   try{await navigator.serviceWorker.register('/sw.js',{scope:'/'});}catch(error){console.warn('PWA registration failed:',error);}
 }
 
-document.addEventListener('DOMContentLoaded',()=>{addIndependentNotice();createAdminInstallPanel();registerPwa();});
+installLegacyDockBlocker();
+document.addEventListener('DOMContentLoaded',()=>{removeLegacyActionDock();addIndependentNotice();createAdminInstallPanel();registerPwa();});
