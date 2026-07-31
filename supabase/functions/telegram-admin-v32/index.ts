@@ -1,4 +1,4 @@
-import {SECRET,json,forward,getAdmin,getConv,clearConv,canCourses,ack,send} from './lib.ts';
+import {SECRET,KEY,SUPABASE_URL,json,forward,getAdmin,getConv,clearConv,canCourses,ack,send,audit} from './lib.ts';
 import {textFlow,callbackFlow} from './course-flow.ts';
 declare const Deno:any;
 
@@ -44,12 +44,35 @@ Deno.serve(async(req:Request)=>{
     await clearConv(chatId);
     return forward(raw,req);
    }
-   const intercept=data==='course:add:start'||data.startsWith('course:view:')||data.startsWith('course:deleteask:')||data.startsWith('v32c:');
+   const intercept=data==='course:add:start'||data==='course:sync:official'||data.startsWith('course:view:')||data.startsWith('course:deleteask:')||data.startsWith('v32c:');
    if(!intercept)return forward(raw,req);
    await ack(callback.id);
    if(!canCourses(admin)){await clearConv(chatId);return json({ok:true})}
-   try{await callbackFlow(chatId,callback.message.message_id,admin,data)}
-   catch(error){
+   try{
+    if(data==='course:sync:official'){
+     if(admin.role!=='owner'){
+      await ack(callback.id,'فحص الخطط الرسمية للمالك فقط',true);
+      return json({ok:true});
+     }
+     const result=await fetch(`${SUPABASE_URL}/functions/v1/sync-study-plans`,{
+      method:'POST',
+      headers:{authorization:`Bearer ${KEY}`,'content-type':'application/json'},
+      body:JSON.stringify({source:'telegram',requested_by:chatId}),
+      signal:AbortSignal.timeout(45000)
+     });
+     const payload=await result.json().catch(()=>({}));
+     if(!result.ok||payload.ok===false)throw new Error(payload.error||'فشل فحص الخطط الرسمية');
+     audit(admin,'official_plan_discovery','',{
+      pages:payload.pages||0,
+      discovered:payload.discovered||0,
+      modern_documents:payload.modern_documents||0,
+      read_only:true
+     });
+     await send(chatId,`تم فحص روابط الخطط الرسمية ✅\n\nالصفحات المفحوصة: ${payload.pages||0}\nالروابط المكتشفة: ${payload.discovered||0}\nالخطط الحديثة: ${payload.modern_documents||0}\n\n🔒 الفحص للقراءة فقط، ولا يتم إضافة أو تعديل أي مقرر قبل المراجعة.`,[[{text:'⬅️ مركز المقررات',callback_data:'courses:menu'}]]);
+     return json({ok:true});
+    }
+    await callbackFlow(chatId,callback.message.message_id,admin,data);
+   }catch(error){
     const message=String((error as Error).message||error).slice(0,180);
     await ack(callback.id,message,true);
     try{await send(chatId,`تعذر إكمال العملية: ${message}`)}catch{}
