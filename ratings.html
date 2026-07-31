@@ -23,11 +23,12 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="UON Hub">
 <link rel="stylesheet" href="/css/pwa.css?v=25.6.0">
+<link rel="stylesheet" href="css/content-reports.css?v=31.2.0">
 </head><body>
 <header class="site-header"><div class="container nav"><a class="brand" href="index.html"><span class="brand-mark">U1</span>UON <span>Hub</span></a><a class="btn" href="index.html">الرئيسية</a></div></header>
 <main class="v14-page-main"><section class="page-hero"><div class="container"><span class="badge">تجارب الطلاب</span><h1>تقييمات الدكاترة والمقررات</h1><p>التقييمات مجهولة ولا نطلب حسابًا.</p></div></section>
 <section class="section"><div class="container">
-<div class="toolbar"><input id="ratingSearch" placeholder="ابحث عن دكتور أو مقرر"><button type="button" id="openRating" class="btn primary" data-ar="إضافة تقييم" data-en="Add Rating">إضافة تقييم</button></div>
+<div class="toolbar"><input id="ratingSearch" placeholder="ابحث عن دكتور أو مقرر"><select id="ratingType"><option value="">الكل</option><option value="instructor">الدكاترة</option><option value="course">المقررات</option></select><select id="ratingSort"><option value="recent">الأحدث</option><option value="top">الأعلى تقييمًا</option><option value="recommended">الأكثر توصية</option></select><button type="button" id="openRating" class="btn primary" data-ar="إضافة تقييم" data-en="Add Rating">إضافة تقييم</button></div><div id="ratingSummary" class="grid grid-3" style="margin:18px 0"></div>
 <div id="ratingCards" class="grid grid-3"></div>
 </div></section></main>
 <div class="modal" id="ratingModal"><div class="card modal-card"><div class="section-head"><h2 data-ar="إضافة تقييم" data-en="Add Rating">إضافة تقييم</h2><button type="button" id="closeRating" class="icon-btn">✕</button></div>
@@ -44,6 +45,7 @@
 <button type="submit" class="btn primary field wide">إرسال للمراجعة</button>
 </form></div></div>
 <div id="toast" class="toast"></div>
-<script type="module" src="js/ratings.js?v=18.8"></script>
+<script type="module" src="js/ratings.js?v=31.2.0"></script>
 <aside class="notification-drawer" id="notificationDrawer"><div class="section-head"><h3>الإشعارات</h3><button class="icon-btn" id="closeNotifications">✕</button></div><div id="notificationItems" class="notification-list"></div></aside><script type="module">import {setupV14Shell} from "./js/v14-ui.js?v=18.8";setupV14Shell();</script><script type="module">import {applyFeatureStates} from "./js/core.js?v=18.8";applyFeatureStates(document);</script><script type="module" src="js/runtime-guard.js?v=18.8"></script><script type="module" src="js/v20-experience.js?v=20.0.0"></script><script type="module" src="/js/pwa-init.js?v=25.6.0"></script>
+<script type="module" src="js/content-reports.js?v=31.2.0"></script>
 </body></html>

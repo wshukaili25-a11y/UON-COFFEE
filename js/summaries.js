@@ -17,6 +17,7 @@ import {
  closeModal,
  trackEvent
 } from './core.js';
+import {mountFeedback} from './resource-feedback.js?v=31.1.0';
 
 setupNav();
 await enforceUonMaintenance();
@@ -83,6 +84,8 @@ function render(){
     <div class="resource-actions">
      ${url?`<a class="btn primary" target="_blank" rel="noopener" href="${esc(url)}">فتح الملف</a>`:''}
      ${url?`<a class="btn" target="_blank" rel="noopener" href="${whatsappShare(title,url)}">مشاركة</a>`:''}
+     <button type="button" class="btn" data-feedback="useful" data-table="summaries" data-id="${item.id}">👍 مفيد</button>
+     <button type="button" class="btn" data-feedback="not-useful" data-table="summaries" data-id="${item.id}">👎 يحتاج تحديث</button>
      ${url?`<button type="button" class="btn danger"
        data-report-table="summaries"
        data-report-id="${item.id}"
@@ -172,4 +175,5 @@ document.addEventListener('click',event=>{
  });
 });
 
+mountFeedback();
 load();
