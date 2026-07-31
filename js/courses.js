@@ -1,4 +1,4 @@
-import {$,get,esc,enforceUonMaintenance,watchUonMaintenance,trackEvent,debounce,installErrorCapture} from './core.js?v=32.2.0';
+import {$,get,esc,enforceUonMaintenance,watchUonMaintenance,trackEvent,debounce,installErrorCapture} from './core.js?v=32.4.0';
 
 await enforceUonMaintenance();
 watchUonMaintenance();
@@ -10,7 +10,7 @@ const normalize=value=>text(value).toLowerCase();
 const nameAr=row=>text(row?.name_ar||row?.name_en||row?.name);
 const nameEn=row=>text(row?.name_en||row?.name_ar||row?.name);
 const programLabel=row=>text(row?.degree_ar)?`${nameAr(row)} — ${text(row.degree_ar)}`:nameAr(row);
-const requirementLabels={university:'متطلب جامعة',college:'متطلب كلية',major:'متطلب تخصص',elective:'اختياري',service:'مقرر خدمة'};
+const requirementLabels={university:'متطلب جامعة',college:'متطلب كلية',major:'متطلب تخصص',elective:'اختياري',service:'مقرر خدمة',multiple:'يختلف حسب البرنامج'};
 const byOrder=(a,b)=>(Number(a.sort_order)||999)-(Number(b.sort_order)||999)||nameAr(a).localeCompare(nameAr(b),'ar');
 
 function optionList(rows,label){return `<option value="">${esc(label)}</option>`+rows.map(row=>`<option value="${esc(row.id)}">${esc(programLabel(row))}</option>`).join('')}
@@ -42,6 +42,14 @@ function linkedCourseCodes(){
  const ids=academicProgramIds();
  if(!ids)return null;
  return new Set(state.links.filter(row=>ids.has(row.program_id)).map(row=>text(row.course_code).toUpperCase()));
+}
+function requirementTypeFor(course){
+ const ids=academicProgramIds(),code=text(course.code).toUpperCase();
+ if(!ids)return course.requirement_type||'';
+ const types=new Set(state.links.filter(row=>ids.has(row.program_id)&&text(row.course_code).toUpperCase()===code).map(row=>text(row.requirement_type)).filter(Boolean));
+ if(types.size===1)return [...types][0];
+ if(types.size>1)return'multiple';
+ return course.requirement_type||'';
 }
 function directAcademicMatch(course){
  const college=selectedCollege(),department=selectedDepartment();
@@ -76,7 +84,7 @@ function render(){
  $('#gridView').classList.toggle('active',state.view==='grid');
  $('#listView').classList.toggle('active',state.view==='list');
  catalog.innerHTML=rows.length?rows.map(course=>{
-  const code=text(course.code).toUpperCase(),title=nameAr(course)||nameEn(course)||code,subtitle=nameEn(course)!==title?nameEn(course):'',type=requirementLabels[course.requirement_type]||'';
+  const code=text(course.code).toUpperCase(),title=nameAr(course)||nameEn(course)||code,subtitle=nameEn(course)!==title?nameEn(course):'',type=requirementLabels[requirementTypeFor(course)]||'';
   return `<article class="v31-course-card"><a href="course.html?code=${encodeURIComponent(code)}"><div class="v31-course-card-head"><span class="v31-course-code">${esc(code)}</span><span class="v31-course-hours">${esc(course.credit_hours||'—')} ساعات</span></div>${type?`<span class="v31-course-college">${esc(type)}</span>`:''}<h2>${esc(title)}</h2>${subtitle?`<p>${esc(subtitle)}</p>`:''}</a><footer><a class="btn primary" href="course.html?code=${encodeURIComponent(code)}">فتح المقرر</a></footer></article>`;
  }).join(''):`<div class="course-empty"><strong>ما حصلنا مقررات مطابقة</strong><span>${academicFilter?'ما تم ربط مقررات بهذا الاختيار حتى الآن.':'غيّر البحث أو الفلاتر وجرب مرة ثانية.'}</span></div>`;
 }
