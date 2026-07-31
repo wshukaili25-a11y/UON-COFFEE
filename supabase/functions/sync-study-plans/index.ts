@@ -57,6 +57,12 @@ Deno.serve(async(req:Request)=>{
  if(!authorized(req))return new Response(JSON.stringify({ok:false,error:'unauthorized'}),{status:401,headers});
  try{
   const body=await req.json().catch(()=>({}));
+  if(body.source==='telegram'){
+   return new Response(JSON.stringify({
+    ok:false,
+    error:'المزامنة التلقائية أُوقفت للحماية. استخدم فحص الخطط للمراجعة قبل أي استيراد.'
+   }),{status:409,headers});
+  }
   const pages=[...new Set((Array.isArray(body.pages)&&body.pages.length?body.pages:DEFAULT_PAGES).map(safePage))].slice(0,3);
   const documents:any[]=[];const errors:any[]=[];
   for(const page of pages){try{documents.push(...discover(await html(page),page));}catch(error){errors.push({page,error:String((error as Error)?.message||error)});}}
