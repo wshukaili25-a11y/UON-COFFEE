@@ -57,7 +57,7 @@ Deno.serve(async(req:Request)=>{
      const result=await fetch(`${SUPABASE_URL}/functions/v1/sync-study-plans`,{
       method:'POST',
       headers:{authorization:`Bearer ${KEY}`,'content-type':'application/json'},
-      body:JSON.stringify({source:'telegram',requested_by:chatId}),
+      body:JSON.stringify({source:'telegram-v32-review',requested_by:chatId}),
       signal:AbortSignal.timeout(45000)
      });
      const payload=await result.json().catch(()=>({}));
