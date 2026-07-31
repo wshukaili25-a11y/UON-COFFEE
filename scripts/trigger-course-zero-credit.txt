@@ -1,0 +1,1 @@
+Run the V32.4.1 zero-credit course display patch.
