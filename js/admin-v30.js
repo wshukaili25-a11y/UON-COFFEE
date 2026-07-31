@@ -1,4 +1,4 @@
-import './admin.js?v=30.0.1';
+import './admin.js?v=30.0.3';
 import {rpc,toast} from './core.js?v=30.0.1';
 
 const passwordKey='uon_admin_password';

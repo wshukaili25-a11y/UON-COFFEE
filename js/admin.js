@@ -15,7 +15,7 @@ function showDashboard(){
  const login=$('#login');
  const dashboard=$('#dashboard');
  if(login){login.hidden=true;login.style.display='none'}
- if(dashboard){dashboard.hidden=false;dashboard.style.display='grid'}
+ if(dashboard){dashboard.hidden=false;dashboard.style.display=''}
 }
 
 showLogin();
