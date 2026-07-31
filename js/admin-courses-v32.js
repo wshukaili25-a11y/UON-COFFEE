@@ -1,2 +1,2 @@
-// Compatibility loader for cached V32.1 admin pages.
-import './admin-courses-v322.js?v=32.2.1';
+// Compatibility loader for cached course administration pages.
+import './admin-courses-v323.js?v=32.3.0';
