@@ -27,6 +27,28 @@ function installLegacyDockBlocker(){
   observer.observe(document.documentElement,{childList:true,subtree:true});
 }
 
+function applyWhatsAppCommunityBranding(){
+  const communityName='مجتمع طلاب جامعة نزوى';
+  const replacements=new Map([
+    ['قناة UON Hub الرسمية على واتساب',communityName],
+    ['متابعة القناة ←','الانضمام للمجتمع ←'],
+    ['مجموعات المواد والقناة الرسمية.','مجموعات المواد ومجتمع طلاب جامعة نزوى.'],
+    ['تابع الإعلانات والتحديثات الجديدة أولًا بأول','انضم للمجتمع وتابع الإعلانات والمجموعات والخدمات الطلابية']
+  ]);
+
+  document.querySelectorAll('strong,small,b,p,h1,h2,h3,a,span').forEach(element=>{
+    const text=element.textContent?.trim();
+    if(text&&replacements.has(text))element.textContent=replacements.get(text);
+  });
+
+  if(location.pathname.endsWith('/groups.html')){
+    const description='مجموعات واتساب للمواد ومجتمع طلاب جامعة نزوى.';
+    document.querySelector('meta[name="description"]')?.setAttribute('content',description);
+    document.querySelector('meta[property="og:description"]')?.setAttribute('content',description);
+    document.querySelector('meta[name="twitter:description"]')?.setAttribute('content',description);
+  }
+}
+
 function isPwaTestMode(){
   const params = new URLSearchParams(location.search);
   if(params.get('admin-pwa') === '1') localStorage.setItem(UON_PWA_TEST_KEY,'1');
@@ -93,4 +115,4 @@ async function registerPwa(){
 }
 
 installLegacyDockBlocker();
-document.addEventListener('DOMContentLoaded',()=>{removeLegacyActionDock();addIndependentNotice();createAdminInstallPanel();registerPwa();});
+document.addEventListener('DOMContentLoaded',()=>{removeLegacyActionDock();applyWhatsAppCommunityBranding();addIndependentNotice();createAdminInstallPanel();registerPwa();});
