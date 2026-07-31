@@ -31,15 +31,19 @@ const currentTheme=()=>localStorage.getItem('uon_theme')||'dark';
 const activePage=()=>pageMap[location.pathname]||'';
 const tr=key=>dictionary[currentLanguage()]?.[key]||key;
 
-
 const FEATURE_STATE_URL='https://irkhvydgxpseflggbeqq.supabase.co/rest/v1/rpc/uon_public_state';
 const FEATURE_STATE_KEY='sb_publishable_gZ9tyM1udrkuQIXHqDtToQ_FyFmePgH';
 let featureStatePromise=null;
 let featureStateMap={};
+let featureVisibilityMap={};
+const featureAliases={
+ university_guide:'university-guide',useful_sites:'useful-sites',support_centers:'support-centers'
+};
+const normalizeFeatureKey=key=>featureAliases[key]||key||'';
 const featureByPage={
  'courses.html':'courses','course.html':'courses','summaries.html':'summaries','groups.html':'groups',
- 'ratings.html':'ratings','university-guide.html':'university_guide','tools.html':'tools','gpa.html':'gpa',
- 'schedule.html':'schedule','calendar.html':'calendar','projects.html':'projects','useful-sites.html':'useful_sites',
+ 'ratings.html':'ratings','university-guide.html':'university-guide','tools.html':'tools','gpa.html':'gpa',
+ 'schedule.html':'schedule','calendar.html':'calendar','projects.html':'projects','useful-sites.html':'useful-sites',
  'assistant.html':'assistant','feedback.html':'feedback','confessions.html':'confessions'
 };
 
@@ -47,14 +51,69 @@ async function loadFeatureState(){
  if(featureStatePromise)return featureStatePromise;
  featureStatePromise=fetch(FEATURE_STATE_URL,{method:'POST',headers:{apikey:FEATURE_STATE_KEY,'Content-Type':'application/json'},body:'{}',cache:'no-store'})
   .then(async r=>{if(!r.ok)throw new Error(`feature state ${r.status}`);return r.json()})
-  .then(state=>{featureStateMap=state?.features||{};return state})
+  .then(state=>{
+   featureStateMap=state?.features||{};
+   featureVisibilityMap=state?.visibility||{};
+   return state;
+  })
   .catch(error=>{featureStatePromise=null;console.warn('Feature guard state failed',error);return null});
  return featureStatePromise;
 }
 
 function targetFeature(link){
- if(link?.dataset?.feature)return link.dataset.feature;
- try{return featureByPage[new URL(link.href,location.href).pathname.split('/').pop()]||''}catch{return ''}
+ const direct=normalizeFeatureKey(link?.dataset?.feature);
+ if(direct)return direct;
+ try{return normalizeFeatureKey(featureByPage[new URL(link.href,location.href).pathname.split('/').pop()]||'')}catch{return ''}
+}
+
+function featureVisible(feature){
+ return featureVisibilityMap[normalizeFeatureKey(feature)]!==false;
+}
+
+function visibilityHost(element){
+ if(element.matches?.('[data-feature]'))return element;
+ const featureParent=element.closest?.('[data-feature]');
+ if(featureParent)return featureParent;
+ const listItem=element.closest?.('li');
+ if(listItem)return listItem;
+ const article=element.closest?.('article');
+ if(article&&article.querySelectorAll('a[href]').length===1)return article;
+ return element;
+}
+
+function setFeatureElementVisibility(element,visible){
+ const host=visibilityHost(element);
+ if(!host)return;
+ if(!visible){
+  host.hidden=true;
+  host.dataset.featureHidden='1';
+  host.setAttribute('aria-hidden','true');
+ }else if(host.dataset.featureHidden==='1'){
+  host.hidden=false;
+  delete host.dataset.featureHidden;
+  host.removeAttribute('aria-hidden');
+ }
+}
+
+function applyFeatureVisibility(root=document){
+ const nodes=[];
+ if(root.matches?.('[data-feature],a[href]'))nodes.push(root);
+ root.querySelectorAll?.('[data-feature],a[href]').forEach(node=>nodes.push(node));
+ nodes.forEach(node=>{
+  const feature=targetFeature(node);
+  if(feature)setFeatureElementVisibility(node,featureVisible(feature));
+ });
+}
+
+function installVisibilityObserver(){
+ if(document.documentElement.dataset.featureVisibilityObserver==='1')return;
+ document.documentElement.dataset.featureVisibilityObserver='1';
+ const observer=new MutationObserver(mutations=>{
+  mutations.forEach(mutation=>mutation.addedNodes.forEach(node=>{
+   if(node.nodeType===1)applyFeatureVisibility(node);
+  }));
+ });
+ observer.observe(document.body,{childList:true,subtree:true});
 }
 
 function installFeatureNavigationGuard(){
@@ -65,7 +124,8 @@ function installFeatureNavigationGuard(){
   if(!link||link.target==='_blank'||event.ctrlKey||event.metaKey||event.shiftKey||event.altKey)return;
   const feature=targetFeature(link);if(!feature)return;
   event.preventDefault();event.stopImmediatePropagation();
-  if(!featureStateMap[feature])await loadFeatureState();
+  if(!featureStateMap[feature]&&featureVisibilityMap[feature]===undefined)await loadFeatureState();
+  if(!featureVisible(feature))return;
   const status=featureStateMap[feature]||'active';
   if(status!=='active'){
    showFeatureStateBanner(status,link.textContent?.trim()||'');
@@ -75,8 +135,10 @@ function installFeatureNavigationGuard(){
  },true);
 
  loadFeatureState().then(()=>{
+  applyFeatureVisibility(document);
+  installVisibilityObserver();
   document.querySelectorAll('a[href]').forEach(link=>{
-   const feature=targetFeature(link);if(!feature)return;
+   const feature=targetFeature(link);if(!feature||!featureVisible(feature))return;
    const status=featureStateMap[feature]||'active';
    link.dataset.status=status;
    link.classList.toggle('feature-unavailable',status!=='active');
@@ -84,6 +146,10 @@ function installFeatureNavigationGuard(){
   });
   const page=location.pathname.split('/').pop()||'index.html';
   const feature=featureByPage[page];
+  if(feature&&!featureVisible(feature)&&page!=='index.html'){
+   location.replace('index.html');
+   return;
+  }
   const status=feature?featureStateMap[feature]:'active';
   if(feature&&status&&status!=='active'&&page!=='coming-soon.html'){
    const q=new URLSearchParams({feature,status});
@@ -93,9 +159,9 @@ function installFeatureNavigationGuard(){
 }
 
 const featureKeys={
- courses:'courses',summaries:'summaries',groups:'groups',ratings:'ratings',guide:'university_guide',
+ courses:'courses',summaries:'summaries',groups:'groups',ratings:'ratings',guide:'university-guide',
  tools:'tools',gpa:'gpa',schedule:'schedule',calendar:'calendar',projects:'projects',
- useful:'useful_sites',assistant:'assistant',feedback:'feedback',confessions:'confessions'
+ useful:'useful-sites',assistant:'assistant',feedback:'feedback',confessions:'confessions'
 };
 
 function navLink(href,key){
@@ -201,7 +267,6 @@ export function setupV14Shell(){
   location.reload();
  }));
 
- // Inline service state banner
  if(!document.querySelector('#featureStateBanner')){
   document.body.insertAdjacentHTML('beforeend',`<div class="feature-state-banner" id="featureStateBanner">
    <button id="featureStateBannerClose">✕</button>
