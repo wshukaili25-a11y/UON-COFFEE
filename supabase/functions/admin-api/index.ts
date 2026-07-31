@@ -207,6 +207,71 @@ Deno.serve(async (req: Request) => {
       return reply(req, { ok: true, data: await adminRead(body) });
     }
 
+
+    if (body.action === 'course_upsert') {
+      const course = body.course || {};
+      const code = String(course.code || '').trim().toUpperCase().replace(/\s+/g, '');
+      const nameAr = String(course.name_ar || '').trim();
+      if (!/^[A-Z]{2,8}[0-9]{2,4}[A-Z]?$/.test(code)) throw new Error('Invalid course code');
+      if (nameAr.length < 2) throw new Error('Course Arabic name is required');
+      const payload = {
+        code,
+        name_ar: nameAr,
+        name_en: String(course.name_en || '').trim() || null,
+        college: String(course.college || '').trim() || null,
+        department: String(course.department || '').trim() || null,
+        credit_hours: course.credit_hours === '' || course.credit_hours == null ? null : Number(course.credit_hours),
+        level: course.level === '' || course.level == null ? null : Number(course.level),
+        description: String(course.description || '').trim() || null,
+        learning_outcomes: String(course.learning_outcomes || '').trim() || null,
+        active: course.active !== false,
+        status: 'approved',
+        updated_at: new Date().toISOString(),
+      };
+      const { data, error } = await db.from('courses').upsert(payload, { onConflict: 'code' }).select('*').single();
+      if (error) throw error;
+      await db.from('admin_audit_log').insert({ admin_name: 'web-admin', action: 'course_upsert', entity: 'courses', entity_id: data.id, details: payload });
+      return reply(req, { ok: true, data });
+    }
+
+    if (body.action === 'course_toggle') {
+      const id = String(body.id || '');
+      if (!id) throw new Error('Course id is required');
+      const { data, error } = await db.from('courses').update({ active: Boolean(body.active), updated_at: new Date().toISOString() }).eq('id', id).select('*').single();
+      if (error) throw error;
+      return reply(req, { ok: true, data });
+    }
+
+    if (body.action === 'course_delete') {
+      const id = String(body.id || '');
+      if (!id) throw new Error('Course id is required');
+      const { error } = await db.from('courses').delete().eq('id', id);
+      if (error) throw error;
+      return reply(req, { ok: true });
+    }
+
+    if (body.action === 'course_bulk_upsert') {
+      const rows = Array.isArray(body.rows) ? body.rows.slice(0, 1000) : [];
+      if (!rows.length) throw new Error('No course rows supplied');
+      const normalized = rows.map((course: any) => ({
+        code: String(course.code || '').trim().toUpperCase().replace(/\s+/g, ''),
+        name_ar: String(course.name_ar || course.name || '').trim(),
+        name_en: String(course.name_en || '').trim() || null,
+        college: String(course.college || '').trim() || null,
+        department: String(course.department || '').trim() || null,
+        credit_hours: course.credit_hours === '' || course.credit_hours == null ? null : Number(course.credit_hours),
+        level: course.level === '' || course.level == null ? null : Number(course.level),
+        description: String(course.description || '').trim() || null,
+        active: String(course.active ?? 'true').toLowerCase() !== 'false',
+        status: 'approved',
+        updated_at: new Date().toISOString(),
+      })).filter((x: any) => /^[A-Z]{2,8}[0-9]{2,4}[A-Z]?$/.test(x.code) && x.name_ar.length >= 2);
+      if (!normalized.length) throw new Error('No valid course rows');
+      const { data, error } = await db.from('courses').upsert(normalized, { onConflict: 'code' }).select('id,code');
+      if (error) throw error;
+      return reply(req, { ok: true, data, imported: data?.length || 0, skipped: rows.length - normalized.length });
+    }
+
     if (body.action === 'reindex') {
       const response = await fetch(`${SUPABASE_URL}/functions/v1/search-reindex`, {
         method: 'POST',
