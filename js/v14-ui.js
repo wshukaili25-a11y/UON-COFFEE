@@ -31,8 +31,16 @@ const currentTheme=()=>localStorage.getItem('uon_theme')||'dark';
 const activePage=()=>pageMap[location.pathname]||'';
 const tr=key=>dictionary[currentLanguage()]?.[key]||key;
 
+const featureKeys={
+ courses:'courses',summaries:'summaries',groups:'groups',ratings:'ratings',guide:'university_guide',
+ tools:'tools',gpa:'gpa',schedule:'schedule',calendar:'calendar',projects:'projects',
+ useful:'useful_sites',assistant:'assistant',feedback:'feedback',confessions:'confessions'
+};
+
 function navLink(href,key){
- return `<a href="${href}" class="${activePage()===key?'active':''}">${tr(key)}</a>`;
+ const feature=featureKeys[key];
+ const attr=feature?` data-feature="${feature}"`:'';
+ return `<a href="${href}"${attr} class="${activePage()===key?'active':''}">${tr(key)}</a>`;
 }
 
 function applyTheme(){
