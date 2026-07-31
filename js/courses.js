@@ -1,11 +1,8 @@
-import {checkFeature,installErrorCapture,$,get,esc,enforceUonMaintenance,watchUonMaintenance,trackEvent,debounce,colleges as coreColleges} from './core.js';
+import {installErrorCapture,$,get,esc,enforceUonMaintenance,watchUonMaintenance,trackEvent,debounce,colleges as coreColleges} from './core.js?v=31.6.3';
 
 await enforceUonMaintenance();
 watchUonMaintenance();
 installErrorCapture();
-
-const featureState=await checkFeature('courses');
-if(featureState!=='active')throw new Error('COURSES_FEATURE_DISABLED');
 
 const lang=()=>localStorage.getItem('uon_language')||'ar';
 const tr=(ar,en)=>lang()==='ar'?ar:en;
@@ -72,7 +69,7 @@ function ensureFallbacks(){
   state.colleges=coreColleges.map((name,index)=>({id:name,name_ar:name,name_en:name,sort_order:(index+1)*10,active:true}));
  }
  if(!state.departments.length){
-  state.departments=state.colleges.flatMap((college,index)=>[
+  state.departments=state.colleges.flatMap(college=>[
    {id:`${college.id}::university`,college_id:String(college.id),name_ar:'متطلبات الجامعة',name_en:'University Requirements',sort_order:1},
    {id:`${college.id}::college`,college_id:String(college.id),name_ar:'متطلبات الكلية',name_en:'College Requirements',sort_order:2}
   ]);
