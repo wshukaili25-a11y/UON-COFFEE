@@ -1,4 +1,5 @@
 import './admin.js?v=30.0.3';
+import './admin-courses-v32.js?v=32.0.0';
 import {rpc,toast} from './core.js?v=30.0.1';
 
 const passwordKey='uon_admin_password';
@@ -38,7 +39,6 @@ function formPayload(form){
  return Object.fromEntries(new FormData(form).entries());
 }
 
-// Secure site settings.
 document.addEventListener('click',event=>{
  const button=event.target.closest('#saveSite');
  if(!button)return;
@@ -56,7 +56,6 @@ document.addEventListener('click',event=>{
  }),'تم حفظ إعدادات الموقع بأمان');
 },true);
 
-// Secure feature and tool state changes.
 document.addEventListener('change',event=>{
  const select=event.target;
  if(!(select instanceof HTMLSelectElement))return;
@@ -74,7 +73,6 @@ document.addEventListener('change',event=>{
  }
 },true);
 
-// Secure moderation center and suggestion actions.
 document.addEventListener('click',event=>{
  const approve=event.target.closest('[data-ok]');
  const reject=event.target.closest('[data-no]');
@@ -91,7 +89,6 @@ document.addEventListener('click',event=>{
  }),action==='approve'?'تم القبول':action==='review'?'تمت المراجعة':action==='delete'?'تم الحذف':'تم الرفض');
 },true);
 
-// Secure announcements.
 document.addEventListener('click',event=>{
  const add=event.target.closest('#addAd');
  const toggle=event.target.closest('[data-togglead]');
@@ -114,7 +111,6 @@ document.addEventListener('click',event=>{
  }),action==='create'?'تمت إضافة الإعلان':action==='toggle'?'تم تحديث حالة الإعلان':'تم حذف الإعلان');
 },true);
 
-// Secure Telegram admin management.
 document.addEventListener('click',event=>{
  const add=event.target.closest('#addTg');
  const del=event.target.closest('[data-deltg]');
@@ -133,7 +129,6 @@ document.addEventListener('click',event=>{
  }),action==='create'?'تمت إضافة المشرف':'تم حذف المشرف');
 },true);
 
-// Secure delete actions for catalog entities.
 document.addEventListener('click',event=>{
  const mappings=[
   ['[data-cal-del]','academic_calendar_events','calDel','تم حذف الموعد'],
@@ -151,12 +146,10 @@ document.addEventListener('click',event=>{
  }
 },true);
 
-// Secure create forms for calendar, courses and notifications.
 document.addEventListener('submit',event=>{
  const form=event.target;
  const map={
   calendarForm:['academic_calendar_events','تمت إضافة الموعد'],
-  courseForm:['courses','تمت إضافة المادة'],
   notificationForm:['site_notifications','تم نشر الإشعار']
  };
  const config=map[form.id];
@@ -169,7 +162,6 @@ document.addEventListener('submit',event=>{
  }),message);
 },true);
 
-// Secure support center settings through the generic settings RPC.
 document.addEventListener('submit',event=>{
  const form=event.target;
  if(!['anjizSettings','masalikSettings'].includes(form.id))return;
