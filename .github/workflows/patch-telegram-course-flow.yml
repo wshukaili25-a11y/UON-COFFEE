@@ -1,6 +1,7 @@
 name: Patch Telegram Course Flow
 
 on:
+  workflow_dispatch:
   push:
     paths:
       - 'scripts/patch_telegram_course_flow.py'
