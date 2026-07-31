@@ -122,7 +122,7 @@ document.addEventListener('click',event=>{
   runButton(drive,()=>callAdminEdge('google-drive-import',{
    source:document.querySelector('#driveFolderId')?.value.trim()||'',
    college:document.querySelector('#driveCollege')?.value||''
-  }),'اكتمل استيراد Google Drive',{log}).catch(()=>{});
+  }),'اكتملت معالجة Google Drive',{log}).catch(()=>{});
   return;
  }
 

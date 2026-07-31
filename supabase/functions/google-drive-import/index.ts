@@ -194,11 +194,12 @@ Deno.serve(async (req: Request) => {
           return;
         }
 
-        const { data: existing } = await db
+        const { data: existing, error: existingError } = await db
           .from('drive_import_items')
           .select('id')
           .eq('drive_file_id', file.id)
           .maybeSingle();
+        if (existingError) throw existingError;
         if (existing) {
           skipped++;
           return;
@@ -217,8 +218,7 @@ Deno.serve(async (req: Request) => {
           .select()
           .single();
         if (itemError) {
-          skipped++;
-          return;
+          throw itemError;
         }
 
         const { data: summary, error: summaryError } = await db
@@ -235,12 +235,19 @@ Deno.serve(async (req: Request) => {
           .select('id')
           .single();
         if (summaryError) {
-          skipped++;
           await db.from('drive_import_items').delete().eq('id', item.id);
-          return;
+          throw summaryError;
         }
 
-        await db.from('drive_import_items').update({ summary_id: summary.id }).eq('id', item.id);
+        const { error: linkError } = await db
+          .from('drive_import_items')
+          .update({ summary_id: summary.id })
+          .eq('id', item.id);
+        if (linkError) {
+          await db.from('drive_import_items').delete().eq('id', item.id);
+          await db.from('summaries').delete().eq('id', summary.id);
+          throw linkError;
+        }
         imported++;
     }
 
