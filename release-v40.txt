@@ -1,0 +1,3 @@
+UON Hub V40.0.0
+Released: 2026-08-01
+Includes: completed course center, structured admin navigation, secure content reports, course content requests, database indexes, tightened RLS, and cache refresh.
