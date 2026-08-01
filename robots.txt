@@ -2,5 +2,7 @@ User-agent: *
 Allow: /
 Disallow: /admin.html
 Disallow: /maintenance.html
+Disallow: /coming-soon.html
+Disallow: /offline.html
 
-Sitemap: https://uonhub.space/sitemap.xml
+Sitemap: https://www.uonhub.space/sitemap.xml
