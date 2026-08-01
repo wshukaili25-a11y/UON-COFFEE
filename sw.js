@@ -1,6 +1,6 @@
-const CACHE_NAME='uonhub-pwa-v34-0-0';
+const CACHE_NAME='uonhub-pwa-v34-0-1';
 const OFFLINE_URL='/offline.html';
-const CORE_ASSETS=['/','/index.html','/tools.html','/groups.html','/assistant.html','/confessions.html','/offline.html','/manifest.webmanifest','/css/app.css','/css/ui-refresh-v24.css','/css/pwa.css','/js/core.js','/js/v14-ui.js','/js/v20-experience.js','/js/pwa-init.js','/js/assistant.js','/js/confessions.js','/js/tools.js','/assets/icons/icon-192.png','/assets/icons/icon-512.png'];
+const CORE_ASSETS=['/','/index.html','/tools.html','/confessions.html','/groups.html','/assistant.html','/offline.html','/manifest.webmanifest','/css/app.css','/css/ui-refresh-v24.css','/css/pwa.css','/js/core.js','/js/v14-ui.js','/js/v20-experience.js','/js/pwa-init.js','/js/tools.js','/js/confessions.js','/js/assistant.js','/assets/icons/icon-192.png','/assets/icons/icon-512.png'];
 self.addEventListener('install',event=>{event.waitUntil(caches.open(CACHE_NAME).then(cache=>Promise.allSettled(CORE_ASSETS.map(asset=>cache.add(asset)))).then(()=>self.skipWaiting()))});
 self.addEventListener('activate',event=>{event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(key=>key!==CACHE_NAME).map(key=>caches.delete(key)))).then(()=>self.clients.claim()))});
 self.addEventListener('fetch',event=>{
@@ -15,5 +15,8 @@ self.addEventListener('fetch',event=>{
   event.respondWith(fetch(event.request).then(response=>{if(response.ok)caches.open(CACHE_NAME).then(cache=>cache.put(event.request,response.clone()));return response}).catch(async()=>await caches.match(event.request)||new Response('',{status:504,statusText:'Offline'})));
   return;
  }
- event.respondWith(caches.match(event.request).then(cached=>{const network=fetch(event.request).then(response=>{if(response.ok)caches.open(CACHE_NAME).then(cache=>cache.put(event.request,response.clone()));return response});return cached||network.catch(()=>new Response('',{status:504,statusText:'Offline'}))}));
+ event.respondWith(caches.match(event.request).then(cached=>{
+  const network=fetch(event.request).then(response=>{if(response.ok)caches.open(CACHE_NAME).then(cache=>cache.put(event.request,response.clone()));return response});
+  return cached||network.catch(()=>new Response('',{status:504,statusText:'Offline'}));
+ }));
 });
