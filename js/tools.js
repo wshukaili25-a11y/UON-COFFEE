@@ -1,5 +1,5 @@
-import {setupNav,enforceUonMaintenance,watchUonMaintenance,$,get,toast,esc} from './core.js?v=34.0.2';
-import {applyFeatureStates as applyV175States} from './core.js?v=34.0.2';
+import {setupNav,enforceUonMaintenance,watchUonMaintenance,$,get,toast,esc} from './core.js?v=35.0.0';
+import {applyFeatureStates as applyV175States} from './core.js?v=35.0.0';
 
 setupNav();
 await enforceUonMaintenance();
@@ -9,7 +9,7 @@ let rows=[];
 let cats=[];
 
 const fixedTools=[
- {feature:'confessions',href:'confessions.html',icon:'👀',title:'الرسائل المجهولة',description:'أنشئ رابطك واستقبل رسائل مجهولة وردّ على ما تختاره.'},
+ {feature:'confessions',href:'confessions.html',icon:'👀',title:'اعترافات الطلاب',description:'اكتب اعترافك بشكل مجهول وتفاعل مع اعترافات الطلاب.'},
  {feature:'useful-sites',href:'useful-sites.html',icon:'🔗',title:'مواقع مهمة ومفيدة',description:'مواقع الجامعة وأدوات دراسية مختارة.'},
  {feature:'assistant',href:'assistant.html',icon:'AI',title:'مساعد UON AI',description:'اسأل عن المقررات والخدمات ودليل الجامعة.'}
 ];
