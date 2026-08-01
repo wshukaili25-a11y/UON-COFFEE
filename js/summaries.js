@@ -1,179 +1,26 @@
-import {
- whatsappShare,
- reportBrokenLink,
- installErrorCapture,
- setupNav,
- enforceUonMaintenance,
- watchUonMaintenance,
- $,
- get,
- insert,
- submitPending,
- notifyPending,
- toast,
- fillCollege,
- esc,
- openModal,
- closeModal,
- trackEvent
-} from './core.js';
-import {mountFeedback} from './resource-feedback.js?v=31.1.0';
-
-setupNav();
-await enforceUonMaintenance();
-watchUonMaintenance();
-installErrorCapture();
-
-const search=$('#search');
-const collegeFilter=$('#collegeFilter');
-const collegeInput=$('#collegeInput');
-const openButton=$('#openForm');
-const closeButton=$('#closeForm');
-const form=$('#submitForm');
-const items=$('#items');
-
-if(collegeFilter)fillCollege(collegeFilter);
-if(collegeInput)fillCollege(collegeInput);
-
-let rows=[];
-
-function safeResourceUrl(value){
- try{
-  const url=new URL(String(value||''),location.origin);
-  return ['https:','http:'].includes(url.protocol)?url.href:'';
- }catch{return ''}
-}
-
-async function load(){
- try{
-  rows=await get('summaries','select=*&approved=eq.true&order=created_at.desc');
-  render();
-  trackEvent('page_view',{page:'summaries'});
- }catch(error){
-  console.error(error);
-  toast('تعذر تحميل الملخصات حاليًا',true);
- }
-}
-
-function render(){
- if(!items)return;
-
- const query=(search?.value||'').trim().toLowerCase();
- const college=collegeFilter?.value||'';
-
- const list=rows.filter(item=>
-  (!college||item.college===college)&&
-  `${item.title||''} ${item.subject||''} ${item.course_code||''}`
-   .toLowerCase()
-   .includes(query)
- );
-
- items.innerHTML=list.length
-  ?list.map(item=>{
-   const title=item.title||'ملخص أو اختبار';
-   const url=safeResourceUrl(item.url||item.link||item.pdf_url||'');
-   const type=item.resource_type||item.content_type||'ملف';
-
-   return `<article class="card item-card">
-    <div class="item-card-head">
-     <span class="badge">${esc(type)}</span>
-     <small>${esc(item.college||'')}</small>
-    </div>
-    <h3>${esc(title)}</h3>
-    <p>${esc(item.subject||item.course_code||'')} ${item.description?`— ${esc(item.description)}`:''}</p>
-    <div class="resource-actions">
-     ${url?`<a class="btn primary" target="_blank" rel="noopener" href="${esc(url)}">فتح الملف</a>`:''}
-     ${url?`<a class="btn" target="_blank" rel="noopener" href="${whatsappShare(title,url)}">مشاركة</a>`:''}
-     <button type="button" class="btn" data-feedback="useful" data-table="summaries" data-id="${item.id}">👍 مفيد</button>
-     <button type="button" class="btn" data-feedback="not-useful" data-table="summaries" data-id="${item.id}">👎 يحتاج تحديث</button>
-     ${url?`<button type="button" class="btn danger"
-       data-report-table="summaries"
-       data-report-id="${item.id}"
-       data-report-title="${esc(title)}"
-       data-report-url="${esc(url)}">بلاغ عن الرابط</button>`:''}
-    </div>
-   </article>`;
-  }).join('')
-  :'<div class="empty">لا توجد نتائج</div>';
-}
-
-search?.addEventListener('input',render);
-collegeFilter?.addEventListener('change',render);
-
-openButton?.addEventListener('click',event=>{
- event.preventDefault();
- openModal('submitModal');
-});
-
-closeButton?.addEventListener('click',event=>{
- event.preventDefault();
- closeModal('submitModal');
-});
-
-$('#submitModal')?.addEventListener('click',event=>{
- if(event.target.id==='submitModal')closeModal('submitModal');
-});
-
-form?.addEventListener('submit',async event=>{
- event.preventDefault();
-
- const submitButton=form.querySelector('button[type="submit"],button:not([type])');
- const originalText=submitButton?.textContent||'إرسال للمشرف';
-
- const body=Object.fromEntries(new FormData(form));
- body.approved=false;
-
- // Compatibility with newer course-center queries.
- if(body.subject&&!body.course_code)body.course_code=String(body.subject).trim().toUpperCase();
- if(body.resource_type&&!body.content_type){
-  body.content_type=body.resource_type==='اختبار'?'exam':'summary';
- }
-
- try{
-  if(submitButton){
-   submitButton.disabled=true;
-   submitButton.textContent='جاري الإرسال...';
-  }
-
-  const data=await submitPending('summaries',body);
-  await notifyPending('summaries',data.id);
-
-  toast('تم إرسال الملف للمراجعة');
-  form.reset();
-  if(collegeInput)fillCollege(collegeInput);
-  closeModal('submitModal');
-  trackEvent('summary_submit',{
-   course_code:body.course_code||body.subject||'',
-   resource_type:body.resource_type||''
-  });
- }catch(error){
-  console.error(error);
-  const message=String(error?.message||'');
-  toast(
-   /row-level security|policy/i.test(message)
-    ?'تعذر الإرسال بسبب صلاحيات قاعدة البيانات'
-    :'تعذر إرسال الملف، تحقق من البيانات والرابط',
-   true
-  );
- }finally{
-  if(submitButton){
-   submitButton.disabled=false;
-   submitButton.textContent=originalText;
-  }
- }
-});
-
-document.addEventListener('click',event=>{
- const button=event.target.closest('[data-report-table]');
- if(!button)return;
-
- reportBrokenLink({
-  sourceTable:button.dataset.reportTable,
-  sourceId:button.dataset.reportId,
-  title:button.dataset.reportTitle,
-  url:button.dataset.reportUrl
- });
-});
-
-mountFeedback();
+import{whatsappShare,reportBrokenLink,installErrorCapture,setupNav,enforceUonMaintenance,watchUonMaintenance,$,get,submitPending,notifyPending,toast,fillCollege,esc,openModal,closeModal,trackEvent,rpc}from'./core.js?v=36.0.0';
+setupNav();await enforceUonMaintenance();watchUonMaintenance();installErrorCapture();
+const search=$('#search'),collegeFilter=$('#collegeFilter'),collegeInput=$('#collegeInput'),typeFilter=$('#typeFilter'),form=$('#submitForm'),items=$('#items');
+fillCollege(collegeFilter);fillCollege(collegeInput);
+let rows=[],stats=new Map(),activeItem=null,selectedRating=0,selectedRecommended=null;
+const SESSION_KEY='uon_anon_session';let sessionId=localStorage.getItem(SESSION_KEY);if(!sessionId){sessionId=crypto.randomUUID();localStorage.setItem(SESSION_KEY,sessionId)}
+const safeUrl=value=>{try{const u=new URL(String(value||''),location.origin);return ['https:','http:'].includes(u.protocol)?u.href:''}catch{return''}};
+const formatDate=v=>v?new Date(v).toLocaleDateString('ar-OM'):'—';
+const starText=value=>{const n=Math.max(0,Math.min(5,Math.round(Number(value)||0)));return '★'.repeat(n)+'☆'.repeat(5-n)};
+async function load(){items.innerHTML='<div class="sum-loading">جاري تحميل الملفات...</div>';try{rows=await get('summaries','select=*&approved=eq.true&order=created_at.desc&limit=500');await loadStats();render();trackEvent('page_view',{page:'summaries'})}catch(error){console.error(error);items.innerHTML='<div class="sum-empty">تعذر تحميل الملخصات حاليًا.</div>';toast('تعذر تحميل الملخصات حاليًا',true)}}
+async function loadStats(){stats.clear();const ids=rows.map(x=>String(x.id));if(!ids.length)return;try{const data=await rpc('uon_summary_rating_stats',{p_ids:ids});for(const s of data||[])stats.set(String(s.resource_id),s)}catch(error){console.warn('Rating stats unavailable',error)}}
+function card(item){const title=item.title||'ملخص أو اختبار',url=safeUrl(item.url||item.link||item.pdf_url),type=item.resource_type||item.content_type||'ملف',code=item.course_code||item.subject||'',s=stats.get(String(item.id))||{},avg=Number(s.average||item.rating||0),count=Number(s.total||0);return `<article class="sum-card" data-id="${item.id}"><div class="sum-card-head"><span class="sum-type">${esc(type)}</span><span class="sum-code">${esc(code)}</span></div><h3>${esc(title)}</h3><p class="sum-desc">${esc(item.description||'ملف دراسي مرفوع لطلاب المقرر.')}</p><div class="sum-meta"><span>🏫 ${esc(item.college||'غير محدد')}</span><span>👁 ${Number(item.views||0)}</span><span>📥 ${Number(item.downloads||0)}</span><span>🗓 ${formatDate(item.updated_at||item.created_at)}</span></div><div class="sum-rating-line"><span class="sum-stars">${starText(avg)}</span><span class="sum-rating-num">${avg?avg.toFixed(1):'جديد'}</span><small>(${count} تقييم)</small></div><div class="sum-actions">${url?`<a class="btn primary" data-open="view" target="_blank" rel="noopener" href="${esc(url)}">فتح الملف</a>`:''}<button class="btn" data-rate>⭐ تقييم</button>${url?`<a class="btn" target="_blank" rel="noopener" href="${whatsappShare(title,url)}">مشاركة</a><button class="btn danger" data-report>بلاغ</button>`:''}</div></article>`}
+function render(){const q=(search.value||'').trim().toLowerCase(),college=collegeFilter.value||'',type=typeFilter.value||'';const list=rows.filter(x=>(!college||x.college===college)&&(!type||(x.resource_type||x.content_type||'')===type)&&`${x.title||''} ${x.subject||''} ${x.course_code||''} ${x.description||''}`.toLowerCase().includes(q));items.innerHTML=list.length?list.map(card).join(''):'<div class="sum-empty">ما حصلنا ملفات تطابق بحثك.</div>'}
+search.oninput=render;collegeFilter.onchange=render;typeFilter.onchange=render;
+$('#openForm').onclick=()=>openModal('submitModal');$('#closeForm').onclick=()=>closeModal('submitModal');$('#closeRating').onclick=()=>closeModal('ratingModal');
+document.querySelectorAll('.modal').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)closeModal(m.id)}));
+form.onsubmit=async e=>{e.preventDefault();const btn=form.querySelector('[type="submit"]'),body=Object.fromEntries(new FormData(form));body.approved=false;if(body.subject)body.course_code=String(body.subject).trim().toUpperCase();body.content_type=body.resource_type==='اختبار'?'exam':'summary';btn.disabled=true;btn.textContent='جاري الإرسال...';try{const data=await submitPending('summaries',body);await notifyPending('summaries',data.id);toast('تم إرسال الملف للمراجعة');form.reset();fillCollege(collegeInput);closeModal('submitModal');trackEvent('summary_submit',{course_code:body.course_code||'',resource_type:body.resource_type||''})}catch(error){toast('تعذر إرسال الملف، تحقق من البيانات والرابط',true)}finally{btn.disabled=false;btn.textContent='إرسال للمراجعة'}};
+function ratingOverview(s={}){const avg=Number(s.average||0),total=Number(s.total||0),stars=s.stars||{},rec=s.recommended_percent;const bars=[5,4,3,2,1].map(n=>{const count=Number(stars[String(n)]||0),pct=total?Math.round(count/total*100):0;return `<div class="rating-bar"><span>${n}★</span><i><span style="width:${pct}%"></span></i><b>${count}</b></div>`}).join('');return `<div class="rating-overview"><div class="rating-score"><strong>${avg?avg.toFixed(1):'—'}</strong><div class="sum-stars">${starText(avg)}</div><small>${total} تقييم</small>${rec!==null&&rec!==undefined?`<p>${rec}% ينصحون به</p>`:''}</div><div class="rating-bars">${bars}</div></div>`}
+function reviewsHtml(s={}){const comments=Array.isArray(s.comments)?s.comments:[];return comments.length?comments.map(r=>`<article class="review"><div class="review-top"><strong>${esc(r.name||'مجهول')}</strong><span class="sum-stars">${starText(r.rating)}</span></div><p>${esc(r.comment||'')}</p><small>${formatDate(r.created_at)}</small></article>`).join(''):'<div class="sum-empty">ما فيه آراء مكتوبة للحين.</div>'}
+function openRating(item){activeItem=item;selectedRating=0;selectedRecommended=null;$('#ratingResourceId').value=item.id;$('#ratingTitle').textContent='تقييم: '+(item.title||'الملف');$('#ratingSubtitle').textContent=item.course_code||item.subject||'';const s=stats.get(String(item.id))||{};$('#ratingOverview').innerHTML=ratingOverview(s);$('#reviewList').innerHTML=reviewsHtml(s);$('#ratingComment').value='';$('#reviewerName').value='';syncPicker();document.querySelectorAll('[data-recommend]').forEach(b=>b.classList.remove('primary'));openModal('ratingModal')}
+function syncPicker(){document.querySelectorAll('#ratingPicker [data-value]').forEach(b=>b.classList.toggle('active',Number(b.dataset.value)<=selectedRating))}
+$('#ratingPicker').onclick=e=>{const b=e.target.closest('[data-value]');if(!b)return;selectedRating=Number(b.dataset.value);syncPicker()};
+document.querySelectorAll('[data-recommend]').forEach(b=>b.onclick=()=>{selectedRecommended=b.dataset.recommend==='true';document.querySelectorAll('[data-recommend]').forEach(x=>x.classList.toggle('primary',x===b))});
+$('#ratingForm').onsubmit=async e=>{e.preventDefault();if(!selectedRating)return toast('اختر عدد النجوم أولًا',true);const btn=e.submitter;btn.disabled=true;try{await rpc('uon_submit_resource_rating',{p_resource_table:'summaries',p_resource_id:String(activeItem.id),p_session_id:sessionId,p_rating:selectedRating,p_recommended:selectedRecommended,p_comment:$('#ratingComment').value.trim()||null,p_reviewer_name:$('#reviewerName').value.trim()||null});toast('تم حفظ تقييمك ⭐');await loadStats();render();openRating(activeItem);trackEvent('summary_rating',{rating:selectedRating})}catch(error){toast(error.message||'تعذر حفظ التقييم',true)}finally{btn.disabled=false}};
+items.onclick=async e=>{const cardEl=e.target.closest('[data-id]');if(!cardEl)return;const item=rows.find(x=>String(x.id)===cardEl.dataset.id);if(!item)return;if(e.target.closest('[data-rate]'))return openRating(item);if(e.target.closest('[data-report]')){const url=safeUrl(item.url||item.link||item.pdf_url);return reportBrokenLink({sourceTable:'summaries',sourceId:item.id,title:item.title,url})}const open=e.target.closest('[data-open]');if(open){rpc('uon_track_summary_open',{p_summary_id:item.id,p_kind:'view'}).catch(()=>{});item.views=Number(item.views||0)+1;trackEvent('summary_open',{id:item.id,course_code:item.course_code||item.subject||''})}};
 load();
