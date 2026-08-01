@@ -1,8 +1,19 @@
-import{get,esc,enforceUonMaintenance,watchUonMaintenance,trackEvent,trackClicks,applyFeatureStates}from'./core.js?v=37.1.0';
-await enforceUonMaintenance();watchUonMaintenance();
+import{get,esc,enforceUonMaintenance,watchUonMaintenance,trackEvent,trackClicks,applyFeatureStates}from'./core.js?v=37.2.0';
+await enforceUonMaintenance();
+watchUonMaintenance();
+
 const qs=s=>document.querySelector(s);
 const formatDate=v=>v?new Date(v).toLocaleDateString('ar-OM'):'اليوم';
-function installStyle(){if(document.querySelector('#home371Style'))return;const l=document.createElement('link');l.id='home371Style';l.rel='stylesheet';l.href='css/home-v371.css?v=37.1.0';document.head.appendChild(l)}
+
+function installStyle(){
+ if(document.querySelector('#home372Style'))return;
+ const link=document.createElement('link');
+ link.id='home372Style';
+ link.rel='stylesheet';
+ link.href='css/home-v371.css?v=37.2.0';
+ document.head.appendChild(link);
+}
+
 const slides=[
  {feature:'summaries',icon:'📚',tag:'مكتبة الطالب',title:'ملخصات واختبارات مرتبة',text:'ابحث برمز المادة، افتح الملف وشوف تقييمات الطلاب قبل التحميل.',url:'summaries.html',cta:'تصفح الملخصات'},
  {feature:'groups',icon:'💬',tag:'مجتمع الطلاب',title:'مجموعات المواد في مكان واضح',text:'وصل لمجموعتك ومجتمع طلاب جامعة نزوى بدون البحث بين روابط كثيرة.',url:'groups.html',cta:'فتح المجموعات'},
@@ -10,15 +21,198 @@ const slides=[
  {feature:'confessions',icon:'👀',tag:'اعترافات الطلاب',title:'اكتب اللي بخاطرك بشكل مجهول',text:'اعترافات مباشرة وتفاعلات طلابية مع تحكم كامل للمشرف.',url:'confessions.html',cta:'شوف الاعترافات'},
  {feature:'university-guide',icon:'🎓',tag:'دليل الجامعة',title:'اعرف كليتك وتخصصك وخطتك',text:'دليل منظم للكليات والأقسام والتخصصات مع المصادر الرسمية.',url:'university-guide.html',cta:'فتح الدليل'}
 ];
-function sliderMarkup(){return `<div class="h371-slider" id="homeServiceSlider"><div class="h371-track">${slides.map((x,i)=>`<article class="h371-slide" data-feature="${x.feature}" data-slide="${i}"><div class="h371-slide-copy"><span class="h371-slide-tag">${x.tag}</span><h2>${x.title}</h2><p>${x.text}</p><a class="btn primary" href="${x.url}">${x.cta}</a></div><span class="h371-slide-icon">${x.icon}</span></article>`).join('')}</div><button class="h371-arrow h371-prev" type="button" aria-label="السابق">‹</button><button class="h371-arrow h371-next" type="button" aria-label="التالي">›</button><div class="h371-dots">${slides.map((_,i)=>`<button type="button" data-go="${i}" aria-label="الشريحة ${i+1}"></button>`).join('')}</div></div>`}
-function shell(){const old=document.querySelector('main');if(!old)return;old.outerHTML=`<main class="home37"><section class="h37-hero"><div class="h37-container"><div class="h371-hero-copy"><span class="h37-eyebrow">🎓 مجتمع طلاب جامعة نزوى</span><h1>كل خدمات طالب جامعة نزوى في <span>مكان واحد</span></h1><p class="h37-hero-copy">ملخصات واختبارات، مجموعات المواد، دليل الجامعة، اعترافات الطلاب، المشاريع، التقييمات ومساعد UON AI — بسرعة وبدون تعقيد.</p><div class="h37-hero-actions"><a class="btn primary" href="tools.html">استكشف كل الخدمات</a><a class="btn" href="summaries.html" data-feature="summaries">تصفح الملخصات</a></div><form class="h37-search" id="homeSearch"><input id="homeSearchInput" placeholder="ابحث عن مادة، ملخص، خدمة أو تخصص..." autocomplete="off"><button class="btn primary">بحث</button></form></div>${sliderMarkup()}</div></section><section class="h37-section h37-soft"><div class="h37-container"><div class="h37-head h37-reveal"><div><h2>ابدأ من هنا</h2><p>أكثر الخدمات التي يحتاجها الطالب يوميًا.</p></div><a href="tools.html">كل الأدوات ←</a></div><div class="h37-services h37-reveal"><a class="h37-service" href="summaries.html" data-feature="summaries"><span class="h37-service-icon">📚</span><strong>الملخصات والاختبارات</strong><small>ملفات مرتبة ومقيّمة حسب المادة.</small></a><a class="h37-service" href="groups.html" data-feature="groups"><span class="h37-service-icon">💬</span><strong>المجموعات والمجتمع</strong><small>مجموعات المواد ومجتمع الطلاب.</small></a><a class="h37-service" href="university-guide.html" data-feature="university-guide"><span class="h37-service-icon">🎓</span><strong>دليل الجامعة</strong><small>الكليات والأقسام والتخصصات.</small></a><a class="h37-service" href="assistant.html" data-feature="assistant"><span class="h37-service-icon">🤖</span><strong>مساعد UON AI</strong><small>اسأل عن الجامعة وخدمات المنصة.</small></a><a class="h37-service" href="confessions.html" data-feature="confessions"><span class="h37-service-icon">👀</span><strong>اعترافات الطلاب</strong><small>اكتب وشارك بشكل مجهول.</small></a><a class="h37-service" href="ratings.html" data-feature="ratings"><span class="h37-service-icon">⭐</span><strong>التقييمات</strong><small>تجارب الطلاب مع المواد والدكاترة.</small></a></div></div></section><section class="h37-section"><div class="h37-container"><div class="h37-head h37-reveal"><div><h2>UON Hub بالأرقام</h2><p>أرقام حقيقية تتحدث من محتوى المنصة.</p></div></div><div class="h37-dashboard h37-reveal"><article class="h37-stat"><strong id="statSummaries">—</strong><span>ملخص واختبار</span></article><article class="h37-stat"><strong id="statGroups">—</strong><span>مجموعة معتمدة</span></article><article class="h37-stat"><strong id="statRatings">—</strong><span>تقييم طالب</span></article><article class="h37-stat"><strong id="statProjects">—</strong><span>مشروع طلابي</span></article></div></div></section><section class="h37-section h37-soft"><div class="h37-container"><div class="h37-content-grid"><section class="h37-panel h37-reveal"><div class="h37-panel-head"><h3>✨ آخر الإضافات</h3><a href="summaries.html">عرض الكل</a></div><div class="h37-feed" id="latestFeed"><div class="h37-empty">جاري التحميل...</div></div></section><section class="h37-panel h37-reveal"><div class="h37-panel-head"><h3>🔥 الأكثر استخدامًا</h3><span class="h37-chip">آخر 7 أيام</span></div><div class="h37-feed" id="popularFeed"><div class="h37-empty">جاري التحميل...</div></div></section></div></div></section><section class="h37-section"><div class="h37-container"><div class="h37-content-grid"><section class="h37-panel h37-reveal" data-feature="confessions"><div class="h37-panel-head"><h3>👀 أحدث الاعترافات</h3><a href="confessions.html">شوف الكل</a></div><div class="h37-feed" id="confessionsFeed"><div class="h37-empty">جاري التحميل...</div></div></section><section class="h37-panel h37-reveal" data-feature="projects"><div class="h37-panel-head"><h3>💡 أحدث المشاريع</h3><a href="projects.html">كل المشاريع</a></div><div class="h37-feed" id="projectsFeed"><div class="h37-empty">جاري التحميل...</div></div></section></div></div></section><section class="h37-section h37-soft"><div class="h37-container"><div class="h37-head h37-reveal"><div><h2>روابط الجامعة المهمة</h2><p>وصول سريع للخدمات الرسمية الأكثر استخدامًا.</p></div><a href="useful-sites.html">كل الروابط ←</a></div><div class="h37-links h37-reveal" id="officialLinks"><div class="h37-empty">جاري التحميل...</div></div></div></section></main>`}
-function feedItem({url='#',icon='✨',title='',sub='',chip=''}){return `<a href="${esc(url)}"${/^https?:/i.test(url)?' target="_blank" rel="noopener"':''}><span class="h37-feed-icon">${icon}</span><span class="h37-feed-body"><strong>${esc(title)}</strong><small>${esc(sub)}</small></span>${chip?`<span class="h37-chip">${esc(chip)}</span>`:''}</a>`}
-async function loadStats(){const targets=['#statSummaries','#statGroups','#statRatings','#statProjects'];try{const [a,b,c,d]=await Promise.all([get('summaries','select=id&approved=eq.true'),get('whatsapp_groups','select=id&approved=eq.true'),get('rating_submissions','select=id&status=eq.approved'),get('student_projects','select=id&status=eq.approved')]);[a,b,c,d].forEach((x,i)=>{const e=qs(targets[i]);if(e)e.textContent=x.length})}catch{targets.forEach(x=>{const e=qs(x);if(e)e.textContent='—'})}}
-async function loadLatest(){const target=qs('#latestFeed');let all=[];const sources=[['summaries','select=id,title,course_code,subject,created_at&approved=eq.true&order=created_at.desc&limit=5','📚','ملخص','summaries.html'],['whatsapp_groups','select=id,subject,course_code,created_at&approved=eq.true&order=created_at.desc&limit=5','💬','مجموعة','groups.html'],['student_projects','select=id,title,major,created_at&status=eq.approved&order=created_at.desc&limit=5','💡','مشروع','projects.html']];for(const[table,q,icon,type,url]of sources){try{(await get(table,q)).forEach(x=>all.push({icon,type,url,title:x.title||x.subject||x.course_code||'إضافة جديدة',sub:x.course_code||x.subject||x.major||formatDate(x.created_at),created_at:x.created_at}))}catch{}}all.sort((a,b)=>new Date(b.created_at)-new Date(a.created_at));const list=all.slice(0,7);target.innerHTML=list.length?list.map(x=>feedItem({...x,chip:x.type})).join(''):'<div class="h37-empty">لا توجد إضافات حديثة.</div>'}
-async function loadPopular(){const t=qs('#popularFeed');try{const since=new Date(Date.now()-7*86400000).toISOString();const rows=await get('usage_events',`select=event_type,metadata&created_at=gte.${encodeURIComponent(since)}&limit=2500`);const map=new Map();for(const x of rows){const label=x.metadata?.code||x.metadata?.course_code||x.metadata?.page||x.event_type;if(!label)continue;const key=String(label).toUpperCase();map.set(key,(map.get(key)||0)+1)}const list=[...map.entries()].sort((a,b)=>b[1]-a[1]).slice(0,6);t.innerHTML=list.length?list.map(([title,count],i)=>feedItem({url:title.match(/^[A-Z]{3,5}\d{3}/)?`course.html?code=${encodeURIComponent(title)}`:'tools.html',icon:String(i+1),title,sub:`${count} استخدام خلال الأسبوع`,chip:'نشط'})).join(''):'<div class="h37-empty">تظهر البيانات بعد استخدام المنصة.</div>'}catch{t.innerHTML='<div class="h37-empty">تعذر تحميل النشاط حاليًا.</div>'}}
-async function loadConfessions(){const t=qs('#confessionsFeed');try{const rows=await get('confessions','select=id,text,college,created_at&status=eq.approved&order=created_at.desc&limit=4');t.innerHTML=rows.length?rows.map(x=>`<a class="h37-confession" href="confessions.html"><span class="h37-feed-icon">👤</span><span class="h37-feed-body"><p>${esc(x.text)}</p><small>${esc(x.college||'مجهول')} • ${formatDate(x.created_at)}</small></span></a>`).join(''):'<div class="h37-empty">ما فيه اعترافات للحين.</div>'}catch{t.innerHTML='<div class="h37-empty">تعذر تحميل الاعترافات.</div>'}}
-async function loadProjects(){const t=qs('#projectsFeed');try{const rows=await get('student_projects','select=id,title,major,url,created_at&status=eq.approved&order=created_at.desc&limit=5');t.innerHTML=rows.length?rows.map(x=>feedItem({url:x.url||'projects.html',icon:'💡',title:x.title,sub:x.major||formatDate(x.created_at)})).join(''):'<div class="h37-empty">لا توجد مشاريع منشورة.</div>'}catch{t.innerHTML='<div class="h37-empty">تعذر تحميل المشاريع.</div>'}}
-async function loadLinks(){const t=qs('#officialLinks');try{const rows=await get('useful_sites','select=title_ar,description_ar,url,icon&active=eq.true&category=eq.university&order=sort_order.asc&limit=8');t.innerHTML=rows.length?rows.map(x=>`<a class="h37-link" href="${esc(x.url)}" target="_blank" rel="noopener"><span>${esc(x.icon||'🔗')}</span><div><strong>${esc(x.title_ar)}</strong><small>${esc(x.description_ar||'رابط رسمي')}</small></div></a>`).join(''):'<div class="h37-empty">لا توجد روابط مضافة.</div>'}catch{t.innerHTML='<div class="h37-empty">تعذر تحميل الروابط.</div>'}}
-function setupSlider(){const root=qs('#homeServiceSlider'),track=root?.querySelector('.h371-track');if(!root||!track)return;let index=0,timer=null,startX=null;const cards=[...track.children];const dots=[...root.querySelectorAll('[data-go]')];const visible=()=>cards.filter(x=>getComputedStyle(x).display!=='none');const go=n=>{const list=visible();if(!list.length)return;index=(n+list.length)%list.length;track.style.transform=`translateX(${index*100}%)`;dots.forEach((x,i)=>x.classList.toggle('active',i===Number(list[index].dataset.slide)))};const restart=()=>{clearInterval(timer);if(!matchMedia('(prefers-reduced-motion: reduce)').matches)timer=setInterval(()=>go(index+1),4800)};root.querySelector('.h371-next').onclick=()=>{go(index+1);restart()};root.querySelector('.h371-prev').onclick=()=>{go(index-1);restart()};dots.forEach(x=>x.onclick=()=>{const wanted=visible().findIndex(y=>y.dataset.slide===x.dataset.go);if(wanted>=0){go(wanted);restart()}});root.addEventListener('pointerdown',e=>{startX=e.clientX;clearInterval(timer)});root.addEventListener('pointerup',e=>{if(startX!==null){const d=e.clientX-startX;if(Math.abs(d)>45)go(index+(d<0?1:-1));startX=null;restart()}});root.addEventListener('mouseenter',()=>clearInterval(timer));root.addEventListener('mouseleave',restart);go(0);restart()}
-function interactions(){qs('#homeSearch')?.addEventListener('submit',e=>{e.preventDefault();const q=qs('#homeSearchInput').value.trim();if(q)location.href=`search.html?q=${encodeURIComponent(q)}`});const ob=new IntersectionObserver(es=>es.forEach(x=>{if(x.isIntersecting){x.target.classList.add('visible');ob.unobserve(x.target)}}),{threshold:.1});document.querySelectorAll('.h37-reveal').forEach(x=>ob.observe(x));setupSlider()}
-installStyle();shell();interactions();await Promise.allSettled([applyFeatureStates(document),loadStats(),loadLatest(),loadPopular(),loadConfessions(),loadProjects(),loadLinks()]);setupSlider();trackClicks();trackEvent('page_view',{page:'home_v371'});window.addEventListener('focus',()=>{applyFeatureStates(document);setupSlider()});
+
+function sliderMarkup(){
+ return `<div class="h371-slider" id="homeServiceSlider">
+  <div class="h371-track">
+   ${slides.map((x,i)=>`<article class="h371-slide" data-feature="${x.feature}" data-slide="${i}">
+    <div class="h371-slide-copy"><span class="h371-slide-tag">${x.tag}</span><h2>${x.title}</h2><p>${x.text}</p><a class="btn primary" href="${x.url}">${x.cta}</a></div>
+    <span class="h371-slide-icon">${x.icon}</span>
+   </article>`).join('')}
+  </div>
+  <button class="h371-arrow h371-prev" type="button" aria-label="السابق">‹</button>
+  <button class="h371-arrow h371-next" type="button" aria-label="التالي">›</button>
+  <div class="h371-dots"></div>
+ </div>`;
+}
+
+function shell(){
+ const old=document.querySelector('main');
+ if(!old)return;
+ old.outerHTML=`<main class="home37">
+ <section class="h37-hero"><div class="h37-container">
+  <div class="h371-hero-copy">
+   <span class="h37-eyebrow">🎓 مجتمع طلاب جامعة نزوى</span>
+   <h1>كل خدمات طالب جامعة نزوى في <span>مكان واحد</span></h1>
+   <p class="h37-hero-copy">ملخصات واختبارات، مجموعات المواد، دليل الجامعة، اعترافات الطلاب، المشاريع، التقييمات ومساعد UON AI — بسرعة وبدون تعقيد.</p>
+   <div class="h37-hero-actions"><a class="btn primary" href="tools.html">استكشف كل الخدمات</a><a class="btn" href="summaries.html" data-feature="summaries">تصفح الملخصات</a></div>
+   <form class="h37-search" id="homeSearch"><input id="homeSearchInput" placeholder="ابحث عن مادة، ملخص، خدمة أو تخصص..." autocomplete="off"><button class="btn primary">بحث</button></form>
+  </div>
+  ${sliderMarkup()}
+ </div></section>
+
+ <section class="h37-section h37-soft"><div class="h37-container">
+  <div class="h37-head h37-reveal"><div><h2>ابدأ من هنا</h2><p>أكثر الخدمات التي يحتاجها الطالب يوميًا.</p></div><a href="tools.html">كل الأدوات ←</a></div>
+  <div class="h37-services h37-reveal">
+   <a class="h37-service" href="summaries.html" data-feature="summaries"><span class="h37-service-icon">📚</span><strong>الملخصات والاختبارات</strong><small>ملفات مرتبة ومقيّمة حسب المادة.</small></a>
+   <a class="h37-service" href="groups.html" data-feature="groups"><span class="h37-service-icon">💬</span><strong>المجموعات والمجتمع</strong><small>مجموعات المواد ومجتمع الطلاب.</small></a>
+   <a class="h37-service" href="university-guide.html" data-feature="university-guide"><span class="h37-service-icon">🎓</span><strong>دليل الجامعة</strong><small>الكليات والأقسام والتخصصات.</small></a>
+   <a class="h37-service" href="assistant.html" data-feature="assistant"><span class="h37-service-icon">🤖</span><strong>مساعد UON AI</strong><small>اسأل عن الجامعة وخدمات المنصة.</small></a>
+   <a class="h37-service" href="confessions.html" data-feature="confessions"><span class="h37-service-icon">👀</span><strong>اعترافات الطلاب</strong><small>اكتب وشارك بشكل مجهول.</small></a>
+   <a class="h37-service" href="ratings.html" data-feature="ratings"><span class="h37-service-icon">⭐</span><strong>التقييمات</strong><small>تجارب الطلاب مع المواد والدكاترة.</small></a>
+  </div>
+ </div></section>
+
+ <section class="h37-section"><div class="h37-container">
+  <div class="h37-head h37-reveal"><div><h2>UON Hub بالأرقام</h2><p>أرقام حقيقية تتحدث من محتوى المنصة.</p></div></div>
+  <div class="h37-dashboard h37-dashboard-five h37-reveal">
+   <article class="h37-stat"><strong id="statSummaries">—</strong><span>ملخص واختبار</span></article>
+   <article class="h37-stat"><strong id="statGroups">—</strong><span>مجموعة معتمدة</span></article>
+   <article class="h37-stat"><strong id="statRatings">—</strong><span>تقييم طالب</span></article>
+   <article class="h37-stat"><strong id="statProjects">—</strong><span>مشروع طلابي</span></article>
+   <article class="h37-stat h37-university-card"><strong>UON</strong><span>جامعة نزوى</span></article>
+  </div>
+ </div></section>
+
+ <section class="h37-section h37-soft"><div class="h37-container"><div class="h37-content-grid">
+  <section class="h37-panel h37-reveal"><div class="h37-panel-head"><h3>✨ آخر الإضافات</h3><a href="summaries.html">عرض الكل</a></div><div class="h37-feed" id="latestFeed"><div class="h37-empty">جاري التحميل...</div></div></section>
+  <section class="h37-panel h37-reveal"><div class="h37-panel-head"><h3>🔥 الأكثر استخدامًا</h3><span class="h37-chip">آخر 7 أيام</span></div><div class="h37-feed" id="popularFeed"><div class="h37-empty">جاري التحميل...</div></div></section>
+ </div></div></section>
+
+ <section class="h37-section"><div class="h37-container"><div class="h37-content-grid">
+  <section class="h37-panel h37-reveal" data-feature="confessions"><div class="h37-panel-head"><h3>👀 أحدث الاعترافات</h3><a href="confessions.html">شوف الكل</a></div><div class="h37-feed" id="confessionsFeed"><div class="h37-empty">جاري التحميل...</div></div></section>
+  <section class="h37-panel h37-reveal" data-feature="projects"><div class="h37-panel-head"><h3>💡 أحدث المشاريع</h3><a href="projects.html">كل المشاريع</a></div><div class="h37-feed" id="projectsFeed"><div class="h37-empty">جاري التحميل...</div></div></section>
+ </div></div></section>
+
+ <section class="h37-section h37-soft"><div class="h37-container">
+  <div class="h37-head h37-reveal"><div><h2>روابط الجامعة المهمة</h2><p>وصول سريع للخدمات الرسمية الأكثر استخدامًا.</p></div><a href="useful-sites.html">كل الروابط ←</a></div>
+  <div class="h37-links h37-reveal" id="officialLinks"><div class="h37-empty">جاري التحميل...</div></div>
+ </div></section>
+ </main>`;
+}
+
+function feedItem({url='#',icon='✨',title='',sub='',chip=''}){
+ return `<a href="${esc(url)}"${/^https?:/i.test(url)?' target="_blank" rel="noopener"':''}><span class="h37-feed-icon">${icon}</span><span class="h37-feed-body"><strong>${esc(title)}</strong><small>${esc(sub)}</small></span>${chip?`<span class="h37-chip">${esc(chip)}</span>`:''}</a>`;
+}
+
+async function loadStats(){
+ const targets=['#statSummaries','#statGroups','#statRatings','#statProjects'];
+ try{
+  const [a,b,c,d]=await Promise.all([
+   get('summaries','select=id&approved=eq.true'),
+   get('whatsapp_groups','select=id&approved=eq.true'),
+   get('rating_submissions','select=id&status=eq.approved'),
+   get('student_projects','select=id&status=eq.approved')
+  ]);
+  [a,b,c,d].forEach((x,i)=>{const e=qs(targets[i]);if(e)e.textContent=x.length});
+ }catch{targets.forEach(x=>{const e=qs(x);if(e)e.textContent='—'})}
+}
+
+async function loadLatest(){
+ const target=qs('#latestFeed');
+ let all=[];
+ const sources=[
+  ['summaries','select=id,title,course_code,subject,created_at&approved=eq.true&order=created_at.desc&limit=5','📚','ملخص','summaries.html'],
+  ['whatsapp_groups','select=id,subject,course_code,created_at&approved=eq.true&order=created_at.desc&limit=5','💬','مجموعة','groups.html'],
+  ['student_projects','select=id,title,major,created_at&status=eq.approved&order=created_at.desc&limit=5','💡','مشروع','projects.html']
+ ];
+ for(const[table,q,icon,type,url]of sources){
+  try{(await get(table,q)).forEach(x=>all.push({icon,type,url,title:x.title||x.subject||x.course_code||'إضافة جديدة',sub:x.course_code||x.subject||x.major||formatDate(x.created_at),created_at:x.created_at}))}catch{}
+ }
+ all.sort((a,b)=>new Date(b.created_at)-new Date(a.created_at));
+ const list=all.slice(0,7);
+ target.innerHTML=list.length?list.map(x=>feedItem({...x,chip:x.type})).join(''):'<div class="h37-empty">لا توجد إضافات حديثة.</div>';
+}
+
+async function loadPopular(){
+ const target=qs('#popularFeed');
+ try{
+  const since=new Date(Date.now()-7*86400000).toISOString();
+  const rows=await get('usage_events',`select=event_type,metadata&created_at=gte.${encodeURIComponent(since)}&limit=2500`);
+  const map=new Map();
+  for(const x of rows){const label=x.metadata?.code||x.metadata?.course_code||x.metadata?.page||x.event_type;if(!label)continue;const key=String(label).toUpperCase();map.set(key,(map.get(key)||0)+1)}
+  const list=[...map.entries()].sort((a,b)=>b[1]-a[1]).slice(0,6);
+  target.innerHTML=list.length?list.map(([title,count],i)=>feedItem({url:/^[A-Z]{3,5}\d{3}/.test(title)?`course.html?code=${encodeURIComponent(title)}`:'tools.html',icon:String(i+1),title,sub:`${count} استخدام خلال الأسبوع`,chip:'نشط'})).join(''):'<div class="h37-empty">تظهر البيانات بعد استخدام المنصة.</div>';
+ }catch{target.innerHTML='<div class="h37-empty">تعذر تحميل النشاط حاليًا.</div>'}
+}
+
+async function loadConfessions(){
+ const target=qs('#confessionsFeed');
+ try{
+  const rows=await get('confessions','select=id,text,college,created_at&status=eq.approved&order=created_at.desc&limit=4');
+  target.innerHTML=rows.length?rows.map(x=>`<a class="h37-confession" href="confessions.html"><span class="h37-feed-icon">👤</span><span class="h37-feed-body"><p>${esc(x.text)}</p><small>${esc(x.college||'مجهول')} • ${formatDate(x.created_at)}</small></span></a>`).join(''):'<div class="h37-empty">ما فيه اعترافات للحين.</div>';
+ }catch{target.innerHTML='<div class="h37-empty">تعذر تحميل الاعترافات.</div>'}
+}
+
+async function loadProjects(){
+ const target=qs('#projectsFeed');
+ try{
+  const rows=await get('student_projects','select=id,title,major,url,created_at&status=eq.approved&order=created_at.desc&limit=5');
+  target.innerHTML=rows.length?rows.map(x=>feedItem({url:x.url||'projects.html',icon:'💡',title:x.title,sub:x.major||formatDate(x.created_at)})).join(''):'<div class="h37-empty">لا توجد مشاريع منشورة.</div>';
+ }catch{target.innerHTML='<div class="h37-empty">تعذر تحميل المشاريع.</div>'}
+}
+
+async function loadLinks(){
+ const target=qs('#officialLinks');
+ try{
+  const rows=await get('useful_sites','select=title_ar,description_ar,url,icon&active=eq.true&category=eq.university&order=sort_order.asc&limit=8');
+  target.innerHTML=rows.length?rows.map(x=>`<a class="h37-link" href="${esc(x.url)}" target="_blank" rel="noopener"><span>${esc(x.icon||'🔗')}</span><div><strong>${esc(x.title_ar)}</strong><small>${esc(x.description_ar||'رابط رسمي')}</small></div></a>`).join(''):'<div class="h37-empty">لا توجد روابط مضافة.</div>';
+ }catch{target.innerHTML='<div class="h37-empty">تعذر تحميل الروابط.</div>'}
+}
+
+function pruneHiddenSlides(){
+ const root=qs('#homeServiceSlider');
+ const track=root?.querySelector('.h371-track');
+ if(!root||!track)return;
+ [...track.children].forEach(slide=>{if(getComputedStyle(slide).display==='none'||slide.hidden)slide.remove()});
+ const cards=[...track.children];
+ const dots=root.querySelector('.h371-dots');
+ dots.innerHTML=cards.map((_,i)=>`<button type="button" data-go="${i}" aria-label="الشريحة ${i+1}"></button>`).join('');
+ if(cards.length<2){root.querySelectorAll('.h371-arrow,.h371-dots').forEach(x=>x.hidden=true)}
+}
+
+let sliderTimer=null;
+function setupSlider(){
+ clearInterval(sliderTimer);
+ const root=qs('#homeServiceSlider');
+ const track=root?.querySelector('.h371-track');
+ if(!root||!track)return;
+ const cards=[...track.children];
+ const dots=[...root.querySelectorAll('[data-go]')];
+ if(!cards.length){root.hidden=true;return}
+ let index=0,startX=null;
+ const go=n=>{
+  index=(n+cards.length)%cards.length;
+  track.style.transform=`translateX(${index*100}%)`;
+  dots.forEach((dot,i)=>dot.classList.toggle('active',i===index));
+ };
+ const restart=()=>{
+  clearInterval(sliderTimer);
+  if(cards.length>1&&!matchMedia('(prefers-reduced-motion: reduce)').matches)sliderTimer=setInterval(()=>go(index+1),4800);
+ };
+ root.querySelector('.h371-next')?.addEventListener('click',()=>{go(index+1);restart()});
+ root.querySelector('.h371-prev')?.addEventListener('click',()=>{go(index-1);restart()});
+ dots.forEach((dot,i)=>dot.addEventListener('click',()=>{go(i);restart()}));
+ root.addEventListener('pointerdown',e=>{startX=e.clientX;clearInterval(sliderTimer)});
+ root.addEventListener('pointerup',e=>{if(startX!==null){const delta=e.clientX-startX;if(Math.abs(delta)>45)go(index+(delta<0?1:-1));startX=null;restart()}});
+ root.addEventListener('mouseenter',()=>clearInterval(sliderTimer));
+ root.addEventListener('mouseleave',restart);
+ go(0);restart();
+}
+
+function interactions(){
+ qs('#homeSearch')?.addEventListener('submit',e=>{e.preventDefault();const q=qs('#homeSearchInput').value.trim();if(q)location.href=`search.html?q=${encodeURIComponent(q)}`});
+ const observer=new IntersectionObserver(entries=>entries.forEach(entry=>{if(entry.isIntersecting){entry.target.classList.add('visible');observer.unobserve(entry.target)}}),{threshold:.1});
+ document.querySelectorAll('.h37-reveal').forEach(x=>observer.observe(x));
+}
+
+installStyle();
+shell();
+interactions();
+await applyFeatureStates(document).catch(()=>{});
+pruneHiddenSlides();
+setupSlider();
+await Promise.allSettled([loadStats(),loadLatest(),loadPopular(),loadConfessions(),loadProjects(),loadLinks()]);
+trackClicks();
+trackEvent('page_view',{page:'home_v372'});
+window.addEventListener('focus',()=>applyFeatureStates(document));
