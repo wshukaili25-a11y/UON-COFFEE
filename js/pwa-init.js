@@ -49,6 +49,35 @@ function applyWhatsAppCommunityBranding(){
   }
 }
 
+async function ensureConfessionsEntry(){
+  const feature='confessions';
+  const homeContainer=document.querySelector('.v18-secondary-tools');
+  if(homeContainer&&!homeContainer.querySelector('[data-feature="confessions"]')){
+    const link=document.createElement('a');
+    link.href='confessions.html';
+    link.dataset.feature=feature;
+    link.innerHTML='<span>👀</span><strong data-ar="الرسائل المجهولة" data-en="Anonymous Messages">الرسائل المجهولة</strong>';
+    homeContainer.prepend(link);
+  }
+
+  const toolsContainer=document.querySelector('#items');
+  if(location.pathname.endsWith('/tools.html')&&toolsContainer&&!toolsContainer.querySelector('[data-feature="confessions"]')){
+    const card=document.createElement('a');
+    card.className='card feature-card';
+    card.href='confessions.html';
+    card.dataset.feature=feature;
+    card.innerHTML='<span class="tool-icon">👀</span><h3>الرسائل المجهولة</h3><p>أنشئ رابطك واستقبل رسائل مجهولة وردّ على ما تختاره.</p><b>فتح</b>';
+    toolsContainer.prepend(card);
+  }
+
+  try{
+    const {applyFeatureStates}=await import('./core.js?v=34.0.2');
+    await applyFeatureStates(document);
+  }catch(error){
+    console.warn('Confessions feature state check skipped',error);
+  }
+}
+
 function isPwaTestMode(){
   const params = new URLSearchParams(location.search);
   if(params.get('admin-pwa') === '1') localStorage.setItem(UON_PWA_TEST_KEY,'1');
@@ -115,4 +144,11 @@ async function registerPwa(){
 }
 
 installLegacyDockBlocker();
-document.addEventListener('DOMContentLoaded',()=>{removeLegacyActionDock();applyWhatsAppCommunityBranding();addIndependentNotice();createAdminInstallPanel();registerPwa();});
+document.addEventListener('DOMContentLoaded',()=>{
+  removeLegacyActionDock();
+  applyWhatsAppCommunityBranding();
+  ensureConfessionsEntry();
+  addIndependentNotice();
+  createAdminInstallPanel();
+  registerPwa();
+});
