@@ -132,6 +132,11 @@ async function registerPwa(){
   if(registration.waiting)registration.waiting.postMessage({type:'SKIP_WAITING'});
  }catch(error){console.warn('PWA registration failed:',error)}
 }
+async function loadAdminEnhancements(){
+ const isAdmin=document.body.classList.contains('admin-page')||/\/admin(?:\.html)?\/?$/.test(location.pathname);
+ if(!isAdmin)return;
+ try{await import(`./admin-v39-fixes.js?v=${APP_VERSION}`)}catch(error){console.error('Admin V39 enhancements failed',error)}
+}
 
 normalizeUiPreferences();
 document.addEventListener('DOMContentLoaded',()=>{
@@ -141,5 +146,6 @@ document.addEventListener('DOMContentLoaded',()=>{
  applyWhatsAppCommunityBranding();
  addIndependentNotice();
  createAdminInstallPanel();
+ loadAdminEnhancements();
  registerPwa();
 });
