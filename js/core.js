@@ -31,19 +31,28 @@ function onAdminPage(){
  return /\/admin(?:\.html)?\/?$/.test(location.pathname)||document.body?.classList.contains('admin-page');
 }
 
-async function adminRead(table,query){
+function requireAdminCredentials(){
  const password=sessionStorage.getItem('uon_admin_password')||'';
  const session=adminSession();
  if(!password||!session?.created_at||Date.now()-session.created_at>ADMIN_SESSION_TTL){
   clearAdminSession();
   throw new Error('انتهت جلسة الإدارة، سجّل الدخول مرة ثانية');
  }
+ return password;
+}
+
+async function adminRequest(table,{method='GET',query='',body,timeout=REQUEST_TIMEOUT}={}){
+ const password=requireAdminCredentials();
+ const action=method==='GET'?'read':'mutate';
+ const payload=action==='read'
+  ?{action,table,query}
+  :{action,table,query,method,data:body};
  const res=await fetchWithTimeout(`${SUPABASE_URL}/functions/v1/admin-api`,{
   method:'POST',
   headers:{...headers,'x-admin-password':password},
-  body:JSON.stringify({action:'read',table,query}),
+  body:JSON.stringify(payload),
   cache:'no-store'
- });
+ },timeout);
  const data=parseResponse(await res.text());
  if(res.status===401)clearAdminSession();
  if(!res.ok||data?.ok===false)throw new Error(data?.error||data?.message||data||`HTTP ${res.status}`);
@@ -51,7 +60,7 @@ async function adminRead(table,query){
 }
 
 export async function api(table,{method='GET',query='',body,prefer='return=representation',timeout=REQUEST_TIMEOUT}={}){
- if(method==='GET'&&onAdminPage())return adminRead(table,query);
+ if(onAdminPage())return adminRequest(table,{method,query,body,timeout});
  const res=await fetchWithTimeout(`${SUPABASE_URL}/rest/v1/${table}${query?`?${query}`:''}`,{
   method,
   headers:{...headers,Prefer:prefer},
