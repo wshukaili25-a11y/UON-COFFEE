@@ -1,4 +1,4 @@
-import{setupNav,enforceUonMaintenance,watchUonMaintenance,$,rpc,insert,submitPending,notifyPending,toast,esc,colleges,get,trackEvent}from'./core.js';
+import{setupNav,enforceUonMaintenance,watchUonMaintenance,$,rpc,submitPending,notifyPending,toast,esc,colleges,get,trackEvent}from'./core.js';
 setupNav();await enforceUonMaintenance();watchUonMaintenance();
 
 const SESSION_KEY='uon_confession_session_v1';
@@ -17,18 +17,18 @@ $('#submitConfession').onclick=async()=>{
  const text=$('#confessionText').value.trim();
  if(text.length<5)return toast('اكتب اعترافًا أطول شوي',true);
  if(text.length>1000)return toast('الاعتراف طويل جدًا',true);
- const btn=$('#submitConfession');btn.disabled=true;btn.textContent='جاري الإرسال...';
+ const college=$('#confessionCollege').value||null;
+ const program=$('#confessionProgram').value.trim()||null;
+ const btn=$('#submitConfession');btn.disabled=true;btn.textContent='جاري النشر...';
  try{
-  const row=await submitPending('confessions',{
-   text,content:text,category:'عام',is_anon:true,status:'pending',
-   college:$('#confessionCollege').value||null,
-   program:$('#confessionProgram').value.trim()||null
-  });
-  await notifyPending('confessions',row.id);
+  await rpc('uon_submit_confession',{p_text:text,p_college:college,p_program:program});
   $('#confessionText').value='';$('#confessionCount').textContent='0';$('#confessionProgram').value='';
-  toast('وصل اعترافك للمراجعة 👀');
-  trackEvent('confession_submitted',{college:$('#confessionCollege').value||''});
- }catch(error){toast(error.message||'تعذر إرسال الاعتراف',true)}finally{btn.disabled=false;btn.textContent='📨 إرسال للمراجعة'}
+  toast('تم نشر اعترافك مباشرة 👀');
+  trackEvent('confession_published',{college:college||''});
+  sort='latest';
+  document.querySelectorAll('[data-sort]').forEach(x=>x.classList.toggle('active',x.dataset.sort==='latest'));
+  await loadFeed();
+ }catch(error){toast(error.message||'تعذر نشر الاعتراف',true)}finally{btn.disabled=false;btn.textContent='📨 نشر الاعتراف'}
 };
 
 function reactionButtons(row){const counts=row.reactions||{};return Object.entries(reactionMeta).map(([key,[emoji,label]])=>`<button class="conf-reaction" data-reaction="${key}" title="${label}">${emoji} <span>${Number(counts[key]||0)}</span></button>`).join('')}
