@@ -1,6 +1,68 @@
-const CACHE_NAME='uonhub-pwa-v38-0-1';
+const CACHE_NAME='uonhub-pwa-v39-0-0';
 const OFFLINE_URL='/offline.html';
-const CORE_ASSETS=['/','/index.html','/tools.html','/summaries.html','/ratings.html','/confessions.html','/groups.html','/assistant.html','/offline.html','/manifest.webmanifest','/css/app.css','/css/ui-refresh-v24.css','/css/home-v371.css?v=37.2.0','/css/ratings-v38.css?v=38.0.0','/css/experience-v38.css?v=38.0.1','/css/pwa.css','/js/core.js','/js/v14-ui.js','/js/v20-experience.js','/js/pwa-init.js?v=38.0.1','/js/home.js?v=37.2.0','/js/ratings.js?v=38.0.0','/js/tools.js?v=35.0.0','/js/summaries.js?v=36.0.0','/js/confessions.js?v=35.0.1','/js/assistant.js','/assets/icons/icon-192.png','/assets/icons/icon-512.png'];
-self.addEventListener('install',event=>{event.waitUntil(caches.open(CACHE_NAME).then(cache=>Promise.allSettled(CORE_ASSETS.map(asset=>cache.add(asset)))).then(()=>self.skipWaiting()))});
-self.addEventListener('activate',event=>{event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(key=>key!==CACHE_NAME).map(key=>caches.delete(key)))).then(()=>self.clients.claim()))});
-self.addEventListener('fetch',event=>{if(event.request.method!=='GET')return;const url=new URL(event.request.url);if(url.origin!==self.location.origin)return;if(event.request.mode==='navigate'){event.respondWith(fetch(event.request,{cache:'reload'}).then(response=>{if(response.ok)caches.open(CACHE_NAME).then(cache=>cache.put(event.request,response.clone()));return response}).catch(async()=>await caches.match(event.request)||await caches.match(OFFLINE_URL)));return}if(/\.(?:js|css)$/.test(url.pathname)){event.respondWith(fetch(event.request,{cache:'reload'}).then(response=>{if(response.ok)caches.open(CACHE_NAME).then(cache=>cache.put(event.request,response.clone()));return response}).catch(async()=>await caches.match(event.request)||new Response('',{status:504,statusText:'Offline'})));return}event.respondWith(caches.match(event.request).then(cached=>{const network=fetch(event.request).then(response=>{if(response.ok)caches.open(CACHE_NAME).then(cache=>cache.put(event.request,response.clone()));return response});return cached||network.catch(()=>new Response('',{status:504,statusText:'Offline'}))}))});
+const CORE_ASSETS=[
+ OFFLINE_URL,
+ '/manifest.webmanifest',
+ '/assets/icons/icon-192.png',
+ '/assets/icons/icon-512.png'
+];
+
+self.addEventListener('install',event=>{
+ event.waitUntil(
+  caches.open(CACHE_NAME)
+   .then(cache=>Promise.allSettled(CORE_ASSETS.map(asset=>cache.add(asset))))
+   .then(()=>self.skipWaiting())
+ );
+});
+self.addEventListener('activate',event=>{
+ event.waitUntil(
+  caches.keys()
+   .then(keys=>Promise.all(keys.filter(key=>key!==CACHE_NAME).map(key=>caches.delete(key))))
+   .then(()=>self.clients.claim())
+ );
+});
+self.addEventListener('message',event=>{
+ if(event.data?.type==='SKIP_WAITING')self.skipWaiting();
+});
+
+async function networkFirst(request,{fallback=OFFLINE_URL,timeout=9000}={}){
+ const cache=await caches.open(CACHE_NAME);
+ const controller=new AbortController();
+ const timer=setTimeout(()=>controller.abort(),timeout);
+ try{
+  const response=await fetch(request,{cache:'no-store',signal:controller.signal});
+  if(response?.ok)cache.put(request,response.clone()).catch(()=>{});
+  return response;
+ }catch{
+  return await cache.match(request,{ignoreSearch:true})
+   || await caches.match(request,{ignoreSearch:true})
+   || (fallback?await caches.match(fallback):null)
+   || new Response('Offline',{status:503,statusText:'Offline'});
+ }finally{clearTimeout(timer)}
+}
+
+self.addEventListener('fetch',event=>{
+ const request=event.request;
+ if(request.method!=='GET'||request.headers.has('range'))return;
+ const url=new URL(request.url);
+ if(url.origin!==self.location.origin)return;
+
+ if(request.mode==='navigate'){
+  event.respondWith(networkFirst(request,{fallback:OFFLINE_URL,timeout:9000}));
+  return;
+ }
+ if(/\.(?:js|css)$/.test(url.pathname)){
+  event.respondWith(networkFirst(request,{fallback:null,timeout:7000}));
+  return;
+ }
+ if(/\.(?:png|jpg|jpeg|webp|svg|ico|woff2?)$/.test(url.pathname)){
+  event.respondWith(caches.open(CACHE_NAME).then(async cache=>{
+   const cached=await cache.match(request,{ignoreSearch:true});
+   const network=fetch(request).then(response=>{
+    if(response.ok)cache.put(request,response.clone()).catch(()=>{});
+    return response;
+   }).catch(()=>null);
+   return cached||await network||new Response('',{status:504,statusText:'Offline'});
+  }));
+ }
+});
