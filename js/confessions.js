@@ -1,21 +1,55 @@
-import{setupNav,enforceUonMaintenance,watchUonMaintenance,$,rpc,toast,esc,trackEvent}from'./core.js';setupNav();await enforceUonMaintenance();watchUonMaintenance();
-const STORE='uon_anon_profile_v1';let owner=null;try{owner=JSON.parse(localStorage.getItem(STORE)||'null')}catch{}
-const params=new URLSearchParams(location.search);const publicHandle=(params.get('u')||'').toLowerCase().trim();
-const fmt=v=>new Date(v).toLocaleString('ar-OM',{dateStyle:'medium',timeStyle:'short'});
-function setTab(name){document.querySelectorAll('[data-tab]').forEach(b=>b.classList.toggle('active',b.dataset.tab===name));document.querySelectorAll('.anon-panel').forEach(p=>p.classList.toggle('active',p.id===`panel-${name}`));if(name==='inbox')loadInbox()}
-document.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>setTab(b.dataset.tab));
-function saveOwner(data){owner=data;localStorage.setItem(STORE,JSON.stringify(data));renderOwner()}
-function linkFor(handle){return `${location.origin}${location.pathname}?u=${encodeURIComponent(handle)}`}
-function renderOwner(){const has=Boolean(owner?.handle&&owner?.secret);$('#createCard').hidden=has;$('#shareCard').hidden=!has;if(has){$('#myLink').textContent=linkFor(owner.handle);$('#settingsName').value=owner.display_name||'';$('#settingsBio').value=owner.bio||'ارسل لي رسالة مجهولة 👀';$('#inboxOpen').checked=owner.inbox_open!==false}}
-$('#createProfile').onclick=async()=>{const display_name=$('#displayName').value.trim();const handle=$('#handle').value.trim().toLowerCase().replace(/[^a-z0-9_]/g,'');if(!display_name||handle.length<3)return toast('اكتب اسم العرض واسم رابط صالح',true);const secret=Array.from(crypto.getRandomValues(new Uint8Array(32)),b=>b.toString(16).padStart(2,'0')).join('');try{const data=await rpc('create_anonymous_profile',{p_handle:handle,p_display_name:display_name,p_secret:secret});saveOwner({...data,secret,bio:'ارسل لي رسالة مجهولة 👀',inbox_open:true});toast('تم إنشاء رابطك');trackEvent('anonymous_profile_created',{handle})}catch(e){toast(e.message,true)}};
-$('#copyLink').onclick=async()=>{await navigator.clipboard.writeText(linkFor(owner.handle));toast('تم نسخ الرابط')};
-$('#shareLink').onclick=async()=>{const data={title:'ارسل لي رسالة مجهولة',text:'ارسل لي رسالة مجهولة بدون ما أعرف من أنت 👀',url:linkFor(owner.handle)};if(navigator.share)await navigator.share(data);else{await navigator.clipboard.writeText(data.url);toast('تم نسخ الرابط')}};
-async function loadInbox(){if(!owner)return $('#inboxList').innerHTML='<div class="anon-empty">أنشئ رابطك أولًا.</div>';$('#inboxList').innerHTML='<div class="anon-empty">جاري التحميل...</div>';try{const data=await rpc('get_anonymous_inbox',{p_handle:owner.handle,p_secret:owner.secret});owner={...owner,...data.profile};localStorage.setItem(STORE,JSON.stringify(owner));renderOwner();const rows=data.messages||[];$('#inboxList').innerHTML=rows.length?rows.map(m=>`<article class="anon-card anon-message" data-id="${m.id}"><div class="anon-meta">${fmt(m.created_at)} • ${m.status==='published'?'منشورة':m.status==='hidden'?'مخفية':'في الصندوق'}</div><p>${esc(m.body)}</p>${m.reply?`<div class="anon-reply"><strong>ردك</strong><p>${esc(m.reply)}</p></div>`:''}<div class="anon-field"><textarea class="replyInput" maxlength="500" rows="2" placeholder="اكتب ردًا اختياريًا">${esc(m.reply||'')}</textarea></div><div class="anon-actions"><button class="btn primary" data-action="publish">نشر مع الرد</button><button class="btn" data-action="hide">إخفاء</button><button class="btn" data-action="inbox">إرجاع للصندوق</button><button class="btn" data-action="delete">حذف</button></div></article>`).join(''):'<div class="anon-empty">صندوقك فاضي حاليًا 👀</div>'}catch(e){$('#inboxList').innerHTML=`<div class="anon-empty">${esc(e.message)}</div>`}}
-$('#inboxList').onclick=async e=>{const btn=e.target.closest('[data-action]');if(!btn)return;const card=btn.closest('[data-id]');const action=btn.dataset.action;const reply=card.querySelector('.replyInput').value.trim();try{await rpc('manage_anonymous_message',{p_handle:owner.handle,p_secret:owner.secret,p_message_id:card.dataset.id,p_action:action,p_reply:reply||null});toast('تم التحديث');loadInbox()}catch(err){toast(err.message,true)}};
-$('#saveSettings').onclick=async()=>{if(!owner)return;try{const data=await rpc('update_anonymous_profile',{p_handle:owner.handle,p_secret:owner.secret,p_display_name:$('#settingsName').value.trim(),p_bio:$('#settingsBio').value.trim(),p_inbox_open:$('#inboxOpen').checked});saveOwner({...owner,...data});toast('تم حفظ الإعدادات')}catch(e){toast(e.message,true)}};
-$('#forgetProfile').onclick=()=>{if(!confirm('سيتم حذف مفتاح الصندوق من هذا الجهاز فقط. هل أنت متأكد؟'))return;localStorage.removeItem(STORE);owner=null;renderOwner();setTab('home');toast('تمت إزالة الصندوق من الجهاز')};
-async function loadPublic(){if(!publicHandle)return;$('#ownerView').hidden=true;$('#publicView').hidden=false;try{const data=await rpc('get_anonymous_profile',{p_handle:publicHandle});if(!data)throw new Error('الرابط غير موجود');$('#publicName').textContent=data.display_name;$('#publicBio').textContent=data.bio||'';if(!data.inbox_open){$('#sendCard').innerHTML='<div class="anon-empty">صندوق الرسائل مغلق حاليًا</div>'}const rows=data.messages||[];$('#publicMessages').innerHTML=rows.length?rows.map(m=>`<article class="anon-card anon-message"><div class="anon-meta">${fmt(m.published_at||m.created_at)}</div><p>${esc(m.body)}</p>${m.reply?`<div class="anon-reply"><strong>الرد</strong><p>${esc(m.reply)}</p></div>`:''}<div class="anon-actions"><button class="btn" data-report="${m.id}">إبلاغ</button></div></article>`).join(''):'<div class="anon-empty">ما فيه ردود منشورة للحين.</div>';document.title=`رسالة مجهولة إلى ${data.display_name} | UON Hub`}catch(e){$('#publicView').innerHTML=`<div class="anon-card anon-empty">${esc(e.message)}</div>`}}
-$('#anonymousBody')?.addEventListener('input',e=>$('#charCount').textContent=e.target.value.length);
-$('#sendAnonymous')?.addEventListener('click',async()=>{const body=$('#anonymousBody').value.trim();if(body.length<2)return toast('اكتب رسالة أولًا',true);try{await rpc('send_anonymous_message',{p_handle:publicHandle,p_body:body});$('#anonymousBody').value='';$('#charCount').textContent='0';toast('وصلت رسالتك بسرية 💌');trackEvent('anonymous_message_sent',{handle:publicHandle})}catch(e){toast(e.message,true)}});
-$('#publicMessages')?.addEventListener('click',async e=>{const id=e.target.closest('[data-report]')?.dataset.report;if(!id)return;const reason=prompt('سبب البلاغ','محتوى غير مناسب');if(reason===null)return;try{await rpc('report_anonymous_message',{p_message_id:id,p_reason:reason,p_fingerprint:null});toast('تم إرسال البلاغ')}catch(err){toast(err.message,true)}});
-renderOwner();loadPublic();
+import{setupNav,enforceUonMaintenance,watchUonMaintenance,$,rpc,insert,submitPending,notifyPending,toast,esc,colleges,get,trackEvent}from'./core.js';
+setupNav();await enforceUonMaintenance();watchUonMaintenance();
+
+const SESSION_KEY='uon_confession_session_v1';
+let sessionId=localStorage.getItem(SESSION_KEY);
+if(!sessionId){sessionId=crypto.randomUUID();localStorage.setItem(SESSION_KEY,sessionId)}
+let sort='latest';
+const reactionMeta={heart:['❤️','إعجاب'],laugh:['😂','ضحك'],sad:['😭','حزن'],wow:['😮','تفاجؤ'],fire:['🔥','نار']};
+const fmt=v=>{try{return new Intl.RelativeTimeFormat('ar',{numeric:'auto'}).format(-Math.max(1,Math.round((Date.now()-new Date(v))/60000)),'minute')}catch{return new Date(v).toLocaleString('ar-OM')}};
+
+function fillColleges(){const options=colleges.map(c=>`<option value="${esc(c)}">${esc(c)}</option>`).join('');$('#confessionCollege').insertAdjacentHTML('beforeend',options);$('#feedCollege').insertAdjacentHTML('beforeend',options)}
+fillColleges();
+
+$('#confessionText').addEventListener('input',e=>$('#confessionCount').textContent=e.target.value.length);
+
+$('#submitConfession').onclick=async()=>{
+ const text=$('#confessionText').value.trim();
+ if(text.length<5)return toast('اكتب اعترافًا أطول شوي',true);
+ if(text.length>1000)return toast('الاعتراف طويل جدًا',true);
+ const btn=$('#submitConfession');btn.disabled=true;btn.textContent='جاري الإرسال...';
+ try{
+  const row=await submitPending('confessions',{
+   text,content:text,category:'عام',is_anon:true,status:'pending',
+   college:$('#confessionCollege').value||null,
+   program:$('#confessionProgram').value.trim()||null
+  });
+  await notifyPending('confessions',row.id);
+  $('#confessionText').value='';$('#confessionCount').textContent='0';$('#confessionProgram').value='';
+  toast('وصل اعترافك للمراجعة 👀');
+  trackEvent('confession_submitted',{college:$('#confessionCollege').value||''});
+ }catch(error){toast(error.message||'تعذر إرسال الاعتراف',true)}finally{btn.disabled=false;btn.textContent='📨 إرسال للمراجعة'}
+};
+
+function reactionButtons(row){const counts=row.reactions||{};return Object.entries(reactionMeta).map(([key,[emoji,label]])=>`<button class="conf-reaction" data-reaction="${key}" title="${label}">${emoji} <span>${Number(counts[key]||0)}</span></button>`).join('')}
+
+function confessionCard(row){const location=[row.college,row.program].filter(Boolean).join(' • ');return `<article class="conf-card" data-id="${row.id}"><div class="conf-meta"><span>👤 مجهول</span><span>${esc(fmt(row.created_at))}</span>${location?`<span>🏫 ${esc(location)}</span>`:''}</div><div class="conf-text">${esc(row.text)}</div><div class="conf-actions">${reactionButtons(row)}<button class="conf-reaction comment-toggle">💬 <span>${Number(row.comments_count||0)}</span></button></div><div class="comments-box" hidden><div class="comments-list"><div class="conf-empty">جاري تحميل التعليقات...</div></div><form class="comment-form"><input maxlength="500" placeholder="اكتب تعليقًا مجهولًا..."><button class="btn" type="submit">إرسال</button></form><p class="conf-note">التعليقات تمر بالمراجعة قبل ظهورها.</p></div></article>`}
+
+async function loadFeed(){const target=$('#confessionsFeed');target.innerHTML='<div class="conf-empty">جاري تحميل الاعترافات...</div>';try{const rows=await rpc('uon_confessions_feed',{p_sort:sort,p_college:$('#feedCollege').value||null,p_limit:60});target.innerHTML=rows?.length?rows.map(confessionCard).join(''):'<div class="conf-empty">ما فيه اعترافات منشورة للحين 👀</div>'}catch(error){target.innerHTML=`<div class="conf-empty">${esc(error.message||'تعذر تحميل الاعترافات')}</div>`}}
+
+async function loadComments(card){const list=card.querySelector('.comments-list');list.innerHTML='<div class="conf-empty">جاري التحميل...</div>';try{const rows=await get('confession_comments',`select=id,content,created_at&confession_id=eq.${encodeURIComponent(card.dataset.id)}&status=eq.approved&order=created_at.asc&limit=100`);list.innerHTML=rows.length?rows.map(x=>`<div class="comment"><div>${esc(x.content)}</div><small>👤 مجهول • ${esc(fmt(x.created_at))}</small></div>`).join(''):'<div class="conf-empty">لا توجد تعليقات بعد.</div>'}catch(error){list.innerHTML='<div class="conf-empty">تعذر تحميل التعليقات.</div>'}}
+
+$('#confessionsFeed').addEventListener('click',async event=>{
+ const card=event.target.closest('[data-id]');if(!card)return;
+ const reaction=event.target.closest('[data-reaction]');
+ if(reaction){reaction.disabled=true;try{const counts=await rpc('uon_toggle_confession_reaction',{p_confession_id:card.dataset.id,p_session_id:sessionId,p_reaction:reaction.dataset.reaction});card.querySelectorAll('[data-reaction]').forEach(button=>{const key=button.dataset.reaction;button.querySelector('span').textContent=Number(counts?.[key]||0);button.classList.toggle('active',counts?.mine===key)});trackEvent('confession_reaction',{reaction:reaction.dataset.reaction})}catch(error){toast(error.message,true)}finally{reaction.disabled=false}return}
+ const toggle=event.target.closest('.comment-toggle');if(toggle){const box=card.querySelector('.comments-box');box.hidden=!box.hidden;if(!box.hidden)loadComments(card)}
+});
+
+$('#confessionsFeed').addEventListener('submit',async event=>{
+ const form=event.target.closest('.comment-form');if(!form)return;event.preventDefault();const card=form.closest('[data-id]');const input=form.querySelector('input');const content=input.value.trim();if(content.length<2)return toast('اكتب تعليقًا أولًا',true);const btn=form.querySelector('button');btn.disabled=true;try{const row=await submitPending('confession_comments',{confession_id:card.dataset.id,content,status:'pending'});await notifyPending('confession_comments',row.id);input.value='';toast('وصل تعليقك للمراجعة 💬');trackEvent('confession_comment_submitted',{})}catch(error){toast(error.message,true)}finally{btn.disabled=false}
+});
+
+document.querySelectorAll('[data-sort]').forEach(button=>button.onclick=()=>{sort=button.dataset.sort;document.querySelectorAll('[data-sort]').forEach(x=>x.classList.toggle('active',x===button));loadFeed()});
+$('#feedCollege').onchange=loadFeed;
+loadFeed();
