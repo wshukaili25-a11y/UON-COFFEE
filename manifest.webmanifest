@@ -3,7 +3,7 @@
   "name": "UON Hub - منصة طلاب جامعة نزوى",
   "short_name": "UON Hub",
   "description": "مشروع طلابي مستقل يسهل وصول طلبة جامعة نزوى إلى الخدمات والمعلومات.",
-  "start_url": "/?source=pwa&v=39.0.0",
+  "start_url": "/?source=pwa&v=40.0.0",
   "scope": "/",
   "display": "standalone",
   "display_override": ["window-controls-overlay", "standalone", "minimal-ui"],
