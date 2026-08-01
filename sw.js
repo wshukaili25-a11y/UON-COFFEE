@@ -1,6 +1,6 @@
-const CACHE_NAME='uonhub-pwa-v35-0-0';
+const CACHE_NAME='uonhub-pwa-v35-0-1';
 const OFFLINE_URL='/offline.html';
-const CORE_ASSETS=['/','/index.html','/tools.html','/confessions.html','/groups.html','/assistant.html','/offline.html','/manifest.webmanifest','/css/app.css','/css/ui-refresh-v24.css','/css/pwa.css','/js/core.js','/js/v14-ui.js','/js/v20-experience.js','/js/pwa-init.js','/js/tools.js?v=35.0.0','/js/confessions.js?v=35.0.0','/js/assistant.js','/assets/icons/icon-192.png','/assets/icons/icon-512.png'];
+const CORE_ASSETS=['/','/index.html','/tools.html','/confessions.html','/groups.html','/assistant.html','/offline.html','/manifest.webmanifest','/css/app.css','/css/ui-refresh-v24.css','/css/pwa.css','/js/core.js','/js/v14-ui.js','/js/v20-experience.js','/js/pwa-init.js','/js/tools.js?v=35.0.0','/js/confessions.js?v=35.0.1','/js/assistant.js','/assets/icons/icon-192.png','/assets/icons/icon-512.png'];
 self.addEventListener('install',event=>{event.waitUntil(caches.open(CACHE_NAME).then(cache=>Promise.allSettled(CORE_ASSETS.map(asset=>cache.add(asset)))).then(()=>self.skipWaiting()))});
 self.addEventListener('activate',event=>{event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(key=>key!==CACHE_NAME).map(key=>caches.delete(key)))).then(()=>self.clients.claim()))});
 self.addEventListener('fetch',event=>{
