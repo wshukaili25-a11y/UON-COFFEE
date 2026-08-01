@@ -2,6 +2,7 @@ import{whatsappShare,reportBrokenLink,installErrorCapture,setupNav,enforceUonMai
 setupNav();await enforceUonMaintenance();watchUonMaintenance();installErrorCapture();
 const search=$('#search'),collegeFilter=$('#collegeFilter'),collegeInput=$('#collegeInput'),typeFilter=$('#typeFilter'),form=$('#submitForm'),items=$('#items');
 fillCollege(collegeFilter);fillCollege(collegeInput);
+$('#ratingPicker').innerHTML=[1,2,3,4,5].map(n=>`<button type="button" data-value="${n}" aria-label="${n} نجوم">★</button>`).join('');
 let rows=[],stats=new Map(),activeItem=null,selectedRating=0,selectedRecommended=null;
 const SESSION_KEY='uon_anon_session';let sessionId=localStorage.getItem(SESSION_KEY);if(!sessionId){sessionId=crypto.randomUUID();localStorage.setItem(SESSION_KEY,sessionId)}
 const safeUrl=value=>{try{const u=new URL(String(value||''),location.origin);return ['https:','http:'].includes(u.protocol)?u.href:''}catch{return''}};
