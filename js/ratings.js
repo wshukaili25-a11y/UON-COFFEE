@@ -1,50 +1,14 @@
-import {$,get,submitPending,esc,toast,openModal,closeModal,notifyPending,enforceUonMaintenance,watchUonMaintenance,trackEvent} from './core.js';
+import{$,get,submitPending,esc,toast,openModal,closeModal,notifyPending,enforceUonMaintenance,watchUonMaintenance,trackEvent}from'./core.js?v=38.0.0';
 await enforceUonMaintenance();watchUonMaintenance();
-let rows=[];
-const num=v=>Number(v)||0;
-async function load(){
- rows=await get('rating_submissions','select=*&status=eq.approved&order=created_at.desc').catch(()=>[]);
- render();trackEvent('page_view',{page:'ratings'});
-}
-function stars(n){const x=Math.max(0,Math.min(5,Math.round(num(n))));return '★'.repeat(x)+'☆'.repeat(5-x)}
-function renderSummary(list){
- const box=$('#ratingSummary');if(!box)return;
- const avg=list.length?list.reduce((a,x)=>a+num(x.overall||x.overall_rating),0)/list.length:0;
- const recommended=list.length?Math.round(list.filter(x=>x.recommended===true||x.recommended==='true').length/list.length*100):0;
- const instructors=list.filter(x=>(x.target_type||x.kind)==='instructor').length;
- box.innerHTML=`<article class="card stat"><span>متوسط التقييم</span><strong>${avg.toFixed(1)} / 5</strong></article><article class="card stat"><span>نسبة التوصية</span><strong>${recommended}%</strong></article><article class="card stat"><span>تقييمات الدكاترة</span><strong>${instructors}</strong></article>`;
-}
-function render(){
- const q=($('#ratingSearch')?.value||'').toLowerCase().trim();
- const type=$('#ratingType')?.value||'';
- const sort=$('#ratingSort')?.value||'recent';
- let filtered=rows.filter(x=>{
-  const rowType=x.target_type||x.kind||'instructor';
-  const text=`${x.target_name||''} ${x.course_code||''} ${x.comment||''}`.toLowerCase();
-  return (!type||rowType===type)&&(!q||text.includes(q));
- });
- filtered=[...filtered].sort((a,b)=>{
-  if(sort==='top')return num(b.overall||b.overall_rating)-num(a.overall||a.overall_rating);
-  if(sort==='recommended')return Number(Boolean(b.recommended))-Number(Boolean(a.recommended));
-  return new Date(b.created_at||0)-new Date(a.created_at||0);
- });
- renderSummary(filtered);
- $('#ratingCards').innerHTML=filtered.length?filtered.map(x=>{const rowType=x.target_type||x.kind;return `<article class="card rating-card">
- <span class="badge">${rowType==='course'?'مقرر':'دكتور'}</span>
- <h3>${esc(x.target_name||'غير محدد')}</h3><strong class="rating-stars">${stars(x.overall||x.overall_rating)}</strong>
- <small>${esc(x.course_code||'')}</small>
- <p>${esc(x.comment||'بدون تعليق')}</p>
- <div class="rating-metrics"><span>الشرح: ${x.teaching||'—'}</span><span>التعامل: ${x.interaction||'—'}</span><span>الصعوبة: ${x.exam_difficulty||'—'}</span><span>${x.recommended===true||x.recommended==='true'?'✅ ينصح به':'➖ بدون توصية'}</span></div>
- </article>`}).join(''):'<div class="empty">لا توجد تقييمات مطابقة</div>';
-}
+let rows=[];const num=v=>Number(v)||0;const isTrue=v=>v===true||v==='true';
+function stars(n){const x=Math.max(0,Math.min(5,Math.round(num(n))));return'★'.repeat(x)+'☆'.repeat(5-x)}
+function formatDate(v){return v?new Date(v).toLocaleDateString('ar-OM'):'—'}
+function setupStarInputs(){document.querySelectorAll('[data-rating-input]').forEach(box=>{const name=box.dataset.ratingInput,input=document.querySelector(`[name="${name}"]`);box.innerHTML=[1,2,3,4,5].map(n=>`<button type="button" data-value="${n}" aria-label="${n} نجوم">★</button>`).join('');box.onclick=e=>{const b=e.target.closest('[data-value]');if(!b)return;const value=Number(b.dataset.value);input.value=value;box.querySelectorAll('[data-value]').forEach(x=>x.classList.toggle('active',Number(x.dataset.value)<=value))}})}
+async function load(){rows=await get('rating_submissions','select=*&status=eq.approved&order=created_at.desc').catch(()=>[]);render();trackEvent('page_view',{page:'ratings_v38'})}
+function renderSummary(list){const box=$('#ratingSummary');const avg=list.length?list.reduce((a,x)=>a+num(x.overall||x.overall_rating),0)/list.length:0;const recommended=list.length?Math.round(list.filter(x=>isTrue(x.recommended)).length/list.length*100):0;const instructors=list.filter(x=>(x.target_type||x.kind)==='instructor').length;const descriptions=list.filter(x=>String(x.comment||'').trim()).length;box.innerHTML=`<article class="r38-stat"><span>متوسط التقييم</span><strong>${avg.toFixed(1)} / 5</strong></article><article class="r38-stat"><span>نسبة التوصية</span><strong>${recommended}%</strong></article><article class="r38-stat"><span>تقييمات الدكاترة</span><strong>${instructors}</strong></article><article class="r38-stat"><span>تجارب مكتوبة</span><strong>${descriptions}</strong></article>`}
+function render(){const q=($('#ratingSearch')?.value||'').toLowerCase().trim(),type=$('#ratingType')?.value||'',sort=$('#ratingSort')?.value||'recent';let filtered=rows.filter(x=>{const rowType=x.target_type||x.kind||'instructor';const text=`${x.target_name||''} ${x.course_code||''} ${x.comment||''}`.toLowerCase();return(!type||rowType===type)&&(!q||text.includes(q))});filtered=[...filtered].sort((a,b)=>sort==='top'?num(b.overall||b.overall_rating)-num(a.overall||a.overall_rating):sort==='recommended'?Number(isTrue(b.recommended))-Number(isTrue(a.recommended)):new Date(b.created_at||0)-new Date(a.created_at||0));renderSummary(filtered);$('#ratingCards').innerHTML=filtered.length?filtered.map(x=>{const rowType=x.target_type||x.kind||'instructor',overall=num(x.overall||x.overall_rating),description=String(x.comment||'').trim();return`<article class="r38-card"><div class="r38-card-head"><div><span class="r38-type">${rowType==='course'?'مقرر':'دكتور'}</span><h3>${esc(x.target_name||'غير محدد')}</h3>${x.course_code?`<span class="r38-course">${esc(x.course_code)}</span>`:''}</div><div><div class="r38-stars">${stars(overall)}</div><div class="r38-score">${overall?overall.toFixed(1):'—'} / 5</div></div></div><p class="r38-description">${esc(description||'لم يُكتب وصف لهذا التقييم.')}</p><div class="r38-metrics"><div class="r38-metric"><span>الشرح</span><b>${x.teaching||x.clarity_rating||'—'}</b></div><div class="r38-metric"><span>التعامل</span><b>${x.interaction||'—'}</b></div><div class="r38-metric"><span>الاختبارات</span><b>${x.exam_difficulty||x.exams_rating||'—'}</b></div><div class="r38-metric"><span>الالتزام</span><b>${x.attendance||'—'}</b></div></div><div class="r38-recommend">${isTrue(x.recommended)?'✅ ينصح به':'➖ لا ينصح به'}</div><small class="r38-date">${formatDate(x.created_at)}</small></article>`}).join(''):'<div class="r38-empty">لا توجد تقييمات مطابقة.</div>'}
 ['ratingSearch','ratingType','ratingSort'].forEach(id=>$('#'+id)?.addEventListener(id==='ratingSearch'?'input':'change',render));
 $('#openRating').onclick=()=>openModal('ratingModal');$('#closeRating').onclick=()=>closeModal('ratingModal');
-$('#ratingForm').onsubmit=async event=>{
- event.preventDefault();const form=event.target;const submitButton=form.querySelector('button[type="submit"]');const originalText=submitButton?.textContent||'إرسال للمراجعة';
- const body=Object.fromEntries(new FormData(form));['overall','teaching','interaction','exam_difficulty'].forEach(k=>{if(body[k]!=='')body[k]=Number(body[k]);else delete body[k]});
- body.target_type=body.target_type||'instructor';body.kind=body.target_type;body.overall_rating=body.overall;body.recommended=body.recommended==='true';body.status='pending';
- try{if(submitButton){submitButton.disabled=true;submitButton.textContent='جاري الإرسال...'}const result=await submitPending('rating_submissions',body);await notifyPending('rating_submissions',result.id);trackEvent('rating_submit',{target_type:body.target_type});toast('تم إرسال التقييم للمراجعة');form.reset();closeModal('ratingModal')}
- catch(error){console.error(error);toast('تعذر إرسال التقييم، راجع البيانات وحاول مرة أخرى',true)}
- finally{if(submitButton){submitButton.disabled=false;submitButton.textContent=originalText}}
-};
-load();
+document.querySelector('#ratingModal')?.addEventListener('click',e=>{if(e.target.id==='ratingModal')closeModal('ratingModal')});
+$('#ratingForm').onsubmit=async event=>{event.preventDefault();const form=event.target,button=form.querySelector('[type="submit"]'),original=button.textContent;const body=Object.fromEntries(new FormData(form));if(!body.overall)return toast('اختر التقييم العام أولًا',true);['overall','teaching','interaction','exam_difficulty','attendance'].forEach(k=>{if(body[k]!=='')body[k]=Number(body[k]);else delete body[k]});body.target_type=body.target_type||'instructor';body.kind=body.target_type;body.overall_rating=body.overall;body.recommended=body.recommended==='true';body.status='pending';if(body.course_code)body.course_code=String(body.course_code).trim().toUpperCase();try{button.disabled=true;button.textContent='جاري الإرسال...';const result=await submitPending('rating_submissions',body);await notifyPending('rating_submissions',result.id);trackEvent('rating_submit',{target_type:body.target_type});toast('تم إرسال التقييم للمراجعة');form.reset();document.querySelectorAll('.r38-stars-input button').forEach(x=>x.classList.remove('active'));closeModal('ratingModal')}catch(error){console.error(error);toast('تعذر إرسال التقييم، راجع البيانات وحاول مرة أخرى',true)}finally{button.disabled=false;button.textContent=original}};
+setupStarInputs();load();
