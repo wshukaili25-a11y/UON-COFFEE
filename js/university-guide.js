@@ -1,137 +1,91 @@
-import {
- setupNav,
- enforceUonMaintenance,
- watchUonMaintenance,
- $,
- get,
- toast,
- esc
-} from './core.js';
+import{
+ setupNav,enforceUonMaintenance,watchUonMaintenance,$,get,toast,esc,
+ trackEvent,installErrorCapture
+}from'./core.js?v=39.0.0';
 
 setupNav();
-await enforceUonMaintenance();
+enforceUonMaintenance();
 watchUonMaintenance();
+installErrorCapture();
 
-const officialPrograms=[{"college": "كلية العلوم والآداب", "degree": "دبلوم", "name_ar": "علوم الحاسب", "name_en": "Computer Science", "official_url": "https://www.unizwa.edu.om/index.php?contentid=619&lang=en"}, {"college": "كلية العلوم والآداب", "degree": "دبلوم", "name_ar": "الإحصاء", "name_en": "Statistics", "official_url": "https://www.unizwa.edu.om/index.php?contentid=619&lang=en"}, {"college": "كلية العلوم والآداب", "degree": "دبلوم", "name_ar": "الرياضيات", "name_en": "Mathematics", "official_url": "https://www.unizwa.edu.om/index.php?contentid=619&lang=en"}, {"college": "كلية العلوم والآداب", "degree": "دبلوم", "name_ar": "الفيزياء", "name_en": "Physics", "official_url": "https://www.unizwa.edu.om/index.php?contentid=619&lang=en"}, {"college": "كلية العلوم والآداب", "degree": "دبلوم", "name_ar": "التقنية الحيوية", "name_en": "Biotechnology", "official_url": "https://www.unizwa.edu.om/index.php?contentid=619&lang=en"}, {"college": "كلية العلوم والآداب", "degree": "دبلوم", "name_ar": "الكيمياء", "name_en": "Chemistry", "official_url": "https://www.unizwa.edu.om/index.php?contentid=619&lang=en"}, {"college": "كلية العلوم والآداب", "degree": "دبلوم", "name_ar": "اللغة العربية", "name_en": "Arabic Language", "official_url": "https://www.unizwa.edu.om/index.php?contentid=619&lang=en"}, {"college": "كلية العلوم والآداب", "degree": "دبلوم", "name_ar": "اللغة الإنجليزية والترجمة", "name_en": "English Language and Translation", "official_url": "https://www.unizwa.edu.om/index.php?contentid=619&lang=en"}, {"college": "كلية العلوم والآداب", "degree": "دبلوم", "name_ar": "اللغة الفرنسية والترجمة", "name_en": "French Language and Translation", "official_url": "https://www.unizwa.edu.om/index.php?contentid=619&lang=en"}, {"college": "كلية العلوم والآداب", "degree": "دبلوم", "name_ar": "اللغة الألمانية والترجمة", "name_en": "German Language and Translation", "official_url": "https://www.unizwa.edu.om/index.php?contentid=619&lang=en"}, {"college": "كلية العلوم والآداب", "degree": "بكالوريوس", "name_ar": "علوم الحاسب", "name_en": "Computer Science", "official_url": "https://www.unizwa.edu.om/index.php?contentid=619&lang=en"}, {"college": "كلية العلوم والآداب", "degree": "بكالوريوس", "name_ar": "الإحصاء", "name_en": "Statistics", "official_url": "https://www.unizwa.edu.om/index.php?contentid=619&lang=en"}, {"college": "كلية العلوم والآداب", "degree": "بكالوريوس", "name_ar": "الرياضيات", "name_en": "Mathematics", "official_url": "https://www.unizwa.edu.om/index.php?contentid=619&lang=en"}, {"college": "كلية العلوم والآداب", "degree": "بكالوريوس", "name_ar": "الفيزياء", "name_en": "Physics", "official_url": "https://www.unizwa.edu.om/index.php?contentid=619&lang=en"}, {"college": "كلية العلوم والآداب", "degree": "بكالوريوس", "name_ar": "التقنية الحيوية", "name_en": "Biotechnology", "official_url": "https://www.unizwa.edu.om/index.php?contentid=619&lang=en"}, {"college": "كلية العلوم والآداب", "degree": "بكالوريوس", "name_ar": "الكيمياء", "name_en": "Chemistry", "official_url": "https://www.unizwa.edu.om/index.php?contentid=619&lang=en"}, {"college": "كلية العلوم والآداب", "degree": "بكالوريوس", "name_ar": "اللغة العربية", "name_en": "Arabic Language", "official_url": "https://www.unizwa.edu.om/index.php?contentid=619&lang=en"}, {"college": "كلية العلوم والآداب", "degree": "بكالوريوس", "name_ar": "اللغة الإنجليزية والترجمة", "name_en": "English Language and Translation", "official_url": "https://www.unizwa.edu.om/index.php?contentid=619&lang=en"}, {"college": "كلية العلوم والآداب", "degree": "بكالوريوس", "name_ar": "اللغة الفرنسية والترجمة", "name_en": "French Language and Translation", "official_url": "https://www.unizwa.edu.om/index.php?contentid=619&lang=en"}, {"college": "كلية العلوم والآداب", "degree": "بكالوريوس", "name_ar": "اللغة الألمانية والترجمة", "name_en": "German Language and Translation", "official_url": "https://www.unizwa.edu.om/index.php?contentid=619&lang=en"}, {"college": "كلية العلوم والآداب", "degree": "بكالوريوس", "name_ar": "التربية في علوم الحاسب", "name_en": "Computer Science Education", "official_url": "https://www.unizwa.edu.om/index.php?contentid=619&lang=en"}, {"college": "كلية العلوم والآداب", "degree": "بكالوريوس", "name_ar": "التربية في الرياضيات", "name_en": "Mathematics Education", "official_url": "https://www.unizwa.edu.om/index.php?contentid=619&lang=en"}, {"college": "كلية العلوم والآداب", "degree": "بكالوريوس", "name_ar": "التربية في الفيزياء", "name_en": "Physics Education", "official_url": "https://www.unizwa.edu.om/index.php?contentid=619&lang=en"}, {"college": "كلية العلوم والآداب", "degree": "بكالوريوس", "name_ar": "التربية في الأحياء", "name_en": "Biology Education", "official_url": "https://www.unizwa.edu.om/index.php?contentid=619&lang=en"}, {"college": "كلية العلوم والآداب", "degree": "بكالوريوس", "name_ar": "التربية في الكيمياء", "name_en": "Chemistry Education", "official_url": "https://www.unizwa.edu.om/index.php?contentid=619&lang=en"}, {"college": "كلية العلوم والآداب", "degree": "بكالوريوس", "name_ar": "التربية في اللغة العربية", "name_en": "Arabic Language Education", "official_url": "https://www.unizwa.edu.om/index.php?contentid=619&lang=en"}, {"college": "كلية العلوم والآداب", "degree": "بكالوريوس", "name_ar": "التربية في اللغة الإنجليزية", "name_en": "English Language Education", "official_url": "https://www.unizwa.edu.om/index.php?contentid=619&lang=en"}, {"college": "كلية العلوم والآداب", "degree": "بكالوريوس", "name_ar": "التربية الخاصة", "name_en": "Special Education", "official_url": "https://www.unizwa.edu.om/index.php?contentid=619&lang=en"}, {"college": "كلية العلوم والآداب", "degree": "بكالوريوس", "name_ar": "رياض الأطفال", "name_en": "Kindergarten Education", "official_url": "https://www.unizwa.edu.om/index.php?contentid=619&lang=en"}, {"college": "كلية العلوم والآداب", "degree": "بكالوريوس", "name_ar": "التربية الفنية", "name_en": "Art Education", "official_url": "https://www.unizwa.edu.om/index.php?contentid=619&lang=en"}, {"college": "كلية العلوم والآداب", "degree": "ماجستير", "name_ar": "الإدارة التربوية", "name_en": "Educational Administration", "official_url": "https://www.unizwa.edu.om/index.php?contentid=619&lang=en"}, {"college": "كلية العلوم والآداب", "degree": "ماجستير", "name_ar": "الإرشاد النفسي", "name_en": "Psychological Counseling", "official_url": "https://www.unizwa.edu.om/index.php?contentid=619&lang=en"}, {"college": "كلية العلوم والآداب", "degree": "ماجستير", "name_ar": "اللغة العربية وآدابها", "name_en": "Arabic Language and Literature", "official_url": "https://www.unizwa.edu.om/index.php?contentid=619&lang=en"}, {"college": "كلية العلوم والآداب", "degree": "ماجستير", "name_ar": "اللغة الإنجليزية", "name_en": "English Language", "official_url": "https://www.unizwa.edu.om/index.php?contentid=619&lang=en"}, {"college": "كلية الاقتصاد والإدارة ونظم المعلومات", "degree": "دبلوم", "name_ar": "المحاسبة", "name_en": "Accounting", "official_url": "https://www.unizwa.edu.om/index.php?contentid=619&lang=en"}, {"college": "كلية الاقتصاد والإدارة ونظم المعلومات", "degree": "دبلوم", "name_ar": "إدارة الأعمال", "name_en": "Business Administration", "official_url": "https://www.unizwa.edu.om/index.php?contentid=619&lang=en"}, {"college": "كلية الاقتصاد والإدارة ونظم المعلومات", "degree": "دبلوم", "name_ar": "الاقتصاد والتمويل", "name_en": "Economics and Finance", "official_url": "https://www.unizwa.edu.om/index.php?contentid=619&lang=en"}, {"college": "كلية الاقتصاد والإدارة ونظم المعلومات", "degree": "دبلوم", "name_ar": "التجارة والتمويل الدولي", "name_en": "International Trade and Finance", "official_url": "https://www.unizwa.edu.om/index.php?contentid=619&lang=en"}, {"college": "كلية الاقتصاد والإدارة ونظم المعلومات", "degree": "دبلوم", "name_ar": "التسويق", "name_en": "Marketing", "official_url": "https://www.unizwa.edu.om/index.php?contentid=619&lang=en"}, {"college": "كلية الاقتصاد والإدارة ونظم المعلومات", "degree": "دبلوم", "name_ar": "إدارة السياحة والمرافق الترفيهية", "name_en": "Tourism and Recreational Facilities Management", "official_url": "https://www.unizwa.edu.om/index.php?contentid=619&lang=en"}, {"college": "كلية الاقتصاد والإدارة ونظم المعلومات", "degree": "دبلوم", "name_ar": "نظم المعلومات", "name_en": "Information Systems", "official_url": "https://www.unizwa.edu.om/index.php?contentid=619&lang=en"}, {"college": "كلية الاقتصاد والإدارة ونظم المعلومات", "degree": "دبلوم", "name_ar": "تصميم الويب وأمن المعلومات", "name_en": "Web Design and Information Security", "official_url": "https://www.unizwa.edu.om/index.php?contentid=619&lang=en"}, {"college": "كلية الاقتصاد والإدارة ونظم المعلومات", "degree": "بكالوريوس", "name_ar": "المحاسبة", "name_en": "Accounting", "official_url": "https://www.unizwa.edu.om/index.php?contentid=619&lang=en"}, {"college": "كلية الاقتصاد والإدارة ونظم المعلومات", "degree": "بكالوريوس", "name_ar": "إدارة الأعمال", "name_en": "Business Administration", "official_url": "https://www.unizwa.edu.om/index.php?contentid=619&lang=en"}, {"college": "كلية الاقتصاد والإدارة ونظم المعلومات", "degree": "بكالوريوس", "name_ar": "الاقتصاد والتمويل – الإدارة المالية", "name_en": "Economics and Finance – Financial Management", "official_url": "https://www.unizwa.edu.om/index.php?contentid=619&lang=en"}, {"college": "كلية الاقتصاد والإدارة ونظم المعلومات", "degree": "بكالوريوس", "name_ar": "الاقتصاد والتمويل – الاقتصاد الدولي", "name_en": "Economics and Finance – International Economics", "official_url": "https://www.unizwa.edu.om/index.php?contentid=619&lang=en"}, {"college": "كلية الاقتصاد والإدارة ونظم المعلومات", "degree": "بكالوريوس", "name_ar": "الاقتصاد والتمويل – الصيرفة والتمويل الإسلامي", "name_en": "Economics and Finance – Islamic Banking and Finance", "official_url": "https://www.unizwa.edu.om/index.php?contentid=619&lang=en"}, {"college": "كلية الاقتصاد والإدارة ونظم المعلومات", "degree": "بكالوريوس", "name_ar": "الاقتصاد والتمويل – اقتصاد الموارد الطبيعية", "name_en": "Economics and Finance – Natural Resource Economics", "official_url": "https://www.unizwa.edu.om/index.php?contentid=619&lang=en"}, {"college": "كلية الاقتصاد والإدارة ونظم المعلومات", "degree": "بكالوريوس", "name_ar": "التجارة والتمويل الدولي", "name_en": "International Trade and Finance", "official_url": "https://www.unizwa.edu.om/index.php?contentid=619&lang=en"}, {"college": "كلية الاقتصاد والإدارة ونظم المعلومات", "degree": "بكالوريوس", "name_ar": "التسويق", "name_en": "Marketing", "official_url": "https://www.unizwa.edu.om/index.php?contentid=619&lang=en"}, {"college": "كلية الاقتصاد والإدارة ونظم المعلومات", "degree": "بكالوريوس", "name_ar": "إدارة السياحة والترفيه", "name_en": "Tourism and Recreational Management", "official_url": "https://www.unizwa.edu.om/index.php?contentid=619&lang=en"}, {"college": "كلية الاقتصاد والإدارة ونظم المعلومات", "degree": "بكالوريوس", "name_ar": "إدارة العمليات", "name_en": "Operations Management", "official_url": "https://www.unizwa.edu.om/index.php?contentid=619&lang=en"}, {"college": "كلية الاقتصاد والإدارة ونظم المعلومات", "degree": "بكالوريوس", "name_ar": "نظم المعلومات", "name_en": "Information Systems", "official_url": "https://www.unizwa.edu.om/index.php?contentid=619&lang=en"}, {"college": "كلية الاقتصاد والإدارة ونظم المعلومات", "degree": "بكالوريوس", "name_ar": "تصميم الويب وأمن المعلومات", "name_en": "Web Design and Information Security", "official_url": "https://www.unizwa.edu.om/index.php?contentid=619&lang=en"}, {"college": "كلية الاقتصاد والإدارة ونظم المعلومات", "degree": "ماجستير", "name_ar": "المحاسبة", "name_en": "Accounting", "official_url": "https://www.unizwa.edu.om/index.php?contentid=619&lang=en"}, {"college": "كلية الاقتصاد والإدارة ونظم المعلومات", "degree": "ماجستير", "name_ar": "إدارة الأعمال", "name_en": "Business Administration", "official_url": "https://www.unizwa.edu.om/index.php?contentid=619&lang=en"}, {"college": "كلية الاقتصاد والإدارة ونظم المعلومات", "degree": "ماجستير", "name_ar": "الماجستير التنفيذي في إدارة الأعمال", "name_en": "Executive Master of Business Administration", "official_url": "https://www.unizwa.edu.om/index.php?contentid=619&lang=en"}, {"college": "كلية الاقتصاد والإدارة ونظم المعلومات", "degree": "ماجستير", "name_ar": "الاقتصاد", "name_en": "Economics", "official_url": "https://www.unizwa.edu.om/index.php?contentid=619&lang=en"}, {"college": "كلية الاقتصاد والإدارة ونظم المعلومات", "degree": "ماجستير", "name_ar": "نظم المعلومات", "name_en": "Information Systems", "official_url": "https://www.unizwa.edu.om/index.php?contentid=619&lang=en"}, {"college": "كلية الاقتصاد والإدارة ونظم المعلومات", "degree": "دكتوراه", "name_ar": "دكتوراه الفلسفة في دراسات الأعمال", "name_en": "Ph.D. in Business Studies", "official_url": "https://www.unizwa.edu.om/index.php?contentid=619&lang=en"}, {"college": "كلية الهندسة والعمارة", "degree": "دبلوم", "name_ar": "تقنيات الهندسة الكيميائية والبتروكيماوية", "name_en": "Chemical and Petrochemical Technologies", "official_url": "https://www.unizwa.edu.om/index.php?contentid=619&lang=en"}, {"college": "كلية الهندسة والعمارة", "degree": "دبلوم", "name_ar": "العمارة", "name_en": "Architecture", "official_url": "https://www.unizwa.edu.om/index.php?contentid=619&lang=en"}, {"college": "كلية الهندسة والعمارة", "degree": "دبلوم", "name_ar": "التقنيات الكهربائية", "name_en": "Electrical Technologies", "official_url": "https://www.unizwa.edu.om/index.php?contentid=619&lang=en"}, {"college": "كلية الهندسة والعمارة", "degree": "دبلوم", "name_ar": "تقنيات هندسة الحاسب", "name_en": "Computer Technologies", "official_url": "https://www.unizwa.edu.om/index.php?contentid=619&lang=en"}, {"college": "كلية الهندسة والعمارة", "degree": "دبلوم", "name_ar": "التقنيات المدنية", "name_en": "Civil Technologies", "official_url": "https://www.unizwa.edu.om/index.php?contentid=619&lang=en"}, {"college": "كلية الهندسة والعمارة", "degree": "دبلوم", "name_ar": "التقنيات البيئية", "name_en": "Environmental Technologies", "official_url": "https://www.unizwa.edu.om/index.php?contentid=619&lang=en"}, {"college": "كلية الهندسة والعمارة", "degree": "دبلوم", "name_ar": "تقنيات التصميم الداخلي", "name_en": "Interior Design Technologies", "official_url": "https://www.unizwa.edu.om/index.php?contentid=619&lang=en"}, {"college": "كلية الهندسة والعمارة", "degree": "بكالوريوس", "name_ar": "الهندسة الكيميائية والبتروكيماوية", "name_en": "Chemical and Petrochemical Engineering", "official_url": "https://www.unizwa.edu.om/index.php?contentid=619&lang=en"}, {"college": "كلية الهندسة والعمارة", "degree": "بكالوريوس", "name_ar": "الهندسة المعمارية", "name_en": "Architectural Engineering", "official_url": "https://www.unizwa.edu.om/index.php?contentid=619&lang=en"}, {"college": "كلية الهندسة والعمارة", "degree": "بكالوريوس", "name_ar": "الهندسة الكهربائية", "name_en": "Electrical Engineering", "official_url": "https://www.unizwa.edu.om/index.php?contentid=619&lang=en"}, {"college": "كلية الهندسة والعمارة", "degree": "بكالوريوس", "name_ar": "هندسة الحاسب", "name_en": "Computer Engineering", "official_url": "https://www.unizwa.edu.om/index.php?contentid=619&lang=en"}, {"college": "كلية الهندسة والعمارة", "degree": "بكالوريوس", "name_ar": "الهندسة المدنية", "name_en": "Civil Engineering", "official_url": "https://www.unizwa.edu.om/index.php?contentid=619&lang=en"}, {"college": "كلية الهندسة والعمارة", "degree": "بكالوريوس", "name_ar": "الهندسة البيئية", "name_en": "Environmental Engineering", "official_url": "https://www.unizwa.edu.om/index.php?contentid=619&lang=en"}, {"college": "كلية الهندسة والعمارة", "degree": "بكالوريوس", "name_ar": "هندسة التصميم الداخلي", "name_en": "Interior Design Engineering", "official_url": "https://www.unizwa.edu.om/index.php?contentid=619&lang=en"}, {"college": "كلية العلوم الصحية", "degree": "دبلوم", "name_ar": "الصيدلة", "name_en": "Pharmacy", "official_url": "https://www.unizwa.edu.om/index.php?contentid=619&lang=en"}, {"college": "كلية العلوم الصحية", "degree": "دبلوم", "name_ar": "التمريض", "name_en": "Nursing", "official_url": "https://www.unizwa.edu.om/index.php?contentid=619&lang=en"}, {"college": "كلية العلوم الصحية", "degree": "دبلوم", "name_ar": "التجسير في الصيدلة", "name_en": "Bridging Pharmacy Diploma", "official_url": "https://www.unizwa.edu.om/index.php?contentid=619&lang=en"}, {"college": "كلية العلوم الصحية", "degree": "دبلوم", "name_ar": "التجسير في التمريض", "name_en": "Bridging Nursing Diploma", "official_url": "https://www.unizwa.edu.om/index.php?contentid=619&lang=en"}, {"college": "كلية العلوم الصحية", "degree": "بكالوريوس", "name_ar": "الصيدلة", "name_en": "Pharmacy", "official_url": "https://www.unizwa.edu.om/index.php?contentid=619&lang=en"}, {"college": "كلية العلوم الصحية", "degree": "بكالوريوس", "name_ar": "التمريض", "name_en": "Nursing", "official_url": "https://www.unizwa.edu.om/index.php?contentid=619&lang=en"}];
-let rows=[];
-let activeCollege='';
+const state={colleges:[],departments:[],programs:[],search:'',collegeId:'',degree:''};
+const text=value=>String(value??'').trim();
+const normalize=value=>text(value).toLowerCase();
+const safeUrl=value=>{
+ try{const url=new URL(String(value||''));return url.protocol==='https:'?url.href:''}catch{return''}
+};
+const collegeName=id=>state.colleges.find(row=>row.id===id)?.name_ar||'';
+const departmentName=id=>state.departments.find(row=>row.id===id)?.name_ar||'';
+const sortByOrder=(a,b)=>(Number(a.sort_order)||999)-(Number(b.sort_order)||999)||text(a.name_ar).localeCompare(text(b.name_ar),'ar');
 
-function keyOf(item){
- return `${item.college||''}|${item.degree||''}|${item.name_ar||item.name_en||''}`.toLowerCase();
+function buildFilters(){
+ $('#collegeFilter').innerHTML='<option value="">كل الكليات</option>'+state.colleges.map(row=>`<option value="${esc(row.id)}">${esc(row.name_ar)}</option>`).join('');
+ const degrees=[...new Set(state.programs.map(row=>text(row.degree_ar)).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'ar'));
+ $('#degreeFilter').innerHTML='<option value="">كل الدرجات</option>'+degrees.map(value=>`<option value="${esc(value)}">${esc(value)}</option>`).join('');
+ $('#collegeTabs').innerHTML=`<button type="button" class="active" data-college-tab="">كل الكليات</button>`+state.colleges.map(row=>`<button type="button" data-college-tab="${esc(row.id)}">${esc(row.name_ar)}</button>`).join('');
+ $('#collegeTabs').addEventListener('click',event=>{
+  const button=event.target.closest('[data-college-tab]');if(!button)return;
+  state.collegeId=button.dataset.collegeTab||'';
+  $('#collegeFilter').value=state.collegeId;
+  document.querySelectorAll('[data-college-tab]').forEach(item=>item.classList.toggle('active',item===button));
+  render();
+ });
 }
-
+function filteredPrograms(){
+ const query=normalize(state.search);
+ return state.programs.filter(program=>{
+  const haystack=normalize([program.name_ar,program.name_en,program.degree_ar,program.degree_en,collegeName(program.college_id),departmentName(program.department_id)].join(' '));
+  return (!state.collegeId||program.college_id===state.collegeId)&&(!state.degree||text(program.degree_ar)===state.degree)&&(!query||haystack.includes(query));
+ }).sort((a,b)=>{
+  const collegeCompare=collegeName(a.college_id).localeCompare(collegeName(b.college_id),'ar');
+  if(collegeCompare)return collegeCompare;
+  const departmentCompare=departmentName(a.department_id).localeCompare(departmentName(b.department_id),'ar');
+  return departmentCompare||sortByOrder(a,b);
+ });
+}
+function programCard(program){
+ const official=safeUrl(program.official_url);
+ return `<article class="guide-program-card"><div class="guide-program-main"><span class="guide-degree">${esc(program.degree_ar||'برنامج أكاديمي')}</span><h3>${esc(program.name_ar)}</h3>${program.name_en&&program.name_en!==program.name_ar?`<p dir="ltr">${esc(program.name_en)}</p>`:''}<small>${esc(departmentName(program.department_id)||'برنامج أكاديمي')} • ${esc(collegeName(program.college_id))}</small></div>${official?`<a class="btn" href="${esc(official)}" target="_blank" rel="noopener noreferrer">المصدر الرسمي</a>`:''}</article>`;
+}
+function render(){
+ const programs=filteredPrograms();
+ $('#collegeCount').textContent=state.colleges.length;
+ $('#programCount').textContent=programs.length;
+ $('#degreeCount').textContent=new Set(programs.map(row=>row.degree_ar).filter(Boolean)).size;
+ const target=$('#items');
+ if(!programs.length){target.innerHTML='<div class="empty">لا توجد برامج مطابقة للبحث.</div>';return}
+ const grouped=new Map();
+ programs.forEach(program=>{
+  const key=`${program.college_id}:${program.department_id||''}`;
+  if(!grouped.has(key))grouped.set(key,{college:collegeName(program.college_id),department:departmentName(program.department_id),items:[]});
+  grouped.get(key).items.push(program);
+ });
+ target.innerHTML=[...grouped.values()].map(group=>`<section class="guide-program-group"><header><span>${esc(group.college)}</span><h2>${esc(group.department||'برامج الكلية')}</h2><b>${group.items.length} برنامج</b></header><div>${group.items.map(programCard).join('')}</div></section>`).join('');
+}
 async function load(){
+ $('#items').innerHTML='<div class="empty">جاري تحميل دليل الجامعة...</div>';
  try{
-  const response=await get('university_programs','select=*&active=eq.true&order=college.asc,name_ar.asc');
-  const databaseRows=Array.isArray(response)?response:[];
-  const merged=new Map();
-
-  officialPrograms.forEach(item=>merged.set(keyOf(item),item));
-  databaseRows.forEach(item=>merged.set(keyOf(item),{...merged.get(keyOf(item)),...item}));
-
-  rows=[...merged.values()];
-  updateSummary();
-  renderTabs();
-  render();
+  const [colleges,departments,programs]=await Promise.all([
+   get('academic_colleges','select=*&active=eq.true&order=sort_order.asc'),
+   get('academic_departments','select=*&active=eq.true&order=sort_order.asc'),
+   get('academic_programs','select=*&active=eq.true&order=sort_order.asc')
+  ]);
+  state.colleges=(colleges||[]).sort(sortByOrder);
+  state.departments=(departments||[]).sort(sortByOrder);
+  state.programs=(programs||[]).filter(row=>row.college_id&&text(row.name_ar));
+  buildFilters();render();
+  trackEvent('page_view',{page:'university-guide',programs:state.programs.length});
  }catch(error){
-  rows=[...officialPrograms];
-  updateSummary();
-  renderTabs();
-  render();
-  console.warn(error);
+  console.error(error);
+  $('#items').innerHTML='<div class="empty">تعذر تحميل دليل الجامعة حاليًا.</div>';
+  toast(error.message||'تعذر تحميل الدليل',true);
  }
 }
-
-function updateSummary(){
- const colleges=new Set(rows.map(item=>item.college).filter(Boolean));
- const degrees=new Set(rows.map(item=>item.degree).filter(Boolean));
- if($('#collegeCount')) $('#collegeCount').textContent=colleges.size;
- if($('#degreeCount')) $('#degreeCount').textContent=degrees.size;
- if($('#programCount')) $('#programCount').textContent=rows.length;
-}
-
-function renderTabs(){
- const colleges=[
-  ['','الكل'],
-  ['كلية العلوم والآداب','العلوم والآداب'],
-  ['كلية الاقتصاد والإدارة ونظم المعلومات','الاقتصاد والإدارة'],
-  ['كلية الهندسة والعمارة','الهندسة والعمارة'],
-  ['كلية العلوم الصحية','العلوم الصحية']
- ];
-
- const tabs=$('#collegeTabs');
- if(!tabs) return;
- tabs.innerHTML=colleges.map(([value,label])=>`
-  <button class="${activeCollege===value?'active':''}" data-college="${esc(value)}">${esc(label)}</button>
- `).join('');
-
- document.querySelectorAll('[data-college]').forEach(button=>{
-  button.onclick=()=>{
-   activeCollege=button.dataset.college;
-   $('#collegeFilter').value=activeCollege;
-   renderTabs();
-   render();
-  };
- });
-}
-
-function render(){
- const searchInput=$('#search');
- const collegeFilter=$('#collegeFilter');
- const degreeFilter=$('#degreeFilter');
- const itemsContainer=$('#items');
- if(!searchInput||!collegeFilter||!degreeFilter||!itemsContainer) return;
-
- const query=searchInput.value.trim().toLowerCase();
- const selectedCollege=collegeFilter.value||activeCollege;
- const degree=degreeFilter.value;
-
- const list=rows.filter(item=>{
-  const text=`${item.name_ar||''} ${item.name_en||''} ${item.college||''} ${item.degree||''}`.toLowerCase();
-  return (!selectedCollege||item.college===selectedCollege)&&
-         (!degree||String(item.degree||'').includes(degree))&&
-         (!query||text.includes(query));
- });
-
-
- const groups=new Map();
- list.forEach(item=>{
-  const key=item.college||'برامج أخرى';
-  if(!groups.has(key))groups.set(key,[]);
-  groups.get(key).push(item);
- });
-
- itemsContainer.innerHTML=list.length?[...groups.entries()].map(([college,items])=>`
-  <section class="guide-college-section">
-   <div class="guide-college-heading">
-    <div><span>كلية</span><h2>${esc(college)}</h2></div>
-    <strong>${items.length} برنامج</strong>
-   </div>
-   <div class="guide-program-grid">
-    ${items.map(item=>`
-     <article class="guide-program-card">
-      <div class="guide-program-top">
-       <span class="degree-tag">${esc(item.degree||'برنامج')}</span>
-       <small>${esc(item.name_en||'')}</small>
-      </div>
-      <h3>${esc(item.name_ar||item.name_en)}</h3>
-      <div class="guide-program-actions">
-       ${item.study_plan_url?`<a class="btn" target="_blank" href="${esc(item.study_plan_url)}">الخطة الدراسية</a>`:''}
-       <a class="btn primary" target="_blank" rel="noopener" href="${esc(item.official_url||'https://www.unizwa.edu.om/program_details.php?comingfrom=1378')}">المصدر الرسمي</a>
-      </div>
-     </article>
-    `).join('')}
-   </div>
-  </section>
- `).join(''):'<div class="empty">لا توجد نتائج مطابقة</div>';
-}
-
-$('#search')?.addEventListener('input',render);
-$('#collegeFilter')?.addEventListener('change',()=>{
- activeCollege=$('#collegeFilter')?.value||'';
- renderTabs();
+$('#search')?.addEventListener('input',event=>{state.search=event.target.value;render()});
+$('#collegeFilter')?.addEventListener('change',event=>{
+ state.collegeId=event.target.value;
+ document.querySelectorAll('[data-college-tab]').forEach(item=>item.classList.toggle('active',item.dataset.collegeTab===state.collegeId));
  render();
 });
-$('#degreeFilter')?.addEventListener('change',render);
-
+$('#degreeFilter')?.addEventListener('change',event=>{state.degree=event.target.value;render()});
 load();
