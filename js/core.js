@@ -1,12 +1,31 @@
 const SUPABASE_URL='https://irkhvydgxpseflggbeqq.supabase.co';
 const SUPABASE_KEY='sb_publishable_gZ9tyM1udrkuQIXHqDtToQ_FyFmePgH';
-const headers={apikey:SUPABASE_KEY,'Content-Type':'application/json'};
+const headers={apikey:SUPABASE_KEY,'Content-Type':'application/json',Accept:'application/json'};
 const ADMIN_SESSION_TTL=30*60*1000;
+const REQUEST_TIMEOUT=10000;
+const STATE_TIMEOUT=4500;
+const STATE_CACHE_TTL=30000;
+const STATE_FALLBACK_TTL=6*60*60*1000;
 
 export const $=(s,r=document)=>r.querySelector(s);
 export const $$=(s,r=document)=>[...r.querySelectorAll(s)];
 export const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-export const uid=()=>crypto.randomUUID();
+export const uid=()=>crypto.randomUUID?.()||`${Date.now()}-${Math.random().toString(16).slice(2)}`;
+
+function parseResponse(text){
+ try{return text?JSON.parse(text):null}catch{return text}
+}
+
+async function fetchWithTimeout(url,options={},timeout=REQUEST_TIMEOUT){
+ const controller=new AbortController();
+ const timer=setTimeout(()=>controller.abort(),timeout);
+ try{
+  return await fetch(url,{...options,signal:controller.signal});
+ }catch(error){
+  if(error?.name==='AbortError')throw new Error('انتهت مهلة الاتصال، حاول مرة ثانية');
+  throw error;
+ }finally{clearTimeout(timer)}
+}
 
 function onAdminPage(){
  return /\/admin(?:\.html)?\/?$/.test(location.pathname)||document.body?.classList.contains('admin-page');
@@ -19,24 +38,27 @@ async function adminRead(table,query){
   clearAdminSession();
   throw new Error('انتهت جلسة الإدارة، سجّل الدخول مرة ثانية');
  }
- const res=await fetch(`${SUPABASE_URL}/functions/v1/admin-api`,{
+ const res=await fetchWithTimeout(`${SUPABASE_URL}/functions/v1/admin-api`,{
   method:'POST',
   headers:{...headers,'x-admin-password':password},
   body:JSON.stringify({action:'read',table,query}),
   cache:'no-store'
  });
- const text=await res.text();let data=null;try{data=text?JSON.parse(text):null}catch{data=text}
+ const data=parseResponse(await res.text());
  if(res.status===401)clearAdminSession();
  if(!res.ok||data?.ok===false)throw new Error(data?.error||data?.message||data||`HTTP ${res.status}`);
  return data?.data||[];
 }
 
-export async function api(table,{method='GET',query='',body,prefer='return=representation'}={}){
+export async function api(table,{method='GET',query='',body,prefer='return=representation',timeout=REQUEST_TIMEOUT}={}){
  if(method==='GET'&&onAdminPage())return adminRead(table,query);
- const res=await fetch(`${SUPABASE_URL}/rest/v1/${table}${query?`?${query}`:''}`,{
-  method,headers:{...headers,Prefer:prefer},body:body===undefined?undefined:JSON.stringify(body),cache:'no-store'
- });
- const text=await res.text();let data=null;try{data=text?JSON.parse(text):null}catch{data=text}
+ const res=await fetchWithTimeout(`${SUPABASE_URL}/rest/v1/${table}${query?`?${query}`:''}`,{
+  method,
+  headers:{...headers,Prefer:prefer},
+  body:body===undefined?undefined:JSON.stringify(body),
+  cache:'no-store'
+ },timeout);
+ const data=parseResponse(await res.text());
  if(!res.ok)throw new Error(data?.message||data?.error_description||data||`HTTP ${res.status}`);
  return data;
 }
@@ -44,32 +66,37 @@ export const get=(t,q='')=>api(t,{query:q,prefer:''});
 export const insert=(t,b,{returning=true}={})=>api(t,{method:'POST',body:b,prefer:returning?'return=representation':'return=minimal'});
 export async function submitPending(table,body){
  const payload={...body};
-
- // whatsapp_groups.id is an auto-generated INTEGER in PostgreSQL.
- // Never send a UUID for this table, even if another caller supplied one.
- if(table==='whatsapp_groups'){
-  delete payload.id;
- }else if(!payload.id){
-  payload.id=crypto.randomUUID();
- }
-
+ if(table==='whatsapp_groups')delete payload.id;
+ else if(!payload.id)payload.id=uid();
  await insert(table,payload,{returning:false});
  return payload;
 }
 export const update=(t,q,b)=>api(t,{method:'PATCH',query:q,body:b});
 export const remove=(t,q)=>api(t,{method:'DELETE',query:q,prefer:''});
-export async function rpc(name,body){
- const res=await fetch(`${SUPABASE_URL}/rest/v1/rpc/${name}`,{method:'POST',headers,body:JSON.stringify(body),cache:'no-store'});
- const text=await res.text();let data=null;try{data=text?JSON.parse(text):null}catch{data=text}
- if(!res.ok)throw new Error(data?.message||data||`HTTP ${res.status}`);return data;
+export async function rpc(name,body,timeout=REQUEST_TIMEOUT){
+ const res=await fetchWithTimeout(`${SUPABASE_URL}/rest/v1/rpc/${name}`,{
+  method:'POST',headers,body:JSON.stringify(body),cache:'no-store'
+ },timeout);
+ const data=parseResponse(await res.text());
+ if(!res.ok)throw new Error(data?.message||data||`HTTP ${res.status}`);
+ return data;
 }
 export async function edge(payload){
- const res=await fetch(`${SUPABASE_URL}/functions/v1/telegram-admin`,{method:'POST',headers,body:JSON.stringify(payload),cache:'no-store'});
- const text=await res.text();if(!res.ok)throw new Error(text||'Edge function error');return text;
+ const res=await fetchWithTimeout(`${SUPABASE_URL}/functions/v1/telegram-admin`,{
+  method:'POST',headers,body:JSON.stringify(payload),cache:'no-store'
+ },15000);
+ const text=await res.text();
+ if(!res.ok)throw new Error(text||'Edge function error');
+ return text;
 }
+
 export function toast(message,error=false){
- let el=$('#toast');if(!el){el=document.createElement('div');el.id='toast';el.className='toast';document.body.append(el)}
- el.textContent=message;el.className=`toast show${error?' error':''}`;clearTimeout(el._t);el._t=setTimeout(()=>el.className='toast',3200);
+ let el=$('#toast');
+ if(!el){el=document.createElement('div');el.id='toast';el.className='toast';document.body.append(el)}
+ el.textContent=message;
+ el.className=`toast show${error?' error':''}`;
+ clearTimeout(el._t);
+ el._t=setTimeout(()=>el.className='toast',3200);
 }
 export function setupNav(){
  $('#menuBtn')?.addEventListener('click',()=>$('#navLinks')?.classList.toggle('open'));
@@ -81,128 +108,120 @@ export const colleges=[
  'كلية العلوم الصحية'
 ];
 export function fillCollege(select,{other=false}={}){
- select.innerHTML='<option value="">اختر الكلية</option>'+colleges.map(c=>`<option value="${c}">${c}</option>`).join('')+(other?'<option value="أخرى">أخرى</option>':'');
+ if(!select)return;
+ select.innerHTML='<option value="">اختر الكلية</option>'+colleges.map(c=>`<option value="${esc(c)}">${esc(c)}</option>`).join('')+(other?'<option value="أخرى">أخرى</option>':'');
 }
-export function openModal(id){$('#'+id)?.classList.add('open')} export function closeModal(id){$('#'+id)?.classList.remove('open')}
+export function openModal(id){$('#'+id)?.classList.add('open')}
+export function closeModal(id){$('#'+id)?.classList.remove('open')}
 
 export async function notifyPending(table,id){
- try{await edge({source:'web-submit',table,id})}catch(e){console.warn('Notification fallback failed',e)}
+ try{await edge({source:'web-submit',table,id})}catch(error){console.warn('Notification fallback failed',error)}
 }
 
+let stateCache=null;
+let stateCacheAt=0;
+let statePromise=null;
+const STATE_STORAGE_KEY='uon_public_state_cache_v39';
 
-
-export async function getUonState(){
- return await rpc('uon_public_state',{});
+function readStoredState(){
+ try{
+  const saved=JSON.parse(localStorage.getItem(STATE_STORAGE_KEY)||'null');
+  return saved&&Date.now()-saved.saved_at<STATE_FALLBACK_TTL?saved.state:null;
+ }catch{return null}
+}
+function storeState(state){
+ try{localStorage.setItem(STATE_STORAGE_KEY,JSON.stringify({saved_at:Date.now(),state}))}catch{}
 }
 
-let maintenanceInitialCheck=true;
+export async function getUonState({force=false}={}){
+ if(!force&&stateCache&&Date.now()-stateCacheAt<STATE_CACHE_TTL)return stateCache;
+ if(!force&&statePromise)return statePromise;
+ statePromise=rpc('uon_public_state',{},STATE_TIMEOUT)
+  .then(state=>{
+   stateCache=state||{};
+   stateCacheAt=Date.now();
+   storeState(stateCache);
+   return stateCache;
+  })
+  .catch(error=>{
+   const fallback=stateCache||readStoredState();
+   if(fallback)return fallback;
+   throw error;
+  })
+  .finally(()=>{statePromise=null});
+ return statePromise;
+}
+
 let maintenanceRedirecting=false;
-
 export async function enforceUonMaintenance(){
- const isAdmin=location.pathname.endsWith('/admin.html');
- const isMaintenance=location.pathname.endsWith('/maintenance.html');
+ const isAdmin=/\/admin(?:\.html)?\/?$/.test(location.pathname);
+ const isMaintenance=/\/maintenance(?:\.html)?\/?$/.test(location.pathname);
  if(isAdmin)return false;
-
- if(maintenanceInitialCheck && document.readyState==='loading'){
-  document.documentElement.classList.add('maintenance-check');
- }
-
  try{
   const state=await getUonState();
   const enabled=state?.maintenance_enabled===true;
-
   if(enabled&&!isMaintenance&&!maintenanceRedirecting){
    maintenanceRedirecting=true;
    location.replace('maintenance.html');
    return true;
   }
-
   if(!enabled&&isMaintenance&&!maintenanceRedirecting){
    maintenanceRedirecting=true;
    location.replace('index.html');
-   return false;
   }
  }catch(error){
-  console.error('UON maintenance state error',error);
- }finally{
-  if(maintenanceInitialCheck){
-   document.documentElement.classList.remove('maintenance-check');
-   maintenanceInitialCheck=false;
-  }
+  console.warn('Maintenance state unavailable; page will continue normally',error);
  }
-
  return false;
 }
 
 export function watchUonMaintenance(){
- if(location.pathname.endsWith('/admin.html'))return;
-
+ if(/\/admin(?:\.html)?\/?$/.test(location.pathname))return;
  let checking=false;
  const check=async()=>{
   if(checking||maintenanceRedirecting)return;
   checking=true;
-  try{
-   await enforceUonMaintenance();
-  }finally{
-   checking=false;
-  }
+  try{await getUonState({force:true});await enforceUonMaintenance()}finally{checking=false}
  };
-
- // No interval: check only when the user returns to the tab/window.
  window.addEventListener('focus',check);
- document.addEventListener('visibilitychange',()=>{
-  if(!document.hidden)check();
- });
+ document.addEventListener('visibilitychange',()=>{if(!document.hidden)check()});
 }
-
 
 export function debounce(fn,delay=250){
  let timer;
- return (...args)=>{
-  clearTimeout(timer);
-  timer=setTimeout(()=>fn(...args),delay);
- };
+ return (...args)=>{clearTimeout(timer);timer=setTimeout(()=>fn(...args),delay)};
 }
-
 export function formatDate(value){
  if(!value)return '—';
- try{return new Date(value).toLocaleString('ar')}catch{return String(value)}
+ try{return new Date(value).toLocaleString('ar-OM')}catch{return String(value)}
 }
 
 export function adminSession(){
  try{return JSON.parse(sessionStorage.getItem('uon_admin_session')||'null')}catch{return null}
 }
-
 export function saveAdminSession(data){
- sessionStorage.setItem('uon_admin_session',JSON.stringify({
-  ...data,
-  created_at:Date.now()
- }));
+ sessionStorage.setItem('uon_admin_session',JSON.stringify({...data,created_at:Date.now()}));
 }
-
 export function clearAdminSession(){
  sessionStorage.removeItem('uon_admin_session');
  sessionStorage.removeItem('uon_admin');
  sessionStorage.removeItem('uon_admin_password');
 }
 
-
 export async function trackEvent(eventType,metadata={}){
  try{
   const sessionKey='uon_anon_session';
   let sessionId=localStorage.getItem(sessionKey);
-  if(!sessionId){sessionId=crypto.randomUUID();localStorage.setItem(sessionKey,sessionId)}
-  await insert('usage_events',{
-   event_type:eventType,
-   page_path:location.pathname,
-   session_id:sessionId,
-   metadata,
-   user_agent:navigator.userAgent.slice(0,300)
-  },{returning:false});
+  if(!sessionId){sessionId=uid();localStorage.setItem(sessionKey,sessionId)}
+  const payload={event_type:eventType,page_path:location.pathname,session_id:sessionId,metadata,user_agent:navigator.userAgent.slice(0,300)};
+  await fetch(`${SUPABASE_URL}/rest/v1/usage_events`,{
+   method:'POST',headers:{...headers,Prefer:'return=minimal'},body:JSON.stringify(payload),keepalive:true
+  });
  }catch(error){console.warn('Usage tracking skipped',error)}
 }
-
 export function trackClicks(){
+ if(document.documentElement.dataset.uonClickTracking==='1')return;
+ document.documentElement.dataset.uonClickTracking='1';
  document.addEventListener('click',event=>{
   const link=event.target.closest('a,button');
   if(!link)return;
@@ -212,7 +231,6 @@ export function trackClicks(){
  },{capture:true});
 }
 
-
 export async function getSetting(key,fallback=''){
  try{
   const rows=await get('site_settings',`select=value&key=eq.${encodeURIComponent(key)}&limit=1`);
@@ -220,49 +238,43 @@ export async function getSetting(key,fallback=''){
   return value===null||value===undefined?fallback:value;
  }catch{return fallback}
 }
-
 export async function loadSocialLinks(){
  const [whatsapp,instagram]=await Promise.all([
   getSetting('whatsapp_channel_url','https://whatsapp.com/channel/0029Vb9RCFoHgZWkH8X6di1x'),
   getSetting('instagram_url','')
  ]);
- document.querySelectorAll('[data-social="whatsapp"]').forEach(a=>{
-  a.href=whatsapp||'#';a.hidden=!whatsapp;
- });
- document.querySelectorAll('[data-social="instagram"]').forEach(a=>{
-  a.href=instagram||'#';a.hidden=!instagram;
- });
+ document.querySelectorAll('[data-social="whatsapp"]').forEach(a=>{a.href=whatsapp||'#';a.hidden=!whatsapp});
+ document.querySelectorAll('[data-social="instagram"]').forEach(a=>{a.href=instagram||'#';a.hidden=!instagram});
  return {whatsapp,instagram};
 }
 
+function safeHref(value='#'){
+ const raw=String(value||'#').trim();
+ if(raw.startsWith('/')||raw.startsWith('./')||raw.startsWith('../')||raw==='#')return raw;
+ try{
+  const url=new URL(raw,location.origin);
+  return ['http:','https:'].includes(url.protocol)?url.href:'#';
+ }catch{return '#'}
+}
 export async function loadNotificationCenter(limit=20){
- const target=document.querySelector('#notificationItems');
+ const target=$('#notificationItems');
  if(!target)return;
  try{
   const rows=await get('site_notifications',`select=*&active=eq.true&order=created_at.desc&limit=${limit}`);
-  target.innerHTML=rows.length?rows.map(x=>`<a class="notification-item" href="${esc(x.url||'#')}">
-   <span>${esc(x.icon||'🔔')}</span>
-   <div><strong>${esc(x.title)}</strong><small>${esc(x.body||'')}</small></div>
+  target.innerHTML=rows.length?rows.map(x=>`<a class="notification-item" href="${esc(safeHref(x.url||'#'))}">
+   <span>${esc(x.icon||'🔔')}</span><div><strong>${esc(x.title)}</strong><small>${esc(x.body||'')}</small></div>
   </a>`).join(''):'<div class="empty">لا توجد إشعارات جديدة</div>';
- }catch(error){target.innerHTML='<div class="empty">تعذر تحميل الإشعارات</div>'}
+ }catch{target.innerHTML='<div class="empty">تعذر تحميل الإشعارات</div>'}
 }
-
 
 export function whatsappShare(title,url=location.href){
- const text=`${title}\n${url}`;
- return `https://wa.me/?text=${encodeURIComponent(text)}`;
+ return `https://wa.me/?text=${encodeURIComponent(`${title}\n${url}`)}`;
 }
-
 export async function reportBrokenLink({sourceTable,sourceId,title,url}){
  const reason=prompt('ما المشكلة في الرابط؟','الرابط لا يعمل');
  if(reason===null)return false;
  const report=await submitPending('broken_link_reports',{
-  source_table:sourceTable,
-  source_id:String(sourceId),
-  source_title:title||'',
-  source_url:url||'',
-  reason,
-  status:'pending'
+  source_table:sourceTable,source_id:String(sourceId),source_title:title||'',source_url:url||'',reason,status:'pending'
  });
  toast('تم إرسال البلاغ للمشرف');
  try{await notifyPending('broken_link_reports',report.id)}catch{}
@@ -270,63 +282,85 @@ export async function reportBrokenLink({sourceTable,sourceId,title,url}){
 }
 
 export function installErrorCapture(){
+ if(document.documentElement.dataset.uonErrorCapture==='1')return;
+ document.documentElement.dataset.uonErrorCapture='1';
  window.addEventListener('error',event=>{
-  insert('system_errors',{source:location.pathname,message:event.message||'Browser error',details:{file:event.filename,line:event.lineno}},{returning:false}).catch(()=>{});
+  insert('system_errors',{
+   source:'browser_error',message:event.message||'Browser error',
+   details:{page:location.pathname,file:event.filename||'',line:event.lineno||0,column:event.colno||0}
+  },{returning:false}).catch(()=>{});
  });
  window.addEventListener('unhandledrejection',event=>{
-  insert('system_errors',{source:location.pathname,message:String(event.reason?.message||event.reason||'Unhandled rejection')},{returning:false}).catch(()=>{});
+  insert('system_errors',{
+   source:'unhandledrejection',message:String(event.reason?.message||event.reason||'Unhandled rejection'),
+   details:{page:location.pathname,stack:String(event.reason?.stack||'').slice(0,3000)}
+  },{returning:false}).catch(()=>{});
  });
 }
-
 
 export function featureStatusLabel(status){
  const lang=localStorage.getItem('uon_language')||'ar';
  const labels={
-  ar:{active:'متاحة',disabled:'قريبًا · Coming Soon',maintenance:'تحت الصيانة',coming_soon:'قريبًا · Coming Soon'},
-  en:{active:'Available',disabled:'Coming Soon',maintenance:'Maintenance',coming_soon:'Coming Soon'}
+  ar:{active:'متاحة',disabled:'متوقفة مؤقتًا',maintenance:'تحت الصيانة',coming_soon:'قريبًا · Coming Soon'},
+  en:{active:'Available',disabled:'Temporarily unavailable',maintenance:'Maintenance',coming_soon:'Coming Soon'}
  };
  return labels[lang]?.[status]||status;
 }
 
 const featureStateHandlers=new WeakMap();
+function setFeatureVisibility(card,visible){
+ if(!visible){
+  card.hidden=true;
+  card.dataset.featureHidden='1';
+  card.setAttribute('aria-hidden','true');
+ }else if(card.dataset.featureHidden==='1'){
+  card.hidden=false;
+  delete card.dataset.featureHidden;
+  card.removeAttribute('aria-hidden');
+ }
+}
 
 export async function applyFeatureStates(root=document){
  try{
   const state=await getUonState();
-  const map=state?.features||{};
-  const {showFeatureStateBanner}=await import('./v14-ui.js?v=17.6');
+  const statuses=state?.features||{};
+  const visibility=state?.visibility||{};
+  const {showFeatureStateBanner}=await import('./v14-ui.js?v=39.0.0');
+  const cards=[];
+  if(root.matches?.('[data-feature]'))cards.push(root);
+  root.querySelectorAll?.('[data-feature]').forEach(card=>cards.push(card));
 
-  root.querySelectorAll('[data-feature]').forEach(card=>{
-   const status=map[card.dataset.feature]||'active';
-   card.dataset.status=status;
-   card.classList.toggle('feature-unavailable',status!=='active');
+  cards.forEach(card=>{
+   const feature=card.dataset.feature;
+   const visible=visibility[feature]!==false;
+   setFeatureVisibility(card,visible);
 
    const previousHandler=featureStateHandlers.get(card);
-   if(previousHandler){
-    card.removeEventListener('click',previousHandler,true);
-    featureStateHandlers.delete(card);
-   }
+   if(previousHandler){card.removeEventListener('click',previousHandler,true);featureStateHandlers.delete(card)}
    card.querySelector('.feature-state')?.remove();
+   if(!visible)return;
 
-   if(status!=='active'){
-    card.setAttribute('aria-disabled','true');
-    const label=document.createElement('span');
-    label.className=`feature-state ${status}`;
-    label.setAttribute('role','status');
-    label.innerHTML=`<span aria-hidden="true">${status==='maintenance'?'⚙':'⏳'}</span><b>${esc(featureStatusLabel(status))}</b>`;
-    card.append(label);
-
-    const handler=event=>{
-     event.preventDefault();
-     event.stopImmediatePropagation();
-     const title=card.querySelector('h3,strong')?.textContent?.trim()||'';
-     showFeatureStateBanner(status,title);
-    };
-    featureStateHandlers.set(card,handler);
-    card.addEventListener('click',handler,true);
-   }else{
+   const status=statuses[feature]||'active';
+   card.dataset.status=status;
+   card.classList.toggle('feature-unavailable',status!=='active');
+   if(status==='active'){
     card.removeAttribute('aria-disabled');
+    return;
    }
+
+   card.setAttribute('aria-disabled','true');
+   const label=document.createElement('span');
+   label.className=`feature-state ${status}`;
+   label.setAttribute('role','status');
+   label.innerHTML=`<span aria-hidden="true">${status==='maintenance'?'⚙':'⏳'}</span><b>${esc(featureStatusLabel(status))}</b>`;
+   card.append(label);
+   const handler=event=>{
+    event.preventDefault();event.stopImmediatePropagation();
+    const title=card.querySelector('h3,strong')?.textContent?.trim()||'';
+    showFeatureStateBanner(status,title);
+   };
+   featureStateHandlers.set(card,handler);
+   card.addEventListener('click',handler,true);
   });
   return state;
  }catch(error){
