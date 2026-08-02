@@ -1,0 +1,4 @@
+UON Hub stable production rollback
+Base commit: 19edf87e7c71ba23aab57b10622a50cde45ea5ab
+Date: 2026-08-02
+Purpose: trigger a clean Vercel production deployment of the restored stable site.
