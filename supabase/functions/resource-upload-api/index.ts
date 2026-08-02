@@ -3,13 +3,22 @@ const SUPABASE_URL=Deno.env.get('SUPABASE_URL')!;
 const SERVICE_ROLE_KEY=Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
 const db=createClient(SUPABASE_URL,SERVICE_ROLE_KEY,{auth:{persistSession:false,autoRefreshToken:false}});
 const allowed=new Set(['https://uonhub.space','https://www.uonhub.space']);
-function origin(req:Request){const value=req.headers.get('origin')||'';try{const host=new URL(value).hostname;if(allowed.has(value)||(host.endsWith('.vercel.app')&&(host.startsWith('uon-')||host.startsWith('uon-hub-'))))return value}catch{}return 'https://uonhub.space'}
+function requestOrigin(req:Request){return req.headers.get('origin')||''}
+function isAllowedOrigin(value:string){if(!value)return false;try{const host=new URL(value).hostname;return allowed.has(value)||(host.endsWith('.vercel.app')&&(host.startsWith('uon-')||host.startsWith('uon-hub-')))}catch{return false}}
+function origin(req:Request){const value=requestOrigin(req);return isAllowedOrigin(value)?value:'https://uonhub.space'}
 function headers(req:Request){return{'Access-Control-Allow-Origin':origin(req),'Access-Control-Allow-Headers':'content-type,authorization,apikey','Access-Control-Allow-Methods':'POST,OPTIONS',Vary:'Origin'}}
 function reply(req:Request,body:unknown,status=200){return new Response(JSON.stringify(body),{status,headers:{...headers(req),'Content-Type':'application/json'}})}
 function safe(value:string){return value.toLowerCase().replace(/[^a-z0-9._-]+/g,'-').replace(/-+/g,'-').slice(0,90)}
 Deno.serve(async req=>{
  if(req.method==='OPTIONS')return new Response(null,{status:204,headers:headers(req)});
  if(req.method!=='POST')return reply(req,{ok:false,error:'method_not_allowed'},405);
+ const reqOrigin=requestOrigin(req);
+ if(reqOrigin&&!isAllowedOrigin(reqOrigin))return reply(req,{ok:false,error:'origin_not_allowed'},403);
+ const contentType=req.headers.get('content-type')||'';
+ if(contentType.includes('application/json')){
+  const body=await req.json().catch(()=>({}));
+  if(body?.dry_run===true)return reply(req,{ok:true,dry_run:true,max_file_size_mb:20,allowed_types:['application/pdf'],review_required:true});
+ }
  let path='';
  try{
   const form=await req.formData();
