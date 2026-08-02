@@ -87,6 +87,10 @@ document.addEventListener('DOMContentLoaded',async()=>{
  createAdminInstallPanel();
  await registerServiceWorker();
  try{
+  const {installLanguageLayer}=await import(`./language-v41.js?v=${APP_VERSION}`);
+  installLanguageLayer();
+ }catch(error){console.warn('Language layer failed',error)}
+ try{
   const {applyFeatureStates}=await import(`./core.js?v=${APP_VERSION}`);
   await applyFeatureStates(document);
  }catch(error){console.warn('Feature state bootstrap skipped',error)}
