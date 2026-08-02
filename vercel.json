@@ -58,7 +58,6 @@
     }
   ],
   "rewrites": [
-    {"source": "/", "destination": "/reset.html"},
     {"source": "/404", "destination": "/404.html"},
     {"source": "/(.*).map", "destination": "/404.html"},
     {"source": "/README(.*)", "destination": "/404.html"},
@@ -71,6 +70,7 @@
   "cleanUrls": true,
   "trailingSlash": false,
   "redirects": [
+    {"source": "/", "destination": "/reset", "permanent": false},
     {"source": "/home", "destination": "/", "permanent": true}
   ]
 }
