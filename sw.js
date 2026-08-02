@@ -1,4 +1,4 @@
-const VERSION='41.0.0';
+const VERSION='41.0.1';
 const STATIC_CACHE=`uonhub-static-${VERSION}`;
 const PAGE_CACHE=`uonhub-pages-${VERSION}`;
 const OFFLINE_URL='/offline.html';
@@ -44,6 +44,17 @@ async function networkFirst(request){
  }
 }
 
+async function networkFirstAsset(request){
+ const cache=await caches.open(STATIC_CACHE);
+ try{
+  const response=await fetch(request,{cache:'no-store'});
+  if(response.ok)await cache.put(request,response.clone());
+  return response;
+ }catch{
+  return await cache.match(request,{ignoreSearch:true})||new Response('',{status:504,statusText:'Offline'});
+ }
+}
+
 async function staleWhileRevalidate(request){
  const cache=await caches.open(STATIC_CACHE);
  const cached=await cache.match(request,{ignoreSearch:true});
@@ -63,7 +74,11 @@ self.addEventListener('fetch',event=>{
   event.respondWith(networkFirst(request));
   return;
  }
- if(['script','style','font','image'].includes(request.destination)){
+ if(['script','style'].includes(request.destination)){
+  event.respondWith(networkFirstAsset(request));
+  return;
+ }
+ if(['font','image'].includes(request.destination)){
   event.respondWith(staleWhileRevalidate(request));
  }
 });
