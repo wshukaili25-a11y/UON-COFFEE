@@ -7,7 +7,14 @@ const SITE=Deno.env.get('SITE_URL')||'https://uonhub.space';
 const db=createClient(SUPABASE_URL,SERVICE_ROLE_KEY,{auth:{persistSession:false,autoRefreshToken:false}});
 const SELF=`${SUPABASE_URL}/functions/v1/telegram-admin-v42`;
 const LEGACY=`${SUPABASE_URL}/functions/v1/telegram-admin`;
-function json(body:unknown,status=200,extra:HeadersInit={}){return new Response(JSON.stringify(body),{status,headers:{'content-type':'application/json',...extra}})}
+const allowed=new Set(['https://uonhub.space','https://www.uonhub.space']);
+function cors(req:Request){
+ const value=req.headers.get('origin')||'';
+ try{const host=new URL(value).hostname;if(allowed.has(value)||(host.endsWith('.vercel.app')&&(host.startsWith('uon-')||host.startsWith('uon-hub-'))))return value}catch{}
+ return 'https://www.uonhub.space';
+}
+function responseHeaders(req:Request){return{'content-type':'application/json','Access-Control-Allow-Origin':cors(req),'Access-Control-Allow-Headers':'content-type,x-admin-password,authorization,apikey','Access-Control-Allow-Methods':'POST,OPTIONS',Vary:'Origin'}}
+function json(req:Request,body:unknown,status=200){return new Response(JSON.stringify(body),{status,headers:responseHeaders(req)})}
 async function tg(method:string,body:any){const response=await fetch(`https://api.telegram.org/bot${TOKEN}/${method}`,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(body),signal:AbortSignal.timeout(7000)});const data=await response.json().catch(()=>({}));if(!response.ok||data.ok===false)throw new Error(data.description||`Telegram ${response.status}`);return data}
 async function authorizedPassword(req:Request){const password=req.headers.get('x-admin-password')||'';if(!password)return false;const{data,error}=await db.rpc('uon_admin_authorized',{p_password:password});return !error&&data===true}
 async function getAdmin(chatId:string){const{data}=await db.from('telegram_admins').select('chat_id,name,role,permissions,active').eq('chat_id',chatId).eq('active',true).maybeSingle();return data}
@@ -20,23 +27,24 @@ async function courses(chatId:string,messageId:number){return tg('editMessageTex
 async function uploads(chatId:string,messageId:number){return tg('editMessageText',{chat_id:chatId,message_id:messageId,text:'📤 الرفع والاستيراد\n\nرفع PDF احترافي، استيراد Drive وTelegram، وجميع الملفات تدخل للمراجعة قبل النشر.',reply_markup:{inline_keyboard:[[{text:'📤 رفع ملف دراسي',url:`${SITE}/upload-summary.html`}],[{text:'🗂 إدارة المحتوى',callback_data:'manage:menu'}],[{text:'⬅️ الرئيسية',callback_data:'v42:home'}]]}})}
 async function forward(req:Request,body:any){return fetch(LEGACY,{method:'POST',headers:{'content-type':'application/json','x-telegram-bot-api-secret-token':SECRET,Authorization:`Bearer ${SERVICE_ROLE_KEY}`},body:JSON.stringify(body)})}
 Deno.serve(async req=>{
- if(req.method==='OPTIONS')return new Response(null,{status:204,headers:{'Access-Control-Allow-Origin':'*','Access-Control-Allow-Headers':'content-type,x-admin-password','Access-Control-Allow-Methods':'POST,OPTIONS'}});
+ if(req.method==='OPTIONS')return new Response(null,{status:204,headers:responseHeaders(req)});
  const body=await req.json().catch(()=>({}));
  if(body.action==='activate'||body.action==='rollback'){
-  if(!(await authorizedPassword(req)))return json({ok:false,error:'unauthorized'},401);
-  const url=body.action==='activate'?SELF:LEGACY;const result=await tg('setWebhook',{url,secret_token:SECRET,drop_pending_updates:false,allowed_updates:['message','callback_query']});return json({ok:true,action:body.action,url,result});
+  if(!(await authorizedPassword(req)))return json(req,{ok:false,error:'unauthorized'},401);
+  try{const url=body.action==='activate'?SELF:LEGACY;const result=await tg('setWebhook',{url,secret_token:SECRET,drop_pending_updates:false,allowed_updates:['message','callback_query']});return json(req,{ok:true,action:body.action,url,result})}
+  catch(error){return json(req,{ok:false,error:String((error as Error)?.message||error)},500)}
  }
- if(req.headers.get('x-telegram-bot-api-secret-token')!==SECRET)return json({ok:false,error:'forbidden'},403);
- const chatId=String(body.message?.chat?.id||body.callback_query?.message?.chat?.id||'');if(!chatId)return json({ok:true});const admin=await getAdmin(chatId);if(!admin)return json({ok:true});
+ if(req.headers.get('x-telegram-bot-api-secret-token')!==SECRET)return json(req,{ok:false,error:'forbidden'},403);
+ const chatId=String(body.message?.chat?.id||body.callback_query?.message?.chat?.id||'');if(!chatId)return json(req,{ok:true});const admin=await getAdmin(chatId);if(!admin)return json(req,{ok:true});
  const callback=String(body.callback_query?.data||'');const messageId=Number(body.callback_query?.message?.message_id||0);
  try{
   if(body.callback_query)await tg('answerCallbackQuery',{callback_query_id:body.callback_query.id}).catch(()=>{});
-  if(body.message?.text==='/start'||body.message?.text==='/menu'||callback==='v42:home'){await sendHome(chatId,messageId||undefined);return json({ok:true})}
-  if(callback==='v42:dashboard'){await dashboard(chatId,messageId);return json({ok:true})}
-  if(callback==='v42:pending'){await pending(chatId,messageId);return json({ok:true})}
-  if(callback==='v42:services'){await services(chatId,messageId);return json({ok:true})}
-  if(callback==='v42:courses'){await courses(chatId,messageId);return json({ok:true})}
-  if(callback==='v42:uploads'){await uploads(chatId,messageId);return json({ok:true})}
+  if(body.message?.text==='/start'||body.message?.text==='/menu'||callback==='v42:home'){await sendHome(chatId,messageId||undefined);return json(req,{ok:true})}
+  if(callback==='v42:dashboard'){await dashboard(chatId,messageId);return json(req,{ok:true})}
+  if(callback==='v42:pending'){await pending(chatId,messageId);return json(req,{ok:true})}
+  if(callback==='v42:services'){await services(chatId,messageId);return json(req,{ok:true})}
+  if(callback==='v42:courses'){await courses(chatId,messageId);return json(req,{ok:true})}
+  if(callback==='v42:uploads'){await uploads(chatId,messageId);return json(req,{ok:true})}
   return await forward(req,body);
- }catch(error){await tg('sendMessage',{chat_id:chatId,text:`تعذر تنفيذ العملية: ${String((error as Error)?.message||error).slice(0,300)}`}).catch(()=>{});return json({ok:false,error:String((error as Error)?.message||error)},500)}
+ }catch(error){await tg('sendMessage',{chat_id:chatId,text:`تعذر تنفيذ العملية: ${String((error as Error)?.message||error).slice(0,300)}`}).catch(()=>{});return json(req,{ok:false,error:String((error as Error)?.message||error)},500)}
 });
