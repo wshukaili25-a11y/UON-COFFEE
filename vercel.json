@@ -57,6 +57,12 @@
       ]
     }
   ],
+  "cleanUrls": false,
+  "trailingSlash": false,
+  "redirects": [
+    {"source": "/", "destination": "/reset.html", "permanent": false},
+    {"source": "/home", "destination": "/", "permanent": true}
+  ],
   "rewrites": [
     {"source": "/404", "destination": "/404.html"},
     {"source": "/(.*).map", "destination": "/404.html"},
@@ -66,11 +72,5 @@
     {"source": "/.github/(.*)", "destination": "/404.html"},
     {"source": "/scripts/(.*)", "destination": "/404.html"},
     {"source": "/supabase/(.*)", "destination": "/404.html"}
-  ],
-  "cleanUrls": true,
-  "trailingSlash": false,
-  "redirects": [
-    {"source": "/", "destination": "/reset", "permanent": false},
-    {"source": "/home", "destination": "/", "permanent": true}
   ]
 }
