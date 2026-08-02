@@ -1,48 +1,30 @@
 {
-  "id": "/",
-  "name": "UON Hub - منصة طلاب جامعة نزوى",
-  "short_name": "UON Hub",
-  "description": "مشروع طلابي مستقل يسهل وصول طلبة جامعة نزوى إلى الخدمات والمعلومات.",
-  "start_url": "/?source=pwa&v=41.0.0",
-  "scope": "/",
-  "display": "standalone",
-  "display_override": ["standalone", "minimal-ui"],
-  "orientation": "portrait-primary",
-  "background_color": "#060b1b",
-  "theme_color": "#060b1b",
-  "lang": "ar",
-  "dir": "rtl",
-  "categories": ["education", "productivity", "utilities"],
-  "icons": [
-    {"src": "/assets/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any"},
-    {"src": "/assets/icons/icon-192-maskable.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable"},
-    {"src": "/assets/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any"},
-    {"src": "/assets/icons/icon-512-maskable.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable"}
+  "id":"/index.html",
+  "name":"UON Hub - منصة طلاب جامعة نزوى",
+  "short_name":"UON Hub",
+  "description":"منصة طلابية مستقلة للملخصات والمقررات والمجموعات والأدوات ومساعد UON AI.",
+  "start_url":"/index.html?source=pwa&v=42.0.0",
+  "scope":"/",
+  "display":"standalone",
+  "display_override":["window-controls-overlay","standalone","minimal-ui"],
+  "orientation":"any",
+  "background_color":"#060b1b",
+  "theme_color":"#060b1b",
+  "lang":"ar",
+  "dir":"rtl",
+  "categories":["education","productivity","utilities"],
+  "icons":[
+    {"src":"/assets/icons/icon-192.png","sizes":"192x192","type":"image/png","purpose":"any"},
+    {"src":"/assets/icons/icon-192-maskable.png","sizes":"192x192","type":"image/png","purpose":"maskable"},
+    {"src":"/assets/icons/icon-512.png","sizes":"512x512","type":"image/png","purpose":"any"},
+    {"src":"/assets/icons/icon-512-maskable.png","sizes":"512x512","type":"image/png","purpose":"maskable"}
   ],
-  "shortcuts": [
-    {
-      "name": "الملخصات والاختبارات",
-      "short_name": "الملخصات",
-      "url": "/summaries.html?source=pwa",
-      "icons": [{"src": "/assets/icons/icon-192.png", "sizes": "192x192", "type": "image/png"}]
-    },
-    {
-      "name": "المجموعات والمجتمع",
-      "short_name": "المجموعات",
-      "url": "/groups.html?source=pwa",
-      "icons": [{"src": "/assets/icons/icon-192.png", "sizes": "192x192", "type": "image/png"}]
-    },
-    {
-      "name": "أدوات الطالب",
-      "short_name": "الأدوات",
-      "url": "/tools.html?source=pwa",
-      "icons": [{"src": "/assets/icons/icon-192.png", "sizes": "192x192", "type": "image/png"}]
-    },
-    {
-      "name": "مساعد UON AI",
-      "short_name": "UON AI",
-      "url": "/assistant.html?source=pwa",
-      "icons": [{"src": "/assets/icons/icon-192.png", "sizes": "192x192", "type": "image/png"}]
-    }
-  ]
+  "shortcuts":[
+    {"name":"مركز المقررات","short_name":"المقررات","url":"/courses.html?source=pwa","icons":[{"src":"/assets/icons/icon-192.png","sizes":"192x192","type":"image/png"}]},
+    {"name":"البحث في المنصة","short_name":"البحث","url":"/search.html?source=pwa","icons":[{"src":"/assets/icons/icon-192.png","sizes":"192x192","type":"image/png"}]},
+    {"name":"الملخصات والاختبارات","short_name":"الملخصات","url":"/summaries.html?source=pwa","icons":[{"src":"/assets/icons/icon-192.png","sizes":"192x192","type":"image/png"}]},
+    {"name":"مساعد UON AI","short_name":"UON AI","url":"/assistant.html?source=pwa","icons":[{"src":"/assets/icons/icon-192.png","sizes":"192x192","type":"image/png"}]},
+    {"name":"رفع ملف دراسي","short_name":"رفع ملف","url":"/upload-summary.html?source=pwa","icons":[{"src":"/assets/icons/icon-192.png","sizes":"192x192","type":"image/png"}]}
+  ],
+  "share_target":{"action":"/search.html","method":"GET","params":{"title":"title","text":"q","url":"url"}}
 }
