@@ -12,22 +12,17 @@ html,body{margin:0;min-height:100%;background:#060b1b;color:#fff;font-family:sys
 <main class="box"><div class="logo">U1</div><h1>جاري تحديث UON Hub</h1><div class="loader"></div><p>تنظيف النسخة القديمة وتشغيل آخر إصدار…</p></main>
 <script>
 (async()=>{
- const key='uon_recovery_v42_done';
  try{
-  if(localStorage.getItem(key)!=='1'){
-   if('serviceWorker' in navigator){
-    const registrations=await navigator.serviceWorker.getRegistrations();
-    await Promise.all(registrations.map(registration=>registration.unregister()));
-   }
-   if('caches' in window){
-    const names=await caches.keys();
-    await Promise.all(names.map(name=>caches.delete(name)));
-   }
-   localStorage.setItem(key,'1');
+  if('serviceWorker' in navigator){
+   const registrations=await navigator.serviceWorker.getRegistrations();
+   await Promise.all(registrations.map(registration=>registration.unregister()));
+  }
+  if('caches' in window){
+   const names=await caches.keys();
+   await Promise.all(names.filter(name=>name.startsWith('uonhub-')).map(name=>caches.delete(name)));
   }
  }catch(error){console.warn('Recovery cleanup skipped',error)}
- const target='/index?uon_recovered=42&t='+Date.now();
- location.replace(target);
+ location.replace('/index.html?uon_recovered=42&t='+Date.now());
 })();
 </script>
 </body>
