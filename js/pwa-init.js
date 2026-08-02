@@ -1,13 +1,93 @@
-const UON_PWA_TEST_KEY='uonhub_pwa_test_mode';let deferredInstallPrompt=null;
-function removeLegacyActionDock(){const selectors=['.v20-utility-dock','.page-action-dock','.floating-action-dock','[data-v20-favorite]','[data-v20-qr]','[data-v20-feedback]'];document.querySelectorAll(selectors.join(',')).forEach(element=>{const dock=element.closest('.v20-utility-dock,.page-action-dock,.floating-action-dock')||element;dock.remove()})}
-function installLegacyDockBlocker(){if(document.querySelector('#uonLegacyDockBlocker'))return;const style=document.createElement('style');style.id='uonLegacyDockBlocker';style.textContent='.v20-utility-dock,.page-action-dock,.floating-action-dock,[data-v20-favorite],[data-v20-qr],[data-v20-feedback]{display:none!important;visibility:hidden!important;pointer-events:none!important}';document.head.appendChild(style);removeLegacyActionDock();new MutationObserver(()=>removeLegacyActionDock()).observe(document.documentElement,{childList:true,subtree:true})}
-function installExperienceV38(){if(!document.querySelector('link[data-uon-v38]')){const link=document.createElement('link');link.rel='stylesheet';link.href='/css/experience-v38.css?v=38.0.0';link.dataset.uonV38='1';document.head.appendChild(link)}if(document.body.classList.contains('admin-page')||/\/admin(?:\.html)?\/?$/.test(location.pathname)||document.querySelector('.uon-ai-fab'))return;const button=document.createElement('a');button.className='uon-ai-fab';button.href='assistant.html';button.setAttribute('aria-label','فتح مساعد UON AI');button.innerHTML='<span class="uon-ai-fab__icon">AI</span><span class="uon-ai-fab__label">اسأل UON AI</span>';document.body.appendChild(button);import('./core.js?v=38.0.0').then(({applyFeatureStates})=>applyFeatureStates(document)).catch(()=>{})}
-function applyWhatsAppCommunityBranding(){const replacements=new Map([['قناة UON Hub الرسمية على واتساب','مجتمع طلاب جامعة نزوى'],['متابعة القناة ←','الانضمام للمجتمع ←'],['مجموعات المواد والقناة الرسمية.','مجموعات المواد ومجتمع طلاب جامعة نزوى.'],['تابع الإعلانات والتحديثات الجديدة أولًا بأول','انضم للمجتمع وتابع الإعلانات والمجموعات والخدمات الطلابية']]);document.querySelectorAll('strong,small,b,p,h1,h2,h3,a,span').forEach(element=>{const text=element.textContent?.trim();if(text&&replacements.has(text))element.textContent=replacements.get(text)})}
-async function ensureConfessionsEntry(){try{const{applyFeatureStates}=await import('./core.js?v=38.0.0');await applyFeatureStates(document)}catch{}}
-function isPwaTestMode(){const params=new URLSearchParams(location.search);if(params.get('admin-pwa')==='1')localStorage.setItem(UON_PWA_TEST_KEY,'1');if(params.get('admin-pwa')==='0')localStorage.removeItem(UON_PWA_TEST_KEY);return localStorage.getItem(UON_PWA_TEST_KEY)==='1'}
-function addIndependentNotice(){if(document.querySelector('.uon-independent-notice'))return;const footer=document.querySelector('.site-footer');if(!footer)return;const notice=document.createElement('div');notice.className='uon-independent-notice';notice.setAttribute('role','note');notice.innerHTML='<span class="uon-independent-notice__icon" aria-hidden="true">i</span><p><strong>تنبيه:</strong> UON Hub هو مشروع طلابي مستقل وغير تابع رسميًا لجامعة نزوى.</p>';footer.parentNode.insertBefore(notice,footer)}
-function createAdminInstallPanel(){if(!isPwaTestMode()||document.querySelector('.uon-pwa-admin-panel'))return;const panel=document.createElement('section');panel.className='uon-pwa-admin-panel';panel.innerHTML='<h3>تجربة تطبيق UON Hub</h3><p id="uonPwaStatus">جاري التحقق من جاهزية التثبيت…</p><div class="uon-pwa-admin-actions"><button class="uon-pwa-install-btn" id="uonPwaInstall" disabled>تثبيت التطبيق</button><button class="uon-pwa-close-btn" id="uonPwaClose">إخفاء وضع التجربة</button></div>';document.body.appendChild(panel);panel.querySelector('#uonPwaClose').onclick=()=>{localStorage.removeItem(UON_PWA_TEST_KEY);panel.remove()}}
-window.addEventListener('beforeinstallprompt',event=>{event.preventDefault();deferredInstallPrompt=event});
-async function registerPwa(){if(!('serviceWorker'in navigator))return;try{await navigator.serviceWorker.register('/sw.js',{scope:'/'})}catch(error){console.warn('PWA registration failed:',error)}}
-installLegacyDockBlocker();
-document.addEventListener('DOMContentLoaded',()=>{removeLegacyActionDock();installExperienceV38();applyWhatsAppCommunityBranding();ensureConfessionsEntry();addIndependentNotice();createAdminInstallPanel();registerPwa()});
+const APP_VERSION='41.0.0';
+const TEST_KEY='uonhub_pwa_test_mode';
+let deferredInstallPrompt=null;
+
+function isAdminPage(){
+ return document.body.classList.contains('admin-page')||/\/admin(?:\.html)?\/?$/.test(location.pathname);
+}
+function isTestMode(){
+ const params=new URLSearchParams(location.search);
+ if(params.get('admin-pwa')==='1')localStorage.setItem(TEST_KEY,'1');
+ if(params.get('admin-pwa')==='0')localStorage.removeItem(TEST_KEY);
+ return localStorage.getItem(TEST_KEY)==='1';
+}
+function removeLegacyDocks(){
+ document.querySelectorAll('.v20-utility-dock,.page-action-dock,.floating-action-dock,[data-v20-favorite],[data-v20-qr],[data-v20-feedback]').forEach(element=>{
+  const host=element.closest('.v20-utility-dock,.page-action-dock,.floating-action-dock')||element;
+  host.remove();
+ });
+}
+function installLegacyDockGuard(){
+ if(document.querySelector('#uonLegacyDockGuard'))return;
+ const style=document.createElement('style');
+ style.id='uonLegacyDockGuard';
+ style.textContent='.v20-utility-dock,.page-action-dock,.floating-action-dock,[data-v20-favorite],[data-v20-qr],[data-v20-feedback]{display:none!important}';
+ document.head.append(style);
+ removeLegacyDocks();
+}
+function addIndependentNotice(){
+ if(document.querySelector('.uon-independent-notice'))return;
+ const footer=document.querySelector('.site-footer');
+ if(!footer)return;
+ const notice=document.createElement('div');
+ notice.className='uon-independent-notice';
+ notice.setAttribute('role','note');
+ notice.innerHTML='<span class="uon-independent-notice__icon" aria-hidden="true">i</span><p data-ar="تنبيه: UON Hub مشروع طلابي مستقل وغير تابع رسميًا لجامعة نزوى." data-en="Notice: UON Hub is an independent student project and is not officially affiliated with the University of Nizwa."><strong>تنبيه:</strong> UON Hub مشروع طلابي مستقل وغير تابع رسميًا لجامعة نزوى.</p>';
+ footer.parentNode.insertBefore(notice,footer);
+}
+function addAiButton(){
+ if(isAdminPage()||document.querySelector('.uon-ai-fab'))return;
+ const button=document.createElement('a');
+ button.className='uon-ai-fab';
+ button.href='assistant.html';
+ button.dataset.feature='assistant';
+ button.setAttribute('aria-label','UON AI');
+ button.innerHTML='<span class="uon-ai-fab__icon">AI</span><span class="uon-ai-fab__label" data-ar="اسأل UON AI" data-en="Ask UON AI">اسأل UON AI</span>';
+ document.body.append(button);
+}
+function createAdminInstallPanel(){
+ if(!isTestMode()||document.querySelector('.uon-pwa-admin-panel'))return;
+ const panel=document.createElement('section');
+ panel.className='uon-pwa-admin-panel';
+ panel.innerHTML='<h3>تجربة تطبيق UON Hub</h3><p id="uonPwaStatus">جاري التحقق من جاهزية التثبيت…</p><div class="uon-pwa-admin-actions"><button class="uon-pwa-install-btn" id="uonPwaInstall" disabled>تثبيت التطبيق</button><button class="uon-pwa-close-btn" id="uonPwaClose">إخفاء وضع التجربة</button></div>';
+ document.body.append(panel);
+ const installButton=panel.querySelector('#uonPwaInstall');
+ const status=panel.querySelector('#uonPwaStatus');
+ const sync=()=>{
+  installButton.disabled=!deferredInstallPrompt;
+  status.textContent=deferredInstallPrompt?'التطبيق جاهز للتثبيت.':'استخدم إضافة إلى الشاشة الرئيسية من قائمة المتصفح.';
+ };
+ installButton.onclick=async()=>{
+  if(!deferredInstallPrompt)return;
+  deferredInstallPrompt.prompt();
+  await deferredInstallPrompt.userChoice.catch(()=>null);
+  deferredInstallPrompt=null;
+  sync();
+ };
+ panel.querySelector('#uonPwaClose').onclick=()=>{localStorage.removeItem(TEST_KEY);panel.remove()};
+ sync();
+}
+async function registerServiceWorker(){
+ if(!('serviceWorker'in navigator))return;
+ try{
+  const registration=await navigator.serviceWorker.register(`/sw.js?v=${APP_VERSION}`,{scope:'/',updateViaCache:'none'});
+  await registration.update().catch(()=>{});
+ }catch(error){console.warn('PWA registration failed',error)}
+}
+window.addEventListener('beforeinstallprompt',event=>{
+ event.preventDefault();
+ deferredInstallPrompt=event;
+ document.querySelector('#uonPwaInstall')?.removeAttribute('disabled');
+});
+window.addEventListener('appinstalled',()=>{deferredInstallPrompt=null});
+document.addEventListener('DOMContentLoaded',async()=>{
+ installLegacyDockGuard();
+ addIndependentNotice();
+ addAiButton();
+ createAdminInstallPanel();
+ await registerServiceWorker();
+ try{
+  const {applyFeatureStates}=await import(`./core.js?v=${APP_VERSION}`);
+  await applyFeatureStates(document);
+ }catch(error){console.warn('Feature state bootstrap skipped',error)}
+});
