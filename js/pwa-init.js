@@ -1,4 +1,4 @@
-const APP_VERSION='41.0.0';
+const APP_VERSION='41.0.1';
 const TEST_KEY='uonhub_pwa_test_mode';
 let deferredInstallPrompt=null;
 
@@ -32,7 +32,7 @@ function addIndependentNotice(){
  const notice=document.createElement('div');
  notice.className='uon-independent-notice';
  notice.setAttribute('role','note');
- notice.innerHTML='<span class="uon-independent-notice__icon" aria-hidden="true">i</span><p data-ar="تنبيه: UON Hub مشروع طلابي مستقل وغير تابع رسميًا لجامعة نزوى." data-en="Notice: UON Hub is an independent student project and is not officially affiliated with the University of Nizwa."><strong>تنبيه:</strong> UON Hub مشروع طلابي مستقل وغير تابع رسميًا لجامعة نزوى.</p>';
+ notice.innerHTML='<span class="uon-independent-notice__icon" aria-hidden="true">i</span><p data-ar="تنبيه: UON Hub مشروع طلابي مستقل وغير تابع رسميًا لجامعة نزوى." data-en="Notice: UON Hub is an independent student project and is not officially affiliated with the University of Nizwa.">تنبيه: UON Hub مشروع طلابي مستقل وغير تابع رسميًا لجامعة نزوى.</p>';
  footer.parentNode.insertBefore(notice,footer);
 }
 function addAiButton(){
@@ -72,15 +72,15 @@ async function registerServiceWorker(){
  try{
   const registration=await navigator.serviceWorker.register(`/sw.js?v=${APP_VERSION}`,{scope:'/',updateViaCache:'none'});
   await registration.update().catch(()=>{});
+  if(registration.waiting)registration.waiting.postMessage({type:'SKIP_WAITING'});
+  navigator.serviceWorker.addEventListener('controllerchange',()=>{
+   if(sessionStorage.getItem('uon_sw_reloaded')==='1')return;
+   sessionStorage.setItem('uon_sw_reloaded','1');
+   location.reload();
+  },{once:true});
  }catch(error){console.warn('PWA registration failed',error)}
 }
-window.addEventListener('beforeinstallprompt',event=>{
- event.preventDefault();
- deferredInstallPrompt=event;
- document.querySelector('#uonPwaInstall')?.removeAttribute('disabled');
-});
-window.addEventListener('appinstalled',()=>{deferredInstallPrompt=null});
-document.addEventListener('DOMContentLoaded',async()=>{
+async function boot(){
  installLegacyDockGuard();
  addIndependentNotice();
  addAiButton();
@@ -94,4 +94,12 @@ document.addEventListener('DOMContentLoaded',async()=>{
   const {applyFeatureStates}=await import(`./core.js?v=${APP_VERSION}`);
   await applyFeatureStates(document);
  }catch(error){console.warn('Feature state bootstrap skipped',error)}
+}
+window.addEventListener('beforeinstallprompt',event=>{
+ event.preventDefault();
+ deferredInstallPrompt=event;
+ document.querySelector('#uonPwaInstall')?.removeAttribute('disabled');
 });
+window.addEventListener('appinstalled',()=>{deferredInstallPrompt=null});
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});
+else boot();
