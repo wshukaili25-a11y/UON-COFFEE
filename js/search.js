@@ -1,80 +1,17 @@
-import {get,$,esc,debounce,enforceUonMaintenance,watchUonMaintenance,trackEvent} from './core.js';
+import{rpc,$,esc,debounce,enforceUonMaintenance,watchUonMaintenance,trackEvent}from'./core.js?v=42.0.0';
+await enforceUonMaintenance();watchUonMaintenance();
 
-await enforceUonMaintenance();
-watchUonMaintenance();
+const input=$('#globalSearch'),results=$('#searchResults'),meta=$('#searchMeta'),filters=$('#searchFilters');
+const lang=()=>localStorage.getItem('uon_language')==='en'?'en':'ar';
+const t=(ar,en)=>lang()==='en'?en:ar;
+let currentType='all',lastRows=[];
+const labels={course:['مقرر','Course'],summary:['ملخص أو اختبار','Summary / Exam'],group:['مجموعة','Group'],project:['مشروع','Project'],site:['موقع مهم','Useful site'],program:['تخصص أو برنامج','Program']};
+const icons={course:'📘',summary:'📚',group:'💬',project:'💡',site:'🔗',program:'🎓'};
 
-const input=$('#globalSearch');
-const results=$('#searchResults');
-const meta=$('#searchMeta');
+function safeUrl(value){try{const url=new URL(value,location.origin);return ['http:','https:'].includes(url.protocol)?url.href:'#'}catch{return'#'}}
+function renderFilters(rows){const counts=rows.reduce((map,row)=>(map[row.result_type]=(map[row.result_type]||0)+1,map),{});const types=Object.keys(counts);filters.innerHTML=`<button class="search-filter ${currentType==='all'?'active':''}" data-type="all">${t('الكل','All')} <span>${rows.length}</span></button>${types.map(type=>`<button class="search-filter ${currentType===type?'active':''}" data-type="${type}">${labels[type]?.[lang()==='en'?1:0]||type} <span>${counts[type]}</span></button>`).join('')}`;filters.querySelectorAll('[data-type]').forEach(button=>button.onclick=()=>{currentType=button.dataset.type;renderFilters(lastRows);renderResults(lastRows)});}
+function renderResults(rows){const visible=currentType==='all'?rows:rows.filter(row=>row.result_type===currentType);if(!visible.length){results.innerHTML=`<div class="search-empty"><span>🔎</span><h3>${t('لا توجد نتائج مطابقة','No matching results')}</h3><p>${t('جرّب رمز المادة أو كلمة أقصر.','Try a course code or a shorter phrase.')}</p></div>`;return}const grouped=visible.reduce((map,row)=>(map[row.result_type]??=[]).push(row)&&map,{});results.innerHTML=Object.entries(grouped).map(([type,items])=>`<section class="search-group"><div class="search-group-head"><h2>${icons[type]||'🔎'} ${labels[type]?.[lang()==='en'?1:0]||type}</h2><span>${items.length}</span></div><div class="search-grid">${items.map(row=>`<a class="search-card" href="${esc(safeUrl(row.url))}"${/^https?:\/\//.test(row.url||'')?' target="_blank" rel="noopener"':''}><span class="search-card-icon">${icons[type]||'🔎'}</span><div><strong>${esc(row.title||'')}</strong><small>${esc(row.subtitle||'')}</small></div><b>←</b></a>`).join('')}</div></section>`).join('');}
+async function run(){const query=input.value.trim();history.replaceState(null,'',query?`?q=${encodeURIComponent(query)}`:location.pathname);if(query.length<2){lastRows=[];filters.innerHTML='';results.innerHTML=`<div class="search-empty"><span>⌨️</span><h3>${t('اكتب حرفين على الأقل','Enter at least two characters')}</h3></div>`;meta.textContent='';return}results.innerHTML=`<div class="search-loading"><span></span>${t('جاري البحث في المنصة…','Searching the platform…')}</div>`;filters.innerHTML='';const start=performance.now();try{lastRows=await rpc('uon_global_search_v42',{p_query:query,p_limit:60,p_language:lang()})||[];currentType='all';renderFilters(lastRows);renderResults(lastRows);meta.textContent=t(`${lastRows.length} نتيجة خلال ${Math.round(performance.now()-start)} مللي ثانية`,`${lastRows.length} results in ${Math.round(performance.now()-start)} ms`);trackEvent('global_search_v42',{query,results:lastRows.length});}catch(error){console.error(error);results.innerHTML=`<div class="search-empty"><span>⚠️</span><h3>${t('تعذر البحث حاليًا','Search is unavailable')}</h3><p>${t('حاول مرة ثانية بعد قليل.','Please try again shortly.')}</p></div>`;meta.textContent='';}}
 
-const sources=[
- {table:'courses',query:'select=code,name_ar,name_en,college,description&active=eq.true',type:'مقرر',url:x=>`course.html?code=${encodeURIComponent(x.code)}`,title:x=>`${x.code} — ${x.name_ar}`,body:x=>x.college||''},
- {table:'summaries',query:'select=id,title,subject,course_code,college,url,description&approved=eq.true',type:'ملخص',url:x=>x.url||'#',title:x=>x.title||x.subject||'ملخص',body:x=>[x.course_code,x.college].filter(Boolean).join(' • ')},
- {table:'whatsapp_groups',query:'select=id,subject,course_code,college,link&approved=eq.true',type:'مجموعة واتساب',url:x=>x.link||'#',title:x=>x.subject||'مجموعة',body:x=>[x.course_code,x.college].filter(Boolean).join(' • ')},
- {table:'rating_submissions',query:'select=id,target_name,course_code,overall,comment&status=eq.approved',type:'تقييم',url:x=>'ratings.html',title:x=>x.target_name||x.course_code||'تقييم',body:x=>`${x.overall||0}/5 ${x.comment||''}`},
- {table:'student_projects',query:'select=id,title,description,category,status&status=eq.approved',type:'مشروع طلابي',url:x=>'projects.html',title:x=>x.title||'مشروع',body:x=>x.description||x.category||''},
- {table:'useful_sites',query:'select=title_ar,description_ar,category,url&active=eq.true',type:'موقع أو برنامج',url:x=>x.url||'useful-sites.html',title:x=>x.title_ar,body:x=>x.description_ar||x.category||''},
- {table:'university_programs',query:'select=name_ar,name_en,college,degree,official_url&active=eq.true',type:'برنامج',url:x=>x.official_url||'university-guide.html',title:x=>x.name_ar||x.name_en,body:x=>[x.college,x.degree].filter(Boolean).join(' • ')}
-];
-
-function matches(item,q){
- return Object.values(item).join(' ').toLowerCase().includes(q.toLowerCase());
-}
-
-function renderCard(item){
- return `<a class="v16-search-result" href="${esc(item.url)}" target="${item.url.startsWith('http')?'_blank':'_self'}">
-  <span>${esc(item.type)}</span>
-  <div><strong>${esc(item.title)}</strong><small>${esc(item.body||'')}</small></div>
-  <b>←</b>
- </a>`;
-}
-
-async function run(){
- const q=input.value.trim();
- if(q.length<2){
-  results.innerHTML='<div class="empty">اكتب حرفين على الأقل</div>';
-  meta.textContent='';
-  return;
- }
-
- results.innerHTML='<div class="empty">جاري البحث...</div>';
- const start=performance.now();
- const found=[];
-
- for(const source of sources){
-  try{
-   const rows=await get(source.table,source.query+'&limit=300');
-   rows.filter(row=>matches(row,q)).slice(0,12).forEach(row=>found.push({
-    type:source.type,
-    title:source.title(row),
-    body:source.body(row),
-    url:source.url(row)
-   }));
-  }catch{}
- }
-
- const grouped={};
- found.forEach(item=>{
-  if(!grouped[item.type])grouped[item.type]=[];
-  grouped[item.type].push(item);
- });
-
- meta.textContent=`${found.length} نتيجة خلال ${Math.round(performance.now()-start)}ms`;
- results.innerHTML=found.length?Object.entries(grouped).map(([type,items])=>`
-  <section class="v16-search-group">
-   <h3>${esc(type)}</h3>
-   <div>${items.map(renderCard).join('')}</div>
-  </section>`).join(''):'<div class="empty">لا توجد نتائج مطابقة</div>';
-
- trackEvent('search',{query:q,results:found.length});
-}
-
-const params=new URLSearchParams(location.search);
-if(params.get('q')){
- input.value=params.get('q');
- run();
-}
-
-$('#searchBtn').onclick=run;
-input.addEventListener('input',debounce(()=>{if(input.value.trim().length>=2)run()},350));
-input.addEventListener('keydown',event=>{if(event.key==='Enter')run()});
+const params=new URLSearchParams(location.search);if(params.get('q')){input.value=params.get('q');run()}
+$('#searchBtn').onclick=run;input.addEventListener('input',debounce(run,260));input.addEventListener('keydown',event=>{if(event.key==='Enter'){event.preventDefault();run()}});
