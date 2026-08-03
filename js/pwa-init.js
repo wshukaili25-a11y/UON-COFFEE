@@ -1,8 +1,8 @@
-const APP_VERSION='44.0.0';
+const APP_VERSION='44.0.1';
 const TEST_KEY='uonhub_pwa_test_mode';
 let deferredInstallPrompt=null;
 
-function isAdminPage(){return document.body.classList.contains('admin-page')||/\/(admin|owner-dashboard)(?:\.html)?\/?$/.test(location.pathname)}
+function isAdminPage(){return document.body.classList.contains('admin-page')||/\/(admin|owner-dashboard|tools-control)(?:\.html)?\/?$/.test(location.pathname)}
 function isTestMode(){const params=new URLSearchParams(location.search);if(params.get('admin-pwa')==='1')localStorage.setItem(TEST_KEY,'1');if(params.get('admin-pwa')==='0')localStorage.removeItem(TEST_KEY);return localStorage.getItem(TEST_KEY)==='1'}
 function removeLegacyDocks(){document.querySelectorAll('.v20-utility-dock,.page-action-dock,.floating-action-dock,[data-v20-favorite],[data-v20-qr],[data-v20-feedback]').forEach(element=>(element.closest('.v20-utility-dock,.page-action-dock,.floating-action-dock')||element).remove())}
 function installLegacyDockGuard(){if(document.querySelector('#uonLegacyDockGuard'))return;const style=document.createElement('style');style.id='uonLegacyDockGuard';style.textContent='.v20-utility-dock,.page-action-dock,.floating-action-dock,[data-v20-favorite],[data-v20-qr],[data-v20-feedback]{display:none!important}';document.head.append(style);removeLegacyDocks()}
@@ -16,9 +16,17 @@ async function bootUnifiedExperience(){
  try{
   const registry=await import(`./tool-registry-v44.js?v=${APP_VERSION}`);
   await registry.bootUnifiedTools();
-  const observeHome=new MutationObserver(()=>{if(document.querySelector('.h37-services,.v18-primary-tools'))registry.renderHomeTools()});
-  observeHome.observe(document.body,{childList:true,subtree:true});
-  setTimeout(()=>observeHome.disconnect(),12000);
+  // The H37 home renderer may replace the legacy home cards after this module boots.
+  // Wait only for that one replacement, then disconnect to avoid a mutation/render loop.
+  if(!document.querySelector('.h37-services')&&document.querySelector('.v18-primary-tools')){
+   const observeHome=new MutationObserver(async()=>{
+    if(!document.querySelector('.h37-services'))return;
+    observeHome.disconnect();
+    await registry.renderHomeTools();
+   });
+   observeHome.observe(document.body,{childList:true,subtree:true});
+   setTimeout(()=>observeHome.disconnect(),12000);
+  }
   const experience=await import(`./platform-experience-v44.js?v=${APP_VERSION}`);
   experience.bootPlatformExperience();
  }catch(error){console.warn('Unified tools V44 skipped',error)}
