@@ -14,6 +14,8 @@ const modules=[
  'js/schedule.js',
  'js/schedule-extras-v44.js',
  'js/tools-control-v44.js',
+ 'js/assistant-v3.js',
+ 'js/assistant-v3-proxy.js',
  'sw.js'
 ];
 
@@ -28,7 +30,19 @@ for(const file of ['vercel.json','manifest.webmanifest','package.json']){
  catch(error){failures.push(`${file}\n${error.message}`)}
 }
 
-const requiredFiles=['tools-control.html','tool-preview.html','go.html','schedule.html','css/tool-registry-v44.css','css/tools-control-v44.css','css/tool-preview-v44.css','css/schedule-extras-v44.css'];
+const requiredFiles=[
+ 'tools-control.html',
+ 'tool-preview.html',
+ 'go.html',
+ 'schedule.html',
+ 'assistant.html',
+ 'css/tool-registry-v44.css',
+ 'css/tools-control-v44.css',
+ 'css/tool-preview-v44.css',
+ 'css/schedule-extras-v44.css',
+ 'css/assistant-v3.css',
+ 'supabase/functions/uon-ai-v3/index.ts'
+];
 for(const file of requiredFiles){
  try{
   const content=await readFile(file,'utf8');
@@ -37,7 +51,7 @@ for(const file of requiredFiles){
 }
 
 if(failures.length){
- console.error(`V44 verification failed:\n\n${failures.join('\n\n')}`);
+ console.error(`UON Hub verification failed:\n\n${failures.join('\n\n')}`);
  process.exit(1);
 }
-console.log(`V44 verification passed (${modules.length} modules).`);
+console.log(`UON Hub verification passed (${modules.length} modules).`);
