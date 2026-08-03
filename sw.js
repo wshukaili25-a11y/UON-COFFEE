@@ -1,9 +1,9 @@
-const VERSION='43.1.0';
+const VERSION='43.2.0';
 const STATIC_CACHE=`uonhub-static-${VERSION}`;
 const PAGE_CACHE=`uonhub-pages-${VERSION}`;
 const DATA_CACHE=`uonhub-data-${VERSION}`;
 const OFFLINE_URL='/offline.html';
-const PRECACHE=['/index.html','/schedule.html',OFFLINE_URL,'/manifest.webmanifest','/css/app.css','/css/ui-refresh-v24.css','/css/schedule.css','/css/pwa.css','/js/v14-ui.js','/js/schedule.js','/js/pwa-init.js','/assets/icons/icon-192.png','/assets/icons/icon-512.png'];
+const PRECACHE=['/index.html','/tools.html','/schedule.html',OFFLINE_URL,'/manifest.webmanifest','/css/app.css','/css/ui-refresh-v24.css','/css/schedule.css','/css/pwa.css','/js/v14-ui.js','/js/tools.js','/js/schedule.js','/js/pwa-init.js','/assets/icons/icon-192.png','/assets/icons/icon-512.png'];
 self.addEventListener('install',event=>event.waitUntil(caches.open(STATIC_CACHE).then(cache=>Promise.allSettled(PRECACHE.map(url=>cache.add(new Request(url,{cache:'reload'}))))).then(()=>self.skipWaiting())));
 self.addEventListener('activate',event=>event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(key=>![STATIC_CACHE,PAGE_CACHE,DATA_CACHE].includes(key)).map(key=>caches.delete(key)))).then(()=>self.clients.claim()).then(async()=>{const clients=await self.clients.matchAll({type:'window'});clients.forEach(client=>client.postMessage({type:'UON_SW_READY',version:VERSION}))})));
 async function networkFirst(request,cacheName,fallback){const cache=await caches.open(cacheName);try{const response=await fetch(request,{cache:'no-store'});if(response.ok)await cache.put(request,response.clone());return response}catch{return await cache.match(request,{ignoreSearch:true})||await caches.match(fallback)||new Response('',{status:503,statusText:'Offline'})}}
