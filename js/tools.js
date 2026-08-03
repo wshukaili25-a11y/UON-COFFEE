@@ -1,5 +1,5 @@
-import {setupNav,enforceUonMaintenance,watchUonMaintenance,$,get,toast,esc} from './core.js?v=35.0.0';
-import {applyFeatureStates as applyV175States} from './core.js?v=35.0.0';
+import {setupNav,enforceUonMaintenance,watchUonMaintenance,$,get,toast,esc} from './core.js?v=43.2.0';
+import {applyFeatureStates as applyV175States} from './core.js?v=43.2.0';
 
 setupNav();
 await enforceUonMaintenance();
@@ -9,24 +9,37 @@ let rows=[];
 let cats=[];
 
 const fixedTools=[
+ {feature:'schedule',href:'schedule.html',icon:'📅',title:'الجدول الدراسي',description:'رتّب محاضراتك، اكتشف التعارضات وصدّر جدولك.'},
  {feature:'confessions',href:'confessions.html',icon:'👀',title:'اعترافات الطلاب',description:'اكتب اعترافك بشكل مجهول وتفاعل مع اعترافات الطلاب.'},
  {feature:'useful-sites',href:'useful-sites.html',icon:'🔗',title:'مواقع مهمة ومفيدة',description:'مواقع الجامعة وأدوات دراسية مختارة.'},
  {feature:'assistant',href:'assistant.html',icon:'AI',title:'مساعد UON AI',description:'اسأل عن المقررات والخدمات ودليل الجامعة.'}
 ];
+const fixedFeatures=new Set(fixedTools.map(item=>item.feature));
 
 function fixedCard(item){
  return `<a class="card feature-card" href="${esc(item.href)}" data-feature="${esc(item.feature)}"><span class="tool-icon">${item.icon}</span><h3>${esc(item.title)}</h3><p>${esc(item.description)}</p><b>فتح</b></a>`;
 }
 
-function render(){
+function applyVisibility(root,state){
+ const visibility=state?.visibility||{};
+ root.querySelectorAll('[data-feature]').forEach(card=>{
+  const key=card.dataset.feature;
+  if(!key)return;
+  card.hidden=visibility[key]===false;
+ });
+}
+
+async function render(){
  const q=($('#search')?.value||'').trim().toLowerCase();
  const c=$('#category')?.value||'';
- const dynamic=rows.filter(x=>(!c||x.category_id===c)&&`${x.name||''} ${x.description||''}`.toLowerCase().includes(q));
+ const dynamic=rows.filter(x=>!fixedFeatures.has(x.feature_key)&&(!c||x.category_id===c)&&`${x.name||''} ${x.description||''}`.toLowerCase().includes(q));
  const fixed=fixedTools.filter(x=>!c&&`${x.title} ${x.description}`.toLowerCase().includes(q));
  const dynamicHtml=dynamic.map(x=>`<article class="card feature-card" data-feature="${esc(x.feature_key||'')}" data-status="${esc(x.status||'active')}"><i>${esc(x.emoji||'🧰')}</i><h3>${esc(x.name)}</h3><p>${esc(x.description||'')}</p>${(x.status||'active')==='active'?`<a class="btn" target="_blank" rel="noopener" href="${esc(x.url)}">فتح</a>`:`<span class="badge">${x.status==='maintenance'?'صيانة':x.status==='coming_soon'?'قريبًا':'متوقفة'}</span>`}</article>`).join('');
  const fixedHtml=fixed.map(fixedCard).join('');
- $('#items').innerHTML=(fixedHtml+dynamicHtml)||'<div class="empty">لا توجد أدوات</div>';
- applyV175States($('#items'));
+ const target=$('#items');
+ target.innerHTML=(fixedHtml+dynamicHtml)||'<div class="empty">لا توجد أدوات</div>';
+ const state=await applyV175States(target);
+ applyVisibility(target,state);
 }
 
 async function load(){
@@ -40,11 +53,11 @@ async function load(){
   console.warn('Tools data load failed',error);
   toast('تعذر تحميل بعض الأدوات، لكن الأدوات الأساسية ما زالت متاحة',true);
  }finally{
-  render();
+  await render();
  }
 }
 
-$('#search').oninput=render;
-$('#category').onchange=render;
-render();
-load();
+$('#search').oninput=()=>{void render()};
+$('#category').onchange=()=>{void render()};
+void render();
+void load();
