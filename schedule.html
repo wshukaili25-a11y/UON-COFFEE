@@ -5,22 +5,22 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="theme-color" content="#060b1b">
   <title>الجدول الدراسي | UON Hub</title>
-  <meta name="description" content="أنشئ جدولك الدراسي الأسبوعي واحفظه على جهازك واكتشف التعارضات بسهولة.">
+  <meta name="description" content="أنشئ جدولك الدراسي الأسبوعي، أضف المادة في أكثر من يوم، واكتشف التعارضات بسهولة.">
   <meta name="robots" content="index,follow,max-image-preview:large">
   <link rel="canonical" href="https://www.uonhub.space/schedule.html">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="UON Hub">
   <meta property="og:title" content="الجدول الدراسي | UON Hub">
-  <meta property="og:description" content="أنشئ جدولك الدراسي الأسبوعي واحفظه على جهازك واكتشف التعارضات بسهولة.">
+  <meta property="og:description" content="أنشئ جدولك الدراسي الأسبوعي، أضف المادة في أكثر من يوم، واكتشف التعارضات بسهولة.">
   <meta property="og:url" content="https://www.uonhub.space/schedule.html">
   <meta property="og:image" content="https://www.uonhub.space/assets/unizwa-new-gate-v52.jpg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/app.css?v=43.0.0">
-  <link rel="stylesheet" href="css/ui-refresh-v24.css?v=43.0.0">
-  <link rel="stylesheet" href="css/schedule.css?v=43.0.0">
-  <link rel="stylesheet" href="/css/pwa.css?v=43.0.0">
+  <link rel="stylesheet" href="css/app.css?v=43.1.0">
+  <link rel="stylesheet" href="css/ui-refresh-v24.css?v=43.1.0">
+  <link rel="stylesheet" href="css/schedule.css?v=43.1.0">
+  <link rel="stylesheet" href="/css/pwa.css?v=43.1.0">
   <link rel="stylesheet" href="css/content-reports.css?v=42.0.0">
   <link rel="manifest" href="/manifest.webmanifest">
   <link rel="apple-touch-icon" href="/assets/icons/icon-192.png">
@@ -48,9 +48,9 @@
 <main class="v14-page-main schedule-page">
   <section class="page-hero schedule-hero">
     <div class="container">
-      <span class="badge">Schedule V43</span>
+      <span class="badge">Schedule V43.1</span>
       <h1 data-ar="الجدول الدراسي" data-en="Study Schedule">الجدول الدراسي</h1>
-      <p data-ar="أنشئ جدولك، احفظه على جهازك واكتشف التعارضات قبل إضافة المحاضرة." data-en="Build your weekly schedule, save it on your device, and detect clashes before adding a class.">أنشئ جدولك، احفظه على جهازك واكتشف التعارضات قبل إضافة المحاضرة.</p>
+      <p data-ar="أضف المادة في يوم واحد أو عدة أيام، عدّلها متى احتجت، وصدّر جدولك كصورة أو ملف." data-en="Add a course on one or several days, edit it anytime, and export your schedule as an image or file.">أضف المادة في يوم واحد أو عدة أيام، عدّلها متى احتجت، وصدّر جدولك كصورة أو ملف.</p>
     </div>
   </section>
 
@@ -60,8 +60,9 @@
         <div class="schedule-panel-head">
           <div>
             <h2 id="scheduleFormTitle" data-ar="إضافة محاضرة" data-en="Add a class">إضافة محاضرة</h2>
-            <p data-ar="الأوقات من 1:00 إلى 7:59 تُفهم مساءً تلقائيًا لتناسب أوقات الجامعة." data-en="Times from 1:00 to 7:59 are automatically treated as PM for university classes.">الأوقات من 1:00 إلى 7:59 تُفهم مساءً تلقائيًا لتناسب أوقات الجامعة.</p>
+            <p data-ar="اختر كل الأيام التي تتكرر فيها المادة. يمكن تعديلها لاحقًا من بطاقة المادة." data-en="Select every day on which the course repeats. You can edit it later from its card.">اختر كل الأيام التي تتكرر فيها المادة. يمكن تعديلها لاحقًا من بطاقة المادة.</p>
           </div>
+          <span id="editingBadge" class="schedule-editing-badge" hidden data-ar="وضع التعديل" data-en="Editing mode">وضع التعديل</span>
         </div>
 
         <form id="scheduleForm" class="schedule-form" novalidate>
@@ -71,22 +72,46 @@
               <input id="course" name="course" maxlength="24" placeholder="INFS205" autocomplete="off" required>
             </div>
             <div class="field">
-              <label for="day" data-ar="اليوم" data-en="Day">اليوم</label>
-              <select id="day" name="day">
-                <option value="الأحد">الأحد</option>
-                <option value="الاثنين">الاثنين</option>
-                <option value="الثلاثاء">الثلاثاء</option>
-                <option value="الأربعاء">الأربعاء</option>
-                <option value="الخميس">الخميس</option>
+              <label for="classType" data-ar="نوع الحصة" data-en="Class type">نوع الحصة</label>
+              <select id="classType" name="classType">
+                <option value="lecture" data-ar="محاضرة" data-en="Lecture">محاضرة</option>
+                <option value="lab" data-ar="مختبر / عملي" data-en="Lab / Practical">مختبر / عملي</option>
+                <option value="tutorial" data-ar="تمارين" data-en="Tutorial">تمارين</option>
+                <option value="workshop" data-ar="ورشة" data-en="Workshop">ورشة</option>
+                <option value="other" data-ar="أخرى" data-en="Other">أخرى</option>
               </select>
             </div>
+
+            <fieldset class="schedule-days-field field-wide">
+              <legend data-ar="أيام المادة" data-en="Course days">أيام المادة</legend>
+              <div class="schedule-days" id="dayOptions">
+                <label class="schedule-day-choice"><input type="checkbox" name="days" value="الأحد" checked><span data-ar="الأحد" data-en="Sunday">الأحد</span></label>
+                <label class="schedule-day-choice"><input type="checkbox" name="days" value="الاثنين"><span data-ar="الاثنين" data-en="Monday">الاثنين</span></label>
+                <label class="schedule-day-choice"><input type="checkbox" name="days" value="الثلاثاء"><span data-ar="الثلاثاء" data-en="Tuesday">الثلاثاء</span></label>
+                <label class="schedule-day-choice"><input type="checkbox" name="days" value="الأربعاء"><span data-ar="الأربعاء" data-en="Wednesday">الأربعاء</span></label>
+                <label class="schedule-day-choice"><input type="checkbox" name="days" value="الخميس"><span data-ar="الخميس" data-en="Thursday">الخميس</span></label>
+              </div>
+            </fieldset>
+
             <div class="field">
               <label for="start" data-ar="من" data-en="From">من</label>
-              <input id="start" name="start" type="time" value="08:00" step="300" required>
+              <div class="schedule-time-control">
+                <input id="start" name="start" type="time" value="08:00" step="300" required>
+                <select id="startPeriod" name="startPeriod" aria-label="فترة بداية المحاضرة">
+                  <option value="am" data-ar="صباحًا" data-en="AM">صباحًا</option>
+                  <option value="pm" data-ar="مساءً" data-en="PM">مساءً</option>
+                </select>
+              </div>
             </div>
             <div class="field">
               <label for="end" data-ar="إلى" data-en="To">إلى</label>
-              <input id="end" name="end" type="time" value="09:50" step="300" required>
+              <div class="schedule-time-control">
+                <input id="end" name="end" type="time" value="09:50" step="300" required>
+                <select id="endPeriod" name="endPeriod" aria-label="فترة نهاية المحاضرة">
+                  <option value="am" data-ar="صباحًا" data-en="AM">صباحًا</option>
+                  <option value="pm" data-ar="مساءً" data-en="PM">مساءً</option>
+                </select>
+              </div>
             </div>
             <div class="field">
               <label for="room" data-ar="القاعة" data-en="Room">القاعة</label>
@@ -99,6 +124,7 @@
           </div>
           <div class="schedule-form-actions">
             <button class="btn primary schedule-add" id="add" type="submit" data-ar="إضافة للجدول" data-en="Add to schedule">إضافة للجدول</button>
+            <button class="btn schedule-cancel-edit" id="cancelEdit" type="button" hidden data-ar="إلغاء التعديل" data-en="Cancel editing">إلغاء التعديل</button>
             <span class="schedule-local-note" data-ar="يُحفظ الجدول على هذا الجهاز فقط." data-en="The schedule is saved only on this device.">يُحفظ الجدول على هذا الجهاز فقط.</span>
           </div>
         </form>
@@ -110,7 +136,14 @@
             <h2 id="scheduleBoardTitle" data-ar="جدول الأسبوع" data-en="Weekly schedule">جدول الأسبوع</h2>
             <span id="scheduleCount" class="schedule-count" aria-live="polite">0 محاضرات</span>
           </div>
-          <button class="btn danger schedule-clear" id="clearSchedule" type="button" hidden data-ar="مسح الجدول" data-en="Clear schedule">مسح الجدول</button>
+          <div class="schedule-board-actions">
+            <button class="btn" id="exportImage" type="button" data-ar="تصدير صورة" data-en="Export image">تصدير صورة</button>
+            <button class="btn" id="printSchedule" type="button" data-ar="طباعة" data-en="Print">طباعة</button>
+            <button class="btn" id="exportJson" type="button" data-ar="حفظ ملف" data-en="Save file">حفظ ملف</button>
+            <button class="btn" id="importJson" type="button" data-ar="استيراد ملف" data-en="Import file">استيراد ملف</button>
+            <input id="importFile" type="file" accept="application/json,.json" hidden>
+            <button class="btn danger schedule-clear" id="clearSchedule" type="button" hidden data-ar="مسح الجدول" data-en="Clear schedule">مسح الجدول</button>
+          </div>
         </div>
         <div class="schedule-scroll" role="region" aria-label="الجدول الدراسي الأسبوعي" tabindex="0">
           <div id="week" class="schedule-week"></div>
@@ -128,12 +161,12 @@
 <div id="toast" class="toast" aria-live="polite"></div>
 <aside class="notification-drawer" id="notificationDrawer"><div class="section-head"><h3>الإشعارات</h3><button class="icon-btn" id="closeNotifications" type="button">✕</button></div><div id="notificationItems" class="notification-list"></div></aside>
 
-<script type="module" src="js/schedule.js?v=43.0.0"></script>
-<script type="module">import {setupV14Shell} from './js/v14-ui.js?v=43.0.0';setupV14Shell();</script>
-<script type="module">import {applyFeatureStates} from './js/core.js?v=43.0.0';applyFeatureStates(document);</script>
-<script type="module" src="js/runtime-guard.js?v=43.0.0"></script>
-<script type="module" src="js/v20-experience.js?v=43.0.0"></script>
-<script type="module" src="/js/pwa-init.js?v=43.0.0"></script>
+<script type="module" src="js/schedule.js?v=43.1.0"></script>
+<script type="module">import {setupV14Shell} from './js/v14-ui.js?v=43.1.0';setupV14Shell();</script>
+<script type="module">import {applyFeatureStates} from './js/core.js?v=43.1.0';applyFeatureStates(document);</script>
+<script type="module" src="js/runtime-guard.js?v=43.1.0"></script>
+<script type="module" src="js/v20-experience.js?v=43.1.0"></script>
+<script type="module" src="/js/pwa-init.js?v=43.1.0"></script>
 <script type="module" src="js/content-reports.js?v=42.0.0"></script>
 </body>
 </html>
