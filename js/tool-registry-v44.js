@@ -1,4 +1,4 @@
-import {rpc,get,esc,toast,trackEvent,applyFeatureStates} from './core.js?v=44.0.0';
+import {rpc,get,esc,toast,trackEvent,applyFeatureStates} from './core.js?v=44.0.1';
 
 const SUPABASE_URL='https://irkhvydgxpseflggbeqq.supabase.co';
 const SUPABASE_KEY='sb_publishable_gZ9tyM1udrkuQIXHqDtToQ_FyFmePgH';
@@ -195,9 +195,11 @@ export async function renderToolsPage(){
  if(!target)return false;
  const search=document.querySelector('#search');
  const category=document.querySelector('#category');
+ const previousCategory=safeText(category?.value);
  if(category){
   const used=[...new Set(catalog.items.filter(item=>item.placement==='tools_only'||item.is_platform).map(item=>item.category_id).filter(Boolean))];
   category.innerHTML=`<option value="">${t('كل التصنيفات','All categories')}</option>`+used.map(id=>`<option value="${esc(id)}">${esc(categoryName(id))}</option>`).join('');
+  if(used.includes(previousCategory))category.value=previousCategory;
  }
  const render=async()=>{
   const query=safeText(search?.value).toLocaleLowerCase(lang()==='en'?'en':'ar');
@@ -210,8 +212,8 @@ export async function renderToolsPage(){
   target.innerHTML=rows.length?rows.map(toolCard).join(''):`<div class="empty uon44-tools-empty">${t('لا توجد أدوات مطابقة','No matching tools')}</div>`;
   await bindFeatureStates(target);
  };
- search?.addEventListener('input',render);
- category?.addEventListener('change',render);
+ if(search)search.oninput=()=>{void render()};
+ if(category)category.onchange=()=>{void render()};
  await render();
  installPreviewBanner();
  return true;
@@ -220,8 +222,8 @@ export async function renderToolsPage(){
 async function refreshViews(){
  try{
   await loadToolCatalog({force:true});
-  await renderHomeTools();
-  await renderToolsPage();
+  if(document.querySelector('.h37-services,.v18-primary-tools'))await renderHomeTools();
+  if(document.querySelector('#items'))await renderToolsPage();
   document.dispatchEvent(new CustomEvent('uon:tool-catalog-updated',{detail:{version:catalog.version,updated_at:catalog.updated_at}}));
  }catch(error){console.warn('Tool catalog refresh failed',error)}
 }
@@ -259,7 +261,7 @@ export async function bootUnifiedTools(){
 
 function injectStyles(){
  if(document.querySelector('#uon44ToolRegistryStyle'))return;
- const link=document.createElement('link');link.id='uon44ToolRegistryStyle';link.rel='stylesheet';link.href='/css/tool-registry-v44.css?v=44.0.0';document.head.append(link);
+ const link=document.createElement('link');link.id='uon44ToolRegistryStyle';link.rel='stylesheet';link.href='/css/tool-registry-v44.css?v=44.0.1';document.head.append(link);
 }
 
 export function getToolCatalog(){return catalog}
