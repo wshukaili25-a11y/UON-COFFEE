@@ -1,55 +1,120 @@
-import{get,esc,enforceUonMaintenance,watchUonMaintenance,trackEvent,trackClicks,applyFeatureStates}from'./core.js?v=41.0.2';
+import{get,esc,enforceUonMaintenance,watchUonMaintenance,trackEvent,trackClicks}from'./core.js?v=45.0.0';
+
 await enforceUonMaintenance();
 watchUonMaintenance();
 
-const qs=s=>document.querySelector(s);
-const lang=localStorage.getItem('uon_language')==='en'?'en':'ar';
-const en=lang==='en';
-const t=(ar,enText)=>en?enText:ar;
-const formatDate=v=>v?new Date(v).toLocaleDateString(en?'en-GB':'ar-OM'):t('اليوم','Today');
+const $=selector=>document.querySelector(selector);
+const language=()=>localStorage.getItem('uon_language')==='en'||document.documentElement.lang?.startsWith('en')?'en':'ar';
+const t=(ar,en)=>language()==='en'?en:ar;
+const PROFILE_KEY='uon-v44-schedule-profiles';
+const ACTIVE_KEY='uon-v44-active-schedule';
+const LEGACY_KEY='uon-v7-schedule';
+const dayMap={0:'الأحد',1:'الاثنين',2:'الثلاثاء',3:'الأربعاء',4:'الخميس'};
+const dayEn={'الأحد':'Sunday','الاثنين':'Monday','الثلاثاء':'Tuesday','الأربعاء':'Wednesday','الخميس':'Thursday'};
 
-function installStyle(){
- if(document.querySelector('#home372Style'))return;
- const link=document.createElement('link');link.id='home372Style';link.rel='stylesheet';link.href='css/home-v371.css?v=41.0.2';document.head.appendChild(link);
+function parseTime(value){
+ const match=/^(\d{1,2}):(\d{2})$/.exec(String(value||''));
+ if(!match)return null;
+ const hour=Number(match[1]),minute=Number(match[2]);
+ if(hour<0||hour>23||minute<0||minute>59)return null;
+ return hour*60+minute;
+}
+function formatTime(value){
+ const total=parseTime(value);
+ if(total==null)return String(value||'');
+ const hour24=Math.floor(total/60),minute=String(total%60).padStart(2,'0'),hour12=hour24%12||12;
+ return language()==='en'?`${hour12}:${minute} ${hour24<12?'AM':'PM'}`:`${hour12}:${minute} ${hour24<12?'ص':'م'}`;
+}
+function readActiveRows(){
+ try{
+  const store=JSON.parse(localStorage.getItem(PROFILE_KEY)||'null');
+  if(store?.profiles?.length){
+   const requested=localStorage.getItem(ACTIVE_KEY);
+   const profile=store.profiles.find(item=>item.id===requested)||store.profiles[0];
+   if(Array.isArray(profile?.rows))return profile.rows;
+  }
+ }catch{}
+ try{
+  const rows=JSON.parse(localStorage.getItem(LEGACY_KEY)||'[]');
+  return Array.isArray(rows)?rows:[];
+ }catch{return[]}
+}
+function currentDayName(){return dayMap[new Date().getDay()]||null}
+function nowMinutes(){const now=new Date();return now.getHours()*60+now.getMinutes()}
+function dateLabel(){return new Intl.DateTimeFormat(language()==='en'?'en-GB':'ar-OM',{weekday:'long',day:'numeric',month:'short'}).format(new Date())}
+
+function renderToday(){
+ const date=$('#homeTodayDate'),title=$('#homeNextClassTitle'),meta=$('#homeNextClassMeta'),list=$('#homeTodayList'),label=$('#homeTodayLabel');
+ if(!date||!title||!meta||!list)return;
+ date.textContent=dateLabel();
+ const day=currentDayName();
+ if(label)label.textContent=day?(language()==='en'?dayEn[day]:day):t('نهاية الأسبوع','Weekend');
+ if(!day){
+  title.textContent=t('ما عندك محاضرات اليوم','No classes today');
+  meta.textContent=t('خذ راحتك وراجع جدول الأسبوع القادم.','Take a break and check the coming week.');
+  list.innerHTML=`<div class="home45-empty-day">${t('اليوم خارج أيام الجدول الدراسي.','Today is outside the study week.')}</div>`;
+  return;
+ }
+ const rows=readActiveRows().filter(item=>item?.day===day&&parseTime(item.start)!=null&&parseTime(item.end)!=null).sort((a,b)=>parseTime(a.start)-parseTime(b.start));
+ const now=nowMinutes();
+ const current=rows.find(item=>parseTime(item.start)<=now&&parseTime(item.end)>now);
+ const next=rows.find(item=>parseTime(item.start)>now);
+ const focus=current||next;
+ if(focus){
+  title.textContent=current?t(`أنت الآن في ${focus.course}`,`Now: ${focus.course}`):focus.course;
+  const status=current?t('تنتهي','Ends'):t('تبدأ','Starts');
+  const time=current?formatTime(focus.end):formatTime(focus.start);
+  meta.textContent=[`${status} ${time}`,focus.room?t(`القاعة ${focus.room}`,`Room ${focus.room}`):'',focus.teacher||''].filter(Boolean).join(' • ');
+ }else if(rows.length){
+  title.textContent=t('خلصت محاضرات اليوم 👏','Classes are done for today 👏');
+  meta.textContent=t('راجع جدول باكر أو افتح الملخصات للمذاكرة.','Check tomorrow’s schedule or open summaries to study.');
+ }else{
+  title.textContent=t('ما أضفت محاضرات لهذا اليوم','No classes added for today');
+  meta.textContent=t('افتح الجدول الدراسي وأضف موادك في أقل من دقيقة.','Open the study schedule and add your classes in under a minute.');
+ }
+ list.innerHTML=rows.length?rows.slice(0,5).map(item=>`<div class="home45-day-item"><span class="home45-day-time">${formatTime(item.start)} – ${formatTime(item.end)}</span><strong class="home45-day-course">${esc(item.course||t('مادة','Course'))}</strong><span class="home45-day-room">${esc(item.room||'')}</span></div>`).join(''):`<div class="home45-empty-day">${t('جدول اليوم فاضي. أضف موادك عشان تظهر لك المحاضرة القادمة هنا.','Today is empty. Add classes to see your next lecture here.')}</div>`;
 }
 
-const slides=[
- {feature:'summaries',icon:'📚',tag:t('مكتبة الطالب','Student Library'),title:t('ملخصات واختبارات مرتبة','Organized summaries and exams'),text:t('ابحث برمز المادة، افتح الملف وشوف تقييمات الطلاب قبل التحميل.','Search by course code, open files, and check student ratings before downloading.'),url:'summaries.html',cta:t('تصفح الملخصات','Browse summaries')},
- {feature:'groups',icon:'💬',tag:t('مجتمع الطلاب','Student Community'),title:t('مجموعات المواد في مكان واضح','Course groups in one clear place'),text:t('وصل لمجموعتك ومجتمع طلاب جامعة نزوى بدون البحث بين روابط كثيرة.','Reach your course group and the UON student community without searching through many links.'),url:'groups.html',cta:t('فتح المجموعات','Open groups')},
- {feature:'assistant',icon:'🤖',tag:'UON AI',title:t('اسأل عن الجامعة بسرعة','Ask about the university quickly'),text:t('مساعد متخصص بخدمات جامعة نزوى والمقررات والمصادر الرسمية.','An assistant focused on University of Nizwa services, courses, and official sources.'),url:'assistant.html',cta:t('اسأل UON AI','Ask UON AI')},
- {feature:'confessions',icon:'👀',tag:t('اعترافات الطلاب','Student Confessions'),title:t('اكتب اللي بخاطرك بشكل مجهول','Share what is on your mind anonymously'),text:t('اعترافات مباشرة وتفاعلات طلابية مع تحكم كامل للمشرف.','Instant anonymous posts and student interactions with moderator control.'),url:'confessions.html',cta:t('شوف الاعترافات','View confessions')},
- {feature:'university-guide',icon:'🎓',tag:t('دليل الجامعة','University Guide'),title:t('اعرف كليتك وتخصصك وخطتك','Explore your college, major, and plan'),text:t('دليل منظم للكليات والأقسام والتخصصات مع المصادر الرسمية.','An organized guide to colleges, departments, majors, and official sources.'),url:'university-guide.html',cta:t('فتح الدليل','Open guide')}
-];
-
-function sliderMarkup(){return `<div class="h371-slider" id="homeServiceSlider"><div class="h371-track">${slides.map((x,i)=>`<article class="h371-slide" data-feature="${x.feature}" data-slide="${i}"><div class="h371-slide-copy"><span class="h371-slide-tag">${x.tag}</span><h2>${x.title}</h2><p>${x.text}</p><a class="btn primary" href="${x.url}">${x.cta}</a></div><span class="h371-slide-icon">${x.icon}</span></article>`).join('')}</div><button class="h371-arrow h371-prev" type="button" aria-label="${t('السابق','Previous')}">‹</button><button class="h371-arrow h371-next" type="button" aria-label="${t('التالي','Next')}">›</button><div class="h371-dots"></div></div>`}
-
-function shell(){
- const old=document.querySelector('main');if(!old)return;
- old.outerHTML=`<main class="home37">
- <section class="h37-hero"><div class="h37-container"><div class="h371-hero-copy"><span class="h37-eyebrow">🎓 ${t('مجتمع طلاب جامعة نزوى','University of Nizwa Student Community')}</span><h1>${t('كل خدمات طالب جامعة نزوى في','All University of Nizwa student services in')} <span>${t('مكان واحد','one place')}</span></h1><p class="h37-hero-copy">${t('ملخصات واختبارات، مجموعات المواد، دليل الجامعة، اعترافات الطلاب، المشاريع، التقييمات ومساعد UON AI — بسرعة وبدون تعقيد.','Summaries, exams, course groups, university guide, confessions, projects, ratings, and UON AI — fast and simple.')}</p><div class="h37-hero-actions"><a class="btn primary" href="tools.html">${t('استكشف كل الخدمات','Explore all services')}</a><a class="btn" href="summaries.html" data-feature="summaries">${t('تصفح الملخصات','Browse summaries')}</a></div><form class="h37-search" id="homeSearch"><input id="homeSearchInput" placeholder="${t('ابحث عن مادة، ملخص، خدمة أو تخصص...','Search for a course, summary, service, or major...')}" autocomplete="off"><button class="btn primary">${t('بحث','Search')}</button></form></div>${sliderMarkup()}</div></section>
- <section class="h37-section h37-soft"><div class="h37-container"><div class="h37-head h37-reveal"><div><h2>${t('ابدأ من هنا','Start here')}</h2><p>${t('أكثر الخدمات التي يحتاجها الطالب يوميًا.','The services students use most every day.')}</p></div><a href="tools.html">${t('كل الأدوات','All tools')} ←</a></div><div class="h37-services h37-reveal">
- ${service('summaries.html','summaries','📚',t('الملخصات والاختبارات','Summaries & Exams'),t('ملفات مرتبة ومقيّمة حسب المادة.','Organized and rated files by course.'))}
- ${service('groups.html','groups','💬',t('المجموعات والمجتمع','Groups & Community'),t('مجموعات المواد ومجتمع الطلاب.','Course groups and the student community.'))}
- ${service('university-guide.html','university-guide','🎓',t('دليل الجامعة','University Guide'),t('الكليات والأقسام والتخصصات.','Colleges, departments, and majors.'))}
- ${service('assistant.html','assistant','🤖',t('مساعد UON AI','UON AI Assistant'),t('اسأل عن الجامعة وخدمات المنصة.','Ask about the university and platform services.'))}
- ${service('confessions.html','confessions','👀',t('اعترافات الطلاب','Student Confessions'),t('اكتب وشارك بشكل مجهول.','Post and share anonymously.'))}
- ${service('ratings.html','ratings','⭐',t('التقييمات','Ratings'),t('تجارب الطلاب مع المواد والدكاترة.','Student experiences with courses and instructors.'))}
- </div></div></section>
- <section class="h37-section"><div class="h37-container"><div class="h37-head h37-reveal"><div><h2>${t('UON Hub بالأرقام','UON Hub in numbers')}</h2><p>${t('أرقام حقيقية تتحدث من محتوى المنصة.','Live numbers based on platform content.')}</p></div></div><div class="h37-dashboard h37-dashboard-five h37-reveal"><article class="h37-stat"><strong id="statSummaries">—</strong><span>${t('ملخص واختبار','summaries and exams')}</span></article><article class="h37-stat"><strong id="statGroups">—</strong><span>${t('مجموعة معتمدة','approved groups')}</span></article><article class="h37-stat"><strong id="statRatings">—</strong><span>${t('تقييم طالب','student ratings')}</span></article><article class="h37-stat"><strong id="statProjects">—</strong><span>${t('مشروع طلابي','student projects')}</span></article><article class="h37-stat h37-university-card"><strong>UON</strong><span>${t('جامعة نزوى','University of Nizwa')}</span></article></div></div></section>
- <section class="h37-section h37-soft"><div class="h37-container"><div class="h37-content-grid"><section class="h37-panel h37-reveal"><div class="h37-panel-head"><h3>✨ ${t('آخر الإضافات','Latest additions')}</h3><a href="summaries.html">${t('عرض الكل','View all')}</a></div><div class="h37-feed" id="latestFeed"><div class="h37-empty">${t('جاري التحميل...','Loading...')}</div></div></section><section class="h37-panel h37-reveal"><div class="h37-panel-head"><h3>🔥 ${t('الأكثر استخدامًا','Most used')}</h3><span class="h37-chip">${t('آخر 7 أيام','Last 7 days')}</span></div><div class="h37-feed" id="popularFeed"><div class="h37-empty">${t('جاري التحميل...','Loading...')}</div></div></section></div></div></section>
- <section class="h37-section"><div class="h37-container"><div class="h37-content-grid"><section class="h37-panel h37-reveal" data-feature="confessions"><div class="h37-panel-head"><h3>👀 ${t('أحدث الاعترافات','Latest confessions')}</h3><a href="confessions.html">${t('شوف الكل','View all')}</a></div><div class="h37-feed" id="confessionsFeed"><div class="h37-empty">${t('جاري التحميل...','Loading...')}</div></div></section><section class="h37-panel h37-reveal" data-feature="projects"><div class="h37-panel-head"><h3>💡 ${t('أحدث المشاريع','Latest projects')}</h3><a href="projects.html">${t('كل المشاريع','All projects')}</a></div><div class="h37-feed" id="projectsFeed"><div class="h37-empty">${t('جاري التحميل...','Loading...')}</div></div></section></div></div></section>
- <section class="h37-section h37-soft"><div class="h37-container"><div class="h37-head h37-reveal"><div><h2>${t('روابط الجامعة المهمة','Important university links')}</h2><p>${t('وصول سريع للخدمات الرسمية الأكثر استخدامًا.','Quick access to the most-used official services.')}</p></div><a href="useful-sites.html">${t('كل الروابط','All links')} ←</a></div><div class="h37-links h37-reveal" id="officialLinks"><div class="h37-empty">${t('جاري التحميل...','Loading...')}</div></div></div></section></main>`;
+function setupSearch(){
+ const form=$('#homeSearch'),input=$('#homeSearchInput');
+ form?.addEventListener('submit',event=>{
+  event.preventDefault();
+  const query=input?.value.trim();
+  if(query)location.href=`search.html?q=${encodeURIComponent(query)}`;
+  else input?.focus();
+ });
 }
-function service(url,feature,icon,title,desc){return `<a class="h37-service" href="${url}" data-feature="${feature}"><span class="h37-service-icon">${icon}</span><strong>${title}</strong><small>${desc}</small></a>`}
-function feedItem({url='#',icon='✨',title='',sub='',chip=''}){return `<a href="${esc(url)}"${/^https?:/i.test(url)?' target="_blank" rel="noopener"':''}><span class="h37-feed-icon">${icon}</span><span class="h37-feed-body"><strong>${esc(title)}</strong><small>${esc(sub)}</small></span>${chip?`<span class="h37-chip">${esc(chip)}</span>`:''}</a>`}
 
-async function loadStats(){const targets=['#statSummaries','#statGroups','#statRatings','#statProjects'];try{const [a,b,c,d]=await Promise.all([get('summaries','select=id&approved=eq.true'),get('whatsapp_groups','select=id&approved=eq.true'),get('rating_submissions','select=id&status=eq.approved'),get('student_projects','select=id&status=eq.approved')]);[a,b,c,d].forEach((x,i)=>{const e=qs(targets[i]);if(e)e.textContent=x.length})}catch{targets.forEach(x=>{const e=qs(x);if(e)e.textContent='—'})}}
-async function loadLatest(){const target=qs('#latestFeed');let all=[];const sources=[['summaries','select=id,title,course_code,subject,created_at&approved=eq.true&order=created_at.desc&limit=5','📚',t('ملخص','Summary'),'summaries.html'],['whatsapp_groups','select=id,subject,course_code,created_at&approved=eq.true&order=created_at.desc&limit=5','💬',t('مجموعة','Group'),'groups.html'],['student_projects','select=id,title,major,created_at&status=eq.approved&order=created_at.desc&limit=5','💡',t('مشروع','Project'),'projects.html']];for(const[table,q,icon,type,url]of sources){try{(await get(table,q)).forEach(x=>all.push({icon,type,url,title:x.title||x.subject||x.course_code||t('إضافة جديدة','New item'),sub:x.course_code||x.subject||x.major||formatDate(x.created_at),created_at:x.created_at}))}catch{}}all.sort((a,b)=>new Date(b.created_at)-new Date(a.created_at));const list=all.slice(0,7);target.innerHTML=list.length?list.map(x=>feedItem({...x,chip:x.type})).join(''):`<div class="h37-empty">${t('لا توجد إضافات حديثة.','No recent additions.')}</div>`}
-async function loadPopular(){const target=qs('#popularFeed');try{const since=new Date(Date.now()-7*86400000).toISOString();const rows=await get('usage_events',`select=event_type,metadata&created_at=gte.${encodeURIComponent(since)}&limit=2500`);const map=new Map();for(const x of rows){const label=x.metadata?.code||x.metadata?.course_code||x.metadata?.page||x.event_type;if(!label)continue;const key=String(label).toUpperCase();map.set(key,(map.get(key)||0)+1)}const list=[...map.entries()].sort((a,b)=>b[1]-a[1]).slice(0,6);target.innerHTML=list.length?list.map(([title,count],i)=>feedItem({url:/^[A-Z]{3,5}\d{3}/.test(title)?`course.html?code=${encodeURIComponent(title)}`:'tools.html',icon:String(i+1),title,sub:t(`${count} استخدام خلال الأسبوع`,`${count} uses this week`),chip:t('نشط','Active')})).join(''):`<div class="h37-empty">${t('تظهر البيانات بعد استخدام المنصة.','Data appears after platform usage.')}</div>`}catch{target.innerHTML=`<div class="h37-empty">${t('تعذر تحميل النشاط حاليًا.','Unable to load activity right now.')}</div>`}}
-async function loadConfessions(){const target=qs('#confessionsFeed');try{const rows=await get('confessions','select=id,text,college,created_at&status=eq.approved&order=created_at.desc&limit=4');target.innerHTML=rows.length?rows.map(x=>`<a class="h37-confession" href="confessions.html"><span class="h37-feed-icon">👤</span><span class="h37-feed-body"><p>${esc(x.text)}</p><small>${esc(x.college||t('مجهول','Anonymous'))} • ${formatDate(x.created_at)}</small></span></a>`).join(''):`<div class="h37-empty">${t('ما فيه اعترافات للحين.','No confessions yet.')}</div>`}catch{target.innerHTML=`<div class="h37-empty">${t('تعذر تحميل الاعترافات.','Unable to load confessions.')}</div>`}}
-async function loadProjects(){const target=qs('#projectsFeed');try{const rows=await get('student_projects','select=id,title,major,url,created_at&status=eq.approved&order=created_at.desc&limit=5');target.innerHTML=rows.length?rows.map(x=>feedItem({url:x.url||'projects.html',icon:'💡',title:x.title,sub:x.major||formatDate(x.created_at)})).join(''):`<div class="h37-empty">${t('لا توجد مشاريع منشورة.','No published projects.')}</div>`}catch{target.innerHTML=`<div class="h37-empty">${t('تعذر تحميل المشاريع.','Unable to load projects.')}</div>`}}
-async function loadLinks(){const target=qs('#officialLinks');try{const rows=await get('useful_sites','select=title_ar,title_en,description_ar,description_en,url,icon&active=eq.true&category=eq.university&order=sort_order.asc&limit=8');target.innerHTML=rows.length?rows.map(x=>`<a class="h37-link" href="${esc(x.url)}" target="_blank" rel="noopener"><span>${esc(x.icon||'🔗')}</span><div><strong>${esc(en?(x.title_en||x.title_ar):x.title_ar)}</strong><small>${esc(en?(x.description_en||x.description_ar||'Official link'):(x.description_ar||'رابط رسمي'))}</small></div></a>`).join(''):`<div class="h37-empty">${t('لا توجد روابط مضافة.','No links added.')}</div>`}catch{target.innerHTML=`<div class="h37-empty">${t('تعذر تحميل الروابط.','Unable to load links.')}</div>`}}
-function pruneHiddenSlides(){const root=qs('#homeServiceSlider'),track=root?.querySelector('.h371-track');if(!root||!track)return;[...track.children].forEach(slide=>{if(getComputedStyle(slide).display==='none'||slide.hidden)slide.remove()});const cards=[...track.children],dots=root.querySelector('.h371-dots');dots.innerHTML=cards.map((_,i)=>`<button type="button" data-go="${i}" aria-label="${t('الشريحة','Slide')} ${i+1}"></button>`).join('');if(cards.length<2)root.querySelectorAll('.h371-arrow,.h371-dots').forEach(x=>x.hidden=true)}
-let sliderTimer=null;function setupSlider(){clearInterval(sliderTimer);const root=qs('#homeServiceSlider'),track=root?.querySelector('.h371-track');if(!root||!track)return;const cards=[...track.children],dots=[...root.querySelectorAll('[data-go]')];if(!cards.length){root.hidden=true;return}let index=0,startX=null;const go=n=>{index=(n+cards.length)%cards.length;track.style.transform=`translateX(${index*100}%)`;dots.forEach((dot,i)=>dot.classList.toggle('active',i===index))};const restart=()=>{clearInterval(sliderTimer);if(cards.length>1&&!matchMedia('(prefers-reduced-motion: reduce)').matches)sliderTimer=setInterval(()=>go(index+1),4800)};root.querySelector('.h371-next')?.addEventListener('click',()=>{go(index+1);restart()});root.querySelector('.h371-prev')?.addEventListener('click',()=>{go(index-1);restart()});dots.forEach((dot,i)=>dot.addEventListener('click',()=>{go(i);restart()}));root.addEventListener('pointerdown',e=>{startX=e.clientX;clearInterval(sliderTimer)});root.addEventListener('pointerup',e=>{if(startX!==null){const delta=e.clientX-startX;if(Math.abs(delta)>45)go(index+(delta<0?1:-1));startX=null;restart()}});root.addEventListener('mouseenter',()=>clearInterval(sliderTimer));root.addEventListener('mouseleave',restart);go(0);restart()}
-function interactions(){qs('#homeSearch')?.addEventListener('submit',e=>{e.preventDefault();const q=qs('#homeSearchInput').value.trim();if(q)location.href=`search.html?q=${encodeURIComponent(q)}`});const observer=new IntersectionObserver(entries=>entries.forEach(entry=>{if(entry.isIntersecting){entry.target.classList.add('visible');observer.unobserve(entry.target)}}),{threshold:.1});document.querySelectorAll('.h37-reveal').forEach(x=>observer.observe(x))}
-installStyle();shell();interactions();await applyFeatureStates(document).catch(()=>{});pruneHiddenSlides();setupSlider();await Promise.allSettled([loadStats(),loadLatest(),loadPopular(),loadConfessions(),loadProjects(),loadLinks()]);trackClicks();trackEvent('page_view',{page:'home_v412',language:lang});window.addEventListener('focus',()=>applyFeatureStates(document));
+function latestItem(item){
+ const title=item.title||item.subject||item.course_code||t('ملف جديد','New file');
+ const subtitle=[item.course_code,item.subject].filter(Boolean).join(' • ')||t('محتوى طلابي','Student content');
+ return `<a class="home45-latest-item" href="summaries.html"><span class="home45-latest-icon">📄</span><span class="home45-latest-body"><strong>${esc(title)}</strong><small>${esc(subtitle)}</small></span><span class="home45-latest-tag">${t('جديد','New')}</span></a>`;
+}
+async function loadLatest(){
+ const target=$('#homeLatestList');
+ if(!target)return;
+ try{
+  const rows=await get('summaries','select=id,title,subject,course_code,created_at&approved=eq.true&order=created_at.desc&limit=5');
+  target.innerHTML=rows.length?rows.map(latestItem).join(''):`<div class="home45-load-note">${t('ما فيه إضافات جديدة حاليًا.','No new additions right now.')}</div>`;
+ }catch(error){
+  console.warn('Latest homepage content skipped',error);
+  target.innerHTML=`<div class="home45-load-note">${t('تعذر تحميل آخر الإضافات، وباقي خدمات الموقع تعمل عادي.','Latest additions could not load; the rest of the site still works.')}</div>`;
+ }
+}
+
+function deferLatest(){
+ const run=()=>void loadLatest();
+ if('requestIdleCallback'in window)requestIdleCallback(run,{timeout:1800});
+ else setTimeout(run,450);
+}
+
+setupSearch();
+renderToday();
+deferLatest();
+trackClicks();
+trackEvent('page_view',{page:'home_v45',language:language(),performance_mode:'lean'});
+
+setInterval(renderToday,60000);
+window.addEventListener('storage',event=>{if([PROFILE_KEY,ACTIVE_KEY,LEGACY_KEY].includes(event.key))renderToday()});
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)renderToday()});
+new MutationObserver(mutations=>{if(mutations.some(item=>item.attributeName==='lang')){renderToday();void loadLatest()}}).observe(document.documentElement,{attributes:true,attributeFilter:['lang']});
