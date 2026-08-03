@@ -1,0 +1,55 @@
+.schedule-page{min-height:70vh}
+.schedule-hero{padding-bottom:24px}
+.schedule-hero .badge{margin-bottom:12px}
+.schedule-section{padding-top:28px}
+.schedule-shell{display:grid;gap:24px}
+.schedule-form-card,.schedule-board-card{padding:clamp(18px,3vw,30px)}
+.schedule-panel-head,.schedule-board-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:20px}
+.schedule-panel-head h2,.schedule-board-head h2{margin:0 0 6px;font-size:clamp(1.35rem,2vw,1.75rem)}
+.schedule-panel-head p{margin:0;color:var(--muted);line-height:1.8;max-width:760px}
+.schedule-form{display:grid;gap:20px}
+.schedule-form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.schedule-form-grid .field{min-width:0}
+.schedule-form-grid input,.schedule-form-grid select{min-height:54px;font-size:1rem}
+.schedule-form-actions{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.schedule-add{min-width:150px;min-height:54px}
+.schedule-local-note{color:var(--muted);font-size:.92rem}
+.schedule-board-card{overflow:hidden}
+.schedule-board-head{align-items:center}
+.schedule-board-head>div{min-width:0}
+.schedule-count{display:inline-flex;align-items:center;min-height:30px;padding:4px 10px;border-radius:999px;background:rgba(28,200,245,.08);border:1px solid rgba(28,200,245,.18);color:#a5e9fb;font-size:.86rem;font-weight:800}
+.schedule-clear{flex:0 0 auto}
+.schedule-scroll{overflow-x:auto;overscroll-behavior-inline:contain;padding:2px 2px 10px;scrollbar-width:thin}
+.schedule-week{display:grid!important;grid-template-columns:repeat(5,minmax(220px,1fr))!important;gap:14px!important;min-width:1160px!important;align-items:start}
+.schedule-day{padding:16px!important;min-height:250px;border:1px solid var(--line);border-radius:18px;background:linear-gradient(180deg,rgba(17,26,55,.92),rgba(9,15,34,.92));box-shadow:none!important}
+.schedule-day h3{margin:0 0 14px;font-size:1.2rem;text-align:center}
+.schedule-day-events{display:grid;gap:11px}
+.schedule-empty{margin:0;padding:26px 12px;text-align:center;color:var(--muted);border:1px dashed rgba(154,168,199,.22);border-radius:14px;background:rgba(255,255,255,.015)}
+.schedule-event{display:grid!important;gap:10px!important;margin:0!important;padding:14px!important;border:1px solid rgba(28,200,245,.16)!important;border-right:4px solid var(--primary)!important;border-radius:14px!important;background:linear-gradient(145deg,rgba(26,39,82,.98),rgba(18,28,61,.98))!important;overflow:hidden;min-width:0}
+.schedule-event-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;flex-wrap:wrap;min-width:0}
+.schedule-course{font-size:1.02rem;line-height:1.4;overflow-wrap:anywhere}
+.schedule-time{white-space:nowrap;color:#b8c7e6;font-size:.9rem;font-weight:700}
+.schedule-meta{display:grid;gap:6px;margin:0}
+.schedule-meta-row{display:grid;grid-template-columns:auto minmax(0,1fr);gap:8px;align-items:start;color:#c8d3e9;font-size:.88rem;line-height:1.55}
+.schedule-meta-row dt{color:var(--muted);font-weight:700}
+.schedule-meta-row dd{margin:0;overflow-wrap:anywhere}
+.schedule-delete{width:100%;min-height:42px;margin-top:2px;border:1px solid rgba(251,113,133,.24);border-radius:11px;background:rgba(251,113,133,.08);color:#fecdd3;font-family:inherit;font-weight:800;cursor:pointer}
+.schedule-delete:hover{background:rgba(251,113,133,.15)}
+.schedule-delete:focus-visible,.schedule-clear:focus-visible,.schedule-add:focus-visible{outline:3px solid rgba(28,200,245,.28);outline-offset:2px}
+@media(max-width:760px){
+ .schedule-section{padding-top:18px}
+ .schedule-form-card,.schedule-board-card{padding:16px}
+ .schedule-form-grid{grid-template-columns:1fr}
+ .schedule-form-actions{align-items:stretch;flex-direction:column}
+ .schedule-add{width:100%}
+ .schedule-local-note{text-align:center}
+ .schedule-board-head{align-items:stretch;flex-direction:column}
+ .schedule-clear{width:100%}
+ .schedule-scroll{overflow:visible;padding:0}
+ .schedule-week{grid-template-columns:1fr!important;min-width:0!important;gap:12px!important}
+ .schedule-day{min-height:0}
+}
+@media(max-width:420px){
+ .schedule-event-top{display:grid}
+ .schedule-time{white-space:normal}
+}
