@@ -64,6 +64,13 @@
     {"source": "/home", "destination": "/", "permanent": true}
   ],
   "rewrites": [
+    {"source": "/go/:slug", "destination": "/go.html?slug=:slug"},
+    {"source": "/schedule", "destination": "/schedule.html"},
+    {"source": "/tools", "destination": "/tools.html"},
+    {"source": "/search", "destination": "/search.html"},
+    {"source": "/gpa", "destination": "/gpa.html"},
+    {"source": "/calendar", "destination": "/calendar.html"},
+    {"source": "/guide", "destination": "/university-guide.html"},
     {"source": "/404", "destination": "/404.html"},
     {"source": "/(.*).map", "destination": "/404.html"},
     {"source": "/README(.*)", "destination": "/404.html"},
