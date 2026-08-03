@@ -70,6 +70,7 @@ async function bootUnifiedExperience(){
   }
   const experience=await import(`./platform-experience-v44.js?v=${APP_VERSION}`);
   experience.bootPlatformExperience();
+  if(document.querySelector('.home45'))document.querySelectorAll('.uon44-command-button,.uon44-catalog-meta').forEach(element=>element.remove());
  }catch(error){console.warn('Unified tools V44 skipped',error)}
 }
 async function boot(){
