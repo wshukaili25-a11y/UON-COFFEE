@@ -1,4 +1,4 @@
-const APP_VERSION='44.1.1';
+const APP_VERSION='44.1.2';
 const TEST_KEY='uonhub_pwa_test_mode';
 let deferredInstallPrompt=null;
 
@@ -10,24 +10,32 @@ function addIndependentNotice(){if(document.querySelector('.uon-independent-noti
 function addAiButton(){if(isAdminPage()||document.querySelector('.uon-ai-fab'))return;const button=document.createElement('a');button.className='uon-ai-fab';button.href='assistant.html';button.dataset.feature='assistant';button.setAttribute('aria-label','UON AI');button.innerHTML='<span class="uon-ai-fab__icon">AI</span><span class="uon-ai-fab__label" data-ar="اسأل UON AI" data-en="Ask UON AI">اسأل UON AI</span>';document.body.append(button)}
 function applyVisibility(state,root=document){const map=state?.visibility||{};root.querySelectorAll('[data-feature]').forEach(element=>{const key=element.dataset.feature;if(key&&map[key]===false)element.hidden=true;else if(key&&map[key]===true){element.hidden=false;element.style.removeProperty('display')}})}
 function fixWhatsAppLogo(root=document){
- const logo='<svg viewBox="0 0 32 32" width="100%" height="100%" aria-hidden="true" focusable="false"><circle cx="16" cy="16" r="15" fill="#25D366"/><path fill="#fff" d="M23.2 18.7c-.4-.2-2.3-1.1-2.7-1.2-.4-.1-.6-.2-.9.2-.3.4-1 1.2-1.2 1.5-.2.3-.5.3-.9.1-2.2-1.1-3.7-2-5.2-4.5-.4-.7.4-.7 1.1-1.7.1-.3.1-.5 0-.7-.1-.2-.9-2.1-1.2-2.9-.3-.8-.7-.7-.9-.7h-.8c-.3 0-.7.1-1.1.5-.4.4-1.4 1.4-1.4 3.4s1.5 4 1.7 4.3c.2.3 2.9 4.5 7.1 6.3 2.6 1.1 3.6 1.2 4.9 1 .8-.1 2.3-.9 2.6-1.8.3-.9.3-1.7.2-1.8-.1-.2-.4-.3-.8-.5Z"/><path fill="#fff" d="M16 3a13 13 0 0 0-11 20l-1.7 6 6.2-1.6A13 13 0 1 0 16 3Zm0 23.6c-2.1 0-4.1-.6-5.8-1.6l-.4-.2-3.7 1 1-3.6-.2-.4A10.6 10.6 0 1 1 16 26.6Z"/></svg>';
  const selectors='[data-tool-key="groups"] .h37-service-icon,a.uon44-secondary-card[data-tool-key="groups"]>span:first-child,.uon44-tool-card[data-tool-key="groups"] .tool-icon';
  root.querySelectorAll(selectors).forEach(element=>{
-  element.innerHTML=logo;
+  if(element.querySelector('img[data-whatsapp-brand]'))return;
+  const compact=element.matches('a.uon44-secondary-card[data-tool-key="groups"]>span:first-child');
+  element.replaceChildren();
+  const image=document.createElement('img');
+  image.src='/assets/whatsapp-official.svg?v=44.1.2';
+  image.alt='';
+  image.setAttribute('aria-hidden','true');
+  image.dataset.whatsappBrand='1';
+  image.width=compact?32:46;
+  image.height=compact?32:46;
+  image.style.cssText=`display:block;width:${compact?'32px':'46px'};height:${compact?'32px':'46px'};object-fit:contain;filter:drop-shadow(0 7px 12px rgba(37,211,102,.2))`;
+  element.append(image);
   element.style.setProperty('background-image','none','important');
+  element.style.setProperty('background','transparent','important');
   element.style.setProperty('color','inherit','important');
-  element.style.setProperty('font-size','initial','important');
+  element.style.setProperty('font-size','0','important');
   element.style.setProperty('display','flex','important');
   element.style.setProperty('align-items','center','important');
   element.style.setProperty('justify-content','center','important');
   element.style.setProperty('overflow','visible','important');
-  if(element.matches('a.uon44-secondary-card[data-tool-key="groups"]>span:first-child')){
+  if(compact){
    element.style.setProperty('width','34px','important');
    element.style.setProperty('height','34px','important');
    element.style.setProperty('flex','0 0 34px','important');
-  }else{
-   element.style.setProperty('width','52px','important');
-   element.style.setProperty('height','52px','important');
   }
  });
 }
@@ -50,8 +58,6 @@ async function bootUnifiedExperience(){
   const registry=await import(`./tool-registry-v44.js?v=${APP_VERSION}`);
   await registry.bootUnifiedTools();
   fixWhatsAppLogo();
-  // The H37 home renderer may replace the legacy home cards after this module boots.
-  // Wait only for that one replacement, then disconnect to avoid a mutation/render loop.
   if(!document.querySelector('.h37-services')&&document.querySelector('.v18-primary-tools')){
    const observeHome=new MutationObserver(async()=>{
     if(!document.querySelector('.h37-services'))return;
