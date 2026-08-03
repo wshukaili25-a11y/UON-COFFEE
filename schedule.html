@@ -1,25 +1,139 @@
-<!doctype html><html lang="ar" dir="rtl"><head><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#060b1b"><title>الجدول الدراسي | UON Hub</title><link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet"><link rel="stylesheet" href="css/app.css?v=18.8"><link rel="stylesheet" href="css/ui-refresh-v24.css?v=24.0.0"><meta name="theme-color" content="#060b1b">
-<meta name="description" content="أداة سهلة لتنظيم الجدول الدراسي الأسبوعي.">
-<meta name="robots" content="index,follow,max-image-preview:large">
-<link rel="canonical" href="https://uonhub.space/schedule.html">
-<meta property="og:type" content="website">
-<meta property="og:site_name" content="UON Hub">
-<meta property="og:title" content="الجدول الدراسي | UON Hub">
-<meta property="og:description" content="أداة سهلة لتنظيم الجدول الدراسي الأسبوعي.">
-<meta property="og:url" content="https://uonhub.space/schedule.html">
-<meta property="og:image" content="https://uonhub.space/assets/unizwa-new-gate-v52.jpg">
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="الجدول الدراسي | UON Hub">
-<meta name="twitter:description" content="أداة سهلة لتنظيم الجدول الدراسي الأسبوعي.">
-<meta name="twitter:image" content="https://uonhub.space/assets/unizwa-new-gate-v52.jpg">
-<link rel="manifest" href="/manifest.webmanifest">
-<link rel="apple-touch-icon" href="/assets/icons/icon-192.png">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="UON Hub">
-<link rel="stylesheet" href="/css/pwa.css?v=25.6.0">
-<link rel="stylesheet" href="css/content-reports.css?v=31.2.0">
-</head><body><header class="site-header"><div class="container nav"><a class="brand" href="index.html"><span class="brand-mark">U1</span>UON <span>Hub</span></a><ul class="nav-links" id="navLinks"><li><a class="" href="index.html">الرئيسية</a></li><li><a class="" href="university-guide.html">دليل الجامعة</a></li><li><a class="" href="summaries.html">الملخصات</a></li><li><a class="" href="groups.html">المجموعات</a></li><li><a class="" href="projects.html">مشاريع الطلاب</a></li><li><a class="" href="ratings.html">التقييمات</a></li><li><a class="" href="tools.html">الأدوات</a></li></ul><div class="nav-actions"><button class="icon-btn mobile-menu" id="menuBtn">☰</button></div></div></header><main><section class="page-hero"><div class="container"><h1 data-ar="الجدول الدراسي" data-en="Study Schedule">الجدول الدراسي</h1><p>أنشئ جدولك، احفظه على جهازك واكتشف التعارضات.</p></div></section><section class="section"><div class="container"><div class="card form-card"><div class="form-grid"><div class="field"><label>المادة</label><input id="course"></div><div class="field"><label>اليوم</label><select id="day"><option>الأحد</option><option>الاثنين</option><option>الثلاثاء</option><option>الأربعاء</option><option>الخميس</option></select></div><div class="field"><label>من</label><input id="start" type="time" value="08:00"></div><div class="field"><label>إلى</label><input id="end" type="time" value="09:30"></div><div class="field"><label>القاعة</label><input id="room"></div><div class="field"><label>الدكتور</label><input id="teacher"></div></div><button class="btn primary" id="add" style="margin-top:14px">إضافة</button></div><div class="card form-card" style="margin-top:18px;overflow:auto"><div id="week" class="schedule-week"></div></div></div></section></main><div class="uon-independent-notice" role="note" aria-label="تنبيه عن طبيعة الموقع"><span class="uon-independent-notice__icon" aria-hidden="true">i</span><p><strong>تنبيه:</strong> UON Hub هو مشروع طلابي مستقل وغير تابع رسميًا لجامعة نزوى. جميع الشعارات والأسماء المستخدمة تعود لمالكيها، ويهدف الموقع إلى تسهيل وصول الطلبة إلى الخدمات والمعلومات.</p></div>
-<footer class="site-footer"><div class="container footer-row"><span>UON Hub · 2026</span><span>منصة طلابية مستقلة لطلاب جامعة نزوى</span></div></footer><div id="toast" class="toast"></div><script type="module" src="js/schedule.js?v=18.8"></script><aside class="notification-drawer" id="notificationDrawer"><div class="section-head"><h3>الإشعارات</h3><button class="icon-btn" id="closeNotifications">✕</button></div><div id="notificationItems" class="notification-list"></div></aside><script type="module">import {setupV14Shell} from "./js/v14-ui.js?v=18.8";setupV14Shell();</script><script type="module">import {applyFeatureStates} from "./js/core.js?v=18.8";applyFeatureStates(document);</script><script type="module" src="js/runtime-guard.js?v=18.8"></script><script type="module" src="js/v20-experience.js?v=22.3.0"></script><script type="module" src="/js/pwa-init.js?v=25.6.0"></script>
-<script type="module" src="js/content-reports.js?v=31.2.0"></script>
-</body></html>
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#060b1b">
+  <title>الجدول الدراسي | UON Hub</title>
+  <meta name="description" content="أنشئ جدولك الدراسي الأسبوعي واحفظه على جهازك واكتشف التعارضات بسهولة.">
+  <meta name="robots" content="index,follow,max-image-preview:large">
+  <link rel="canonical" href="https://www.uonhub.space/schedule.html">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="UON Hub">
+  <meta property="og:title" content="الجدول الدراسي | UON Hub">
+  <meta property="og:description" content="أنشئ جدولك الدراسي الأسبوعي واحفظه على جهازك واكتشف التعارضات بسهولة.">
+  <meta property="og:url" content="https://www.uonhub.space/schedule.html">
+  <meta property="og:image" content="https://www.uonhub.space/assets/unizwa-new-gate-v52.jpg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/app.css?v=43.0.0">
+  <link rel="stylesheet" href="css/ui-refresh-v24.css?v=43.0.0">
+  <link rel="stylesheet" href="css/schedule.css?v=43.0.0">
+  <link rel="stylesheet" href="/css/pwa.css?v=43.0.0">
+  <link rel="stylesheet" href="css/content-reports.css?v=42.0.0">
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="apple-touch-icon" href="/assets/icons/icon-192.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="UON Hub">
+</head>
+<body>
+<header class="site-header">
+  <div class="container nav">
+    <a class="brand" href="index.html"><span class="brand-mark">U1</span>UON <span>Hub</span></a>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="index.html">الرئيسية</a></li>
+      <li><a href="university-guide.html">دليل الجامعة</a></li>
+      <li><a href="summaries.html">الملخصات</a></li>
+      <li><a href="groups.html">المجموعات</a></li>
+      <li><a href="projects.html">مشاريع الطلاب</a></li>
+      <li><a href="ratings.html">التقييمات</a></li>
+      <li><a class="active" href="tools.html">الأدوات</a></li>
+    </ul>
+    <div class="nav-actions"><button class="icon-btn mobile-menu" id="menuBtn" type="button" aria-label="فتح القائمة">☰</button></div>
+  </div>
+</header>
+
+<main class="v14-page-main schedule-page">
+  <section class="page-hero schedule-hero">
+    <div class="container">
+      <span class="badge">Schedule V43</span>
+      <h1 data-ar="الجدول الدراسي" data-en="Study Schedule">الجدول الدراسي</h1>
+      <p data-ar="أنشئ جدولك، احفظه على جهازك واكتشف التعارضات قبل إضافة المحاضرة." data-en="Build your weekly schedule, save it on your device, and detect clashes before adding a class.">أنشئ جدولك، احفظه على جهازك واكتشف التعارضات قبل إضافة المحاضرة.</p>
+    </div>
+  </section>
+
+  <section class="section schedule-section">
+    <div class="container schedule-shell">
+      <section class="card schedule-form-card" aria-labelledby="scheduleFormTitle">
+        <div class="schedule-panel-head">
+          <div>
+            <h2 id="scheduleFormTitle" data-ar="إضافة محاضرة" data-en="Add a class">إضافة محاضرة</h2>
+            <p data-ar="الأوقات من 1:00 إلى 7:59 تُفهم مساءً تلقائيًا لتناسب أوقات الجامعة." data-en="Times from 1:00 to 7:59 are automatically treated as PM for university classes.">الأوقات من 1:00 إلى 7:59 تُفهم مساءً تلقائيًا لتناسب أوقات الجامعة.</p>
+          </div>
+        </div>
+
+        <form id="scheduleForm" class="schedule-form" novalidate>
+          <div class="schedule-form-grid">
+            <div class="field">
+              <label for="course" data-ar="المادة" data-en="Course">المادة</label>
+              <input id="course" name="course" maxlength="24" placeholder="INFS205" autocomplete="off" required>
+            </div>
+            <div class="field">
+              <label for="day" data-ar="اليوم" data-en="Day">اليوم</label>
+              <select id="day" name="day">
+                <option value="الأحد">الأحد</option>
+                <option value="الاثنين">الاثنين</option>
+                <option value="الثلاثاء">الثلاثاء</option>
+                <option value="الأربعاء">الأربعاء</option>
+                <option value="الخميس">الخميس</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="start" data-ar="من" data-en="From">من</label>
+              <input id="start" name="start" type="time" value="08:00" step="300" required>
+            </div>
+            <div class="field">
+              <label for="end" data-ar="إلى" data-en="To">إلى</label>
+              <input id="end" name="end" type="time" value="09:50" step="300" required>
+            </div>
+            <div class="field">
+              <label for="room" data-ar="القاعة" data-en="Room">القاعة</label>
+              <input id="room" name="room" maxlength="30" placeholder="8-3" autocomplete="off">
+            </div>
+            <div class="field">
+              <label for="teacher" data-ar="الدكتور" data-en="Instructor">الدكتور</label>
+              <input id="teacher" name="teacher" maxlength="80" placeholder="اسم الدكتور" autocomplete="off">
+            </div>
+          </div>
+          <div class="schedule-form-actions">
+            <button class="btn primary schedule-add" id="add" type="submit" data-ar="إضافة للجدول" data-en="Add to schedule">إضافة للجدول</button>
+            <span class="schedule-local-note" data-ar="يُحفظ الجدول على هذا الجهاز فقط." data-en="The schedule is saved only on this device.">يُحفظ الجدول على هذا الجهاز فقط.</span>
+          </div>
+        </form>
+      </section>
+
+      <section class="card schedule-board-card" aria-labelledby="scheduleBoardTitle">
+        <div class="schedule-board-head">
+          <div>
+            <h2 id="scheduleBoardTitle" data-ar="جدول الأسبوع" data-en="Weekly schedule">جدول الأسبوع</h2>
+            <span id="scheduleCount" class="schedule-count" aria-live="polite">0 محاضرات</span>
+          </div>
+          <button class="btn danger schedule-clear" id="clearSchedule" type="button" hidden data-ar="مسح الجدول" data-en="Clear schedule">مسح الجدول</button>
+        </div>
+        <div class="schedule-scroll" role="region" aria-label="الجدول الدراسي الأسبوعي" tabindex="0">
+          <div id="week" class="schedule-week"></div>
+        </div>
+      </section>
+    </div>
+  </section>
+</main>
+
+<div class="uon-independent-notice" role="note" aria-label="تنبيه عن طبيعة الموقع">
+  <span class="uon-independent-notice__icon" aria-hidden="true">i</span>
+  <p><strong>تنبيه:</strong> UON Hub هو مشروع طلابي مستقل وغير تابع رسميًا لجامعة نزوى. جميع الشعارات والأسماء المستخدمة تعود لمالكيها، ويهدف الموقع إلى تسهيل وصول الطلبة إلى الخدمات والمعلومات.</p>
+</div>
+<footer class="site-footer"><div class="container footer-row"><span>UON Hub · 2026</span><span>منصة طلابية مستقلة لطلاب جامعة نزوى</span></div></footer>
+<div id="toast" class="toast" aria-live="polite"></div>
+<aside class="notification-drawer" id="notificationDrawer"><div class="section-head"><h3>الإشعارات</h3><button class="icon-btn" id="closeNotifications" type="button">✕</button></div><div id="notificationItems" class="notification-list"></div></aside>
+
+<script type="module" src="js/schedule.js?v=43.0.0"></script>
+<script type="module">import {setupV14Shell} from './js/v14-ui.js?v=43.0.0';setupV14Shell();</script>
+<script type="module">import {applyFeatureStates} from './js/core.js?v=43.0.0';applyFeatureStates(document);</script>
+<script type="module" src="js/runtime-guard.js?v=43.0.0"></script>
+<script type="module" src="js/v20-experience.js?v=43.0.0"></script>
+<script type="module" src="/js/pwa-init.js?v=43.0.0"></script>
+<script type="module" src="js/content-reports.js?v=42.0.0"></script>
+</body>
+</html>
