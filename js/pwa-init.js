@@ -1,4 +1,4 @@
-const APP_VERSION='44.1.2';
+const APP_VERSION='45.0.0';
 const TEST_KEY='uonhub_pwa_test_mode';
 let deferredInstallPrompt=null;
 
@@ -16,7 +16,7 @@ function fixWhatsAppLogo(root=document){
   const compact=element.matches('a.uon44-secondary-card[data-tool-key="groups"]>span:first-child');
   element.replaceChildren();
   const image=document.createElement('img');
-  image.src='/assets/whatsapp-official.svg?v=44.1.2';
+  image.src='/assets/whatsapp-official.svg?v=45.0.0';
   image.alt='';
   image.setAttribute('aria-hidden','true');
   image.dataset.whatsappBrand='1';
@@ -70,6 +70,7 @@ async function bootUnifiedExperience(){
   }
   const experience=await import(`./platform-experience-v44.js?v=${APP_VERSION}`);
   experience.bootPlatformExperience();
+  if(document.querySelector('.home45'))document.querySelectorAll('.uon44-command-button,.uon44-catalog-meta').forEach(element=>element.remove());
  }catch(error){console.warn('Unified tools V44 skipped',error)}
 }
 async function boot(){
