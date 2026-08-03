@@ -1,4 +1,4 @@
-const APP_VERSION='42.0.0';
+const APP_VERSION='43.0.0';
 const TEST_KEY='uonhub_pwa_test_mode';
 let deferredInstallPrompt=null;
 function isAdminPage(){return document.body.classList.contains('admin-page')||/\/(admin|owner-dashboard)(?:\.html)?\/?$/.test(location.pathname)}
