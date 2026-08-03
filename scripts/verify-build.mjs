@@ -9,6 +9,7 @@ const modules=[
  'js/tools.js',
  'js/search.js',
  'js/go.js',
+ 'js/tool-preview-v44.js',
  'js/schedule-profile-boot-v44.js',
  'js/schedule.js',
  'js/schedule-extras-v44.js',
@@ -27,7 +28,7 @@ for(const file of ['vercel.json','manifest.webmanifest','package.json']){
  catch(error){failures.push(`${file}\n${error.message}`)}
 }
 
-const requiredFiles=['tools-control.html','go.html','schedule.html','css/tool-registry-v44.css','css/tools-control-v44.css','css/schedule-extras-v44.css'];
+const requiredFiles=['tools-control.html','tool-preview.html','go.html','schedule.html','css/tool-registry-v44.css','css/tools-control-v44.css','css/tool-preview-v44.css','css/schedule-extras-v44.css'];
 for(const file of requiredFiles){
  try{
   const content=await readFile(file,'utf8');
