@@ -63,10 +63,10 @@ function installSupportStyles(){
 }
 
 function supportMarkup(){
- return `<section class="h37-section h37-soft uon-support-centers" aria-labelledby="uonSupportCentersTitle">
+ return `<section class="h37-section uon-support-centers" aria-labelledby="uonSupportCentersTitle">
   <div class="h37-container">
    <div class="h37-head h37-reveal visible">
-    <div><h2 id="uonSupportCentersTitle">مراكز الدعم الأكاديمي</h2><p>دعم جامعي يساعدك في السنة التأسيسية ومواد التخصص.</p></div>
+    <div><h2 id="uonSupportCentersTitle">مراكز الدعم الأكاديمي</h2><p>خدمات مساندة للطلبة، مرتبة تحت الأدوات للوصول السريع.</p></div>
    </div>
    <div class="uon-support-grid h37-reveal visible">
     <article class="uon-support-card">
@@ -87,9 +87,11 @@ function ensureSupportCenters(){
  const main=document.querySelector('main.home37');
  if(!main)return false;
  if(main.querySelector('.uon-support-centers'))return true;
+ const toolsSection=main.querySelector('.h37-services')?.closest('.h37-section');
+ if(!toolsSection)return false;
  installSupportStyles();
- main.insertAdjacentHTML('beforeend',supportMarkup());
- console.info('UON support centers rendered');
+ toolsSection.insertAdjacentHTML('afterend',supportMarkup());
+ console.info('UON support centers rendered below tools');
  return true;
 }
 
