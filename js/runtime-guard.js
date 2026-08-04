@@ -49,15 +49,15 @@ function installSupportStyles(){
  style.textContent=`
  .uon-support-centers{position:relative}
  .uon-support-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
- .uon-support-card.h37-service{min-height:220px;padding:18px;display:flex;flex-direction:column;justify-content:flex-start}
- .uon-support-card .h37-service-icon{margin-bottom:15px}
- .uon-support-kicker{display:inline-flex;width:max-content;max-width:100%;margin-bottom:9px;padding:5px 9px;border:1px solid var(--h-border);border-radius:999px;background:#ffffff08;font-size:11px;font-weight:800;opacity:.72}
- .uon-support-card h3{margin:0;font-size:17px;line-height:1.55}
- .uon-support-card p{margin:8px 0 0;line-height:1.7;font-size:13px;opacity:.62}
- .uon-support-actions{margin-top:auto;padding-top:15px}
- .uon-support-card .btn{display:inline-flex;width:max-content;max-width:100%;align-items:center;justify-content:center;padding:9px 14px;font-size:13px}
- @media(max-width:650px){.uon-support-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.uon-support-card.h37-service{min-height:225px}}
- @media(max-width:430px){.uon-support-grid{grid-template-columns:1fr}.uon-support-card.h37-service{min-height:190px}}
+ .uon-support-card.h37-service{min-height:180px}
+ .uon-support-tool-icon.h37-service-icon{display:grid;place-items:center;width:54px;height:54px;margin:0 0 22px;border:1px solid rgba(139,92,246,.34);border-radius:16px;background:rgba(139,92,246,.055);color:#b9a5ff;box-shadow:inset 0 1px rgba(255,255,255,.04)}
+ .uon-support-tool-icon svg{width:29px;height:29px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+ .uon-support-card.h37-service strong{font-size:16px;line-height:1.55}
+ .uon-support-card.h37-service small{line-height:1.7;margin-top:auto;padding-top:10px}
+ @media(max-width:650px){
+  .uon-support-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .uon-support-card.h37-service{min-height:145px}
+ }
  `;
  document.head.append(style);
 }
@@ -69,20 +69,20 @@ function supportMarkup(){
     <div><h2 id="uonSupportCentersTitle">مراكز الدعم الأكاديمي</h2><p>خدمات مساندة للطالب بنفس نظام أدوات المنصة.</p></div>
    </div>
    <div class="uon-support-grid h37-reveal visible">
-    <article class="h37-service uon-support-card">
-     <span class="h37-service-icon" aria-hidden="true">🚀</span>
-     <span class="uon-support-kicker">لطلاب السنة التأسيسية</span>
-     <h3>ابدأ أقوى مع مركز أنجز</h3>
-     <p>دعم في الإنجليزية والرياضيات والحاسب ومهارات الدراسة.</p>
-     <div class="uon-support-actions"><a class="btn primary" href="https://portal.unizwa.edu.om/twc/" target="_blank" rel="noopener noreferrer">احجز موعدك</a></div>
-    </article>
-    <article class="h37-service uon-support-card">
-     <span class="h37-service-icon" aria-hidden="true">🎓</span>
-     <span class="uon-support-kicker">لطلاب التخصص</span>
-     <h3>مركز تعزيز مسالك التعلم</h3>
-     <p>جلسات دعم أكاديمي وورش مساندة في مواد التخصص الأساسية.</p>
-     <div class="uon-support-actions"><a class="btn primary" href="https://portal.unizwa.edu.om/twc/" target="_blank" rel="noopener noreferrer">احجز موعدك</a></div>
-    </article>
+    <a class="h37-service uon-support-card" href="https://portal.unizwa.edu.om/twc/" target="_blank" rel="noopener noreferrer" aria-label="فتح حجز مركز أنجز">
+     <span class="h37-service-icon uon-support-tool-icon" aria-hidden="true">
+      <svg viewBox="0 0 24 24"><path d="M14.5 5.5c2.6-2.6 5.8-2.8 5.8-2.8s-.2 3.2-2.8 5.8l-4.2 4.2-2-2 3.2-5.2Z"/><path d="m11.3 10.7-3.8-.2-3 3 5.1 1.1M13.3 12.7l.2 3.8-3 3-1.1-5.1M16.8 7.2h.01M6.5 17.5c-1.2.2-2.3 1.3-2.5 2.5 1.2-.2 2.3-1.3 2.5-2.5Z"/></svg>
+     </span>
+     <strong>مركز أنجز</strong>
+     <small>دعم طلاب السنة التأسيسية في الإنجليزية والرياضيات والحاسب ومهارات الدراسة.</small>
+    </a>
+    <a class="h37-service uon-support-card" href="https://portal.unizwa.edu.om/twc/" target="_blank" rel="noopener noreferrer" aria-label="فتح حجز مركز تعزيز مسالك التعلم">
+     <span class="h37-service-icon uon-support-tool-icon" aria-hidden="true">
+      <svg viewBox="0 0 24 24"><path d="m3 9 9-5 9 5-9 5-9-5Z"/><path d="M7 12v4.2c2.8 2.1 7.2 2.1 10 0V12M21 9v6"/></svg>
+     </span>
+     <strong>مركز تعزيز مسالك التعلم</strong>
+     <small>جلسات دعم أكاديمي وورش مساندة لطلاب التخصص في المواد الأساسية.</small>
+    </a>
    </div>
   </div>
  </section>`;
@@ -97,7 +97,7 @@ function ensureSupportCenters(){
  if(!toolsSection)return false;
  installSupportStyles();
  toolsSection.insertAdjacentHTML('afterend',supportMarkup());
- console.info('UON support centers rendered below tools with matching theme');
+ console.info('UON support centers rendered as tool cards');
  return true;
 }
 
