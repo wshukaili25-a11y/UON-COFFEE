@@ -1,13 +1,13 @@
-import {get} from './core.js?v=47.0.1';
+import {get} from './core.js?v=47.0.2';
 
 const STYLE_ID='uon47StudentToolsStyle';
-const VERSION='47.0.1';
+const VERSION='47.0.2';
 let installed=false;
 let observer=null;
 let queued=false;
-let supportSettingsPromise=null;
+let settingsPromise=null;
 
-const PATHS={
+const ICONS={
  schedule:'<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18"/><path d="m9 16 2 2 4-4"/>',
  courses:'<path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2Z"/><path d="M8 7h8M8 11h6"/>',
  gpa:'<rect x="4" y="2" width="16" height="20" rx="2"/><path d="M8 6h8M8 11h2M14 11h2M8 15h2M14 15h2M8 19h8"/>',
@@ -27,6 +27,10 @@ const PATHS={
  fallback:'<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>'
 };
 
+const english=()=>localStorage.getItem('uon_language')==='en';
+const text=(ar,en)=>english()?en:ar;
+const setText=(element,value)=>{if(element&&element.textContent!==value)element.textContent=value};
+
 function injectStyles(){
  if(document.getElementById(STYLE_ID))return;
  const link=document.createElement('link');
@@ -36,135 +40,87 @@ function injectStyles(){
  document.head.append(link);
 }
 
-function svg(key){
- const path=PATHS[key]||PATHS.fallback;
- return `<svg class="uon47-icon-svg" viewBox="0 0 24 24" aria-hidden="true">${path}</svg>`;
-}
+function svg(key){return `<svg class="uon47-icon-svg" viewBox="0 0 24 24" aria-hidden="true">${ICONS[key]||ICONS.fallback}</svg>`}
 
 function replaceIcon(element,key){
  if(!element)return;
- const expected=`${key}:${VERSION}`;
- if(element.dataset.uon47Icon===expected&&element.querySelector('.uon47-icon-svg'))return;
- element.dataset.uon47Icon=expected;
+ const marker=`${key}:${VERSION}`;
+ if(element.dataset.uon47Icon===marker&&element.querySelector('.uon47-icon-svg'))return;
+ element.dataset.uon47Icon=marker;
  element.classList.add('uon47-icon-frame');
  element.style.removeProperty('background-image');
- element.replaceChildren();
- element.insertAdjacentHTML('afterbegin',svg(key));
+ element.innerHTML=svg(key);
 }
 
 function applyToolIcons(root=document){
- root.querySelectorAll('[data-tool-key]').forEach(card=>{
-  const key=card.dataset.toolKey;
-  const icon=card.querySelector('.h37-service-icon,.tool-icon');
-  replaceIcon(icon,key);
- });
- root.querySelectorAll('.v18-primary-tools [data-feature],.v18-secondary-tools [data-feature]').forEach(card=>{
-  const key=card.dataset.feature;
-  const icon=card.querySelector('.v18-tool-icon')||card.querySelector(':scope > span:first-child');
-  replaceIcon(icon,key);
- });
+ root.querySelectorAll('[data-tool-key]').forEach(card=>replaceIcon(card.querySelector('.h37-service-icon,.tool-icon'),card.dataset.toolKey));
+ root.querySelectorAll('.v18-primary-tools [data-feature],.v18-secondary-tools [data-feature]').forEach(card=>replaceIcon(card.querySelector('.v18-tool-icon')||card.querySelector(':scope > span:first-child'),card.dataset.feature));
  replaceIcon(document.querySelector('#anjizCard .v251-support-icon'),'anjiz');
  replaceIcon(document.querySelector('#masalikCard .v251-support-icon'),'masalik');
 }
 
-function supportSectionMarkup(){
- const english=localStorage.getItem('uon_language')==='en';
+function supportMarkup(){
  return `<section class="h37-section h37-soft uon47-support-home" data-feature="support-centers" id="support-centers">
   <div class="h37-container">
-   <div class="h37-head v18-section-head"><div><h2 data-ar="مراكز الدعم للطالب" data-en="Student support centers">${english?'Student support centers':'مراكز الدعم للطالب'}</h2><p data-ar="مراكز تساعدك في السنة التأسيسية والتخصص، مع روابط الحجز المباشر." data-en="Support for foundation and major students, with direct booking links.">${english?'Support for foundation and major students, with direct booking links.':'مراكز تساعدك في السنة التأسيسية والتخصص، مع روابط الحجز المباشر.'}</p></div></div>
+   <div class="h37-head v18-section-head"><div><h2 data-ar="مراكز الدعم للطالب" data-en="Student support centers">${text('مراكز الدعم للطالب','Student support centers')}</h2><p data-ar="مراكز تساعدك في السنة التأسيسية والتخصص، مع روابط الحجز المباشر." data-en="Support for foundation and major students, with direct booking links.">${text('مراكز تساعدك في السنة التأسيسية والتخصص، مع روابط الحجز المباشر.','Support for foundation and major students, with direct booking links.')}</p></div></div>
    <div class="v18-centers v251-centers-no-images">
-    <article id="anjizCard" class="v251-support-card">
-     <div class="v251-support-icon" aria-hidden="true"></div>
-     <div class="v251-support-content"><span data-ar="لطلاب السنة التأسيسية" data-en="For foundation students">${english?'For foundation students':'لطلاب السنة التأسيسية'}</span><h3 id="anjizTitle">${english?'Anjiz Center':'مركز أنجز'}</h3><p id="anjizDescription">${english?'Support for foundation students in core skills.':'دعم لطلاب السنة التأسيسية في المهارات والمواد الأساسية.'}</p><a id="anjizLink" class="btn primary v251-booking-btn" target="_blank" rel="noopener noreferrer">${english?'Book now':'احجز الآن'}</a></div>
-    </article>
-    <article id="masalikCard" class="v251-support-card">
-     <div class="v251-support-icon" aria-hidden="true"></div>
-     <div class="v251-support-content"><span data-ar="لطلاب التخصص" data-en="For major students">${english?'For major students':'لطلاب التخصص'}</span><h3 id="masalikTitle">${english?'Masalik Learning Support Center':'مركز مسالك التعلم'}</h3><p id="masalikDescription">${english?'Academic support sessions for major courses.':'جلسات دعم أكاديمي لطلاب التخصص.'}</p><a id="masalikLink" class="btn primary v251-booking-btn" target="_blank" rel="noopener noreferrer">${english?'Book now':'احجز الآن'}</a></div>
-    </article>
+    <article id="anjizCard" class="v251-support-card"><div class="v251-support-icon" aria-hidden="true"></div><div class="v251-support-content"><span data-ar="لطلاب السنة التأسيسية" data-en="For foundation students">${text('لطلاب السنة التأسيسية','For foundation students')}</span><h3 id="anjizTitle">${text('مركز أنجز','Anjiz Center')}</h3><p id="anjizDescription">${text('دعم لطلاب السنة التأسيسية في المهارات والمواد الأساسية.','Support for foundation students in core skills.')}</p><a id="anjizLink" class="btn primary v251-booking-btn" target="_blank" rel="noopener noreferrer">${text('احجز الآن','Book now')}</a></div></article>
+    <article id="masalikCard" class="v251-support-card"><div class="v251-support-icon" aria-hidden="true"></div><div class="v251-support-content"><span data-ar="لطلاب التخصص" data-en="For major students">${text('لطلاب التخصص','For major students')}</span><h3 id="masalikTitle">${text('مركز مسالك التعلم','Masalik Learning Support Center')}</h3><p id="masalikDescription">${text('جلسات دعم أكاديمي لطلاب التخصص.','Academic support sessions for major courses.')}</p><a id="masalikLink" class="btn primary v251-booking-btn" target="_blank" rel="noopener noreferrer">${text('احجز الآن','Book now')}</a></div></article>
    </div>
   </div>
  </section>`;
 }
 
 function ensureSupportSection(){
- let support=document.querySelector('section[data-feature="support-centers"]');
- if(!support){
-  const main=document.querySelector('main');
-  if(!main)return null;
-  main.insertAdjacentHTML('beforeend',supportSectionMarkup());
-  support=document.querySelector('section[data-feature="support-centers"]');
- }
- return support;
+ let section=document.querySelector('section[data-feature="support-centers"]');
+ if(section)return section;
+ const main=document.querySelector('main');
+ if(!main)return null;
+ main.insertAdjacentHTML('beforeend',supportMarkup());
+ return document.querySelector('section[data-feature="support-centers"]');
 }
 
 function safeLink(value){
- try{
-  const url=new URL(String(value||''),location.origin);
-  return ['http:','https:'].includes(url.protocol)?url.href:'';
- }catch{return''}
+ try{const url=new URL(String(value||''),location.origin);return ['http:','https:'].includes(url.protocol)?url.href:''}catch{return''}
 }
 
-async function hydrateSupportCenters(){
- const support=ensureSupportSection();
- if(!support)return;
- if(!supportSettingsPromise){
-  supportSettingsPromise=get('site_settings','select=key,value&key=in.(anjiz_title,anjiz_description,anjiz_booking_url,anjiz_cta,masalik_title,masalik_description,masalik_booking_url,masalik_cta)').catch(()=>[]);
+async function hydrateSupport(section){
+ if(!section||section.dataset.uon47Settings==='ready'||section.dataset.uon47Settings==='loading')return;
+ section.dataset.uon47Settings='loading';
+ if(!settingsPromise){
+  settingsPromise=get('site_settings','select=key,value&key=in.(anjiz_title,anjiz_description,anjiz_booking_url,anjiz_cta,masalik_title,masalik_description,masalik_booking_url,masalik_cta)').catch(()=>[]);
  }
- const rows=await supportSettingsPromise;
+ const rows=await settingsPromise;
  const settings=Object.fromEntries((rows||[]).map(row=>[row.key,String(row.value??'')]));
- const english=localStorage.getItem('uon_language')==='en';
- const data=[
-  {prefix:'anjiz',fallbackTitle:english?'Anjiz Center':'مركز أنجز',fallbackCta:english?'Book now':'احجز الآن'},
-  {prefix:'masalik',fallbackTitle:english?'Masalik Learning Support Center':'مركز مسالك التعلم',fallbackCta:english?'Book now':'احجز الآن'}
- ];
- data.forEach(item=>{
-  const title=document.querySelector(`#${item.prefix}Title`);
-  const description=document.querySelector(`#${item.prefix}Description`);
-  const link=document.querySelector(`#${item.prefix}Link`);
-  if(title)title.textContent=settings[`${item.prefix}_title`]||item.fallbackTitle;
-  if(description&&settings[`${item.prefix}_description`])description.textContent=settings[`${item.prefix}_description`];
+ for(const prefix of ['anjiz','masalik']){
+  const title=document.querySelector(`#${prefix}Title`);
+  const description=document.querySelector(`#${prefix}Description`);
+  const link=document.querySelector(`#${prefix}Link`);
+  setText(title,settings[`${prefix}_title`]||title?.textContent||'');
+  if(settings[`${prefix}_description`])setText(description,settings[`${prefix}_description`]);
   if(link){
-   const href=safeLink(settings[`${item.prefix}_booking_url`]);
-   link.textContent=settings[`${item.prefix}_cta`]||item.fallbackCta;
-   link.href=href||'#';
-   link.hidden=!href;
+   const href=safeLink(settings[`${prefix}_booking_url`]);
+   setText(link,settings[`${prefix}_cta`]||text('احجز الآن','Book now'));
+   if(href&&link.href!==href)link.href=href;
+   if(link.hidden===Boolean(href))link.hidden=!href;
   }
- });
-}
-
-function positionSupportCenters(){
- const support=ensureSupportSection();
- const primaryRoot=document.querySelector('.h37-services,.v18-primary-tools');
- const primarySection=primaryRoot?.closest('section');
- document.querySelectorAll('.uon44-secondary-section').forEach(section=>section.remove());
- document.querySelectorAll('.v18-secondary-tools').forEach(grid=>{
-  const section=grid.closest('section');
-  if(section&&section!==support)section.remove();
- });
- if(!support||!primarySection)return;
- support.id='support-centers';
- support.classList.add('uon47-support-home');
- support.style.removeProperty('display');
- const heading=support.querySelector('.v18-section-head h2,.h37-head h2');
- if(heading){
-  heading.textContent=localStorage.getItem('uon_language')==='en'?'Student support centers':'مراكز الدعم للطالب';
-  heading.dataset.ar='مراكز الدعم للطالب';
-  heading.dataset.en='Student support centers';
  }
- if(support.previousElementSibling!==primarySection)primarySection.insertAdjacentElement('afterend',support);
- void hydrateSupportCenters().then(()=>applyToolIcons(support));
+ section.dataset.uon47Settings='ready';
 }
 
-function refresh(){
- positionSupportCenters();
- applyToolIcons();
+function positionSupport(){
+ const section=ensureSupportSection();
+ const primary=document.querySelector('.h37-services,.v18-primary-tools')?.closest('section');
+ document.querySelectorAll('.uon44-secondary-section').forEach(item=>item.remove());
+ document.querySelectorAll('.v18-secondary-tools').forEach(grid=>{const parent=grid.closest('section');if(parent&&parent!==section)parent.remove()});
+ if(!section||!primary)return;
+ setText(section.querySelector('.v18-section-head h2,.h37-head h2'),text('مراكز الدعم للطالب','Student support centers'));
+ if(section.previousElementSibling!==primary)primary.insertAdjacentElement('afterend',section);
+ void hydrateSupport(section).then(()=>applyToolIcons(section));
 }
 
-function queueRefresh(){
- if(queued)return;
- queued=true;
- requestAnimationFrame(()=>{queued=false;refresh()});
-}
+function refresh(){positionSupport();applyToolIcons()}
+function queueRefresh(){if(queued)return;queued=true;requestAnimationFrame(()=>{queued=false;refresh()})}
 
 export function installStudentToolsUI(){
  if(installed)return;
@@ -175,11 +131,13 @@ export function installStudentToolsUI(){
  observer.observe(document.body,{childList:true,subtree:true});
  document.addEventListener('uon:tool-catalog-updated',queueRefresh);
  document.addEventListener('uon:language-changed',()=>{
-  supportSettingsPromise=null;
+  settingsPromise=null;
+  const section=document.querySelector('section[data-feature="support-centers"]');
+  section?.removeAttribute('data-uon47-settings');
   queueRefresh();
  });
  setTimeout(queueRefresh,300);
  setTimeout(queueRefresh,1000);
  setTimeout(queueRefresh,2500);
- setTimeout(()=>observer?.disconnect(),45000);
+ setTimeout(()=>observer?.disconnect(),15000);
 }
