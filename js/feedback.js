@@ -35,30 +35,46 @@
     }
   }
 
+  function sessionId() {
+    const key = 'uon_anon_session';
+    let id = localStorage.getItem(key);
+    if (!id) {
+      id = crypto.randomUUID();
+      localStorage.setItem(key, id);
+    }
+    return id;
+  }
+
   async function submitSuggestion(payload) {
-    const response = await fetch(`${SUPABASE_URL}/rest/v1/feature_suggestions`, {
+    const response = await fetch(`${SUPABASE_URL}/rest/v1/rpc/uon_submit_feature_suggestion`, {
       method: 'POST',
       headers: {
         apikey: SUPABASE_KEY,
-        'Content-Type': 'application/json',
-        Prefer: 'return=minimal'
+        'Content-Type': 'application/json'
       },
-      body: JSON.stringify(payload),
+      body: JSON.stringify({
+        p_category: payload.category,
+        p_title: payload.title,
+        p_details: payload.details,
+        p_college: payload.college,
+        p_contact: payload.contact,
+        p_page_url: payload.page_url,
+        p_session_id: sessionId()
+      }),
       cache: 'no-store'
     });
 
+    const raw = await response.text();
+    let parsed = null;
+    try { parsed = raw ? JSON.parse(raw) : null; } catch { parsed = raw; }
     if (!response.ok) {
-      const raw = await response.text();
-      let message = raw;
-      try {
-        const parsed = JSON.parse(raw);
-        message = parsed.message || parsed.error_description || raw;
-      } catch {}
-      throw new Error(message || `HTTP ${response.status}`);
+      throw new Error(parsed?.message || parsed?.error_description || parsed || `HTTP ${response.status}`);
     }
+    return typeof parsed === 'string' ? parsed : parsed;
   }
 
   async function notifyAdmin(id) {
+    if (!id) return;
     try {
       await fetch(`${SUPABASE_URL}/functions/v1/telegram-admin`, {
         method: 'POST',
@@ -81,29 +97,24 @@
 
     populateColleges(collegeSelect);
 
-    // Capture phase prevents any older cached handler or browser fallback from reloading the page.
     form.addEventListener('submit', async event => {
       event.preventDefault();
       event.stopImmediatePropagation();
-
       if (form.dataset.submitting === 'true') return;
 
       const button = form.querySelector('button[type="submit"]');
       const data = new FormData(form);
-      const id = crypto.randomUUID();
       const payload = {
-        id,
         category: String(data.get('category') || '').trim(),
         college: String(data.get('college') || '').trim() || null,
         title: String(data.get('title') || '').trim(),
         details: String(data.get('details') || '').trim(),
         contact: String(data.get('contact') || '').trim() || null,
-        status: 'pending',
         page_url: location.href
       };
 
-      if (!payload.category || !payload.title || !payload.details) {
-        toast('أكمل نوع الاقتراح والعنوان والتفاصيل', true);
+      if (!payload.category || payload.title.length < 3 || payload.details.length < 10) {
+        toast('أكمل نوع الاقتراح، واكتب عنوانًا وتفاصيل أوضح', true);
         return;
       }
 
@@ -114,7 +125,7 @@
       }
 
       try {
-        await submitSuggestion(payload);
+        const id = await submitSuggestion(payload);
         void notifyAdmin(id);
         form.reset();
         populateColleges(collegeSelect);

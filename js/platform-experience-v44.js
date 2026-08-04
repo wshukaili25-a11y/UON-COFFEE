@@ -1,9 +1,24 @@
-import {rpc,submitPending,notifyPending,insert,toast,esc} from './core.js?v=44.0.0';
+import {rpc,notifyPending,toast,esc} from './core.js?v=44.0.0';
 import {getToolCatalog} from './tool-registry-v44.js?v=44.0.0';
 
 let booted=false;
 const lang=()=>localStorage.getItem('uon_language')==='en'||document.documentElement.lang?.startsWith('en')?'en':'ar';
 const t=(ar,en)=>lang()==='en'?en:ar;
+
+function safeHref(value,fallback='#'){
+ const raw=String(value??'').trim();
+ if(!raw)return fallback;
+ try{
+  const url=new URL(raw,location.origin);
+  return ['http:','https:'].includes(url.protocol)?url.href:fallback;
+ }catch{return fallback}
+}
+function sessionId(){
+ const key='uon_anon_session';
+ let id=localStorage.getItem(key);
+ if(!id){id=crypto.randomUUID();localStorage.setItem(key,id)}
+ return id;
+}
 
 function installCommandButton(){
  if(document.querySelector('#uon44CommandButton'))return;
@@ -30,7 +45,8 @@ async function loadAnnouncement(){
   const item=Array.isArray(rows)?rows[0]:null;
   if(!item)return;
   const notice=document.createElement('aside');notice.className='uon44-announcement';notice.setAttribute('role','status');
-  notice.innerHTML=`<span>${esc(item.type==='urgent'?'🚨':item.type==='important'?'⚠️':item.type==='event'?'📅':'📢')}</span><div><strong>${esc(item.title||'')}</strong><small>${esc(item.body||'')}</small></div>${item.button_url?`<a class="btn primary" href="${esc(item.button_url)}">${esc(item.button_text||t('فتح','Open'))}</a>`:''}<button type="button" aria-label="${t('إغلاق','Close')}">✕</button>`;
+  const buttonUrl=safeHref(item.button_url,'');
+  notice.innerHTML=`<span>${esc(item.type==='urgent'?'🚨':item.type==='important'?'⚠️':item.type==='event'?'📅':'📢')}</span><div><strong>${esc(item.title||'')}</strong><small>${esc(item.body||'')}</small></div>${buttonUrl?`<a class="btn primary" href="${esc(buttonUrl)}" rel="noopener">${esc(item.button_text||t('فتح','Open'))}</a>`:''}<button type="button" aria-label="${t('إغلاق','Close')}">✕</button>`;
   notice.querySelector('button').onclick=()=>{sessionStorage.setItem('uon44_announcement_dismissed','1');notice.remove()};
   document.body.append(notice);
  }catch(error){console.warn('Targeted announcement skipped',error)}
@@ -39,7 +55,7 @@ async function loadAnnouncement(){
 function createReportDialog(){
  if(document.querySelector('#uon44ReportDialog'))return document.querySelector('#uon44ReportDialog');
  const dialog=document.createElement('dialog');dialog.id='uon44ReportDialog';dialog.className='uon44-report-dialog';
- dialog.innerHTML=`<form class="uon44-report-form" method="dialog"><h2>${t('إبلاغ عن مشكلة','Report a problem')}</h2><p id="uon44ReportTarget"></p><input id="uon44ReportTool" type="hidden"><label>${t('نوع المشكلة','Problem type')}<select id="uon44ReportType"><option value="broken_link">${t('الرابط لا يعمل','Broken link')}</option><option value="incorrect">${t('معلومة غير صحيحة','Incorrect information')}</option><option value="display">${t('مشكلة في العرض','Display problem')}</option><option value="performance">${t('بطء أو تعليق','Slow or frozen')}</option><option value="other">${t('مشكلة أخرى','Other')}</option></select></label><label>${t('التفاصيل','Details')}<textarea id="uon44ReportDetails" maxlength="1200" required placeholder="${t('اشرح المشكلة باختصار…','Describe the problem briefly…')}"></textarea></label><label>${t('وسيلة تواصل اختيارية','Optional contact')}<input id="uon44ReportContact" maxlength="120" placeholder="Telegram / email"></label><div class="uon44-report-actions"><button class="btn" value="cancel" type="button" data-close-report>${t('إلغاء','Cancel')}</button><button class="btn primary" type="submit" value="submit">${t('إرسال البلاغ','Send report')}</button></div></form>`;
+ dialog.innerHTML=`<form class="uon44-report-form" method="dialog"><h2>${t('إبلاغ عن مشكلة','Report a problem')}</h2><p id="uon44ReportTarget"></p><input id="uon44ReportTool" type="hidden"><label>${t('نوع المشكلة','Problem type')}<select id="uon44ReportType"><option value="broken_link">${t('الرابط لا يعمل','Broken link')}</option><option value="wrong_content">${t('معلومة غير صحيحة','Incorrect information')}</option><option value="outdated">${t('محتوى قديم','Outdated content')}</option><option value="duplicate">${t('محتوى مكرر','Duplicate content')}</option><option value="other">${t('مشكلة أخرى','Other')}</option></select></label><label>${t('التفاصيل','Details')}<textarea id="uon44ReportDetails" maxlength="1000" required placeholder="${t('اشرح المشكلة باختصار…','Describe the problem briefly…')}"></textarea></label><label>${t('وسيلة تواصل اختيارية','Optional contact')}<input id="uon44ReportContact" maxlength="120" placeholder="Telegram / email"></label><div class="uon44-report-actions"><button class="btn" value="cancel" type="button" data-close-report>${t('إلغاء','Cancel')}</button><button class="btn primary" type="submit" value="submit">${t('إرسال البلاغ','Send report')}</button></div></form>`;
  document.body.append(dialog);
  dialog.querySelector('[data-close-report]').onclick=()=>dialog.close();
  dialog.querySelector('form').addEventListener('submit',submitReport);
@@ -49,7 +65,7 @@ function openReport(key=''){
  const dialog=createReportDialog();
  const item=getToolCatalog().items?.find(row=>row.key===key);
  dialog.querySelector('#uon44ReportTool').value=key;
- dialog.querySelector('#uon44ReportTarget').textContent=item?`${t('الأداة','Tool')}: ${lang()==='en'?(item.name_en||item.name_ar):item.name_ar}`:t('سيتم إرفاق الصفحة والجهاز تلقائيًا.','The page and device will be attached automatically.');
+ dialog.querySelector('#uon44ReportTarget').textContent=item?`${t('الأداة','Tool')}: ${lang()==='en'?(item.name_en||item.name_ar):item.name_ar}`:t('سيتم إرفاق الصفحة تلقائيًا.','The page will be attached automatically.');
  dialog.querySelector('#uon44ReportDetails').value='';
  dialog.showModal();
 }
@@ -59,33 +75,22 @@ async function submitReport(event){
  const toolKey=dialog.querySelector('#uon44ReportTool').value;
  const item=getToolCatalog().items?.find(row=>row.key===toolKey);
  const details=dialog.querySelector('#uon44ReportDetails').value.trim();
+ const contact=dialog.querySelector('#uon44ReportContact').value.trim();
  if(details.length<5){toast(t('اكتب تفاصيل أوضح للمشكلة','Add a little more detail'),true);return}
- const payload={
-  reason:dialog.querySelector('#uon44ReportType').value==='broken_link'?'broken_link':'other',
-  report_type:dialog.querySelector('#uon44ReportType').value,
-  content_title:item?.name_ar||document.title,
-  details,
-  page_url:location.href,
-  page_title:document.title,
-  source_table:item?'tool_registry':null,
-  source_id:item?.key||null,
-  source_url:item?.url||location.href,
-  status:'pending',
-  contact:dialog.querySelector('#uon44ReportContact').value.trim()||null,
-  client_context:{
-   viewport:`${innerWidth}x${innerHeight}`,
-   language:navigator.language,
-   online:navigator.onLine,
-   platform:navigator.platform,
-   user_agent:navigator.userAgent.slice(0,400),
-   catalog_version:getToolCatalog().version||44
-  }
- };
  try{
-  const report=await submitPending('content_reports',payload);
+  const reportId=await rpc('uon_submit_content_report',{
+   p_source_table:item?'tool_registry':null,
+   p_source_id:item?.key||null,
+   p_content_title:item?.name_ar||document.title,
+   p_source_url:item?.url||location.href,
+   p_report_type:dialog.querySelector('#uon44ReportType').value,
+   p_details:contact?`${details}\nالتواصل: ${contact}`:details,
+   p_page_url:location.href,
+   p_session_id:sessionId()
+  });
   dialog.close();toast(t('تم إرسال البلاغ للمشرف','Report sent to the moderator'));
-  notifyPending('content_reports',report.id).catch(()=>{});
- }catch(error){console.error(error);toast(t('تعذر إرسال البلاغ الآن','Could not send the report now'),true)}
+  if(reportId)notifyPending('content_reports',reportId).catch(()=>{});
+ }catch(error){console.error(error);toast(error?.message||t('تعذر إرسال البلاغ الآن','Could not send the report now'),true)}
 }
 
 function installReporting(){
@@ -94,25 +99,15 @@ function installReporting(){
  const button=document.createElement('button');button.type='button';button.className='uon44-report-page';button.hidden=true;button.onclick=()=>openReport('');document.body.append(button);
 }
 
-function installCatalogMeta(){
- let meta=document.querySelector('#uon44CatalogMeta');
- if(!meta){meta=document.createElement('span');meta.id='uon44CatalogMeta';meta.className='uon44-catalog-meta';document.body.append(meta)}
- const sync=detail=>{meta.textContent=`Tools V${detail?.version||getToolCatalog().version||44}`};
- sync();document.addEventListener('uon:tool-catalog-updated',event=>sync(event.detail));
-}
-
-function fingerprint(source,message,details={}){
- const raw=`${source}|${message}|${details.file||''}|${details.line||''}`;
- let hash=2166136261;
- for(let i=0;i<raw.length;i++){hash^=raw.charCodeAt(i);hash=Math.imul(hash,16777619)}
- return `web-${(hash>>>0).toString(16)}`;
-}
 async function logError(source,message,details={}){
+ const clean=String(message||'').trim().slice(0,500);
+ if(clean.length<3)return;
  try{
-  const key=fingerprint(source,message,details);
-  const existing=await fetch(`https://irkhvydgxpseflggbeqq.supabase.co/rest/v1/system_errors?select=id,occurrences&fingerprint=eq.${encodeURIComponent(key)}&status=eq.open&limit=1`,{headers:{apikey:'sb_publishable_gZ9tyM1udrkuQIXHqDtToQ_FyFmePgH'}}).then(response=>response.ok?response.json():[]).catch(()=>[]);
-  if(existing?.[0])return;
-  await insert('system_errors',{source,message:String(message).slice(0,1200),severity:'error',status:'open',fingerprint:key,occurrences:1,last_seen_at:new Date().toISOString(),details:{...details,page:location.href,user_agent:navigator.userAgent.slice(0,400)}} ,{returning:false});
+  await rpc('uon_report_client_error',{
+   p_message:clean,
+   p_source:String(source||'browser').slice(0,80),
+   p_details:{...details,page:location.href,user_agent:navigator.userAgent.slice(0,300)}
+  });
  }catch{}
 }
 function installErrorCapture(){
@@ -122,5 +117,5 @@ function installErrorCapture(){
 
 export function bootPlatformExperience(){
  if(booted)return;booted=true;
- installCommandButton();installReporting();installCatalogMeta();installErrorCapture();loadAnnouncement();
+ installCommandButton();installReporting();installErrorCapture();loadAnnouncement();
 }
