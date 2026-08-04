@@ -1,0 +1,19 @@
+const API='https://irkhvydgxpseflggbeqq.supabase.co/functions/v1/owner-dashboard-api';
+const SESSION_KEY='uon_owner_session_v42';
+const esc=value=>String(value??'').replace(/[&<>'"]/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[char]));
+const token=()=>sessionStorage.getItem(SESSION_KEY)||'';
+function toast(message,error=false){let el=document.querySelector('#toast');if(!el)return;el.textContent=message;el.className=`toast show${error?' error':''}`;clearTimeout(el._sessionTimer);el._sessionTimer=setTimeout(()=>el.className='toast',3200)}
+function deviceLabel(session){const name=session.device_name||session.user_agent||'جهاز غير معروف';return name.length>70?`${name.slice(0,67)}...`:name}
+function formatDate(value){if(!value)return '—';try{return new Date(value).toLocaleString('ar-OM')}catch{return String(value)}}
+async function call(action,payload={}){const current=token();if(!current)throw new Error('سجّل الدخول أولًا');const r=await fetch(API,{method:'POST',headers:{'Content-Type':'application/json','x-owner-session':current},body:JSON.stringify({action,...payload}),cache:'no-store'});const p=await r.json().catch(()=>({}));if(r.status===401){sessionStorage.removeItem(SESSION_KEY);location.reload();throw new Error('انتهت الجلسة')}if(!r.ok||!p.ok)throw new Error(p.error||'تعذر تنفيذ العملية');return p}
+function render(items=[]){const target=document.querySelector('#ownerSessions');if(!target)return;if(!items.length){target.innerHTML='<div class="owner42-empty">لا توجد جلسات نشطة</div>';return}target.innerHTML=items.map(item=>`<div class="owner42-row" data-session-id="${esc(item.id)}"><div><strong>${esc(deviceLabel(item))}${item.is_current?' · هذا الجهاز':''}</strong><small>آخر نشاط: ${esc(formatDate(item.last_seen_at||item.created_at))} · تنتهي: ${esc(formatDate(item.expires_at))}</small></div>${item.is_current?'<span class="badge">الحالية</span>':`<button class="btn danger" data-revoke-session="${esc(item.id)}">إنهاء</button>`}</div>`).join('')}
+async function loadSessions(){const target=document.querySelector('#ownerSessions');if(!token()){if(target)target.innerHTML='<div class="owner42-empty">سجّل الدخول لعرض الجلسات</div>';return}try{const p=await call('list_sessions',{device_name:navigator.platform||'',user_agent:navigator.userAgent});render(p.sessions||[])}catch(error){if(target)target.innerHTML=`<div class="owner42-empty">${esc(error.message)}</div>`}}
+async function revokeSession(id,button){if(!confirm('إنهاء هذه الجلسة؟'))return;button.disabled=true;try{await call('revoke_session',{session_id:id});toast('تم إنهاء الجلسة');await loadSessions()}catch(error){toast(error.message,true)}finally{button.disabled=false}}
+async function revokeOthers(){if(!confirm('إنهاء جميع الجلسات الأخرى والإبقاء على هذا الجهاز؟'))return;const button=document.querySelector('#revokeOtherSessions');button.disabled=true;try{const p=await call('revoke_other_sessions');toast(`تم إنهاء ${Number(p.revoked||0).toLocaleString('ar-OM')} جلسة`);await loadSessions()}catch(error){toast(error.message,true)}finally{button.disabled=false}}
+document.addEventListener('click',event=>{const button=event.target.closest('[data-revoke-session]');if(button)revokeSession(button.dataset.revokeSession,button)});
+document.querySelector('#refreshOwnerSessions')?.addEventListener('click',loadSessions);
+document.querySelector('#revokeOtherSessions')?.addEventListener('click',revokeOthers);
+window.addEventListener('storage',event=>{if(event.key===SESSION_KEY)loadSessions()});
+setTimeout(loadSessions,500);
+setInterval(()=>{if(!document.hidden&&token())call('touch_session',{device_name:navigator.platform||'',user_agent:navigator.userAgent}).catch(()=>{})},5*60*1000);
+window.UONOwnerSessions={refresh:loadSessions};
