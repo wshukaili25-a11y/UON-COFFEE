@@ -2,11 +2,41 @@ const SUPABASE_URL='https://irkhvydgxpseflggbeqq.supabase.co';
 const SUPABASE_KEY='sb_publishable_gZ9tyM1udrkuQIXHqDtToQ_FyFmePgH';
 const headers={apikey:SUPABASE_KEY,'Content-Type':'application/json'};
 const ADMIN_SESSION_TTL=30*60*1000;
+const VISIBLE_VERSION_RE=/\s+(?:v|V)\d+(?:\.\d+)*/g;
 
 export const $=(s,r=document)=>r.querySelector(s);
 export const $$=(s,r=document)=>[...r.querySelectorAll(s)];
 export const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 export const uid=()=>crypto.randomUUID();
+export function safeHref(value,fallback='#'){
+ try{
+  const url=new URL(String(value||fallback),location.origin);
+  return ['http:','https:'].includes(url.protocol)?url.href:fallback;
+ }catch{return fallback}
+}
+
+function stripVisibleVersion(value){return String(value||'').replace(VISIBLE_VERSION_RE,'').replace(/\s{2,}/g,' ').trim()}
+export function cleanVisibleVersionLabels(root=document){
+ if(!root)return;
+ const walker=document.createTreeWalker(root,NodeFilter.SHOW_TEXT,{acceptNode(node){
+  const parent=node.parentElement;
+  if(!parent||parent.closest('script,style,code,pre'))return NodeFilter.FILTER_REJECT;
+  return VISIBLE_VERSION_RE.test(node.nodeValue||'')?(VISIBLE_VERSION_RE.lastIndex=0,NodeFilter.FILTER_ACCEPT):(VISIBLE_VERSION_RE.lastIndex=0,NodeFilter.FILTER_REJECT);
+ }});
+ const nodes=[];while(walker.nextNode())nodes.push(walker.currentNode);
+ nodes.forEach(node=>{node.nodeValue=stripVisibleVersion(node.nodeValue)});
+ root.querySelectorAll?.('[placeholder],[title],[aria-label]').forEach(el=>{
+  for(const attr of ['placeholder','title','aria-label']){
+   if(el.hasAttribute(attr))el.setAttribute(attr,stripVisibleVersion(el.getAttribute(attr)));
+  }
+ });
+}
+function scheduleVersionCleanup(){
+ const run=()=>cleanVisibleVersionLabels(document);
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',run,{once:true});else queueMicrotask(run);
+ setTimeout(run,500);setTimeout(run,1800);
+}
+scheduleVersionCleanup();
 
 function onAdminPage(){
  return /\/admin(?:\.html)?\/?$/.test(location.pathname)||document.body?.classList.contains('admin-page');
@@ -44,15 +74,11 @@ export const get=(t,q='')=>api(t,{query:q,prefer:''});
 export const insert=(t,b,{returning=true}={})=>api(t,{method:'POST',body:b,prefer:returning?'return=representation':'return=minimal'});
 export async function submitPending(table,body){
  const payload={...body};
-
- // whatsapp_groups.id is an auto-generated INTEGER in PostgreSQL.
- // Never send a UUID for this table, even if another caller supplied one.
  if(table==='whatsapp_groups'){
   delete payload.id;
  }else if(!payload.id){
   payload.id=crypto.randomUUID();
  }
-
  await insert(table,payload,{returning:false});
  return payload;
 }
@@ -88,8 +114,6 @@ export function openModal(id){$('#'+id)?.classList.add('open')} export function 
 export async function notifyPending(table,id){
  try{await edge({source:'web-submit',table,id})}catch(e){console.warn('Notification fallback failed',e)}
 }
-
-
 
 export async function getUonState(){
  return await rpc('uon_public_state',{});
@@ -148,13 +172,11 @@ export function watchUonMaintenance(){
   }
  };
 
- // No interval: check only when the user returns to the tab/window.
  window.addEventListener('focus',check);
  document.addEventListener('visibilitychange',()=>{
   if(!document.hidden)check();
  });
 }
-
 
 export function debounce(fn,delay=250){
  let timer;
@@ -186,19 +208,18 @@ export function clearAdminSession(){
  sessionStorage.removeItem('uon_admin_password');
 }
 
-
 export async function trackEvent(eventType,metadata={}){
  try{
   const sessionKey='uon_anon_session';
   let sessionId=localStorage.getItem(sessionKey);
   if(!sessionId){sessionId=crypto.randomUUID();localStorage.setItem(sessionKey,sessionId)}
-  await insert('usage_events',{
-   event_type:eventType,
-   page_path:location.pathname,
-   session_id:sessionId,
-   metadata,
-   user_agent:navigator.userAgent.slice(0,300)
-  },{returning:false});
+  await rpc('uon_track_event',{
+   p_event_type:String(eventType||'').slice(0,80),
+   p_page_path:location.pathname,
+   p_session_id:sessionId,
+   p_metadata:metadata&&typeof metadata==='object'?metadata:{},
+   p_user_agent:navigator.userAgent.slice(0,300)
+  });
  }catch(error){console.warn('Usage tracking skipped',error)}
 }
 
@@ -211,7 +232,6 @@ export function trackClicks(){
   if(link.matches('a[href*="summaries"]'))trackEvent('summary_section_open',{href:link.getAttribute('href')});
  },{capture:true});
 }
-
 
 export async function getSetting(key,fallback=''){
  try{
@@ -227,10 +247,10 @@ export async function loadSocialLinks(){
   getSetting('instagram_url','')
  ]);
  document.querySelectorAll('[data-social="whatsapp"]').forEach(a=>{
-  a.href=whatsapp||'#';a.hidden=!whatsapp;
+  const href=safeHref(whatsapp,'#');a.href=href;a.hidden=href==='#';a.rel='noopener noreferrer';
  });
  document.querySelectorAll('[data-social="instagram"]').forEach(a=>{
-  a.href=instagram||'#';a.hidden=!instagram;
+  const href=safeHref(instagram,'#');a.href=href;a.hidden=href==='#';a.rel='noopener noreferrer';
  });
  return {whatsapp,instagram};
 }
@@ -239,14 +259,14 @@ export async function loadNotificationCenter(limit=20){
  const target=document.querySelector('#notificationItems');
  if(!target)return;
  try{
-  const rows=await get('site_notifications',`select=*&active=eq.true&order=created_at.desc&limit=${limit}`);
-  target.innerHTML=rows.length?rows.map(x=>`<a class="notification-item" href="${esc(x.url||'#')}">
+  const safeLimit=Math.max(1,Math.min(Number(limit)||20,50));
+  const rows=await get('site_notifications',`select=*&active=eq.true&order=created_at.desc&limit=${safeLimit}`);
+  target.innerHTML=rows.length?rows.map(x=>`<a class="notification-item" href="${esc(safeHref(x.url||'#','#'))}" rel="noopener">
    <span>${esc(x.icon||'🔔')}</span>
    <div><strong>${esc(x.title)}</strong><small>${esc(x.body||'')}</small></div>
   </a>`).join(''):'<div class="empty">لا توجد إشعارات جديدة</div>';
  }catch(error){target.innerHTML='<div class="empty">تعذر تحميل الإشعارات</div>'}
 }
-
 
 export function whatsappShare(title,url=location.href){
  const text=`${title}\n${url}`;
@@ -270,14 +290,18 @@ export async function reportBrokenLink({sourceTable,sourceId,title,url}){
 }
 
 export function installErrorCapture(){
+ const send=(source,message,details={})=>rpc('uon_report_client_error',{
+  p_message:String(message||'').slice(0,500),
+  p_source:String(source||'browser').slice(0,80),
+  p_details:{...details,page:location.href,user_agent:navigator.userAgent.slice(0,300)}
+ }).catch(()=>{});
  window.addEventListener('error',event=>{
-  insert('system_errors',{source:location.pathname,message:event.message||'Browser error',details:{file:event.filename,line:event.lineno}},{returning:false}).catch(()=>{});
+  send(location.pathname,event.message||'Browser error',{file:event.filename,line:event.lineno,column:event.colno});
  });
  window.addEventListener('unhandledrejection',event=>{
-  insert('system_errors',{source:location.pathname,message:String(event.reason?.message||event.reason||'Unhandled rejection')},{returning:false}).catch(()=>{});
+  send(location.pathname,String(event.reason?.message||event.reason||'Unhandled rejection'));
  });
 }
-
 
 export function featureStatusLabel(status){
  const lang=localStorage.getItem('uon_language')||'ar';
