@@ -48,16 +48,16 @@ function installSupportStyles(){
  style.id='uonSupportCentersStyle';
  style.textContent=`
  .uon-support-centers{position:relative}
- .uon-support-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
- .uon-support-card{display:grid;grid-template-columns:auto minmax(0,1fr);gap:18px;align-items:start;padding:24px;border:1px solid rgba(148,163,184,.18);border-radius:22px;background:linear-gradient(145deg,rgba(255,255,255,.08),rgba(255,255,255,.035));box-shadow:0 18px 45px rgba(2,6,23,.16)}
- .uon-support-icon{display:grid;place-items:center;width:58px;height:58px;border-radius:18px;background:rgba(56,189,248,.13);font-size:29px}
- .uon-support-content{min-width:0}
- .uon-support-kicker{display:block;margin-bottom:7px;font-size:.82rem;font-weight:800;opacity:.72}
- .uon-support-card h3{margin:0 0 8px;font-size:1.2rem;line-height:1.5}
- .uon-support-card p{margin:0 0 18px;line-height:1.85;opacity:.82}
- .uon-support-card .btn{display:inline-flex;width:max-content;max-width:100%;align-items:center;justify-content:center}
- @media(max-width:760px){.uon-support-grid{grid-template-columns:1fr}.uon-support-card{padding:20px;gap:14px}.uon-support-icon{width:50px;height:50px;font-size:25px}}
- @media(max-width:430px){.uon-support-card{grid-template-columns:1fr}.uon-support-icon{width:48px;height:48px}}
+ .uon-support-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+ .uon-support-card.h37-service{min-height:220px;padding:18px;display:flex;flex-direction:column;justify-content:flex-start}
+ .uon-support-card .h37-service-icon{margin-bottom:15px}
+ .uon-support-kicker{display:inline-flex;width:max-content;max-width:100%;margin-bottom:9px;padding:5px 9px;border:1px solid var(--h-border);border-radius:999px;background:#ffffff08;font-size:11px;font-weight:800;opacity:.72}
+ .uon-support-card h3{margin:0;font-size:17px;line-height:1.55}
+ .uon-support-card p{margin:8px 0 0;line-height:1.7;font-size:13px;opacity:.62}
+ .uon-support-actions{margin-top:auto;padding-top:15px}
+ .uon-support-card .btn{display:inline-flex;width:max-content;max-width:100%;align-items:center;justify-content:center;padding:9px 14px;font-size:13px}
+ @media(max-width:650px){.uon-support-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.uon-support-card.h37-service{min-height:225px}}
+ @media(max-width:430px){.uon-support-grid{grid-template-columns:1fr}.uon-support-card.h37-service{min-height:190px}}
  `;
  document.head.append(style);
 }
@@ -66,16 +66,22 @@ function supportMarkup(){
  return `<section class="h37-section uon-support-centers" aria-labelledby="uonSupportCentersTitle">
   <div class="h37-container">
    <div class="h37-head h37-reveal visible">
-    <div><h2 id="uonSupportCentersTitle">مراكز الدعم الأكاديمي</h2><p>خدمات مساندة للطلبة، مرتبة تحت الأدوات للوصول السريع.</p></div>
+    <div><h2 id="uonSupportCentersTitle">مراكز الدعم الأكاديمي</h2><p>خدمات مساندة للطالب بنفس نظام أدوات المنصة.</p></div>
    </div>
    <div class="uon-support-grid h37-reveal visible">
-    <article class="uon-support-card">
-     <div class="uon-support-icon" aria-hidden="true">🚀</div>
-     <div class="uon-support-content"><span class="uon-support-kicker">لطلاب السنة التأسيسية</span><h3>ابدأ أقوى مع مركز أنجز</h3><p>دعم مخصص لطلاب السنة التأسيسية في الإنجليزية والرياضيات والحاسب ومهارات الدراسة.</p><a class="btn primary" href="https://portal.unizwa.edu.om/twc/" target="_blank" rel="noopener noreferrer">احجز موعدك</a></div>
+    <article class="h37-service uon-support-card">
+     <span class="h37-service-icon" aria-hidden="true">🚀</span>
+     <span class="uon-support-kicker">لطلاب السنة التأسيسية</span>
+     <h3>ابدأ أقوى مع مركز أنجز</h3>
+     <p>دعم في الإنجليزية والرياضيات والحاسب ومهارات الدراسة.</p>
+     <div class="uon-support-actions"><a class="btn primary" href="https://portal.unizwa.edu.om/twc/" target="_blank" rel="noopener noreferrer">احجز موعدك</a></div>
     </article>
-    <article class="uon-support-card">
-     <div class="uon-support-icon" aria-hidden="true">🎓</div>
-     <div class="uon-support-content"><span class="uon-support-kicker">لطلاب التخصص</span><h3>طوّر مستواك مع مركز تعزيز مسالك التعلم</h3><p>جلسات دعم أكاديمي وورش صغيرة لطلاب التخصص في المواد الأساسية.</p><a class="btn primary" href="https://portal.unizwa.edu.om/twc/" target="_blank" rel="noopener noreferrer">احجز موعدك</a></div>
+    <article class="h37-service uon-support-card">
+     <span class="h37-service-icon" aria-hidden="true">🎓</span>
+     <span class="uon-support-kicker">لطلاب التخصص</span>
+     <h3>مركز تعزيز مسالك التعلم</h3>
+     <p>جلسات دعم أكاديمي وورش مساندة في مواد التخصص الأساسية.</p>
+     <div class="uon-support-actions"><a class="btn primary" href="https://portal.unizwa.edu.om/twc/" target="_blank" rel="noopener noreferrer">احجز موعدك</a></div>
     </article>
    </div>
   </div>
@@ -91,7 +97,7 @@ function ensureSupportCenters(){
  if(!toolsSection)return false;
  installSupportStyles();
  toolsSection.insertAdjacentHTML('afterend',supportMarkup());
- console.info('UON support centers rendered below tools');
+ console.info('UON support centers rendered below tools with matching theme');
  return true;
 }
 
