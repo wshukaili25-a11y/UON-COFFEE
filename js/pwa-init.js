@@ -1,4 +1,4 @@
-const APP_VERSION='44.1.2';
+const APP_VERSION='47.0.0';
 const TEST_KEY='uonhub_pwa_test_mode';
 let deferredInstallPrompt=null;
 
@@ -16,7 +16,7 @@ function fixWhatsAppLogo(root=document){
   const compact=element.matches('a.uon44-secondary-card[data-tool-key="groups"]>span:first-child');
   element.replaceChildren();
   const image=document.createElement('img');
-  image.src='/assets/whatsapp-official.svg?v=44.1.2';
+  image.src='/assets/whatsapp-official.svg?v=47.0.0';
   image.alt='';
   image.setAttribute('aria-hidden','true');
   image.dataset.whatsappBrand='1';
@@ -78,6 +78,7 @@ async function boot(){
  await registerServiceWorker();
  try{const{installLanguageLayer}=await import(`./language-v41.js?v=${APP_VERSION}`);installLanguageLayer()}catch(error){console.warn('Language layer failed',error)}
  await bootUnifiedExperience();
+ try{const{installStudentToolsUI}=await import(`./student-tools-ui-v47.js?v=${APP_VERSION}`);installStudentToolsUI()}catch(error){console.warn('Student tools UI skipped',error)}
  watchWhatsAppLogo();
  try{const{applyFeatureStates}=await import(`./core.js?v=${APP_VERSION}`);const state=await applyFeatureStates(document);applyVisibility(state,document);setTimeout(()=>{applyVisibility(state,document);fixWhatsAppLogo()},1200)}catch(error){console.warn('Feature state bootstrap skipped',error)}
 }
