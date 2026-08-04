@@ -7,6 +7,8 @@ const modules=[
  'js/tool-registry-v44.js',
  'js/platform-experience-v44.js',
  'js/tools.js',
+ 'js/tools-primary-v46.js',
+ 'js/useful-sites.js',
  'js/search.js',
  'js/go.js',
  'js/tool-preview-v44.js',
@@ -28,7 +30,11 @@ for(const file of ['vercel.json','manifest.webmanifest','package.json']){
  catch(error){failures.push(`${file}\n${error.message}`)}
 }
 
-const requiredFiles=['tools-control.html','tool-preview.html','go.html','schedule.html','css/tool-registry-v44.css','css/tools-control-v44.css','css/tool-preview-v44.css','css/schedule-extras-v44.css'];
+const requiredFiles=[
+ 'tools-control.html','tool-preview.html','go.html','schedule.html','tools.html','useful-sites.html',
+ 'css/tool-registry-v44.css','css/tools-control-v44.css','css/tool-preview-v44.css','css/schedule-extras-v44.css',
+ 'css/tools-primary-v46.css','css/useful-sites-v46.css'
+];
 for(const file of requiredFiles){
  try{
   const content=await readFile(file,'utf8');
@@ -37,7 +43,7 @@ for(const file of requiredFiles){
 }
 
 if(failures.length){
- console.error(`V44 verification failed:\n\n${failures.join('\n\n')}`);
+ console.error(`V44/V46 verification failed:\n\n${failures.join('\n\n')}`);
  process.exit(1);
 }
-console.log(`V44 verification passed (${modules.length} modules).`);
+console.log(`V44/V46 verification passed (${modules.length} modules).`);
