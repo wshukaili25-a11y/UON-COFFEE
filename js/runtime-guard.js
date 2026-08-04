@@ -106,8 +106,8 @@ async function loadSupportSettings(){
 }
 
 async function ensureSupportCenters(){
- if(!isHomePage()||document.querySelector('.uon-support-centers'))return;
- const main=document.querySelector('main.home37,main.v18-home,main');
+ if(!isHomePage()||document.querySelector('.uon-support-centers'))return true;
+ const main=document.querySelector('main.home37');
  if(!main)return false;
  installSupportStyles();
  const settings=await loadSupportSettings();
@@ -139,7 +139,7 @@ if(isHomePage()){
  const restore=async()=>{
   if(await ensureSupportCenters())return;
   tries+=1;
-  if(tries<30)setTimeout(restore,120);
+  if(tries<40)setTimeout(restore,120);
  };
  restore();
 }
