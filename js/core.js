@@ -9,8 +9,10 @@ export const $$=(s,r=document)=>[...r.querySelectorAll(s)];
 export const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 export const uid=()=>crypto.randomUUID();
 export function safeHref(value,fallback='#'){
+ const raw=String(value??'').trim();
+ if(!raw)return fallback;
  try{
-  const url=new URL(String(value||fallback),location.origin);
+  const url=new URL(raw,location.origin);
   return ['http:','https:'].includes(url.protocol)?url.href:fallback;
  }catch{return fallback}
 }
