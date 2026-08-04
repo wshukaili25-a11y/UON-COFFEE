@@ -1,4 +1,7 @@
-const PRIMARY_KEYS=['schedule','courses','gpa','projects','confessions','useful-sites'];
+const PRIMARY_KEYS=[
+ 'schedule','courses','gpa','projects','confessions','useful-sites',
+ 'summaries','groups','university-guide','ratings','assistant','calendar'
+];
 const target=document.querySelector('#items');
 let arranging=false;
 let queued=false;
@@ -6,11 +9,11 @@ let queued=false;
 const language=()=>localStorage.getItem('uon_language')==='en'?'en':'ar';
 const text=(ar,en)=>language()==='en'?en:ar;
 
-function group(title,description,cards,kind){
+function group(cards){
  if(!cards.length)return null;
  const section=document.createElement('section');
- section.className=`uon46-tools-group ${kind}`;
- section.innerHTML=`<div class="uon46-tools-group-head"><div><h2>${title}</h2><p>${description}</p></div>${kind==='primary'?`<span class="uon46-tools-group-badge">★ ${text('الأكثر استخدامًا','Most used')}</span>`:''}</div><div class="uon46-tools-grid"></div>`;
+ section.className='uon46-tools-group primary';
+ section.innerHTML=`<div class="uon46-tools-group-head"><div><h2>${text('الأدوات الأساسية','Essential tools')}</h2><p>${text('كل أدوات وخدمات الطالب في مكان واحد.','All student tools and services in one place.')}</p></div><span class="uon46-tools-group-badge">★ ${text('كل الخدمات','All services')}</span></div><div class="uon46-tools-grid"></div>`;
  const grid=section.querySelector('.uon46-tools-grid');
  cards.forEach(card=>grid.append(card));
  return section;
@@ -23,26 +26,12 @@ function arrange(){
  arranging=true;
  try{
   const byKey=new Map(directCards.map(card=>[card.dataset.toolKey,card]));
-  const primary=PRIMARY_KEYS.map(key=>byKey.get(key)).filter(Boolean);
-  const primarySet=new Set(primary);
-  const others=directCards.filter(card=>!primarySet.has(card));
-  const fragment=document.createDocumentFragment();
-  const mainGroup=group(
-   text('الأدوات الأساسية','Essential tools'),
-   text('أهم الأدوات التي يحتاجها الطالب يوميًا.','The tools students use most often.'),
-   primary,
-   'primary'
-  );
-  const otherGroup=group(
-   text('خدمات وأدوات أخرى','Other services and tools'),
-   text('بقية خدمات UON Hub والأدوات الطلابية.','More UON Hub services and student tools.'),
-   others,
-   'secondary'
-  );
-  if(mainGroup)fragment.append(mainGroup);
-  if(otherGroup)fragment.append(otherGroup);
+  const ordered=PRIMARY_KEYS.map(key=>byKey.get(key)).filter(Boolean);
+  const orderedSet=new Set(ordered);
+  directCards.filter(card=>!orderedSet.has(card)).forEach(card=>ordered.push(card));
+  const mainGroup=group(ordered);
   target.classList.add('uon46-tools-root');
-  target.replaceChildren(fragment);
+  target.replaceChildren(mainGroup||document.createDocumentFragment());
  }finally{
   arranging=false;
  }
