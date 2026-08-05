@@ -1,4 +1,4 @@
-const APP_VERSION='48.0.3';
+const APP_VERSION='48.0.4';
 const TEST_KEY='uonhub_pwa_test_mode';
 let deferredInstallPrompt=null;
 
