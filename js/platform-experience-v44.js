@@ -22,7 +22,7 @@ function sessionId(){
 
 function installCommandButton(){
  if(document.querySelector('#uon44CommandButton'))return;
- const button=document.createElement('button');button.id='uon44CommandButton';button.className='uon44-command-button';button.type='button';
+ const button=document.createElement('button');button.id='uon44CommandButton';button.className='uon44-command-button';button.type='button';button.hidden=true;
  button.innerHTML=`<span>🔎</span><span>${t('بحث شامل','Global search')}</span><kbd>Ctrl K</kbd>`;
  button.addEventListener('click',openSearch);
  document.body.append(button);
@@ -55,7 +55,7 @@ async function loadAnnouncement(){
 function createReportDialog(){
  if(document.querySelector('#uon44ReportDialog'))return document.querySelector('#uon44ReportDialog');
  const dialog=document.createElement('dialog');dialog.id='uon44ReportDialog';dialog.className='uon44-report-dialog';
- dialog.innerHTML=`<form class="uon44-report-form" method="dialog"><h2>${t('إبلاغ عن مشكلة','Report a problem')}</h2><p id="uon44ReportTarget"></p><input id="uon44ReportTool" type="hidden"><label>${t('نوع المشكلة','Problem type')}<select id="uon44ReportType"><option value="broken_link">${t('الرابط لا يعمل','Broken link')}</option><option value="wrong_content">${t('معلومة غير صحيحة','Incorrect information')}</option><option value="outdated">${t('محتوى قديم','Outdated content')}</option><option value="duplicate">${t('محتوى مكرر','Duplicate content')}</option><option value="other">${t('مشكلة أخرى','Other')}</option></select></label><label>${t('التفاصيل','Details')}<textarea id="uon44ReportDetails" maxlength="1000" required placeholder="${t('اشرح المشكلة باختصار…','Describe the problem briefly…')}"></textarea></label><label>${t('وسيلة تواصل اختيارية','Optional contact')}<input id="uon44ReportContact" maxlength="120" placeholder="Telegram / email"></label><div class="uon44-report-actions"><button class="btn" value="cancel" type="button" data-close-report>${t('إلغاء','Cancel')}</button><button class="btn primary" type="submit" value="submit">${t('إرسال البلاغ','Send report')}</button></div></form>`;
+ dialog.innerHTML=`<form class="uon44-report-form" method="dialog"><h2>${t('إبلاغ عن مشكلة','Report a problem')}</h2><p id="uon44ReportTarget"></p><input id="uon44ReportTool" type="hidden"><label>${t('نوع المشكلة','Problem type')}<select id="uon44ReportType"><option value="broken_link">${t('الرابط لا يعمل','Broken link')}</option><option value="wrong_content">${t('معلومة غير صحيحة','Incorrect information')}</option><option value="outdated">${t('محتوى قديم','Outdated content')}</option><option value="duplicate">${t('محتوى مكرر','Duplicate content')}</option><option value="other">${t('مشكلة أخرى','Other')}</option></select></label><label>${t('التفاصيل','Details')}<textarea id="uon44ReportDetails" maxlength="1000" required placeholder="${t('اشرح المشكلة باختصار…','Describe the problem briefly…')}"></textarea></label><label>${t('وسيلة تواصل اختيارية','Optional contact')}<input id="uon44ReportContact" maxlength="120" placeholder="${t('رقم هاتفك / حسابك على Instagram','Your phone number / Instagram account')}"></label><div class="uon44-report-actions"><button class="btn" value="cancel" type="button" data-close-report>${t('إلغاء','Cancel')}</button><button class="btn primary" type="submit" value="submit">${t('إرسال البلاغ','Send report')}</button></div></form>`;
  document.body.append(dialog);
  dialog.querySelector('[data-close-report]').onclick=()=>dialog.close();
  dialog.querySelector('form').addEventListener('submit',submitReport);
