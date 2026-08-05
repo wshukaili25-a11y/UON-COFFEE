@@ -101,7 +101,7 @@ top_events as (
   group by 1 order by total desc limit 10
 ),
 hourly as (
-  select extract(hour from created_at at time zone 'Asia/Muscat')::int hour, count(*) total
+  select extract(hour from created_at at time zone 'Asia/Muscat')::int as peak_hour, count(*) total
   from base
   group by 1 order by total desc limit 6
 ),
