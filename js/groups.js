@@ -4,7 +4,6 @@ import {
  watchUonMaintenance,
  $,
  get,
- insert,
  submitPending,
  notifyPending,
  toast,
@@ -22,8 +21,9 @@ const searchInput=$('#groupSearch');
 const collegeFilter=$('#groupCollege');
 const itemsContainer=$('#groupsGrid');
 
-fillCollege(collegeFilter);
-fillCollege($('#collegeInput'),{other:true});
+if(collegeFilter)fillCollege(collegeFilter);
+const collegeInput=$('#collegeInput');
+if(collegeInput)fillCollege(collegeInput,{other:true});
 
 let rows=[];
 
@@ -42,8 +42,6 @@ async function load(){
  if(!itemsContainer)return;
  itemsContainer.innerHTML='<div class="group-empty">جاري تحميل المجموعات…</div>';
  try{
-  // Prefer the approved-only query. If the API rejects that filter (for example
-  // after a schema/RLS change), retry with a plain read and filter approval locally.
   try{
    rows=await get('whatsapp_groups','select=*&approved=eq.true&order=created_at.desc');
   }catch(primaryError){
@@ -60,12 +58,10 @@ async function load(){
 function render(){
  const query=(searchInput?.value||'').trim().toLowerCase();
  const college=collegeFilter?.value||'';
-
  const filtered=rows.filter(item=>
   (!college||item.college===college)&&
   `${item.subject||''} ${item.course_code||''} ${item.college||''}`.toLowerCase().includes(query)
  );
-
  if(!itemsContainer)return;
  itemsContainer.innerHTML=filtered.length
   ?filtered.map(item=>`
@@ -86,9 +82,9 @@ function render(){
   :'<div class="empty">لا توجد مجموعات مطابقة حاليًا</div>';
 }
 
-$('#collegeInput')?.addEventListener('change',()=>{
+collegeInput?.addEventListener('change',()=>{
  const field=$('#otherCollegeField');
- if(field)field.hidden=$('#collegeInput').value!=='أخرى';
+ if(field)field.hidden=collegeInput.value!=='أخرى';
 });
 
 searchInput?.addEventListener('input',render);
@@ -104,11 +100,9 @@ $('#closeForm')?.addEventListener('click',()=>closeModal('submitModal'));
 $('#submitForm')?.addEventListener('submit',async event=>{
  event.preventDefault();
  const body=Object.fromEntries(new FormData(event.target));
-
- if(body.college==='أخرى')body.college=$('#otherCollege').value.trim();
+ if(body.college==='أخرى')body.college=$('#otherCollege')?.value?.trim()||'';
  body.approved=false;
  delete body.id;
-
  try{
   const result=await submitPending('whatsapp_groups',body);
   if(result?.id)await notifyPending('whatsapp_groups',result.id);
