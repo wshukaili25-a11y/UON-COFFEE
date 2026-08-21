@@ -39,8 +39,18 @@ function showLoadError(error){
 }
 
 async function load(){
+ if(!itemsContainer)return;
+ itemsContainer.innerHTML='<div class="group-empty">جاري تحميل المجموعات…</div>';
  try{
-  rows=await get('whatsapp_groups','select=*&approved=eq.true&order=created_at.desc');
+  // Prefer the approved-only query. If the API rejects that filter (for example
+  // after a schema/RLS change), retry with a plain read and filter approval locally.
+  try{
+   rows=await get('whatsapp_groups','select=*&approved=eq.true&order=created_at.desc');
+  }catch(primaryError){
+   console.warn('Approved WhatsApp groups query failed; retrying plain read',primaryError);
+   rows=await get('whatsapp_groups','select=*&order=created_at.desc');
+  }
+  rows=(Array.isArray(rows)?rows:[]).filter(item=>item?.approved===true||item?.approved==='true'||item?.approved===1);
   render();
  }catch(error){
   showLoadError(error);
