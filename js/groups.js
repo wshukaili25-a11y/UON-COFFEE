@@ -23,7 +23,7 @@ const itemsContainer=$('#groupsGrid');
 
 if(collegeFilter)fillCollege(collegeFilter);
 const collegeInput=$('#collegeInput');
-if(collegeInput)fillCollege(collegeInput,{other:true});
+if(collegeInput)fillCollege(collegeInput);
 
 let rows=[];
 
@@ -99,8 +99,11 @@ $('#closeForm')?.addEventListener('click',()=>closeModal('submitModal'));
 
 $('#submitForm')?.addEventListener('submit',async event=>{
  event.preventDefault();
- const body=Object.fromEntries(new FormData(event.target));
- if(body.college==='أخرى')body.college=$('#otherCollege')?.value?.trim()||'';
+ const raw=Object.fromEntries(new FormData(event.target));
+ const body={};
+ for(const key of ['subject','course_code','college','link','description']){
+  if(raw[key]!==undefined)body[key]=String(raw[key]||'').trim();
+ }
  body.approved=false;
  delete body.id;
  try{
