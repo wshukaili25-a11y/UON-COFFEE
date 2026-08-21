@@ -7,3 +7,5 @@ html{scroll-behavior:smooth}.home37 a,.home37 button{touch-action:manipulation}.
 @media(max-width:700px){.home37 .h37-search{display:grid;grid-template-columns:1fr auto;gap:8px;padding:7px}.home37 .h37-search .btn{padding-inline:15px}.home37 .h37-services{grid-template-columns:repeat(2,minmax(0,1fr))}.home37 .h37-service{min-height:155px;padding:17px}.home37 .h37-service strong{font-size:.92rem}.home37 .h37-service small{font-size:.76rem}.home37 .h37-content-grid{grid-template-columns:1fr}.home37 .h37-links{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:430px){.home37 .h37-services{gap:9px}.home37 .h37-service{min-height:145px;padding:14px}.home37 .h37-links{gap:8px}.home37 .h37-search{grid-template-columns:1fr}.home37 .h37-search .btn{width:100%}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.home37 .h37-service,.home37 .h37-link{transition:none}}
+/* Keep all service cards unchanged. Remove only the old hero Browse Summaries button. */
+.home37 .h37-hero-actions a[href="summaries.html"]{display:none!important}
