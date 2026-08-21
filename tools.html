@@ -42,7 +42,7 @@
 </header>
 
 <main>
-  <section class="page-hero">
+  <section class="page-hero tools-page-hero">
     <div class="container">
       <span class="student-label">أدوات UON Hub</span>
       <h1>كل أدوات الطالب في مكان واحد</h1>
@@ -50,7 +50,7 @@
     </div>
   </section>
 
-  <section class="section">
+  <section class="section tools-section">
     <div class="container">
       <div class="toolbar tools-toolbar" aria-label="تصفية الأدوات">
         <input id="search" type="search" placeholder="ابحث عن أداة أو خدمة" aria-label="البحث عن أداة أو خدمة">
@@ -94,6 +94,35 @@
   @media(max-width:900px){.tools-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
   @media(max-width:650px){.tools-toolbar{grid-template-columns:1fr}.tools-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.uon44-tool-card{min-height:155px}}
   @media(max-width:380px){.tools-grid{grid-template-columns:1fr 1fr}}
+
+  /* Mobile page polish: same existing colors, medium comfortable spacing. */
+  .tools-page-hero .container{max-width:1100px}
+  .tools-page-hero h1{line-height:1.3}
+  .tools-page-hero p{line-height:1.8}
+  .tools-section .container{max-width:1100px}
+  @media(max-width:850px){
+    .tools-page-hero{padding-block:28px 22px}
+    .tools-page-hero h1{font-size:clamp(1.65rem,6vw,2.15rem);margin-bottom:10px}
+    .tools-page-hero p{font-size:.92rem;max-width:48rem}
+    .tools-section{padding-block:24px}
+    .tools-toolbar{gap:9px;margin-bottom:14px}
+    .tools-toolbar input,.tools-toolbar select{min-height:46px}
+  }
+  @media(max-width:650px){
+    .tools-page-hero{padding-block:24px 18px}
+    .tools-section{padding-block:20px}
+    .tools-grid{gap:10px}
+    .uon44-tool-card{min-height:160px}
+  }
+  @media(max-width:430px){
+    .tools-page-hero{padding-block:20px 16px}
+    .tools-page-hero h1{font-size:1.55rem}
+    .tools-page-hero p{font-size:.86rem;line-height:1.75}
+    .tools-section{padding-block:18px}
+    .tools-grid{gap:8px}
+    .uon44-tool-card{min-height:150px}
+    .tools-toolbar input,.tools-toolbar select{min-height:44px;border-radius:12px}
+  }
 </style>
 </body>
 </html>
