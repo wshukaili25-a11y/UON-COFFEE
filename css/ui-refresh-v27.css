@@ -106,3 +106,19 @@ html{scroll-behavior:smooth}.home37 a,.home37 button{touch-action:manipulation}.
   .uon-independent-notice{margin-inline:10px!important;}
   .site-footer{padding-block:20px 24px;}
 }
+
+/* Mobile footer — quiet, centered, and compact without changing existing colors/content. */
+.site-footer{border-top:1px solid var(--line);background:rgba(6,11,27,.35)}
+.footer-managed{text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px}
+.footer-managed p{margin:0;line-height:1.7}.footer-top-text{font-weight:700;color:var(--text)}.footer-credit{font-size:.9rem}.footer-credit-label{font-weight:900;color:var(--text)}.footer-rights-text{font-size:.82rem;color:var(--muted)}
+@media(max-width:700px){
+ .site-footer{padding:22px 0 calc(24px + env(safe-area-inset-bottom));}
+ .footer-managed{width:calc(100% - 28px);gap:6px}
+ .footer-top-text{font-size:.92rem}.footer-credit{font-size:.84rem}.footer-rights-text{font-size:.78rem}
+}
+@media(max-width:430px){
+ .site-footer{padding:20px 0 calc(22px + env(safe-area-inset-bottom));}
+ .footer-managed{width:calc(100% - 24px);gap:5px}
+ .footer-top-text{font-size:.88rem}.footer-credit{font-size:.8rem}.footer-rights-text{font-size:.74rem}
+}
+@media(prefers-reduced-motion:reduce){.site-footer,.footer-managed{transition:none}}
