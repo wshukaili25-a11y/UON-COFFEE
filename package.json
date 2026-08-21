@@ -6,7 +6,7 @@
     "vercel-build": "node scripts/verify-build.mjs"
   },
   "engines": {
-    "node": "20.x"
+    "node": "24.x"
   },
   "dependencies": {
     "ai": "latest"
