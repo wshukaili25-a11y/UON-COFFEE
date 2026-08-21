@@ -1,5 +1,5 @@
 import{$,esc,enforceUonMaintenance,watchUonMaintenance,trackEvent,applyFeatureStates,get}from'./core.js?v=42.0.0';
-const API='/api/uon-ai';
+const API='https://irkhvydgxpseflggbeqq.supabase.co/functions/v1/uon-ai-v3';
 const form=$('#chatForm'),input=$('#question'),chat=$('#chat'),submitButton=form?.querySelector('button[type="submit"]');
 const history=[];let sending=false;
 const lang=()=>localStorage.getItem('uon_language')==='en'?'en':'ar';
