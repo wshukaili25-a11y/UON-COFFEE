@@ -1,0 +1,40 @@
+/* UON Hub Redesign — unified theme
+   Light: warm off-white + soft sage
+   Dark: charcoal + deep sage
+*/
+:root {
+  --bg: #f7f6f1;
+  --surface: #ffffff;
+  --surface-soft: #eef2eb;
+  --text: #171b18;
+  --text-muted: #68716b;
+  --primary: #8fa58f;
+  --primary-strong: #5f765f;
+  --primary-soft: #dfe8dd;
+  --border: #dde3dc;
+  --shadow: 0 12px 32px rgba(31, 45, 35, .08);
+}
+[data-theme="dark"] {
+  --bg: #121714;
+  --surface: #1a211d;
+  --surface-soft: #202a23;
+  --text: #f3f5f2;
+  --text-muted: #aab4ad;
+  --primary: #9caf9b;
+  --primary-strong: #c1d0bd;
+  --primary-soft: #2c3a30;
+  --border: #303b33;
+  --shadow: 0 12px 32px rgba(0,0,0,.28);
+}
+html, body { background: var(--bg) !important; color: var(--text) !important; }
+body, body * { border-color: var(--border); }
+a, button, .btn, .button { color: inherit; }
+button, .btn, .button { background: var(--primary) !important; color: #152017 !important; border-color: transparent !important; box-shadow: none; }
+button:hover, .btn:hover, .button:hover { background: var(--primary-strong) !important; color: #fff !important; }
+.card, .service-card, .tool-card, .modal, .dropdown, .menu, .panel { background: var(--surface) !important; color: var(--text) !important; border-color: var(--border) !important; box-shadow: var(--shadow); }
+.muted, .subtitle, .description, small { color: var(--text-muted) !important; }
+input, textarea, select { background: var(--surface) !important; color: var(--text) !important; border-color: var(--border) !important; }
+::selection { background: var(--primary-soft); color: var(--text); }
+/* Kill legacy purple/violet theme leakage */
+[class*="purple"], [class*="violet"] { color: var(--text) !important; background-color: transparent !important; border-color: var(--border) !important; }
+}
