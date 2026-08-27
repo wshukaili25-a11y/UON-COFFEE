@@ -2,7 +2,6 @@ create table if not exists public.contact_numbers (
   id uuid primary key default gen_random_uuid(),
   label text not null,
   phone text not null,
-  href text generated always as ('tel:' || regexp_replace(phone, '[^0-9+]', '', 'g')) stored,
   sort_order integer not null default 0,
   is_visible boolean not null default true,
   created_at timestamptz not null default now(),
