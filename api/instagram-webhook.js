@@ -6,8 +6,9 @@ const VERIFY_TOKEN = process.env.INSTAGRAM_VERIFY_TOKEN?.trim();
 const ACCESS_TOKEN = process.env.INSTAGRAM_ACCESS_TOKEN?.trim();
 const IG_USER_ID = process.env.INSTAGRAM_IG_USER_ID?.trim();
 const APP_SECRET = process.env.INSTAGRAM_APP_SECRET?.trim();
-const API_VERSION = process.env.INSTAGRAM_API_VERSION?.trim() || 'v24.0';
+const API_VERSION = process.env.INSTAGRAM_API_VERSION?.trim();
 const GRAPH_BASE = (process.env.INSTAGRAM_GRAPH_BASE_URL?.trim() || 'https://graph.instagram.com').replace(/\/$/, '');
+const SEND_URL = process.env.INSTAGRAM_SEND_URL?.trim();
 const AI_ENDPOINT = process.env.UON_AI_ENDPOINT?.trim();
 const AI_KEY = process.env.UON_AI_API_KEY?.trim();
 
@@ -87,9 +88,17 @@ function splitMessage(value, max = 900) {
   return chunks;
 }
 
+function instagramSendUrl() {
+  if (SEND_URL) return SEND_URL;
+  if (!API_VERSION || !IG_USER_ID) {
+    throw new Error('Set INSTAGRAM_SEND_URL, or set both INSTAGRAM_API_VERSION and INSTAGRAM_IG_USER_ID');
+  }
+  return `${GRAPH_BASE}/${API_VERSION}/${encodeURIComponent(IG_USER_ID)}/messages`;
+}
+
 async function sendInstagramText(recipientId, message) {
-  if (!ACCESS_TOKEN || !IG_USER_ID) throw new Error('Instagram credentials are not configured');
-  const url = `${GRAPH_BASE}/${API_VERSION}/${encodeURIComponent(IG_USER_ID)}/messages`;
+  if (!ACCESS_TOKEN) throw new Error('INSTAGRAM_ACCESS_TOKEN is not configured');
+  const url = instagramSendUrl();
 
   for (const chunk of splitMessage(message)) {
     const response = await fetch(url, {
