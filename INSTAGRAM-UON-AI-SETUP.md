@@ -12,13 +12,15 @@ Use the deployed HTTPS URL as the Meta webhook callback URL.
 
 - `INSTAGRAM_VERIFY_TOKEN` — random private string used only for Meta webhook verification.
 - `INSTAGRAM_ACCESS_TOKEN` — Instagram access token with messaging permissions.
-- `INSTAGRAM_IG_USER_ID` — Instagram professional account ID used by the Send API.
 - `INSTAGRAM_APP_SECRET` — Meta app secret; enables `X-Hub-Signature-256` verification.
+- Configure the Send API using either `INSTAGRAM_SEND_URL`, or both `INSTAGRAM_API_VERSION` and `INSTAGRAM_IG_USER_ID`.
 
 ## Optional environment variables
 
-- `INSTAGRAM_API_VERSION` — Graph API version. Default in code: `v24.0`.
-- `INSTAGRAM_GRAPH_BASE_URL` — default: `https://graph.instagram.com`.
+- `INSTAGRAM_SEND_URL` — full Send API messages endpoint. Use this when you want the Meta-configured endpoint to be explicit.
+- `INSTAGRAM_API_VERSION` — Graph API version. Required when `INSTAGRAM_SEND_URL` is not set.
+- `INSTAGRAM_IG_USER_ID` — Instagram professional account ID. Required when `INSTAGRAM_SEND_URL` is not set.
+- `INSTAGRAM_GRAPH_BASE_URL` — defaults to `https://graph.instagram.com`.
 - `UON_AI_ENDPOINT` — recommended: the deployed Supabase `uon-ai-v2` function URL so replies are grounded in UON Hub search/course data.
 - `UON_AI_API_KEY` — optional API key when the configured UON AI endpoint requires one.
 
@@ -30,8 +32,8 @@ If `UON_AI_ENDPOINT` is not set, the webhook falls back to the same deployment's
 2. Create/configure the Meta app and enable Instagram messaging for the account.
 3. Set the callback URL to `https://<deployment-domain>/api/instagram-webhook`.
 4. Set Meta's Verify Token to exactly the same value as `INSTAGRAM_VERIFY_TOKEN` in Vercel.
-5. Subscribe to Instagram messaging webhook events required for DMs.
-6. Add the account access token, Instagram account ID and App Secret to Vercel.
+5. Subscribe to the Instagram messaging webhook events required for DMs.
+6. Add the access token, App Secret, and the Send API configuration to Vercel environment variables.
 7. Redeploy after environment variables are added.
 
 ## Current behavior
