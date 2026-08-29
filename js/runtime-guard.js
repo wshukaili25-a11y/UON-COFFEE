@@ -1,5 +1,14 @@
 const shown=new Set();
 
+(function installUnifiedTheme(){
+ if(document.querySelector('link[data-uon-green-theme]'))return;
+ const link=document.createElement('link');
+ link.rel='stylesheet';
+ link.href='/css/uon-green-theme.css?v=1.0.0';
+ link.dataset.uonGreenTheme='1';
+ document.head.appendChild(link);
+})();
+
 function showMessage(message,type='error'){
  const key=`${type}:${message}`;
  if(shown.has(key))return;
@@ -50,7 +59,7 @@ function installSupportStyles(){
  .uon-support-centers{position:relative}
  .uon-support-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
  .uon-support-card.h37-service{min-height:180px}
- .uon-support-tool-icon.h37-service-icon{display:grid;place-items:center;width:54px;height:54px;margin:0 0 22px;border:1px solid rgba(139,92,246,.34);border-radius:16px;background:rgba(139,92,246,.055);color:#b9a5ff;box-shadow:inset 0 1px rgba(255,255,255,.04)}
+ .uon-support-tool-icon.h37-service-icon{display:grid;place-items:center;width:54px;height:54px;margin:0 0 22px;border:1px solid rgba(15,122,75,.28);border-radius:16px;background:rgba(15,122,75,.055);color:#0f7a4b;box-shadow:inset 0 1px rgba(255,255,255,.04)}
  .uon-support-tool-icon svg{width:29px;height:29px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
  .uon-support-card.h37-service strong{font-size:16px;line-height:1.55}
  .uon-support-card.h37-service small{line-height:1.7;margin-top:auto;padding-top:10px}
