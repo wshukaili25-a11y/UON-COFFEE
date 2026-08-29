@@ -1,12 +1,14 @@
 const shown=new Set();
 
 (function installUnifiedTheme(){
- if(document.querySelector('link[data-uon-green-theme]'))return;
+ const old=document.querySelector('link[data-uon-green-theme]');
+ if(old)old.remove();
  const link=document.createElement('link');
  link.rel='stylesheet';
- link.href='/css/uon-green-theme.css?v=1.1.0';
+ link.href='/css/uon-green-theme.css?v=2.0.0';
  link.dataset.uonGreenTheme='1';
  document.head.appendChild(link);
+ addEventListener('load',()=>{if(link.parentNode){link.remove();document.head.appendChild(link)}},{once:true});
 })();
 
 function showMessage(message,type='error'){
@@ -36,7 +38,7 @@ addEventListener('online',()=>{
   box.dataset.type='success';
   box.querySelector('strong').textContent='عاد الاتصال';
   box.querySelector('p').textContent='يمكنك متابعة استخدام المنصة.';
-  box.classList.add('show');
+  box.classList.add('show';
   setTimeout(()=>box.classList.remove('show'),2500);
  }
 });
@@ -63,38 +65,13 @@ function installSupportStyles(){
  .uon-support-tool-icon svg{width:29px;height:29px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
  .uon-support-card.h37-service strong{font-size:16px;line-height:1.55}
  .uon-support-card.h37-service small{line-height:1.7;margin-top:auto;padding-top:10px}
- @media(max-width:650px){
-  .uon-support-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
-  .uon-support-card.h37-service{min-height:145px}
- }
+ @media(max-width:650px){.uon-support-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.uon-support-card.h37-service{min-height:145px}}
  `;
  document.head.append(style);
 }
 
 function supportMarkup(){
- return `<section class="h37-section uon-support-centers" aria-labelledby="uonSupportCentersTitle">
-  <div class="h37-container">
-   <div class="h37-head h37-reveal visible">
-    <div><h2 id="uonSupportCentersTitle">مراكز الدعم الأكاديمي</h2><p>خدمات مساندة للطالب بنفس نظام أدوات المنصة.</p></div>
-   </div>
-   <div class="uon-support-grid h37-reveal visible">
-    <a class="h37-service uon-support-card" href="https://portal.unizwa.edu.om/twc/" target="_blank" rel="noopener noreferrer" aria-label="فتح حجز مركز أنجز">
-     <span class="h37-service-icon uon-support-tool-icon" aria-hidden="true">
-      <svg viewBox="0 0 24 24"><path d="M14.5 5.5c2.6-2.6 5.8-2.8 5.8-2.8s-.2 3.2-2.8 5.8l-4.2 4.2-2-2 3.2-5.2Z"/><path d="m11.3 10.7-3.8-.2-3 3 5.1 1.1M13.3 12.7l.2 3.8-3 3-1.1-5.1M16.8 7.2h.01M6.5 17.5c-1.2.2-2.3 1.3-2.5 2.5 1.2-.2 2.3-1.3 2.5-2.5Z"/></svg>
-     </span>
-     <strong>مركز أنجز</strong>
-     <small>دعم طلاب السنة التأسيسية في الإنجليزية والرياضيات والحاسب ومهارات الدراسة.</small>
-    </a>
-    <a class="h37-service uon-support-card" href="https://portal.unizwa.edu.om/twc/" target="_blank" rel="noopener noreferrer" aria-label="فتح حجز مركز تعزيز مسالك التعلم">
-     <span class="h37-service-icon uon-support-tool-icon" aria-hidden="true">
-      <svg viewBox="0 0 24 24"><path d="m3 9 9-5 9 5-9 5-9-5Z"/><path d="M7 12v4.2c2.8 2.1 7.2 2.1 10 0V12M21 9v6"/></svg>
-     </span>
-     <strong>مركز تعزيز مسالك التعلم</strong>
-     <small>جلسات دعم أكاديمي وورش مساندة لطلاب التخصص في المواد الأساسية.</small>
-    </a>
-   </div>
-  </div>
- </section>`;
+ return `<section class="h37-section uon-support-centers" aria-labelledby="uonSupportCentersTitle"><div class="h37-container"><div class="h37-head h37-reveal visible"><div><h2 id="uonSupportCentersTitle">مراكز الدعم الأكاديمي</h2><p>خدمات مساندة للطالب بنفس نظام أدوات المنصة.</p></div></div><div class="uon-support-grid h37-reveal visible"><a class="h37-service uon-support-card" href="https://portal.unizwa.edu.om/twc/" target="_blank" rel="noopener noreferrer" aria-label="فتح حجز مركز أنجز"><span class="h37-service-icon uon-support-tool-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M14.5 5.5c2.6-2.6 5.8-2.8 5.8-2.8s-.2 3.2-2.8 5.8l-4.2 4.2-2-2 3.2-5.2Z"/><path d="m11.3 10.7-3.8-.2-3 3 5.1 1.1M13.3 12.7l.2 3.8-3 3-1.1-5.1M16.8 7.2h.01M6.5 17.5c-1.2.2-2.3 1.3-2.5 2.5 1.2-.2 2.3-1.3 2.5-2.5Z"/></svg></span><strong>مركز أنجز</strong><small>دعم طلاب السنة التأسيسية في الإنجليزية والرياضيات والحاسب ومهارات الدراسة.</small></a><a class="h37-service uon-support-card" href="https://portal.unizwa.edu.om/twc/" target="_blank" rel="noopener noreferrer" aria-label="فتح حجز مركز تعزيز مسالك التعلم"><span class="h37-service-icon uon-support-tool-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m3 9 9-5 9 5-9 5-9-5Z"/><path d="M7 12v4.2c2.8 2.1 7.2 2.1 10 0V12M21 9v6"/></svg></span><strong>مركز تعزيز مسالك التعلم</strong><small>جلسات دعم أكاديمي وورش مساندة لطلاب التخصص في المواد الأساسية.</small></a></div></div></section>`;
 }
 
 function ensureSupportCenters(){
@@ -106,16 +83,11 @@ function ensureSupportCenters(){
  if(!toolsSection)return false;
  installSupportStyles();
  toolsSection.insertAdjacentHTML('afterend',supportMarkup());
- console.info('UON support centers rendered as tool cards');
  return true;
 }
-
 if(isHomePage()){
  ensureSupportCenters();
  const observer=new MutationObserver(()=>ensureSupportCenters());
  observer.observe(document.documentElement,{childList:true,subtree:true});
- setTimeout(()=>ensureSupportCenters(),100);
- setTimeout(()=>ensureSupportCenters(),500);
- setTimeout(()=>ensureSupportCenters(),1500);
- setTimeout(()=>ensureSupportCenters(),4000);
+ [100,500,1500,4000].forEach(ms=>setTimeout(()=>ensureSupportCenters(),ms));
 }
