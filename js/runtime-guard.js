@@ -38,7 +38,7 @@ addEventListener('online',()=>{
   box.dataset.type='success';
   box.querySelector('strong').textContent='عاد الاتصال';
   box.querySelector('p').textContent='يمكنك متابعة استخدام المنصة.';
-  box.classList.add('show';
+  box.classList.add('show');
   setTimeout(()=>box.classList.remove('show'),2500);
  }
 });
