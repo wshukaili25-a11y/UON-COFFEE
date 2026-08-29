@@ -2,9 +2,10 @@ const shown=new Set();
 
 (function installUnifiedTheme(){
  document.querySelectorAll('link[data-uon-green-theme]').forEach(x=>x.remove());
- const files=['/css/uon-green-theme.css?v=2.0.0','/css/uon-green-v18-fix.css?v=1.0.0'];
+ const files=['/css/uon-green-theme.css?v=2.1.0','/css/uon-green-v18-fix.css?v=1.1.0'];
  const links=files.map(href=>{const link=document.createElement('link');link.rel='stylesheet';link.href=href;link.dataset.uonGreenTheme='1';document.head.appendChild(link);return link});
- addEventListener('load',()=>{links.forEach(link=>{if(link.parentNode){link.remove();document.head.appendChild(link)}})},{once:true});
+ const moveLast=()=>links.forEach(link=>{if(link.parentNode){link.remove();document.head.appendChild(link)}});
+ addEventListener('load',()=>{moveLast();setTimeout(moveLast,150);setTimeout(moveLast,800)},{once:true});
 })();
 
 function showMessage(message,type='error'){
