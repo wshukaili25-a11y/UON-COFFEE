@@ -8,6 +8,51 @@ const shown=new Set();
  addEventListener('load',()=>{moveLast();setTimeout(moveLast,150);setTimeout(moveLast,800)},{once:true});
 })();
 
+function forceGreenHomepageAccents(){
+ if(!(location.pathname==='/'||location.pathname.endsWith('/index.html')))return;
+ const whatsapp=document.querySelector('.v18-primary-tools a[data-feature="groups"]');
+ if(whatsapp){
+  whatsapp.style.setProperty('background','#fff','important');
+  whatsapp.style.setProperty('border-color','#d5e6dc','important');
+  whatsapp.style.setProperty('color','#13251c','important');
+  const icon=whatsapp.querySelector('.v18-tool-icon,.v18-wa-icon');
+  if(icon){
+   icon.style.setProperty('background','#edf7f1','important');
+   icon.style.setProperty('border-color','#c8e1d3','important');
+   icon.style.setProperty('color','#0f7a4b','important');
+   icon.style.setProperty('box-shadow','none','important');
+   icon.querySelectorAll('*').forEach(el=>{
+    el.style.setProperty('color','#0f7a4b','important');
+    el.style.setProperty('stroke','#0f7a4b','important');
+    el.style.setProperty('fill','#0f7a4b','important');
+   });
+  }
+ }
+ const university=document.querySelector('.v20-stat-card.university');
+ if(university){
+  university.style.setProperty('background','linear-gradient(145deg,#fff,#edf7f1)','important');
+  university.style.setProperty('border-color','#c7dfd2','important');
+  university.style.setProperty('box-shadow','0 8px 28px rgba(15,122,75,.055)','important');
+  const code=university.querySelector('.v20-university-code');
+  if(code){
+   code.style.setProperty('color','#0f7a4b','important');
+   code.style.setProperty('-webkit-text-fill-color','#0f7a4b','important');
+   code.style.setProperty('background','none','important');
+   code.style.setProperty('text-shadow','none','important');
+  }
+ }
+}
+
+function installGreenAccentGuard(){
+ const run=()=>forceGreenHomepageAccents();
+ run();
+ [50,150,400,900,1500,3000].forEach(ms=>setTimeout(run,ms));
+ addEventListener('load',()=>{run();setTimeout(run,250);setTimeout(run,1200)},{once:true});
+ const observer=new MutationObserver(run);
+ observer.observe(document.documentElement,{subtree:true,childList:true,attributes:true,attributeFilter:['class','style','data-theme']});
+}
+installGreenAccentGuard();
+
 function showMessage(message,type='error'){
  const key=`${type}:${message}`;
  if(shown.has(key))return;
