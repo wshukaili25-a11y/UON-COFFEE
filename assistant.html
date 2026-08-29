@@ -57,22 +57,15 @@
     if(event && event.stopPropagation) event.stopPropagation();
     return false;
   }
-
   document.addEventListener('submit', function(event){
-    if(event.target && event.target.id === 'chatForm'){
-      stopAssistantSubmit(event);
-    }
+    if(event.target && event.target.id === 'chatForm') stopAssistantSubmit(event);
   }, true);
-
   document.addEventListener('DOMContentLoaded', function(){
     var form=document.getElementById('chatForm');
-    if(form){
-      form.setAttribute('action','javascript:void(0)');
-      form.addEventListener('submit',stopAssistantSubmit,true);
-    }
+    if(form){form.setAttribute('action','javascript:void(0)');form.addEventListener('submit',stopAssistantSubmit,true);}
   });
 })();
 </script>
-<script type="module" src="js/assistant.js?v=18.11"></script><aside class="notification-drawer" id="notificationDrawer"><div class="section-head"><h3>الإشعارات</h3><button class="icon-btn" id="closeNotifications">✕</button></div><div id="notificationItems" class="notification-list"></div></aside><script type="module">import {setupV14Shell} from "./js/v14-ui.js?v=18.11";setupV14Shell();</script><script type="module">import {applyFeatureStates} from "./js/core.js?v=18.11";applyFeatureStates(document);</script><script type="module" src="js/runtime-guard.js?v=18.11"></script><script type="module" src="js/v20-experience.js?v=22.3.0"></script><script type="module" src="/js/pwa-init.js?v=25.6.0"></script>
+<script type="module" src="js/assistant.js?v=6.0.0"></script><aside class="notification-drawer" id="notificationDrawer"><div class="section-head"><h3>الإشعارات</h3><button class="icon-btn" id="closeNotifications">✕</button></div><div id="notificationItems" class="notification-list"></div></aside><script type="module">import {setupV14Shell} from "./js/v14-ui.js?v=18.11";setupV14Shell();</script><script type="module">import {applyFeatureStates} from "./js/core.js?v=18.11";applyFeatureStates(document);</script><script type="module" src="js/runtime-guard.js?v=18.11"></script><script type="module" src="js/v20-experience.js?v=22.3.0"></script><script type="module" src="/js/pwa-init.js?v=25.6.0"></script>
 <script type="module" src="js/content-reports.js?v=31.2.0"></script>
 </body></html>
