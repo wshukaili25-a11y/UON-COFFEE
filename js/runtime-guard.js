@@ -4,7 +4,7 @@ const shown=new Set();
  if(document.querySelector('link[data-uon-green-theme]'))return;
  const link=document.createElement('link');
  link.rel='stylesheet';
- link.href='/css/uon-green-theme.css?v=1.0.0';
+ link.href='/css/uon-green-theme.css?v=1.1.0';
  link.dataset.uonGreenTheme='1';
  document.head.appendChild(link);
 })();
