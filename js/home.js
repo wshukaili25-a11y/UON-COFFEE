@@ -6,7 +6,6 @@ if(!document.querySelector('#home372Style')){
 }
 
 await enforceUonMaintenance();
-watchUonMaintenance();
 
 const qs=s=>document.querySelector(s);
 const lang=localStorage.getItem('uon_language')==='en'?'en':'ar';
@@ -79,4 +78,6 @@ function hydrateNearViewport(){
 }
 
 shell();interactions();await applyFeatureStates(document).catch(()=>{});pruneHiddenSlides();setupSlider();hydrateNearViewport();
-trackClicks();trackEvent('page_view',{page:'home_v414_perf',language:lang});window.addEventListener('focus',()=>applyFeatureStates(document));
+trackClicks();window.addEventListener('focus',()=>applyFeatureStates(document));
+const afterPaint=()=>{watchUonMaintenance();void trackEvent('page_view',{page:'home_v414_perf',language:lang})};
+if('requestIdleCallback'in window)requestIdleCallback(afterPaint,{timeout:1800});else setTimeout(afterPaint,250);
