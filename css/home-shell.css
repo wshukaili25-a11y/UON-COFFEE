@@ -1,0 +1,21 @@
+/* UON Hub homepage shell — small shared layer for the current home page only. */
+html[data-theme="light"]{
+ --bg:#f6f8fc;--surface:#ffffff;--surface2:#eef3fb;--line:#dfe6f1;
+ --text:#142033;--muted:#6b778c;--primary:#3157d5;--secondary:#7c5ce5;
+ --green:#159763;--yellow:#b7791f;--red:#d84a66;--shadow:0 18px 55px rgba(31,45,75,.09)
+}
+html[data-theme="light"] body{background:var(--bg);color:var(--text)}
+html[data-theme="light"] .site-header{background:rgba(255,255,255,.9);border-bottom-color:rgba(20,32,51,.08);box-shadow:0 8px 28px rgba(31,45,75,.06)}
+html[data-theme="light"] .brand{color:var(--text)}
+html[data-theme="light"] .brand-mark{color:#fff;background:linear-gradient(135deg,var(--primary),#14a37f)}
+html[data-theme="light"] .nav-links a{color:var(--muted)}
+html[data-theme="light"] .nav-links a:hover,html[data-theme="light"] .nav-links a.active{color:var(--primary);background:rgba(49,87,213,.08)}
+html[data-theme="light"] .icon-btn,html[data-theme="light"] .btn{background:var(--surface);color:var(--text);border-color:var(--line)}
+html[data-theme="light"] .btn.primary{background:var(--primary);color:#fff;border-color:var(--primary)}
+html[data-theme="light"] .card{background:var(--surface);border-color:var(--line);box-shadow:0 10px 30px rgba(31,45,75,.06)}
+html[data-theme="light"] .site-footer{background:rgba(255,255,255,.72);border-top-color:var(--line)}
+html[data-theme="light"] .uon-independent-notice{color:#5e6675;background:rgba(183,121,31,.07);border-color:rgba(183,121,31,.18)}
+html[data-theme="light"] .uon-independent-notice strong,html[data-theme="light"] .uon-independent-notice__icon{color:#8a5a13}
+/* Static contact block below the JS-rendered home. */
+.home-contact-section{padding:34px 0}.home-contact-head{margin-bottom:16px}.home-contact-head h2{margin:4px 0}.home-contact-head p{margin:0;color:var(--muted)}.home-contact-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px}.home-contact-grid .card{padding:20px;text-align:center;text-decoration:none}.home-contact-grid .card span{display:block;color:var(--muted);font-weight:700;margin-bottom:8px}.home-contact-grid .card strong[dir="ltr"]{display:block;font-size:1.15rem;letter-spacing:.4px;word-break:break-all}.home-contact-bank{display:block;font-size:1.05rem;color:var(--green);margin-bottom:5px}
+@media(max-width:850px){html[data-theme="light"] .nav-links{background:rgba(255,255,255,.98);border-color:var(--line);box-shadow:0 20px 50px rgba(31,45,75,.14)}}
