@@ -1,10 +1,13 @@
 const SESSION_KEY='uon_ai_session_v46';
 const STORE_KEY='uon_ai_history_v47';
+const CLIENT_KEY='uon_ai_client_v55';
 const CHAT_API='https://irkhvydgxpseflggbeqq.supabase.co/functions/v1/uon-ai-chat';
 const qs=new URLSearchParams(location.search);
 const requested=qs.get('chat')||'';
 const isUuid=v=>/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(v||'');
 const makeId=()=>{try{return crypto.randomUUID()}catch{return'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,c=>{const r=Math.random()*16|0,v=c==='x'?r:(r&3|8);return v.toString(16)})}};
+function clientToken(){let token='';try{token=localStorage.getItem(CLIENT_KEY)||''}catch{}if(!/^[0-9a-f-]{36}$/i.test(token)){token=makeId();try{localStorage.setItem(CLIENT_KEY,token)}catch{}}return token}
+const CLIENT_TOKEN=clientToken();
 if(isUuid(requested))sessionStorage.setItem(SESSION_KEY,requested);
 if(!isUuid(sessionStorage.getItem(SESSION_KEY)||''))sessionStorage.setItem(SESSION_KEY,makeId());
 const activeId=()=>sessionStorage.getItem(SESSION_KEY);
@@ -14,7 +17,7 @@ const msgText=el=>el?.querySelector('.message-content')?.textContent?.trim()||el
 function snapshot(){const chat=document.querySelector('#chat');if(!chat)return;const messages=[...chat.querySelectorAll(':scope > .message.user,:scope > .message.bot')].map(el=>({role:el.classList.contains('user')?'user':'assistant',content:msgText(el)})).filter(x=>x.content&&!/^هلا 👋/.test(x.content)&&!/^تم إيقاف الرد/.test(x.content));if(!messages.length)return;const data=readStore(),id=activeId(),firstUser=messages.find(x=>x.role==='user')?.content||'محادثة UON AI';data[id]={id,title:firstUser.slice(0,55),updated_at:Date.now(),messages:messages.slice(-30)};writeStore(data);renderHistory()}
 function paint(messages){const chat=document.querySelector('#chat');if(!chat||!Array.isArray(messages)||!messages.length)return false;chat.innerHTML='';for(const m of messages){if(!m?.content)continue;const article=document.createElement('article');article.className=`message ${m.role==='user'?'user':'bot'}`;const body=document.createElement('div');body.className='message-content';body.textContent=m.content;article.appendChild(body);chat.appendChild(article)}chat.scrollTop=chat.scrollHeight;return true}
 function restoreLocal(){const data=readStore(),entry=data[activeId()];return entry?.messages?.length?paint(entry.messages):false}
-async function restoreServer(){const id=activeId();if(!isUuid(id))return false;try{const res=await fetch(CHAT_API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'history',session_id:id,limit:30}),cache:'no-store',signal:AbortSignal.timeout(9000)});if(!res.ok)return false;const data=await res.json().catch(()=>({}));const messages=Array.isArray(data.messages)?data.messages.filter(x=>x?.content):[];if(!messages.length)return false;const store=readStore(),firstUser=messages.find(x=>x.role==='user')?.content||'محادثة UON AI';store[id]={id,title:firstUser.slice(0,55),updated_at:data.last_message_at?Date.parse(data.last_message_at)||Date.now():Date.now(),messages:messages.slice(-30).map(x=>({role:x.role,content:x.content}))};writeStore(store);paint(messages);renderHistory();return true}catch{return false}}
+async function restoreServer(){const id=activeId();if(!isUuid(id))return false;try{const res=await fetch(CHAT_API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'history',session_id:id,client_token:CLIENT_TOKEN,limit:30}),cache:'no-store',signal:AbortSignal.timeout(9000)});if(!res.ok)return false;const data=await res.json().catch(()=>({}));const messages=Array.isArray(data.messages)?data.messages.filter(x=>x?.content):[];if(!messages.length)return false;const store=readStore(),firstUser=messages.find(x=>x.role==='user')?.content||'محادثة UON AI';store[id]={id,title:firstUser.slice(0,55),updated_at:data.last_message_at?Date.parse(data.last_message_at)||Date.now():Date.now(),messages:messages.slice(-30).map(x=>({role:x.role,content:x.content}))};writeStore(store);paint(messages);renderHistory();return true}catch{return false}}
 function startNew(){const id=makeId();sessionStorage.setItem(SESSION_KEY,id);location.href='assistant.html'}
 function openConversation(id){if(!isUuid(id))return;sessionStorage.setItem(SESSION_KEY,id);location.href=`assistant.html?chat=${encodeURIComponent(id)}`}
 function removeConversation(id,event){event?.stopPropagation();const data=readStore();delete data[id];writeStore(data);if(id===activeId())return startNew();renderHistory()}
