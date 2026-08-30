@@ -54,9 +54,29 @@ function pruneHiddenSlides(){const root=qs('#homeServiceSlider'),track=root?.que
 let sliderTimer=null;function setupSlider(){clearInterval(sliderTimer);const root=qs('#homeServiceSlider'),track=root?.querySelector('.h371-track');if(!root||!track)return;const cards=[...track.children],dots=[...root.querySelectorAll('[data-go]')];if(!cards.length){root.hidden=true;return}let index=0,startX=null;const go=n=>{index=(n+cards.length)%cards.length;track.style.transform=`translateX(${index*100}%)`;dots.forEach((dot,i)=>dot.classList.toggle('active',i===index))};const restart=()=>{clearInterval(sliderTimer);if(cards.length>1&&!matchMedia('(prefers-reduced-motion: reduce)').matches)sliderTimer=setInterval(()=>go(index+1),4800)};root.querySelector('.h371-next')?.addEventListener('click',()=>{go(index+1);restart()});root.querySelector('.h371-prev')?.addEventListener('click',()=>{go(index-1);restart()});dots.forEach((dot,i)=>dot.addEventListener('click',()=>{go(i);restart()}));root.addEventListener('pointerdown',e=>{startX=e.clientX;clearInterval(sliderTimer)});root.addEventListener('pointerup',e=>{if(startX!==null){const delta=e.clientX-startX;if(Math.abs(delta)>45)go(index+(delta<0?1:-1));startX=null;restart()}});root.addEventListener('mouseenter',()=>clearInterval(sliderTimer));root.addEventListener('mouseleave',restart);go(0);restart()}
 function interactions(){qs('#homeSearch')?.addEventListener('submit',e=>{e.preventDefault();const q=qs('#homeSearchInput').value.trim();if(q)location.href=`search.html?q=${encodeURIComponent(q)}`});const observer=new IntersectionObserver(entries=>entries.forEach(entry=>{if(entry.isIntersecting){entry.target.classList.add('visible');observer.unobserve(entry.target)}}),{threshold:.1});document.querySelectorAll('.h37-reveal').forEach(x=>observer.observe(x))}
 
-shell();interactions();await applyFeatureStates(document).catch(()=>{});pruneHiddenSlides();setupSlider();
-// Keep first paint light: load the visible stats now, then hydrate below-the-fold feeds when the browser is idle.
-void loadStats();
-const hydrateSecondary=()=>Promise.allSettled([loadLatest(),loadPopular(),loadConfessions(),loadProjects(),loadLinks()]);
-if('requestIdleCallback'in window)requestIdleCallback(()=>hydrateSecondary(),{timeout:1200});else setTimeout(()=>hydrateSecondary(),120);
-trackClicks();trackEvent('page_view',{page:'home_v413_perf',language:lang});window.addEventListener('focus',()=>applyFeatureStates(document));
+const loaded=new Set();
+function hydrateNearViewport(){
+ const jobs=[
+  ['#statSummaries','stats',loadStats],
+  ['#latestFeed','latest',loadLatest],
+  ['#popularFeed','popular',loadPopular],
+  ['#confessionsFeed','confessions',loadConfessions],
+  ['#projectsFeed','projects',loadProjects],
+  ['#officialLinks','links',loadLinks]
+ ];
+ const run=(key,loader)=>{if(loaded.has(key))return;loaded.add(key);void Promise.resolve(loader()).catch(()=>loaded.delete(key))};
+ if(!('IntersectionObserver'in window)){
+  const hydrate=()=>jobs.forEach(([,key,loader])=>run(key,loader));
+  if('requestIdleCallback'in window)requestIdleCallback(hydrate,{timeout:1500});else setTimeout(hydrate,180);
+  return;
+ }
+ const observer=new IntersectionObserver(entries=>entries.forEach(entry=>{
+  if(!entry.isIntersecting)return;
+  const job=jobs.find(([selector])=>entry.target.matches(selector));
+  if(job){run(job[1],job[2]);observer.unobserve(entry.target)}
+ }),{rootMargin:'700px 0px',threshold:0.01});
+ jobs.forEach(([selector])=>{const el=qs(selector);if(el)observer.observe(el)});
+}
+
+shell();interactions();await applyFeatureStates(document).catch(()=>{});pruneHiddenSlides();setupSlider();hydrateNearViewport();
+trackClicks();trackEvent('page_view',{page:'home_v414_perf',language:lang});window.addEventListener('focus',()=>applyFeatureStates(document));
