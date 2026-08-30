@@ -6,7 +6,7 @@ const VISIBLE_VERSION_RE=/\s+(?:v|V)\d+(?:\.\d+)*/g;
 
 export const $=(s,r=document)=>r.querySelector(s);
 export const $$=(s,r=document)=>[...r.querySelectorAll(s)];
-export const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+export const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot',"'":'&#39;'}[c]));
 export const uid=()=>crypto.randomUUID();
 export function safeHref(value,fallback='#'){
  const raw=String(value??'').trim();
@@ -315,12 +315,16 @@ export function featureStatusLabel(status){
 }
 
 const featureStateHandlers=new WeakMap();
+let featureBannerModulePromise=null;
+function showFeatureStateBannerLazy(status,title){
+ featureBannerModulePromise ||= import('./v14-ui.js?v=17.6');
+ featureBannerModulePromise.then(({showFeatureStateBanner})=>showFeatureStateBanner(status,title)).catch(error=>console.warn('Feature banner unavailable',error));
+}
 
 export async function applyFeatureStates(root=document){
  try{
   const state=await getUonState();
   const map=state?.features||{};
-  const {showFeatureStateBanner}=await import('./v14-ui.js?v=17.6');
 
   root.querySelectorAll('[data-feature]').forEach(card=>{
    const status=map[card.dataset.feature]||'active';
@@ -346,7 +350,7 @@ export async function applyFeatureStates(root=document){
      event.preventDefault();
      event.stopImmediatePropagation();
      const title=card.querySelector('h3,strong')?.textContent?.trim()||'';
-     showFeatureStateBanner(status,title);
+     showFeatureStateBannerLazy(status,title);
     };
     featureStateHandlers.set(card,handler);
     card.addEventListener('click',handler,true);
