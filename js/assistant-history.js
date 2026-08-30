@@ -1,0 +1,20 @@
+const SESSION_KEY='uon_ai_session_v46';
+const STORE_KEY='uon_ai_history_v47';
+const qs=new URLSearchParams(location.search);
+const requested=qs.get('chat')||'';
+const isUuid=v=>/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(v||'');
+const makeId=()=>{try{return crypto.randomUUID()}catch{return'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,c=>{const r=Math.random()*16|0,v=c==='x'?r:(r&3|8);return v.toString(16)})}};
+if(isUuid(requested))sessionStorage.setItem(SESSION_KEY,requested);
+if(!isUuid(sessionStorage.getItem(SESSION_KEY)||''))sessionStorage.setItem(SESSION_KEY,makeId());
+const activeId=()=>sessionStorage.getItem(SESSION_KEY);
+const readStore=()=>{try{return JSON.parse(localStorage.getItem(STORE_KEY)||'{}')||{}}catch{return{}}};
+const writeStore=data=>{try{localStorage.setItem(STORE_KEY,JSON.stringify(data))}catch{}};
+const msgText=el=>el?.querySelector('.message-content')?.textContent?.trim()||el?.textContent?.trim()||'';
+function snapshot(){const chat=document.querySelector('#chat');if(!chat)return;const messages=[...chat.querySelectorAll(':scope > .message.user,:scope > .message.bot')].map(el=>({role:el.classList.contains('user')?'user':'assistant',content:msgText(el)})).filter(x=>x.content&&!/^هلا 👋/.test(x.content));if(!messages.length)return;const data=readStore(),id=activeId(),firstUser=messages.find(x=>x.role==='user')?.content||'محادثة UON AI';data[id]={id,title:firstUser.slice(0,55),updated_at:Date.now(),messages:messages.slice(-30)};writeStore(data);renderHistory()}
+function restore(){const data=readStore(),entry=data[activeId()],chat=document.querySelector('#chat');if(!entry?.messages?.length||!chat)return;chat.innerHTML='';for(const m of entry.messages){const article=document.createElement('article');article.className=`message ${m.role==='user'?'user':'bot'}`;const body=document.createElement('div');body.className='message-content';body.textContent=m.content;article.appendChild(body);chat.appendChild(article)}chat.scrollTop=chat.scrollHeight}
+function startNew(){const id=makeId();sessionStorage.setItem(SESSION_KEY,id);location.href='assistant.html'}
+function openConversation(id){if(!isUuid(id))return;sessionStorage.setItem(SESSION_KEY,id);location.href=`assistant.html?chat=${encodeURIComponent(id)}`}
+function removeConversation(id,event){event?.stopPropagation();const data=readStore();delete data[id];writeStore(data);if(id===activeId())return startNew();renderHistory()}
+function renderHistory(){const host=document.querySelector('#assistantHistoryItems');if(!host)return;const rows=Object.values(readStore()).sort((a,b)=>(b.updated_at||0)-(a.updated_at||0)).slice(0,20);host.innerHTML='';if(!rows.length){host.innerHTML='<p class="assistant-history-empty">ما عندك محادثات محفوظة للحين.</p>';return}for(const row of rows){const b=document.createElement('button');b.type='button';b.className='assistant-history-item'+(row.id===activeId()?' active':'');const date=new Date(row.updated_at||Date.now()).toLocaleDateString('ar-OM',{month:'short',day:'numeric'});b.innerHTML=`<span><strong></strong><small>${date}</small></span><i aria-label="حذف">×</i>`;b.querySelector('strong').textContent=row.title||'محادثة UON AI';b.addEventListener('click',()=>openConversation(row.id));b.querySelector('i').addEventListener('click',e=>removeConversation(row.id,e));host.appendChild(b)}}
+function boot(){const chat=document.querySelector('#chat');restore();renderHistory();document.querySelector('#assistantNewChat')?.addEventListener('click',startNew);const drawer=document.querySelector('#assistantHistoryDrawer'),open=document.querySelector('#assistantHistoryOpen'),close=document.querySelector('#assistantHistoryClose');open?.addEventListener('click',()=>drawer?.classList.add('open'));close?.addEventListener('click',()=>drawer?.classList.remove('open'));if(chat){let timer;new MutationObserver(()=>{clearTimeout(timer);timer=setTimeout(snapshot,120)}).observe(chat,{childList:true,subtree:true})}}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
