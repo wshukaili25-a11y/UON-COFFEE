@@ -110,3 +110,7 @@ if(isHomePage()){
  setTimeout(()=>ensureSupportCenters(),1500);
  setTimeout(()=>ensureSupportCenters(),4000);
 }
+
+if(location.pathname.endsWith('/assistant.html')){
+ import('./assistant-visual-guide.js?v=50.0.0').catch(error=>console.warn('Assistant visual guides skipped',error));
+}
