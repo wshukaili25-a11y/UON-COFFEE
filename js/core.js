@@ -117,8 +117,20 @@ export async function notifyPending(table,id){
  try{await edge({source:'web-submit',table,id})}catch(e){console.warn('Notification fallback failed',e)}
 }
 
+const UON_STATE_TTL=2500;
+let uonStateCache=null;
+let uonStateCachedAt=0;
+let uonStateInflight=null;
 export async function getUonState(){
- return await rpc('uon_public_state',{});
+ const now=Date.now();
+ if(uonStateCache&&now-uonStateCachedAt<UON_STATE_TTL)return uonStateCache;
+ if(uonStateInflight)return uonStateInflight;
+ uonStateInflight=rpc('uon_public_state',{}).then(state=>{
+  uonStateCache=state;
+  uonStateCachedAt=Date.now();
+  return state;
+ }).finally(()=>{uonStateInflight=null});
+ return uonStateInflight;
 }
 
 let maintenanceInitialCheck=true;
