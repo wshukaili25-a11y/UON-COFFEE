@@ -1,21 +1,32 @@
 const loadDeferredCss=(href,id)=>{if(document.getElementById(id))return;const link=document.createElement('link');link.id=id;link.rel='stylesheet';link.href=href;link.media='print';link.onload=()=>{link.media='all'};document.head.appendChild(link)};
-const runAfterPaint=()=>{
- const load=()=>{loadDeferredCss('css/content-reports.css?v=31.2.0','contentReportsDeferredStyle');return Promise.allSettled([
-  import('./runtime-guard.js?v=49.0.1'),
-  import('./v20-experience.js?v=49.0.1'),
-  import('./pwa-init.js?v=49.0.1'),
-  import('./content-reports.js?v=49.0.1')
- ]).then(results=>{
-  const labels=['Runtime guard','Home experience','PWA','Content reports'];
-  results.forEach((result,index)=>{
-   if(result.status==='rejected')console.warn(labels[index]+' deferred load failed',result.reason);
-  });
- })};
- if('requestIdleCallback'in window){
-  requestIdleCallback(()=>{void load()},{timeout:1600});
- }else{
-  setTimeout(()=>{void load()},700);
+const idle=(fn,timeout=1800)=>{
+ if('scheduler'in window&&typeof scheduler.postTask==='function'){
+  scheduler.postTask(fn,{priority:'background',delay:0}).catch(()=>{});return;
  }
+ if('requestIdleCallback'in window){requestIdleCallback(()=>fn(),{timeout});return}
+ setTimeout(fn,Math.min(timeout,900));
+};
+const importQuiet=async(spec,label)=>{try{await import(spec)}catch(error){console.warn(label+' deferred load failed',error)}};
+const runAfterPaint=()=>{
+ // Stage 1: only runtime/PWA work shortly after the page is visually ready.
+ idle(()=>{void Promise.allSettled([
+  importQuiet('./runtime-guard.js?v=49.0.1','Runtime guard'),
+  importQuiet('./pwa-init.js?v=49.0.1','PWA')
+ ])},1400);
+
+ // Stage 2: optional experience/reporting code waits longer so it cannot compete
+ // with the home feed, scrolling, or the first user interaction.
+ const stageTwo=()=>{
+  loadDeferredCss('css/content-reports.css?v=31.2.0','contentReportsDeferredStyle');
+  void Promise.allSettled([
+   importQuiet('./v20-experience.js?v=49.0.1','Home experience'),
+   importQuiet('./content-reports.js?v=49.0.1','Content reports')
+  ]);
+ };
+ let started=false;
+ const startOnce=()=>{if(started)return;started=true;idle(stageTwo,4200)};
+ ['pointerdown','keydown','touchstart'].forEach(type=>window.addEventListener(type,startOnce,{once:true,passive:true}));
+ setTimeout(startOnce,3200);
 };
 if(document.readyState==='complete')runAfterPaint();
 else window.addEventListener('load',runAfterPaint,{once:true});
