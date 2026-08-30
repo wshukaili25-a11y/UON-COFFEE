@@ -25,3 +25,5 @@ html{scroll-behavior:smooth}.home37 a,.home37 button{touch-action:manipulation}.
 @media(max-width:700px){.site-footer{padding:22px 0 calc(24px + env(safe-area-inset-bottom))}.footer-managed{width:calc(100% - 28px);gap:6px}.footer-top-text{font-size:.92rem}.footer-credit{font-size:.84rem}.footer-rights-text{font-size:.78rem}}
 @media(max-width:430px){.site-footer{padding:20px 0 calc(22px + env(safe-area-inset-bottom))}.footer-managed{width:calc(100% - 24px);gap:5px}.footer-top-text{font-size:.88rem}.footer-credit{font-size:.8rem}.footer-rights-text{font-size:.74rem}}
 @media(prefers-reduced-motion:reduce){.site-footer,.footer-managed{transition:none}}
+/* Performance: use the already-optimized 9KB university gate image instead of the 728KB campus aerial background on legacy guide/support cards. */
+.hero-guide,.lec-card,#masalikCard .support-thumb,#masalikCard .v16-support-image,#masalikCard .v18-center-img{background-image:url('../assets/unizwa-new-gate-v52.jpg')!important}
