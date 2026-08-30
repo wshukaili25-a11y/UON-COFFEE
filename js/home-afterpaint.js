@@ -1,11 +1,13 @@
 const runAfterPaint=()=>{
  const load=()=>Promise.allSettled([
-  import('./v20-experience.js?v=49.0.0'),
-  import('./pwa-init.js?v=49.0.0'),
-  import('./content-reports.js?v=49.0.0')
+  import('./runtime-guard.js?v=49.0.1'),
+  import('./v20-experience.js?v=49.0.1'),
+  import('./pwa-init.js?v=49.0.1'),
+  import('./content-reports.js?v=49.0.1')
  ]).then(results=>{
+  const labels=['Runtime guard','Home experience','PWA','Content reports'];
   results.forEach((result,index)=>{
-   if(result.status==='rejected')console.warn(['Home experience','PWA','Content reports'][index]+' deferred load failed',result.reason);
+   if(result.status==='rejected')console.warn(labels[index]+' deferred load failed',result.reason);
   });
  });
  if('requestIdleCallback'in window){
