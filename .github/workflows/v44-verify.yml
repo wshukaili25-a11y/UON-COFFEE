@@ -1,4 +1,4 @@
-name: V44 Verification
+name: UON Hub Verification
 
 on:
   pull_request:
