@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0b5d3d">
+<title>ANJIZ Management System · University of Nizwa</title>
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<div id="login" class="login"><div class="login-card">
+<div class="brand"><div class="mark">A</div><div><h1>ANJIZ Management System</h1><p>Foundation Institute · University of Nizwa</p></div></div>
+<div class="build">V7 · Full Requirements Implementation · Mobile Safe</div>
+<div class="field"><label>Email / University ID</label><input id="loginId" value="admin@anjiz.demo" autocomplete="username"></div>
+<div class="field"><label>Password</label><input id="loginPw" type="password" value="anjiz" autocomplete="current-password"></div>
+<div class="login-actions"><button class="btn primary" onclick="login()">Sign in</button><button class="btn outline" onclick="scanLoginId()">Scan Student ID / Barcode</button><button class="btn secondary" onclick="fillDemo('student')">Student Demo</button></div>
+<div id="loginError" class="muted" style="margin-top:8px"></div>
+<div class="demo"><b>Demo accounts · password: anjiz</b><br>Admin: admin@anjiz.demo / A001<br>Instructor: instructor@anjiz.demo / I101<br>Student: student@anjiz.demo / S001<br>Visitor: visitor@anjiz.demo / V001<br>Peer-Tutor: peer@anjiz.demo / P001<br>Trainee: trainee@anjiz.demo / T001</div>
+</div></div>
+<div id="app" class="shell hidden"><aside class="side"><div class="brand"><div class="mark">A</div><div><h1>ANJIZ</h1><p>Management System</p></div></div><div class="profile"><b id="userName"></b><small id="userId"></small><span id="userRole" class="role"></span></div><div id="nav" class="nav"></div><div class="side-note">Prototype follows the ANJIZ New System requirements supplied by Foundation Institute. Demo data only.</div></aside><main class="main"><div class="topbar"><div><h2 id="pageTitle">Dashboard</h2><div id="pageSub" class="sub"></div></div><div class="row no-print"><button class="btn outline" onclick="openNotifications()">Notifications <span id="notifCount" class="badge red">0</span></button><button class="btn secondary" onclick="resetDemo()">Reset Demo</button><button class="btn danger" onclick="logout()">Log out</button></div></div><div id="content"></div><div class="footer">ANJIZ System Prototype · University of Nizwa · Foundation Institute</div></main></div><div id="modalRoot"></div>
+<script src="/app1.js?v=7"></script>
+<script src="/app2.js?v=7"></script>
+<script src="/app3.js?v=7"></script>
+<script src="/app4.js?v=7"></script>
+<script src="/app5.js?v=7"></script>
+<script src="/app6.js?v=7"></script>
+<script src="/app7.js?v=7"></script>
+<script src="/app8.js?v=7"></script>
+<script src="/app9.js?v=7"></script>
+</body></html>
