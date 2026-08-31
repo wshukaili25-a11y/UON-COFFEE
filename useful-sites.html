@@ -4,7 +4,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <title>مواقع وأدوات مفيدة للطلاب | UON Hub</title>
   <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/app.css?v=30.0.1">
@@ -27,6 +27,7 @@
   <link rel="stylesheet" href="/css/pwa.css?v=25.6.0">
   <link rel="stylesheet" href="css/content-reports.css?v=31.2.0">
   <link rel="stylesheet" href="css/useful-sites-v46.css?v=46.0.0">
+  <link rel="stylesheet" href="css/student-tools-v53.css?v=53.0.0">
 </head>
 <body>
 <header class="site-header"></header>
@@ -43,12 +44,12 @@
       <div class="useful46-controls">
         <label class="useful46-search">
           <span aria-hidden="true">🔎</span>
-          <input id="usefulSearch" type="search" placeholder="ابحث عن موقع أو أداة مثل Moodle أو PDF أو ترجمة" autocomplete="off">
+          <input id="usefulSearch" type="search" placeholder="ابحث عن موقع أو أداة مثل Moodle أو PDF أو ترجمة" autocomplete="off" aria-label="البحث في المواقع والأدوات">
         </label>
-        <div class="useful46-count" id="usefulCount">جاري التحميل...</div>
+        <div class="useful46-count" id="usefulCount" aria-live="polite">جاري التحميل...</div>
       </div>
       <div class="useful46-filters" id="siteFilters" aria-label="تصنيفات المواقع والأدوات"></div>
-      <div class="useful46-grid" id="usefulSites"></div>
+      <div class="useful46-grid" id="usefulSites" aria-live="polite"></div>
     </div>
   </section>
 </main>
@@ -56,7 +57,7 @@
 <footer class="site-footer"><div class="container footer-row"><span>UON Hub · 2026</span><span>منصة طلابية مستقلة</span></div></footer>
 <div id="toast" class="toast"></div>
 <script type="module" src="js/useful-sites.js?v=46.0.0"></script>
-<aside class="notification-drawer" id="notificationDrawer"><div class="section-head"><h3>الإشعارات</h3><button class="icon-btn" id="closeNotifications">✕</button></div><div id="notificationItems" class="notification-list"></div></aside>
+<aside class="notification-drawer" id="notificationDrawer"><div class="section-head"><h3>الإشعارات</h3><button class="icon-btn" id="closeNotifications" aria-label="إغلاق الإشعارات">✕</button></div><div id="notificationItems" class="notification-list"></div></aside>
 <script type="module">import {setupV14Shell} from "./js/v14-ui.js?v=34.0.2";setupV14Shell();</script>
 <script type="module" src="js/runtime-guard.js?v=34.0.2"></script>
 <script type="module" src="js/v20-experience.js?v=34.0.2"></script>
