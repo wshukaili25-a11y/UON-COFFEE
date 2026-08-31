@@ -1,0 +1,1 @@
+Temporary safety rollback marker: restore stable ANJIZ runtime loader while retaining booking-v10 assets for a safer integration path.
