@@ -1,1 +1,18 @@
-(()=>{if(window.__anjizReportsTimetableV13)return;window.__anjizReportsTimetableV13=1;const reportUrl='https://raw.githubusercontent.com/wshukaili25-a11y/UON-COFFEE/6f208a721d1621ceef38937815d122ab09c6ca31/anjiz-v7/reports-v12.js',packUrl='https://raw.githubusercontent.com/wshukaili25-a11y/UON-COFFEE/anjiz-system-v7/anjiz-v7/timetable-v13.pack.b64?v=20260901e';async function gunzipB64(t){const b=Uint8Array.from(atob(t.trim()),c=>c.charCodeAt(0));return await new Response(new Blob([b]).stream().pipeThrough(new DecompressionStream('gzip'))).text()}(async()=>{try{const [reportCode,pack]=await Promise.all([fetch(reportUrl,{cache:'no-store'}).then(r=>{if(!r.ok)throw new Error('reports core '+r.status);return r.text()}),fetch(packUrl,{cache:'no-store'}).then(r=>{if(!r.ok)throw new Error('timetable pack '+r.status);return r.text()})]);const raw=await gunzipB64(pack),marker='/*__ANJIZ_TIMETABLE_CSS_SPLIT__*/',i=raw.indexOf(marker);if(i<0)throw new Error('Timetable package validation failed');const ttCode=raw.slice(0,i),ttCss=raw.slice(i+marker.length);if(!document.getElementById('timetableV13-css')){const style=document.createElement('style');style.id='timetableV13-css';style.textContent=ttCss;document.head.appendChild(style)}const blob=new Blob([reportCode+'\n'+ttCode],{type:'text/javascript'}),url=URL.createObjectURL(blob);await new Promise((resolve,reject)=>{const s=document.createElement('script');s.src=url;s.onload=resolve;s.onerror=reject;document.head.appendChild(s)});URL.revokeObjectURL(url);window.__reportsV12CoreLoaded=1;window.__timetableV13Loaded=1}catch(e){console.warn('ANJIZ reports/timetable V13 add-ons unavailable',e)}})()})();
+(()=>{if(window.__anjizReportsTimetableCommsV14)return;window.__anjizReportsTimetableCommsV14=1;
+const reportUrl='https://raw.githubusercontent.com/wshukaili25-a11y/UON-COFFEE/6f208a721d1621ceef38937815d122ab09c6ca31/anjiz-v7/reports-v12.js';
+const root='https://raw.githubusercontent.com/wshukaili25-a11y/UON-COFFEE/anjiz-system-v7/anjiz-v7/';
+async function text(u,n){return fetch(u,{cache:'no-store'}).then(r=>{if(!r.ok)throw new Error(n+' '+r.status);return r.text()})}
+async function gunzipB64(t){const b=Uint8Array.from(atob(t.trim()),c=>c.charCodeAt(0));return await new Response(new Blob([b]).stream().pipeThrough(new DecompressionStream('gzip'))).text()}
+async function unpack(url,marker,label){const p=await text(url,label);const raw=await gunzipB64(p),i=raw.indexOf(marker);if(i<0)throw new Error(label+' validation failed');return{js:raw.slice(0,i),css:raw.slice(i+marker.length)}}
+function style(id,css){if(document.getElementById(id))return;const s=document.createElement('style');s.id=id;s.textContent=css;document.head.appendChild(s)}
+(async()=>{try{
+const [reportCode,tt,comm]=await Promise.all([
+ text(reportUrl,'reports core'),
+ unpack(root+'timetable-v13.pack.b64?v=20260901e','/*__ANJIZ_TIMETABLE_CSS_SPLIT__*/','timetable pack'),
+ unpack(root+'comms-v14.pack.b64?v=20260901f','/*__ANJIZ_COMMS_CSS_SPLIT__*/','communications pack')
+]);
+style('timetableV13-css',tt.css);style('commsV14-css',comm.css);
+const blob=new Blob([reportCode+'\n'+tt.js+'\n'+comm.js],{type:'text/javascript'}),url=URL.createObjectURL(blob);
+await new Promise((resolve,reject)=>{const s=document.createElement('script');s.src=url;s.onload=resolve;s.onerror=reject;document.head.appendChild(s)});URL.revokeObjectURL(url);
+window.__reportsV12CoreLoaded=1;window.__timetableV13Loaded=1;window.__commsV14Loaded=1;
+}catch(e){console.warn('ANJIZ V14 add-ons unavailable',e)}})()})();
