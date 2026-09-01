@@ -1,58 +1,134 @@
-let appointmentViewState={month:'',date:'',service:'all',status:'all',search:''};
-function apEnsureState(){
-  const all=myAppointments().slice().sort((a,b)=>(a.date+a.time).localeCompare(b.date+b.time));
-  const today=localDateISO();
-  if(!appointmentViewState.date){
-    const todayHas=all.some(x=>x.date===today);
-    const next=all.find(x=>x.date>=today)||all[0];
-    appointmentViewState.date=todayHas?today:(next?.date||today);
+(()=>{
+  if(window.__anjizAppointmentsSafeLoaderV24)return;
+  window.__anjizAppointmentsSafeLoaderV24=1;
+
+  const STABLE_APPOINTMENTS='https://raw.githubusercontent.com/wshukaili25-a11y/UON-COFFEE/c901e4101b97ec981dce9714fe42c2c6e7df7bfc/anjiz-v7/appointments-v9.js';
+  const QR_LIB='https://cdn.jsdelivr.net/npm/html5-qrcode@2.3.8/html5-qrcode.min.js';
+  let activeScanner=null;
+
+  function loadScript(src,id){
+    return new Promise((resolve,reject)=>{
+      if(id&&document.getElementById(id)){
+        if(id==='anjiz-html5-qrcode-v24'&&window.Html5Qrcode)return resolve();
+        const old=document.getElementById(id);
+        old.addEventListener('load',resolve,{once:true});
+        old.addEventListener('error',reject,{once:true});
+        return;
+      }
+      const s=document.createElement('script');
+      if(id)s.id=id;
+      s.src=src;
+      s.async=true;
+      s.onload=resolve;
+      s.onerror=reject;
+      document.head.appendChild(s);
+    });
   }
-  if(!appointmentViewState.month)appointmentViewState.month=appointmentViewState.date.slice(0,7);
-}
-function apFiltered(){
-  apEnsureState();
-  const q=(appointmentViewState.search||'').trim().toLowerCase();
-  return myAppointments().filter(x=>
-    (appointmentViewState.service==='all'||x.service===appointmentViewState.service)&&
-    (appointmentViewState.status==='all'||x.status===appointmentViewState.status)&&
-    (!q||[x.student,x.serviceName,x.staff,x.studentUid,x.bookedBy].some(v=>String(v||'').toLowerCase().includes(q)))
-  ).sort((a,b)=>(a.date+a.time).localeCompare(b.date+b.time));
-}
-function apRefresh(){el('content').innerHTML=appointmentsPage()}
-function apShiftMonth(delta){
-  apEnsureState();const [y,m]=appointmentViewState.month.split('-').map(Number),d=new Date(y,m-1+delta,1);
-  appointmentViewState.month=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
-  appointmentViewState.date=`${appointmentViewState.month}-01`;apRefresh();
-}
-function apGoToday(){appointmentViewState.date=localDateISO();appointmentViewState.month=appointmentViewState.date.slice(0,7);apRefresh()}
-function apSelectDate(date){appointmentViewState.date=date;appointmentViewState.month=date.slice(0,7);apRefresh()}
-function apSetService(v){appointmentViewState.service=v;apRefresh()}
-function apSetStatus(v){appointmentViewState.status=v;apRefresh()}
-function apSetSearch(v){appointmentViewState.search=v;apRefresh()}
-function apMonthLabel(ym){const [y,m]=ym.split('-').map(Number);return new Date(y,m-1,1).toLocaleDateString('en-US',{month:'long',year:'numeric'})}
-function apCalendar(){
-  apEnsureState();const arr=apFiltered(),[y,m]=appointmentViewState.month.split('-').map(Number),first=new Date(y,m-1,1),count=new Date(y,m,0).getDate(),offset=first.getDay(),today=localDateISO();
-  let cells='';for(let i=0;i<offset;i++)cells+='<div class="cal-cell cal-empty"></div>';
-  for(let day=1;day<=count;day++){
-    const date=`${y}-${String(m).padStart(2,'0')}-${String(day).padStart(2,'0')}`,items=arr.filter(x=>x.date===date),selected=date===appointmentViewState.date;
-    const services=[...new Set(items.map(x=>x.service))].slice(0,3);
-    cells+=`<button class="cal-cell ${items.length?'has-events':''} ${selected?'selected':''} ${date===today?'today':''}" onclick="apSelectDate('${date}')"><span class="cal-day">${day}</span>${items.length?`<b class="cal-count">${items.length}</b><div class="cal-dots">${services.map(()=>'<i></i>').join('')}</div>`:''}</button>`;
+
+  function normalizeScan(raw){
+    const value=String(raw||'').trim();
+    try{
+      const u=new URL(value,location.href);
+      for(const key of ['uid','id','user','verify']){
+        const v=u.searchParams.get(key);
+        if(v&&/^[A-Za-z0-9._-]{2,64}$/.test(v))return {id:v.toUpperCase(),url:value};
+      }
+      const m=(u.hash||'').match(/(?:uid|id|user|verify)=([A-Za-z0-9._-]{2,64})/i);
+      if(m)return {id:m[1].toUpperCase(),url:value};
+    }catch(e){}
+    const m=value.match(/(?:ANJIZ\s*[:#|\-]\s*)?([A-Z]{1,5}\d{2,14})/i);
+    return {id:(m?m[1]:value).toUpperCase(),url:/^https?:\/\//i.test(value)?value:''};
   }
-  return `<div class="calendar-shell"><div class="calendar-head"><button class="cal-nav" onclick="apShiftMonth(-1)" aria-label="Previous month">‹</button><div><span class="section-label">MONTH VIEW</span><h3>${apMonthLabel(appointmentViewState.month)}</h3></div><button class="cal-nav" onclick="apShiftMonth(1)" aria-label="Next month">›</button></div><div class="cal-weekdays">${['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].map(x=>`<span>${x}</span>`).join('')}</div><div class="cal-grid">${cells}</div></div>`
-}
-function apDayView(){
-  apEnsureState();const date=appointmentViewState.date,items=apFiltered().filter(x=>x.date===date).sort((a,b)=>a.time.localeCompare(b.time));
-  return `<div class="day-shell"><div class="toolbar"><div><span class="section-label">DAY VIEW</span><h3>${dayOf(date)} · ${date}</h3></div><span class="day-total">${items.length} appointment${items.length===1?'':'s'}</span></div><div class="day-list">${items.length?items.map(a=>{let su=user(a.studentUid),canMark=['admin','instructor','peer'].includes(me.role);return `<article class="day-appt"><div class="time-rail"><b>${esc(a.time.split('-')[0])}</b><span>${esc(a.time.split('-')[1]||'')}</span></div><div class="appt-body"><div class="appt-title"><div><b>${esc(a.student)}${su?.disability?' ★':''}</b><span>${esc(a.serviceName)}</span></div>${statusBadge(a.status)}</div><div class="appt-meta"><span>Assigned: <b>${esc(a.staff)}</b></span><span>Attendance: ${statusBadge(a.attendance)}</span></div><div class="appt-actions"><button class="btn outline" onclick="showAppointmentDetails(${a.id})">Details</button>${canMark&&a.status!=='Conducted'?`<button class="btn secondary" onclick="markAppointment(${a.id},'Present')">Present</button><button class="btn danger" onclick="markAppointment(${a.id},'Absent')">Absent</button>`:''}</div></div></article>`}).join(''):`<div class="empty-state"><b>No appointments on this day</b><span>Select another date from the calendar or create a new booking.</span>${['admin','peer','student'].includes(me.role)?'<button class="btn primary" onclick="openPage(\'book\')">New booking</button>':''}</div>`}</div></div>`
-}
-function apListTable(arr){
-  return table(['Student','Service','Day / Date','Time','Assigned','Status','Attendance',''],arr.map(a=>{let su=user(a.studentUid);return[`${esc(a.student)}${su?.disability?' ★':''}`,esc(a.serviceName),`${esc(a.day||dayOf(a.date))}<br><span class="muted">${esc(a.date)}</span>`,esc(a.time),esc(a.staff),statusBadge(a.status),statusBadge(a.attendance),`<button class="btn outline" onclick="showAppointmentDetails(${a.id})">Details</button>`]}),r=>r[0].includes('★')?'star':'')
-}
-function showAppointmentDetails(id){
-  const a=db.appointments.find(x=>x.id===id);if(!a)return;const su=user(a.studentUid),staff=user(a.staffUid),canMark=['admin','instructor','peer'].includes(me.role);
-  showModal(`<div class="appt-modal-head"><div><span class="section-label">ANJIZ APPOINTMENT</span><h3>${esc(a.serviceName)}</h3></div>${statusBadge(a.status)}</div><div class="detail-grid"><div><small>Student / Visitor</small><b>${esc(a.student)}${su?.disability?' ★':''}</b><span>${esc(a.studentUid)}</span></div><div><small>Day & Date</small><b>${esc(a.day||dayOf(a.date))}</b><span>${esc(a.date)}</span></div><div><small>Time</small><b>${esc(a.time)}</b></div><div><small>Assigned Staff</small><b>${esc(a.staff)}</b><span>${esc(staff?.role||'')}</span></div><div><small>Attendance</small>${statusBadge(a.attendance)}</div><div><small>Booked By</small><b>${esc(a.bookedBy||'—')}</b></div></div><div class="row" style="margin-top:16px"><button class="btn outline" onclick="closeModal()">Close</button>${canMark&&a.status!=='Conducted'?`<button class="btn secondary" onclick="closeModal();markAppointment(${a.id},'Present')">Mark Present</button><button class="btn danger" onclick="closeModal();markAppointment(${a.id},'Absent')">Mark Absent</button>`:''}</div>`)
-}
-function appointmentsPage(){
-  apEnsureState();const arr=apFiltered(),conducted=arr.filter(x=>x.status==='Conducted').length,present=arr.filter(x=>x.attendance==='Present').length,upcoming=arr.filter(x=>x.status!=='Conducted').length;
-  const serviceOptions=SERVICES.map(s=>`<option value="${s.id}" ${appointmentViewState.service===s.id?'selected':''}>${esc(s.name)}</option>`).join('');
-  return `<div class="appt-page-head"><div><span class="section-label">SCHEDULING & ATTENDANCE</span><h3>${me.role==='admin'?'ANJIZ Appointments':'My ANJIZ Appointments'}</h3><p>Calendar, day schedule and appointment records in one view.</p></div><div class="row">${['admin','peer','student'].includes(me.role)?'<button class="btn primary" onclick="openPage(\'book\')">＋ New booking</button>':''}<button class="btn outline" onclick="exportAppointments()">Export Excel</button></div></div>${cards([['Filtered appointments',arr.length,'Current view'],['Upcoming',upcoming,'Not yet conducted'],['Conducted',conducted,'Completed sessions'],['Present',present,'Attendance recorded']])}<div class="panel appt-filter-panel"><div class="appt-filters"><div class="field"><label>Service / Program</label><select onchange="apSetService(this.value)"><option value="all">All services</option>${serviceOptions}</select></div><div class="field"><label>Status</label><select onchange="apSetStatus(this.value)"><option value="all" ${appointmentViewState.status==='all'?'selected':''}>All statuses</option><option value="Confirmed" ${appointmentViewState.status==='Confirmed'?'selected':''}>Confirmed</option><option value="Conducted" ${appointmentViewState.status==='Conducted'?'selected':''}>Conducted</option></select></div><div class="field ap-search"><label>Search</label><div class="search-inline"><input value="${esc(appointmentViewState.search)}" placeholder="Student, ID, staff…" onkeydown="if(event.key==='Enter')apSetSearch(this.value)"><button class="btn outline" onclick="apSetSearch(this.previousElementSibling.value)">Search</button></div></div><div class="field"><label>Calendar</label><button class="btn outline full" onclick="apGoToday()">Today</button></div></div></div><div class="appt-layout"><div class="panel ap-calendar-panel">${apCalendar()}</div><div class="panel ap-day-panel">${apDayView()}</div></div><div class="panel" style="margin-top:12px"><div class="toolbar"><div><span class="section-label">ALL RECORDS</span><h3>Appointment List</h3></div><span class="muted">${arr.length} result${arr.length===1?'':'s'}</span></div>${arr.length?apListTable(arr):'<div class="empty-state"><b>No appointments match these filters</b><span>Clear or change the filters to view more records.</span></div>'}</div>`
-}
+
+  async function stopScanner(){
+    const scanner=activeScanner;
+    activeScanner=null;
+    if(!scanner)return;
+    try{if(scanner.isScanning)await scanner.stop()}catch(e){}
+    try{await scanner.clear()}catch(e){}
+  }
+
+  window.stopAnjizScannerV24=async function(){
+    await stopScanner();
+    try{closeModal()}catch(e){}
+  };
+
+  async function applyResult(raw,fieldId){
+    const result=normalizeScan(raw);
+    await stopScanner();
+    try{closeModal()}catch(e){}
+    const target=document.getElementById(fieldId);
+    if(target){
+      target.value=result.id;
+      target.dispatchEvent(new Event('input',{bubbles:true}));
+      target.dispatchEvent(new Event('change',{bubbles:true}));
+      target.focus();
+    }
+    if(fieldId==='loginId'){
+      const p=document.getElementById('loginPass');
+      if(p)p.focus();
+    }
+  }
+
+  async function scanWithImage(file,fieldId){
+    if(!file)return;
+    try{
+      if(!window.Html5Qrcode)await loadScript(QR_LIB,'anjiz-html5-qrcode-v24');
+      const tempId='anjizQrTempV24';
+      let temp=document.getElementById(tempId);
+      if(!temp){temp=document.createElement('div');temp.id=tempId;temp.style.display='none';document.body.appendChild(temp)}
+      const reader=new Html5Qrcode(tempId);
+      const raw=await reader.scanFile(file,true);
+      try{await reader.clear()}catch(e){}
+      await applyResult(raw,fieldId);
+    }catch(e){
+      alert('The QR image could not be read. Try a clearer image or enter the University ID manually.');
+    }
+  }
+
+  const scannerFunction=async function(fieldId){
+    try{
+      if(!window.Html5Qrcode)await loadScript(QR_LIB,'anjiz-html5-qrcode-v24');
+    }catch(e){
+      alert('QR scanner could not load. Check the internet connection and try again.');
+      return;
+    }
+
+    try{
+      showModal(`<div><span class="section-label">ANJIZ QR SCANNER</span><h3>Scan Student ID / QR</h3><p class="muted">Allow camera access, then point the rear camera at the ANJIZ QR code.</p><div id="anjizQrReaderV24" style="width:100%;min-height:300px;border-radius:14px;overflow:hidden;background:#071f17;margin-top:12px"></div><div class="row" style="margin-top:12px"><label class="btn secondary" style="cursor:pointer">Choose QR Image<input id="anjizQrFileV24" type="file" accept="image/*" style="display:none"></label><button class="btn danger" onclick="stopAnjizScannerV24()">Close</button></div></div>`);
+    }catch(e){return}
+
+    const file=document.getElementById('anjizQrFileV24');
+    if(file)file.onchange=()=>scanWithImage(file.files&&file.files[0],fieldId);
+
+    try{
+      activeScanner=new Html5Qrcode('anjizQrReaderV24');
+      await activeScanner.start(
+        {facingMode:'environment'},
+        {fps:10,qrbox:{width:230,height:230},aspectRatio:1},
+        raw=>applyResult(raw,fieldId),
+        ()=>{}
+      );
+    }catch(e){
+      const box=document.getElementById('anjizQrReaderV24');
+      if(box)box.innerHTML='<div class="notice warn" style="margin:12px">Camera access is unavailable here. Tap <b>Choose QR Image</b> and select or take a photo of the QR code.</div>';
+    }
+  };
+
+  try{scanBarcodeToField=scannerFunction}catch(e){}
+  window.scanBarcodeToField=scannerFunction;
+  window.scanLoginId=function(){return scannerFunction('loginId')};
+
+  fetch(STABLE_APPOINTMENTS,{cache:'no-store'})
+    .then(r=>{if(!r.ok)throw new Error('appointments '+r.status);return r.text()})
+    .then(code=>{
+      const blob=new Blob([code],{type:'text/javascript'});
+      const url=URL.createObjectURL(blob);
+      const s=document.createElement('script');
+      s.src=url;
+      s.onload=()=>URL.revokeObjectURL(url);
+      s.onerror=()=>URL.revokeObjectURL(url);
+      document.head.appendChild(s);
+    })
+    .catch(e=>console.warn('ANJIZ appointments enhancement unavailable',e));
+})();
