@@ -1,5 +1,5 @@
 import './admin.js?v=30.0.3';
-import './admin-courses-v32.js?v=32.0.0';
+import './admin-courses-v323.js?v=32.3.0';
 import {rpc,toast} from './core.js?v=30.0.1';
 
 const passwordKey='uon_admin_password';
