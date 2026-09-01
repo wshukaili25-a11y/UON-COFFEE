@@ -7,7 +7,7 @@ const modules = [
   'js/tools.js','js/tools-primary-v46.js','js/useful-sites.js','js/search.js','js/go.js',
   'js/tool-preview-v44.js','js/schedule-profile-boot-v44.js','js/schedule.js',
   'js/schedule-extras-v44.js','js/tools-control-v44.js','sw.js',
-  'js/admin-v30.js','js/admin-edge-v30.js','js/admin-operations-v31.js','js/admin-courses-v314.js','js/admin-courses-v323.js',
+  'js/admin-v30.js','js/admin-edge-v30.js','js/admin-operations-v31.js','js/admin-courses-v323.js',
   'js/owner-dashboard.js','js/owner-sessions-v48.js','js/telegram-bot-control-fix.js',
   'js/questions.js','js/marketplace.js','js/assistant.js','js/assistant-history.js'
 ];
