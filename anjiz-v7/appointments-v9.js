@@ -1,9 +1,10 @@
 (()=>{
-  if(window.__anjizAppointmentsSafeLoaderV24)return;
-  window.__anjizAppointmentsSafeLoaderV24=1;
+  if(window.__anjizAppointmentsSafeLoaderV25)return;
+  window.__anjizAppointmentsSafeLoaderV25=1;
 
   const STABLE_APPOINTMENTS='https://raw.githubusercontent.com/wshukaili25-a11y/UON-COFFEE/c901e4101b97ec981dce9714fe42c2c6e7df7bfc/anjiz-v7/appointments-v9.js';
   const QR_LIB='https://cdn.jsdelivr.net/npm/html5-qrcode@2.3.8/html5-qrcode.min.js';
+  const QR_MAKE_LIB='https://raw.githubusercontent.com/davidshimjs/qrcodejs/master/qrcode.min.js';
   let activeScanner=null;
 
   function loadScript(src,id){
@@ -25,11 +26,24 @@
     });
   }
 
+  async function loadFetchedScript(src,id,test){
+    if(test&&test())return;
+    if(id&&document.getElementById(id)&&test&&test())return;
+    const code=await fetch(src,{cache:'no-store'}).then(r=>{if(!r.ok)throw new Error('library '+r.status);return r.text()});
+    const blob=new Blob([code],{type:'text/javascript'}),url=URL.createObjectURL(blob);
+    await new Promise((resolve,reject)=>{
+      const s=document.createElement('script');if(id)s.id=id;s.src=url;
+      s.onload=()=>{URL.revokeObjectURL(url);resolve()};
+      s.onerror=()=>{URL.revokeObjectURL(url);reject(new Error('library execution failed'))};
+      document.head.appendChild(s);
+    });
+  }
+
   function normalizeScan(raw){
     const value=String(raw||'').trim();
     try{
       const u=new URL(value,location.href);
-      for(const key of ['uid','id','user','verify']){
+      for(const key of ['verifyUid','uid','id','user','verify']){
         const v=u.searchParams.get(key);
         if(v&&/^[A-Za-z0-9._-]{2,64}$/.test(v))return {id:v.toUpperCase(),url:value};
       }
@@ -118,6 +132,38 @@
   try{scanBarcodeToField=scannerFunction}catch(e){}
   window.scanBarcodeToField=scannerFunction;
   window.scanLoginId=function(){return scannerFunction('loginId')};
+
+  function escV25(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+  function verificationUrlV25(uid){const u=new URL(location.href);u.search='';u.hash='';u.searchParams.set('verifyUid',uid);return u.toString()}
+
+  window.downloadMyQrV25=function(){
+    const host=document.getElementById('anjizMyQrBoxV25');if(!host)return;
+    const canvas=host.querySelector('canvas');const img=host.querySelector('img');
+    const href=canvas?.toDataURL?.('image/png')||img?.src;if(!href)return;
+    const a=document.createElement('a');a.href=href;a.download='ANJIZ-QR.png';document.body.appendChild(a);a.click();a.remove();
+  };
+
+  function installQrMakerV25(){
+    if(window.__anjizQrMakerV25)return true;
+    if(typeof window.openMyQrV24!=='function')return false;
+    window.__anjizQrMakerV25=1;
+    window.openMyQrV24=async function(){
+      let who=null;try{who=me}catch(e){}if(!who)return;
+      const verify=verificationUrlV25(who.uid);
+      showModal(`<div style="text-align:center"><span class="section-label">ANJIZ DIGITAL ID</span><h3 style="margin:5px 0">My QR</h3><p class="muted">Scan to verify this ANJIZ identity.</p><div style="display:grid;place-items:center;min-height:270px"><div id="anjizMyQrBoxV25" style="width:260px;height:260px;max-width:100%;display:grid;place-items:center;background:#fff;border-radius:16px;padding:8px;box-sizing:border-box"><div class="muted">Generating QR…</div></div></div><b style="display:block;margin-top:8px">${escV25(who.name)}</b><span class="muted">${escV25(who.uid)} · ${escV25(who.sub||who.role||'')}</span><div class="row" style="justify-content:center;margin-top:14px;flex-wrap:wrap"><button class="btn primary" onclick="downloadMyQrV25()">Download QR</button><button class="btn secondary" onclick="navigator.clipboard?.writeText('${verify.replace(/'/g,"\\'")}');try{toast('Verification link copied')}catch(e){}">Copy Verification Link</button><button class="btn outline" onclick="closeModal()">Close</button></div></div>`);
+      try{
+        await loadFetchedScript(QR_MAKE_LIB,'anjiz-qrcode-maker-v25',()=>!!window.QRCode);
+        const host=document.getElementById('anjizMyQrBoxV25');if(!host)return;host.innerHTML='';
+        new QRCode(host,{text:verify,width:244,height:244,colorDark:'#0b5d3d',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.M});
+      }catch(e){
+        const host=document.getElementById('anjizMyQrBoxV25');if(host)host.innerHTML='<div style="padding:20px;text-align:center"><b>QR generator unavailable</b><br><small class="muted">Use Copy Verification Link</small></div>';
+      }
+    };
+    return true;
+  }
+
+  let qrInstallTries=0;
+  const qrInstallTimer=setInterval(()=>{if(installQrMakerV25()||++qrInstallTries>100)clearInterval(qrInstallTimer)},150);
 
   fetch(STABLE_APPOINTMENTS,{cache:'no-store'})
     .then(r=>{if(!r.ok)throw new Error('appointments '+r.status);return r.text()})
