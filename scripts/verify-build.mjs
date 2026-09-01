@@ -1,6 +1,6 @@
 import { access, readFile } from 'node:fs/promises';
 import { spawnSync } from 'node:child_process';
-import { dirname, resolve } from 'node:path';
+import { dirname, resolve, relative } from 'node:path';
 
 const modules = [
   'js/core.js','js/pwa-init.js','js/tool-registry-v44.js','js/platform-experience-v44.js',
@@ -71,9 +71,46 @@ for (const htmlFile of htmlFiles) {
   }
 }
 
+const checkedModules = new Set();
+async function verifyModuleImports(file) {
+  const normalized = file.replaceAll('\\','/');
+  if (checkedModules.has(normalized)) return;
+  checkedModules.add(normalized);
+
+  let source = '';
+  try { source = await readFile(normalized, 'utf8'); }
+  catch (error) {
+    failures.push(`${normalized}\n${error.message}`);
+    return;
+  }
+
+  const refs = new Set();
+  for (const match of source.matchAll(/(?:import|export)\s+(?:[^'";]+?\s+from\s+)?["']([^"']+)["']/g)) refs.add(match[1]);
+  for (const match of source.matchAll(/import\(\s*["']([^"']+)["']\s*\)/g)) refs.add(match[1]);
+
+  for (const rawRef of refs) {
+    if (!rawRef.startsWith('.') && !rawRef.startsWith('/')) continue;
+    const cleanRef = rawRef.split('#')[0].split('?')[0];
+    const localPath = cleanRef.startsWith('/')
+      ? resolve(process.cwd(), `.${cleanRef}`)
+      : resolve(process.cwd(), dirname(normalized), cleanRef);
+    const displayPath = relative(process.cwd(), localPath).replaceAll('\\','/');
+
+    try { await access(localPath); }
+    catch {
+      failures.push(`${normalized}\nmissing local import: ${rawRef}`);
+      continue;
+    }
+
+    if (/\.(?:m?js)$/i.test(cleanRef)) await verifyModuleImports(displayPath);
+  }
+}
+
+for (const file of modules) await verifyModuleImports(file);
+
 if (failures.length) {
   console.error(`Production verification failed:\n\n${failures.join('\n\n')}`);
   process.exit(1);
 }
 
-console.log(`Production verification passed (${modules.length} modules, ${requiredFiles.length} required files, local HTML references checked).`);
+console.log(`Production verification passed (${modules.length} entry modules, ${checkedModules.size} modules checked, ${requiredFiles.length} required files, local HTML references checked).`);
