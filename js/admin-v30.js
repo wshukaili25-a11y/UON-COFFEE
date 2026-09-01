@@ -1,5 +1,6 @@
 import './admin.js?v=30.0.3';
 import './admin-questions-v53.js?v=53.3.0';
+import './admin-marketplace-v53.js?v=53.3.0';
 import {rpc,toast} from './core.js?v=30.0.1';
 
 const passwordKey='uon_admin_password';
