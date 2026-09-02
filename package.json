@@ -3,7 +3,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "vercel-build": "node scripts/verify-build.mjs"
+    "vercel-build": "node scripts/verify-google-v641.mjs && node scripts/verify-build.mjs"
   },
   "engines": {
     "node": "24.x"
