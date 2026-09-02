@@ -13,7 +13,7 @@ const PRECACHE = [
   '/css/useful-sites-v46.css','/css/support-centers.css','/css/user-dashboard-v61.css','/css/student-pulse.css',
   '/css/home-student-pulse.css','/css/student-tools-ui-v47.css','/js/v14-ui.js','/js/tools.js','/js/tools-primary-v46.js',
   '/js/useful-sites.js','/js/student-tools-ui-v47.js','/js/schedule-profile-boot-v44.js','/js/schedule.js','/js/schedule-extras-v44.js',
-  '/js/schedule-insights-v61.js','/js/schedule-smart-v63.js','/js/schedule-prefill-v63.js','/js/assistant-smart-v63.js','/js/assistant-schedule-actions-v63.js','/js/assistant.js','/js/assistant-history.js','/js/google-connect-v641.js','/js/student-tasks-data.js','/js/tasks.js','/js/study-focus-data.js','/js/study-focus.js','/js/search.js','/js/go.js','/js/pwa-init.js','/js/tool-registry-v44.js','/js/platform-experience-v44.js',
+  '/js/schedule-insights-v61.js','/js/schedule-smart-v63.js','/js/schedule-prefill-v63.js','/js/assistant-smart-v63.js','/js/assistant-schedule-actions-v63.js','/js/assistant.js','/js/assistant-history.js','/js/google-connect-v641.js','/js/google-auth-session-v641.js','/js/student-tasks-data.js','/js/tasks.js','/js/study-focus-data.js','/js/study-focus.js','/js/search.js','/js/go.js','/js/pwa-init.js','/js/tool-registry-v44.js','/js/platform-experience-v44.js',
   '/js/app-capabilities-v48.js','/js/contact-directory.js','/js/support-centers.js','/js/academic-calendar-data.js',
   '/js/academic-calendar-page.js','/js/student-pulse.js','/js/user-dashboard.js','/js/notifications.js','/js/v20-experience.js',
   '/js/home-student-pulse.js','/js/security-guard-v48.js','/assets/whatsapp-official.svg','/assets/icons/icon-192.png','/assets/icons/icon-512.png'
