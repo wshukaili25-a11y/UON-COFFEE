@@ -7,14 +7,15 @@ const SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
 const PUBLIC_KEY = Deno.env.get('SUPABASE_ANON_KEY') || Deno.env.get('SUPABASE_PUBLISHABLE_KEY') || '';
 const CONNECTOR_SECRET = Deno.env.get('UON_AI_CONNECTOR_SECRET') || '';
 const GEMINI_API_KEY = Deno.env.get('GEMINI_API_KEY') || '';
-const GEMINI_PRIMARY_MODEL = Deno.env.get('GEMINI_PRIMARY_MODEL') || 'gemini-3.7-flash';
-const GEMINI_FALLBACK_MODEL = Deno.env.get('GEMINI_FALLBACK_MODEL') || 'gemini-3.5-flash-lite';
+const GEMINI_PRIMARY_MODEL = Deno.env.get('GEMINI_PRIMARY_MODEL') || 'gemini-3.5-flash-lite';
+const GEMINI_FALLBACK_MODEL = Deno.env.get('GEMINI_FALLBACK_MODEL') || 'gemini-3.1-flash-lite';
 
 const BASE = `${SUPABASE_URL}/functions/v1/uon-ai-chat`;
 const GOOGLE = `${SUPABASE_URL}/functions/v1/uon-ai-google-v64`;
 const PERSONAL = `${SUPABASE_URL}/functions/v1/uon-google-account-v64`;
 const db = createClient(SUPABASE_URL, SERVICE_ROLE_KEY, { auth: { persistSession: false, autoRefreshToken: false } });
 const allowed = new Set(['https://uonhub.space', 'https://www.uonhub.space']);
+const uuid = (v: unknown) => /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(String(v || ''));
 
 function origin(req: Request) {
   const value = req.headers.get('origin') || '';
@@ -42,6 +43,10 @@ function clean(v: unknown, n = 1000) {
 
 function norm(v: unknown) {
   return clean(v).toLowerCase().replace(/[أإآ]/g, 'ا').replace(/ة/g, 'ه').replace(/ى/g, 'ي');
+}
+
+function learnNorm(v: unknown) {
+  return norm(v).replace(/[^\p{L}\p{N}\s]/gu, ' ').replace(/\s+/g, ' ').trim();
 }
 
 function safeUrl(v: unknown) {
@@ -318,6 +323,42 @@ async function geminiAnswer(question: string, lang: string) {
   };
 }
 
+async function recordGeminiTurn(body: any, question: string, answer: string, requestId: string) {
+  if (!uuid(body?.session_id)) return;
+  const sessionId = String(body.session_id);
+  const channel = ['web', 'instagram', 'telegram'].includes(body?.channel) ? body.channel : 'web';
+  const { data: existing } = await db.from('uon_ai_conversations').select('id').eq('session_id', sessionId).maybeSingle();
+  let conversationId = existing?.id || '';
+  if (!conversationId) {
+    const { data, error } = await db.from('uon_ai_conversations').insert({ session_id: sessionId, channel, status: 'ai', page_context: clean(body?.page_context, 240) || null, last_message_at: new Date().toISOString() }).select('id').single();
+    if (error) throw error;
+    conversationId = data.id;
+  } else {
+    await db.from('uon_ai_conversations').update({ last_message_at: new Date().toISOString(), updated_at: new Date().toISOString() }).eq('id', conversationId);
+  }
+  await db.from('uon_ai_messages').insert({ conversation_id: conversationId, role: 'user', content: question });
+  await db.from('uon_ai_messages').insert({ conversation_id: conversationId, role: 'assistant', content: answer, request_id: requestId });
+}
+
+async function learnGemini(question: string, result: any) {
+  const normalized = learnNorm(question);
+  if (!normalized) return;
+  const { data } = await db.from('uon_ai_learning_patterns').select('*').eq('normalized_question', normalized).maybeSingle();
+  const patch: any = {
+    sample_question: question,
+    times_seen: Number(data?.times_seen || 0) + 1,
+    last_seen_at: new Date().toISOString(),
+    updated_at: new Date().toISOString()
+  };
+  if (Number(result?.confidence || 0) >= .86 && Number(result?.sources_count || 0) >= 3) {
+    patch.best_answer_preview = clean(result.answer, 900);
+    patch.best_confidence = Number(result.confidence || 0);
+    patch.best_sources_count = Number(result.sources_count || 0);
+  }
+  if (data) await db.from('uon_ai_learning_patterns').update(patch).eq('normalized_question', normalized);
+  else await db.from('uon_ai_learning_patterns').insert({ normalized_question: normalized, first_seen_at: new Date().toISOString(), positive_count: 0, negative_count: 0, ...patch });
+}
+
 Deno.serve(async (req: Request) => {
   if (req.method === 'OPTIONS') return new Response(null, { status: 204, headers: headers(req) });
   if (req.method !== 'POST') return new Response(JSON.stringify({ error: 'method_not_allowed' }), { status: 405, headers: headers(req) });
@@ -351,6 +392,13 @@ Deno.serve(async (req: Request) => {
       if (!base.r.ok) return new Response(base.text, { status: base.r.status, headers: headers(req) });
       result = base.data;
       result.connectors = { ...(result.connectors || {}), gemini: { used: false, fallback_to_legacy: true, reason: GEMINI_API_KEY ? 'no_grounded_context_or_special_mode' : 'api_key_not_configured' } };
+    } else {
+      const requestId = crypto.randomUUID();
+      result.request_id = requestId;
+      await Promise.allSettled([
+        recordGeminiTurn(body, question, result.answer, requestId),
+        learnGemini(question, result)
+      ]);
     }
 
     if (useGoogle) result = merge(result, google, lang, question);
