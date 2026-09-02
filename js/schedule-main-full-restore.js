@@ -1,1 +1,0 @@
-import './schedule-main.js?v=59.0.0';
