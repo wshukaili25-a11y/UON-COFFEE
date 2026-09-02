@@ -1,3 +1,4 @@
+import './assistant-schedule-actions-v63.js?v=63.0.0';
 const SESSION_KEY='uon_ai_session_v46';
 const STORE_KEY='uon_ai_history_v47';
 const CLIENT_KEY='uon_ai_client_v55';

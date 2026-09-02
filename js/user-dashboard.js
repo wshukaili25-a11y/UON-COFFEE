@@ -2,6 +2,7 @@ import {esc,toast} from './core.js?v=62.1.0';
 import {nextClass,currentAcademicPulse,formatClassTime,readSchedule} from './student-pulse.js?v=62.1.0';
 import {STUDENT_TASKS_KEY,readStudentTasks,nextStudentTask,formatTaskDue,taskDueState} from './student-tasks-data.js?v=62.1.0';
 import {STUDY_SESSIONS_KEY,STUDY_SETTINGS_KEY,studyStats,formatStudyDuration} from './study-focus-data.js?v=62.1.0';
+import {getGoogleAuthStatus,googleAuthStatusText} from './google-auth-status-v641.js?v=64.1.0';
 
 const FAVORITES_KEY='uon_favorites_v20';
 const RECENT_KEY='uon_recent_pages_v61';
@@ -82,6 +83,18 @@ function listMarkup(rows,{empty}){
 }
 const favoriteRows=document.querySelector('#favoriteRows');if(favoriteRows)favoriteRows.innerHTML=listMarkup(favorites,{empty:'ما حفظت أي صفحة للحين. استخدم زر ♡ في الصفحات اللي تهمك.'});
 const recentRows=document.querySelector('#recentRows');if(recentRows)recentRows.innerHTML=listMarkup(recents,{empty:'سجل الاستخدام فاضي. افتح أدواتك وبتظهر هنا تلقائيًا.'});
+
+async function renderGoogleProviderStatus(){
+ const status=await getGoogleAuthStatus();
+ const link=document.querySelector('a[href="google-connect.html"]');
+ if(!link)return;
+ const title=link.querySelector('strong'),detail=link.querySelector('small');
+ if(title)title.textContent=status.enabled?'ربط Google':'Google قيد الإعداد';
+ if(detail)detail.textContent=status.enabled?'Calendar وDrive بشكل اختياري وخاص':'Calendar وDrive غير مفعّلين للحسابات حاليًا';
+ link.title=googleAuthStatusText(status);
+ link.dataset.googleAuthEnabled=status.enabled?'true':'false';
+}
+void renderGoogleProviderStatus();
 
 document.querySelector('#clearRecent')?.addEventListener('click',()=>{localStorage.removeItem(RECENT_KEY);if(recentRows)recentRows.innerHTML='<div class="dashboard-empty">تم مسح آخر الصفحات.</div>';setText('#recentCount',0);toast('تم مسح سجل آخر الصفحات')});
 

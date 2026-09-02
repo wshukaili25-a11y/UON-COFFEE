@@ -5,26 +5,27 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="theme-color" content="#060b1b">
   <title>الجدول الدراسي | UON Hub</title>
-  <meta name="description" content="أنشئ أكثر من جدول دراسي، شاركه، احسب ساعات الدوام والفراغ، واكتشف التعارضات تلقائيًا.">
+  <meta name="description" content="أنشئ أكثر من جدول دراسي، تابع محاضرتك الحالية والقادمة، احسب ساعات الدوام والفراغ، واكتشف التعارضات تلقائيًا.">
   <meta name="robots" content="index,follow,max-image-preview:large">
   <link rel="canonical" href="https://uonhub.space/schedule.html">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="UON Hub">
   <meta property="og:title" content="الجدول الدراسي | UON Hub">
-  <meta property="og:description" content="أنشئ أكثر من جدول دراسي، شاركه، احسب ساعات الدوام والفراغ، واكتشف التعارضات تلقائيًا.">
+  <meta property="og:description" content="تابع يومك الدراسي، اكتشف التعارضات والفراغات وابدأ Focus مباشرة من المادة.">
   <meta property="og:url" content="https://uonhub.space/schedule.html">
   <meta property="og:image" content="https://uonhub.space/assets/unizwa-new-gate-v52.jpg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/app.css?v=61.2.0">
-  <link rel="stylesheet" href="css/ui-refresh-v24.css?v=61.2.0">
-  <link rel="stylesheet" href="css/schedule.css?v=61.2.0">
-  <link rel="stylesheet" href="css/schedule-extras-v44.css?v=61.2.0">
-  <link rel="stylesheet" href="css/schedule-insights-v61.css?v=61.2.0">
-  <link rel="stylesheet" href="css/student-tools-v53.css?v=61.2.0">
-  <link rel="stylesheet" href="/css/pwa.css?v=61.2.0">
-  <link rel="stylesheet" href="css/content-reports.css?v=61.2.0">
+  <link rel="stylesheet" href="css/app.css?v=63.0.0">
+  <link rel="stylesheet" href="css/ui-refresh-v24.css?v=63.0.0">
+  <link rel="stylesheet" href="css/schedule.css?v=63.0.0">
+  <link rel="stylesheet" href="css/schedule-extras-v44.css?v=63.0.0">
+  <link rel="stylesheet" href="css/schedule-insights-v61.css?v=63.0.0">
+  <link rel="stylesheet" href="css/schedule-smart-v63.css?v=63.0.0">
+  <link rel="stylesheet" href="css/student-tools-v53.css?v=63.0.0">
+  <link rel="stylesheet" href="/css/pwa.css?v=63.0.0">
+  <link rel="stylesheet" href="css/content-reports.css?v=63.0.0">
   <link rel="manifest" href="/manifest.webmanifest">
   <link rel="apple-touch-icon" href="/assets/icons/icon-192.png">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -32,73 +33,13 @@
   <meta name="apple-mobile-web-app-title" content="UON Hub">
 </head>
 <body data-feature="schedule" data-uon-page="schedule">
-<header class="site-header">
-  <div class="container nav">
-    <a class="brand" href="index.html"><span class="brand-mark" aria-hidden="true">U</span><span class="brand-name">UON <b>Hub</b></span></a>
-    <ul class="nav-links" id="navLinks">
-      <li><a href="index.html">الرئيسية</a></li>
-      <li><a href="university-guide.html">دليل الجامعة</a></li>
-      <li><a class="active" href="tools.html">الأدوات</a></li>
-      <li><a href="summaries.html">الملخصات</a></li>
-      <li><a href="groups.html">المجموعات</a></li>
-      <li><a href="projects.html">مشاريع الطلاب</a></li>
-      <li><a href="ratings.html">التقييمات</a></li>
-    </ul>
-    <div class="nav-actions"><a class="btn" href="user-dashboard.html">لوحتي</a><button class="icon-btn mobile-menu" id="menuBtn" type="button" aria-label="فتح القائمة">☰</button></div>
-  </div>
-</header>
-
+<header class="site-header"><div class="container nav"><a class="brand" href="index.html"><span class="brand-mark" aria-hidden="true">U</span><span class="brand-name">UON <b>Hub</b></span></a><ul class="nav-links" id="navLinks"><li><a href="index.html">الرئيسية</a></li><li><a href="university-guide.html">دليل الجامعة</a></li><li><a class="active" href="tools.html">الأدوات</a></li><li><a href="summaries.html">الملخصات</a></li><li><a href="groups.html">المجموعات</a></li><li><a href="projects.html">مشاريع الطلاب</a></li><li><a href="ratings.html">التقييمات</a></li></ul><div class="nav-actions"><a class="btn" href="user-dashboard.html">لوحتي</a><button class="icon-btn mobile-menu" id="menuBtn" type="button" aria-label="فتح القائمة">☰</button></div></div></header>
 <main class="v14-page-main schedule-page">
-  <section class="page-hero schedule-hero">
-    <div class="container">
-      <span class="student-label">أداة أكاديمية ذكية</span>
-      <h1 data-ar="الجدول الدراسي" data-en="Study Schedule">الجدول الدراسي</h1>
-      <p data-ar="أنشئ أكثر من جدول، أضف المادة في عدة أيام، شارك جدولك واكتشف التعارضات والفترات الفاضية تلقائيًا." data-en="Create multiple schedules, add courses on several days, share your schedule, and automatically detect conflicts and free time.">أنشئ أكثر من جدول، أضف المادة في عدة أيام، شارك جدولك واكتشف التعارضات والفترات الفاضية تلقائيًا.</p>
-    </div>
-  </section>
-
-  <section class="section schedule-section">
-    <div class="container schedule-shell">
-      <section class="card schedule-form-card" aria-labelledby="scheduleFormTitle">
-        <div class="schedule-panel-head">
-          <div>
-            <h2 id="scheduleFormTitle" data-ar="إضافة محاضرة" data-en="Add a class">إضافة محاضرة</h2>
-            <p data-ar="اختر كل الأيام التي تتكرر فيها المادة. يمكن تعديلها لاحقًا من بطاقة المادة." data-en="Select every day on which the course repeats. You can edit it later from its card.">اختر كل الأيام التي تتكرر فيها المادة. يمكن تعديلها لاحقًا من بطاقة المادة.</p>
-          </div>
-          <span id="editingBadge" class="schedule-editing-badge" hidden data-ar="وضع التعديل" data-en="Editing mode">وضع التعديل</span>
-        </div>
-        <form id="scheduleForm" class="schedule-form" novalidate>
-          <div class="schedule-form-grid">
-            <div class="field"><label for="course">المادة</label><input id="course" name="course" maxlength="24" placeholder="INFS205" autocomplete="off" required></div>
-            <div class="field"><label for="classType">نوع الحصة</label><select id="classType" name="classType"><option value="lecture">محاضرة</option><option value="lab">مختبر / عملي</option><option value="tutorial">تمارين</option><option value="workshop">ورشة</option><option value="other">أخرى</option></select></div>
-            <fieldset class="schedule-days-field field-wide"><legend>أيام المادة</legend><div class="schedule-days" id="dayOptions">
-              <label class="schedule-day-choice"><input type="checkbox" name="days" value="الأحد" checked><span>الأحد</span></label>
-              <label class="schedule-day-choice"><input type="checkbox" name="days" value="الاثنين"><span>الاثنين</span></label>
-              <label class="schedule-day-choice"><input type="checkbox" name="days" value="الثلاثاء"><span>الثلاثاء</span></label>
-              <label class="schedule-day-choice"><input type="checkbox" name="days" value="الأربعاء"><span>الأربعاء</span></label>
-              <label class="schedule-day-choice"><input type="checkbox" name="days" value="الخميس"><span>الخميس</span></label>
-            </div></fieldset>
-            <div class="field"><label for="start">من</label><div class="schedule-time-control"><input id="start" name="start" type="time" value="08:00" step="300" required><select id="startPeriod" name="startPeriod" aria-label="فترة بداية المحاضرة"><option value="am">صباحًا</option><option value="pm">مساءً</option></select></div></div>
-            <div class="field"><label for="end">إلى</label><div class="schedule-time-control"><input id="end" name="end" type="time" value="09:50" step="300" required><select id="endPeriod" name="endPeriod" aria-label="فترة نهاية المحاضرة"><option value="am">صباحًا</option><option value="pm">مساءً</option></select></div></div>
-            <div class="field"><label for="room">القاعة</label><input id="room" name="room" maxlength="30" placeholder="8-3" autocomplete="off"></div>
-            <div class="field"><label for="teacher">الدكتور</label><input id="teacher" name="teacher" maxlength="80" placeholder="اسم الدكتور" autocomplete="off"></div>
-          </div>
-          <div class="schedule-form-actions"><button class="btn primary schedule-add" id="add" type="submit">إضافة للجدول</button><button class="btn schedule-cancel-edit" id="cancelEdit" type="button" hidden>إلغاء التعديل</button><span class="schedule-local-note">يُحفظ الجدول على هذا الجهاز، ويمكن مشاركته كرابط.</span></div>
-        </form>
-      </section>
-
-      <section class="card schedule-board-card" aria-labelledby="scheduleBoardTitle">
-        <div class="schedule-board-head"><div><h2 id="scheduleBoardTitle">جدول الأسبوع</h2><span id="scheduleCount" class="schedule-count" aria-live="polite">0 محاضرات</span></div><div class="schedule-board-actions"><button class="btn" id="exportImage" type="button">تصدير صورة</button><button class="btn" id="printSchedule" type="button">طباعة</button><button class="btn" id="exportJson" type="button">حفظ ملف</button><button class="btn" id="importJson" type="button">استيراد ملف</button><input id="importFile" type="file" accept="application/json,.json" hidden><button class="btn danger schedule-clear" id="clearSchedule" type="button" hidden>مسح الجدول</button></div></div>
-        <div class="schedule-scroll" role="region" aria-label="الجدول الدراسي الأسبوعي" tabindex="0"><div id="week" class="schedule-week"></div></div>
-      </section>
-    </div>
-  </section>
-</main>
-<div class="uon-independent-notice" role="note"><span class="uon-independent-notice__icon" aria-hidden="true">i</span><p><strong>تنبيه:</strong> UON Hub هو مشروع طلابي مستقل وغير تابع رسميًا لجامعة نزوى.</p></div>
-<footer class="site-footer"><div class="container footer-row"><span>UON Hub · 2026</span><span>منصة طلابية مستقلة لطلاب جامعة نزوى</span></div></footer>
-<div id="toast" class="toast" aria-live="polite"></div><aside class="notification-drawer" id="notificationDrawer"><div class="section-head"><h3>الإشعارات</h3><button class="icon-btn" id="closeNotifications" type="button" aria-label="إغلاق الإشعارات">✕</button></div><div id="notificationItems" class="notification-list"></div></aside>
-<script type="module">await import('./js/schedule-time-fix-v44.js?v=61.2.0');await import('./js/schedule-profile-boot-v44.js?v=61.2.0');await import('./js/schedule.js?v=61.2.0');await import('./js/schedule-extras-v44.js?v=61.2.0');await import('./js/schedule-insights-v61.js?v=61.2.0');</script>
-<script type="module">import {setupV14Shell} from './js/v14-ui.js?v=61.2.0';setupV14Shell();</script>
-<script type="module">import {applyFeatureStates} from './js/core.js?v=61.2.0';applyFeatureStates(document);</script>
-<script type="module" src="js/runtime-guard.js?v=61.2.0"></script><script type="module" src="js/v20-experience.js?v=61.2.0"></script><script type="module" src="/js/pwa-init.js?v=61.2.0"></script><script type="module" src="js/content-reports.js?v=61.2.0"></script>
+<section class="page-hero schedule-hero"><div class="container"><span class="student-label">أداة أكاديمية ذكية</span><h1>الجدول الدراسي</h1><p>شوف يومك الآن، أضف موادك، اكتشف التعارضات والفراغات، وابدأ Focus للمادة مباشرة من الجدول.</p></div></section>
+<section class="section schedule-section"><div class="container schedule-shell">
+<section class="card schedule-form-card" aria-labelledby="scheduleFormTitle"><div class="schedule-panel-head"><div><h2 id="scheduleFormTitle">إضافة محاضرة</h2><p>اختر كل الأيام التي تتكرر فيها المادة. يمكن تعديلها لاحقًا من بطاقة المادة.</p></div><span id="editingBadge" class="schedule-editing-badge" hidden>وضع التعديل</span></div><form id="scheduleForm" class="schedule-form" novalidate><div class="schedule-form-grid"><div class="field"><label for="course">المادة</label><input id="course" name="course" maxlength="24" placeholder="INFS205" autocomplete="off" required></div><div class="field"><label for="classType">نوع الحصة</label><select id="classType" name="classType"><option value="lecture">محاضرة</option><option value="lab">مختبر / عملي</option><option value="tutorial">تمارين</option><option value="workshop">ورشة</option><option value="other">أخرى</option></select></div><fieldset class="schedule-days-field field-wide"><legend>أيام المادة</legend><div class="schedule-days" id="dayOptions"><label class="schedule-day-choice"><input type="checkbox" name="days" value="الأحد" checked><span>الأحد</span></label><label class="schedule-day-choice"><input type="checkbox" name="days" value="الاثنين"><span>الاثنين</span></label><label class="schedule-day-choice"><input type="checkbox" name="days" value="الثلاثاء"><span>الثلاثاء</span></label><label class="schedule-day-choice"><input type="checkbox" name="days" value="الأربعاء"><span>الأربعاء</span></label><label class="schedule-day-choice"><input type="checkbox" name="days" value="الخميس"><span>الخميس</span></label></div></fieldset><div class="field"><label for="start">من</label><div class="schedule-time-control"><input id="start" name="start" type="time" value="08:00" step="300" required><select id="startPeriod" name="startPeriod"><option value="am">صباحًا</option><option value="pm">مساءً</option></select></div></div><div class="field"><label for="end">إلى</label><div class="schedule-time-control"><input id="end" name="end" type="time" value="09:50" step="300" required><select id="endPeriod" name="endPeriod"><option value="am">صباحًا</option><option value="pm">مساءً</option></select></div></div><div class="field"><label for="room">القاعة</label><input id="room" name="room" maxlength="30" placeholder="8-3" autocomplete="off"></div><div class="field"><label for="teacher">الدكتور</label><input id="teacher" name="teacher" maxlength="80" placeholder="اسم الدكتور" autocomplete="off"></div></div><div class="schedule-form-actions"><button class="btn primary schedule-add" id="add" type="submit">إضافة للجدول</button><button class="btn schedule-cancel-edit" id="cancelEdit" type="button" hidden>إلغاء التعديل</button><span class="schedule-local-note">يُحفظ الجدول على هذا الجهاز، ويمكن مشاركته كرابط.</span></div></form></section>
+<section class="card schedule-board-card" aria-labelledby="scheduleBoardTitle"><div class="schedule-board-head"><div><h2 id="scheduleBoardTitle">جدول الأسبوع</h2><span id="scheduleCount" class="schedule-count" aria-live="polite">0 محاضرات</span></div><div class="schedule-board-actions"><button class="btn" id="exportImage" type="button">تصدير صورة</button><button class="btn" id="printSchedule" type="button">طباعة</button><button class="btn" id="exportJson" type="button">حفظ ملف</button><button class="btn" id="importJson" type="button">استيراد ملف</button><input id="importFile" type="file" accept="application/json,.json" hidden><button class="btn danger schedule-clear" id="clearSchedule" type="button" hidden>مسح الجدول</button></div></div><div class="schedule-scroll" role="region" aria-label="الجدول الدراسي الأسبوعي" tabindex="0"><div id="week" class="schedule-week"></div></div></section>
+</div></section></main>
+<div class="uon-independent-notice" role="note"><span class="uon-independent-notice__icon" aria-hidden="true">i</span><p><strong>تنبيه:</strong> UON Hub هو مشروع طلابي مستقل وغير تابع رسميًا لجامعة نزوى.</p></div><footer class="site-footer"><div class="container footer-row"><span>UON Hub · 2026</span><span>منصة طلابية مستقلة لطلاب جامعة نزوى</span></div></footer><div id="toast" class="toast" aria-live="polite"></div><aside class="notification-drawer" id="notificationDrawer"><div class="section-head"><h3>الإشعارات</h3><button class="icon-btn" id="closeNotifications" type="button" aria-label="إغلاق الإشعارات">✕</button></div><div id="notificationItems" class="notification-list"></div></aside>
+<script type="module">await import('./js/schedule-time-fix-v44.js?v=63.0.0');await import('./js/schedule-profile-boot-v44.js?v=63.0.0');await import('./js/schedule.js?v=63.0.0');await import('./js/schedule-extras-v44.js?v=63.0.0');await import('./js/schedule-insights-v61.js?v=63.0.0');await import('./js/schedule-smart-v63.js?v=63.0.0');</script><script type="module">import {setupV14Shell} from './js/v14-ui.js?v=63.0.0';setupV14Shell();</script><script type="module">import {applyFeatureStates} from './js/core.js?v=63.0.0';applyFeatureStates(document);</script><script type="module" src="js/runtime-guard.js?v=63.0.0"></script><script type="module" src="js/v20-experience.js?v=63.0.0"></script><script type="module" src="/js/pwa-init.js?v=63.0.0"></script><script type="module" src="js/content-reports.js?v=63.0.0"></script>
 </body></html>

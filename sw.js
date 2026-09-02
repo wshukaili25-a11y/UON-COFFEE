@@ -1,4 +1,4 @@
-const VERSION = '62.1.0';
+const VERSION = '64.4.0';
 const STATIC_CACHE = `uonhub-static-${VERSION}`;
 const PAGE_CACHE = `uonhub-pages-${VERSION}`;
 const DATA_CACHE = `uonhub-data-${VERSION}`;
@@ -6,14 +6,14 @@ const USER_SAVED_CACHE = 'uonhub-user-saved-v1';
 const OFFLINE_URL = '/offline.html';
 
 const PRECACHE = [
-  '/index.html','/tools.html','/useful-sites.html','/schedule.html','/tasks.html','/study-focus.html','/user-dashboard.html',
+  '/index.html','/tools.html','/useful-sites.html','/schedule.html','/tasks.html','/study-focus.html','/user-dashboard.html','/assistant.html','/google-connect.html',
   '/notifications.html','/academic-calendar.html','/search.html','/go.html','/support-centers.html',
   OFFLINE_URL,'/manifest.webmanifest','/css/app.css','/css/ui-refresh-v24.css','/css/schedule.css',
-  '/css/schedule-extras-v44.css','/css/schedule-insights-v61.css','/css/student-tasks-v61.css','/css/study-focus-v62.css','/css/pwa.css','/css/tool-registry-v44.css','/css/tools-primary-v46.css',
+  '/css/schedule-extras-v44.css','/css/schedule-insights-v61.css','/css/schedule-smart-v63.css','/css/assistant-smart-v63.css','/css/google-connect-v641.css','/css/student-tasks-v61.css','/css/study-focus-v62.css','/css/pwa.css','/css/tool-registry-v44.css','/css/tools-primary-v46.css',
   '/css/useful-sites-v46.css','/css/support-centers.css','/css/user-dashboard-v61.css','/css/student-pulse.css',
   '/css/home-student-pulse.css','/css/student-tools-ui-v47.css','/js/v14-ui.js','/js/tools.js','/js/tools-primary-v46.js',
   '/js/useful-sites.js','/js/student-tools-ui-v47.js','/js/schedule-profile-boot-v44.js','/js/schedule.js','/js/schedule-extras-v44.js',
-  '/js/schedule-insights-v61.js','/js/student-tasks-data.js','/js/tasks.js','/js/study-focus-data.js','/js/study-focus.js','/js/search.js','/js/go.js','/js/pwa-init.js','/js/tool-registry-v44.js','/js/platform-experience-v44.js',
+  '/js/schedule-insights-v61.js','/js/schedule-smart-v63.js','/js/schedule-prefill-v63.js','/js/assistant-smart-v63.js','/js/assistant-schedule-actions-v63.js','/js/assistant.js','/js/assistant-history.js','/js/google-connect-v641.js','/js/google-auth-session-v641.js','/js/google-auth-status-v641.js','/js/student-tasks-data.js','/js/tasks.js','/js/study-focus-data.js','/js/study-focus.js','/js/search.js','/js/go.js','/js/pwa-init.js','/js/tool-registry-v44.js','/js/platform-experience-v44.js',
   '/js/app-capabilities-v48.js','/js/contact-directory.js','/js/support-centers.js','/js/academic-calendar-data.js',
   '/js/academic-calendar-page.js','/js/student-pulse.js','/js/user-dashboard.js','/js/notifications.js','/js/v20-experience.js',
   '/js/home-student-pulse.js','/js/security-guard-v48.js','/assets/whatsapp-official.svg','/assets/icons/icon-192.png','/assets/icons/icon-512.png'
