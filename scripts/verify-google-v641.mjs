@@ -18,7 +18,7 @@ const checks=[
   },
   {
     file:'supabase/functions/uon-ai-chat-v64/index.ts',
-    must:['privateIntent(q)','calendar-upcoming','drive-files','google_calendar_private','google_drive_private','private:true'],
+    must:['privateIntent(q)','calendar-upcoming','drive-files','google_calendar_private','google_drive_private','private:true','gemini-3.8-flash','models?pageSize=100','uon_ai_model_health','thinkingLevel:\'low\'','gemini-health'],
     mustNot:['uon_ai_knowledge', 'provider_token']
   },
   {
@@ -46,7 +46,7 @@ for(const check of checks){
 }
 
 if(failures.length){
-  console.error(`Google V64.1 verification failed:\n${failures.join('\n')}`);
+  console.error(`Google V64.4 verification failed:\n${failures.join('\n')}`);
   process.exit(1);
 }
-console.log(`Google V64.1 verification passed (${checks.length} privacy/readiness files checked).`);
+console.log(`Google V64.4 verification passed (${checks.length} privacy/readiness files checked).`);
