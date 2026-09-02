@@ -8,10 +8,16 @@ const CONNECTOR_SECRET = Deno.env.get('UON_AI_CONNECTOR_SECRET') || '';
 const db = createClient(SUPABASE_URL, SERVICE_ROLE_KEY, { auth: { persistSession: false, autoRefreshToken: false } });
 
 const UON_CENTER = { latitude: 22.9108, longitude: 57.6722 };
+const UON_ORIGIN = 'University of Nizwa, Oman';
 function clean(v: unknown, n = 500) { return String(v ?? '').replace(/\s+/g, ' ').trim().slice(0, n); }
 function out(body: unknown, status = 200) { return new Response(JSON.stringify(body), { status, headers: { 'content-type': 'application/json; charset=utf-8', 'cache-control': 'no-store' } }); }
 function authorized(req: Request) { return Boolean(CONNECTOR_SECRET) && req.headers.get('x-connector-secret') === CONNECTOR_SECRET; }
 function mapsSearchUrl(query: string) { return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`; }
+function directionsUrl(placeId: string, name: string, address: string) {
+  const params = new URLSearchParams({ api: '1', origin: UON_ORIGIN, destination: `${name} ${address}`.trim(), travelmode: 'driving' });
+  if (placeId) params.set('destination_place_id', placeId);
+  return `https://www.google.com/maps/dir/?${params.toString()}`;
+}
 async function rememberPlaceId(placeId: string, query: string, relevance = 0.7) {
   if (!placeId) return;
   const tag = clean(query, 120).toLowerCase();
@@ -40,16 +46,20 @@ async function textSearch(query: string, maxResults = 5) {
   });
   const data = await res.json().catch(() => ({}));
   if (!res.ok) return { available: false, reason: `GOOGLE_PLACES_HTTP_${res.status}`, places: [] };
-  const places = (data.places || []).slice(0, 8).map((p: any) => ({
-    place_id: clean(p.id, 220),
-    name: clean(p.displayName?.text, 220),
-    address: clean(p.formattedAddress, 360),
-    lat: Number(p.location?.latitude) || null,
-    lng: Number(p.location?.longitude) || null,
-    maps_url: clean(p.googleMapsUri, 900) || mapsSearchUrl(`${clean(p.displayName?.text, 180)} ${clean(p.formattedAddress, 220)}`),
-    primary_type: clean(p.primaryType, 100),
-    open_now: typeof p.currentOpeningHours?.openNow === 'boolean' ? p.currentOpeningHours.openNow : null,
-  })).filter((p: any) => p.place_id && p.name);
+  const places = (data.places || []).slice(0, 8).map((p: any) => {
+    const placeId = clean(p.id, 220), name = clean(p.displayName?.text, 220), address = clean(p.formattedAddress, 360);
+    return {
+      place_id: placeId,
+      name,
+      address,
+      lat: Number(p.location?.latitude) || null,
+      lng: Number(p.location?.longitude) || null,
+      maps_url: clean(p.googleMapsUri, 900) || mapsSearchUrl(`${name} ${address}`),
+      directions_url: directionsUrl(placeId, name, address),
+      primary_type: clean(p.primaryType, 100),
+      open_now: typeof p.currentOpeningHours?.openNow === 'boolean' ? p.currentOpeningHours.openNow : null,
+    };
+  }).filter((p: any) => p.place_id && p.name);
   await Promise.allSettled(places.map((p: any, index: number) => rememberPlaceId(p.place_id, q, Math.max(0.4, 0.95 - index * 0.08))));
   return { available: true, places };
 }
