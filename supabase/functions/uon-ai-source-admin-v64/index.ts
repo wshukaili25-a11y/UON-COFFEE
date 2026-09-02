@@ -14,6 +14,7 @@ const GEMINI_PRIMARY_MODEL=Deno.env.get('GEMINI_PRIMARY_MODEL')||'gemini-3.5-fla
 const GEMINI_FALLBACK_MODEL=Deno.env.get('GEMINI_FALLBACK_MODEL')||'gemini-3.1-flash-lite';
 const db=createClient(SUPABASE_URL,SERVICE_ROLE_KEY,{auth:{persistSession:false,autoRefreshToken:false}});
 const SYNC_URL=`${SUPABASE_URL}/functions/v1/uon-ai-source-sync-v64`;
+const CHAT_URL=`${SUPABASE_URL}/functions/v1/uon-ai-chat-v64`;
 const allowed=new Set(['https://uonhub.space','https://www.uonhub.space']);
 function origin(req:Request){const v=req.headers.get('origin')||'';try{const h=new URL(v).hostname;if(allowed.has(v)||(h.endsWith('.vercel.app')&&(h.startsWith('uon-')||h.startsWith('uon-hub-'))))return v}catch{}return'https://uonhub.space'}
 function headers(req:Request){return{'Access-Control-Allow-Origin':origin(req),'Access-Control-Allow-Headers':'content-type,x-admin-password','Access-Control-Allow-Methods':'POST,OPTIONS','Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store',Vary:'Origin'}}
@@ -22,8 +23,10 @@ const clean=(v:any,n=1000)=>String(v??'').replace(/\s+/g,' ').trim().slice(0,n);
 async function admin(req:Request){const password=req.headers.get('x-admin-password')||'';if(!password)return{ok:false,password};const{data,error}=await db.rpc('uon_admin_authorized',{p_password:password});return{ok:!error&&data===true,password}}
 const PROVIDERS=new Set(['university_page','google_drive','google_calendar_public']);
 async function googleAuthReady(){try{const r=await fetch(`${SUPABASE_URL}/auth/v1/settings`,{headers:PUBLIC_KEY?{apikey:PUBLIC_KEY}:{},signal:AbortSignal.timeout(5000)});const data=await r.json().catch(()=>({}));return r.ok&&data?.external?.google===true}catch{return false}}
-async function healthData(){const [googleAuth,chunks,activeChunks,hiddenParents]=await Promise.all([
+async function geminiRuntime(){if(!GEMINI_API_KEY)return null;try{const r=await fetch(CHAT_URL,{method:'POST',headers:{'content-type':'application/json',...(PUBLIC_KEY?{apikey:PUBLIC_KEY,Authorization:`Bearer ${PUBLIC_KEY}`}:{})},body:JSON.stringify({action:'gemini-health'}),signal:AbortSignal.timeout(9000)});const data=await r.json().catch(()=>({}));return r.ok?data:null}catch{return null}}
+async function healthData(){const [googleAuth,gemini,chunks,activeChunks,hiddenParents]=await Promise.all([
  googleAuthReady(),
+ geminiRuntime(),
  db.from('uon_ai_knowledge').select('*',{count:'exact',head:true}).eq('source_provider','university_page').contains('metadata',{derived_chunk:true}),
  db.from('uon_ai_knowledge').select('*',{count:'exact',head:true}).eq('source_provider','university_page').eq('active',true).contains('metadata',{derived_chunk:true}),
  db.from('uon_ai_knowledge').select('*',{count:'exact',head:true}).eq('source_provider','university_page').eq('active',false).contains('metadata',{chunked:true})
@@ -32,9 +35,15 @@ async function healthData(){const [googleAuth,chunks,activeChunks,hiddenParents]
  google_maps_live_configured:Boolean(GOOGLE_MAPS_API_KEY&&CONNECTOR_SECRET),
  google_oauth_refresh_configured:Boolean(GOOGLE_OAUTH_CLIENT_ID&&GOOGLE_OAUTH_CLIENT_SECRET),
  google_drive_service_account_configured:Boolean(GOOGLE_SERVICE_ACCOUNT_JSON),
- gemini_api_configured:Boolean(GEMINI_API_KEY),
- gemini_primary_model:GEMINI_PRIMARY_MODEL,
- gemini_fallback_model:GEMINI_FALLBACK_MODEL,
+ gemini_api_configured:gemini?.configured??Boolean(GEMINI_API_KEY),
+ gemini_runtime_ready:Boolean(gemini?.configured&&gemini?.selected),
+ gemini_primary_model:gemini?.selected||GEMINI_PRIMARY_MODEL,
+ gemini_fallback_model:gemini?.fallback||GEMINI_FALLBACK_MODEL,
+ gemini_preferred_model:gemini?.preferred||'',
+ gemini_preferred_available:Boolean(gemini?.preferred_available),
+ gemini_available_count:Number(gemini?.available_count||0),
+ gemini_discovery:clean(gemini?.discovery,80)||'not_checked',
+ gemini_quarantined:Array.isArray(gemini?.quarantined)?gemini.quarantined.slice(0,8):[],
  university_chunks:Number(chunks.count||0),
  active_university_chunks:Number(activeChunks.count||0),
  hidden_university_parents:Number(hiddenParents.count||0)
