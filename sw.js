@@ -1,4 +1,4 @@
-const VERSION = '48.0.10';
+const VERSION = '60.0.0';
 const STATIC_CACHE = `uonhub-static-${VERSION}`;
 const PAGE_CACHE = `uonhub-pages-${VERSION}`;
 const DATA_CACHE = `uonhub-data-${VERSION}`;
@@ -7,16 +7,16 @@ const OFFLINE_URL = '/offline.html';
 
 const PRECACHE = [
   '/index.html', '/tools.html', '/useful-sites.html', '/schedule.html',
-  '/search.html', '/go.html', OFFLINE_URL, '/manifest.webmanifest',
+  '/search.html', '/go.html', '/support-centers.html', OFFLINE_URL, '/manifest.webmanifest',
   '/css/app.css', '/css/ui-refresh-v24.css', '/css/schedule.css',
   '/css/schedule-extras-v44.css', '/css/pwa.css', '/css/tool-registry-v44.css',
-  '/css/tools-primary-v46.css', '/css/useful-sites-v46.css',
+  '/css/tools-primary-v46.css', '/css/useful-sites-v46.css', '/css/support-centers.css',
   '/css/student-tools-ui-v47.css', '/js/v14-ui.js', '/js/tools.js',
   '/js/tools-primary-v46.js', '/js/useful-sites.js', '/js/student-tools-ui-v47.js',
   '/js/schedule-profile-boot-v44.js', '/js/schedule.js', '/js/schedule-extras-v44.js',
   '/js/search.js', '/js/go.js', '/js/pwa-init.js', '/js/tool-registry-v44.js',
-  '/js/platform-experience-v44.js', '/js/app-capabilities-v48.js',
-  '/js/security-guard-v48.js', '/assets/whatsapp-official.svg',
+  '/js/platform-experience-v44.js', '/js/app-capabilities-v48.js', '/js/contact-directory.js',
+  '/js/support-centers.js', '/js/security-guard-v48.js', '/assets/whatsapp-official.svg',
   '/assets/icons/icon-192.png', '/assets/icons/icon-512.png'
 ];
 
