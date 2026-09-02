@@ -18,7 +18,7 @@ const checks=[
   },
   {
     file:'supabase/functions/uon-ai-chat-v64/index.ts',
-    must:['privateIntent(question)','calendar-upcoming','drive-files','google_calendar_private','google_drive_private','private:true'],
+    must:['privateIntent(q)','calendar-upcoming','drive-files','google_calendar_private','google_drive_private','private:true'],
     mustNot:['uon_ai_knowledge', 'provider_token']
   },
   {
@@ -39,7 +39,7 @@ for(const check of checks){
   try{source=await readFile(check.file,'utf8')}catch(error){failures.push(`${check.file}: ${error.message}`);continue}
   const compact=source.replace(/\s+/g,'');
   for(const expected of check.must||[]){
-    const found=expected==='private:true'?compact.includes(expected):source.includes(expected);
+    const found=(expected==='private:true'||expected==='privateIntent(q)')?compact.includes(expected):source.includes(expected);
     if(!found)failures.push(`${check.file}: missing invariant ${JSON.stringify(expected)}`);
   }
   for(const forbidden of check.mustNot||[])if(source.includes(forbidden))failures.push(`${check.file}: forbidden pattern ${JSON.stringify(forbidden)}`);
