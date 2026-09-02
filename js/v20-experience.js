@@ -1,5 +1,5 @@
 import {get,insert,esc,toast,trackEvent,rpc} from './core.js?v=30.0.1';
-import './student-pulse.js?v=61.0.0';
+import './student-pulse.js?v=61.1.0';
 
 if(!document.querySelector('link[data-v30-mobile]')){
  const mobileCss=document.createElement('link');
