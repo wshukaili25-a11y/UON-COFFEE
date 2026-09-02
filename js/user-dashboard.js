@@ -1,7 +1,7 @@
-import {esc,toast} from './core.js?v=62.0.0';
-import {nextClass,currentAcademicPulse,formatClassTime,readSchedule} from './student-pulse.js?v=62.0.0';
-import {STUDENT_TASKS_KEY,readStudentTasks,nextStudentTask,formatTaskDue,taskDueState} from './student-tasks-data.js?v=62.0.0';
-import {STUDY_SESSIONS_KEY,STUDY_SETTINGS_KEY,studyStats,formatStudyDuration} from './study-focus-data.js?v=62.0.0';
+import {esc,toast} from './core.js?v=62.1.0';
+import {nextClass,currentAcademicPulse,formatClassTime,readSchedule} from './student-pulse.js?v=62.1.0';
+import {STUDENT_TASKS_KEY,readStudentTasks,nextStudentTask,formatTaskDue,taskDueState} from './student-tasks-data.js?v=62.1.0';
+import {STUDY_SESSIONS_KEY,STUDY_SETTINGS_KEY,studyStats,formatStudyDuration} from './study-focus-data.js?v=62.1.0';
 
 const FAVORITES_KEY='uon_favorites_v20';
 const RECENT_KEY='uon_recent_pages_v61';
@@ -67,8 +67,9 @@ else{
 }
 
 if(study.todayMinutes>0){
- const top=study.topCourses[0];setText('#studyPulseText',`${formatStudyDuration(study.todayMinutes)} اليوم • ${study.todaySessions} جلسة${top?` • أكثر مادة: ${top.course}`:''}`);
-}else setText('#studyPulseText','ما سجلت جلسة مذاكرة اليوم. ابدأ Focus واختر مادة من جدولك.');
+ const top=study.topCourses[0];setText('#studyPulseText',`${formatStudyDuration(study.todayMinutes)} اليوم • 🔥 ${study.streakDays} ${study.streakDays===1?'يوم':'أيام'} • هدف الأسبوع ${study.goalProgress}%${top?` • ${top.course}`:''}`);
+}else if(study.streakDays>0)setText('#studyPulseText',`سلسلتك 🔥 ${study.streakDays} ${study.streakDays===1?'يوم':'أيام'} • هدف الأسبوع ${study.goalProgress}% • سجل جلسة اليوم وحافظ عليها.`);
+else setText('#studyPulseText',`هدفك الأسبوعي ${formatStudyDuration(study.goalMinutes)}. ابدأ أول Focus واختر مادة من جدولك.`);
 
 const coursesBox=document.querySelector('#dashboardCourses');
 if(coursesBox){
