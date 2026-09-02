@@ -1,3 +1,4 @@
+import './admin-schedule-sections-v54.js?v=54.0.0';
 import {rpc,esc} from './core.js?v=53.3.0';
 
 const labels={
