@@ -1,4 +1,5 @@
 import {get,insert,esc,toast,trackEvent,rpc} from './core.js?v=30.0.1';
+import './student-pulse.js?v=61.0.0';
 
 if(!document.querySelector('link[data-v30-mobile]')){
  const mobileCss=document.createElement('link');
@@ -9,12 +10,20 @@ if(!document.querySelector('link[data-v30-mobile]')){
 }
 
 const PAGE_KEY='uon_favorites_v20';
+const RECENT_KEY='uon_recent_pages_v61';
 const contributionKey='uon_contributions_v20';
 const current={title:document.title.replace(/\s*\|.*$/,''),url:location.pathname.split('/').pop()||'index.html'};
 
 function readJson(key,fallback){try{return JSON.parse(localStorage.getItem(key)||JSON.stringify(fallback))}catch{return fallback}}
 function writeJson(key,value){localStorage.setItem(key,JSON.stringify(value))}
 function favorites(){return readJson(PAGE_KEY,[])}
+function recentPages(){return readJson(RECENT_KEY,[])}
+function trackRecentPage(){
+ if(document.body.classList.contains('admin-page')||/^(admin|owner-dashboard|tools-control)\.html$/i.test(current.url))return;
+ const rows=recentPages().filter(item=>item?.url&&item.url!==current.url);
+ rows.unshift({...current,visited_at:new Date().toISOString()});
+ writeJson(RECENT_KEY,rows.slice(0,12));
+}
 function isFavorite(){return favorites().some(x=>x.url===current.url)}
 function toggleFavorite(){const rows=favorites();const i=rows.findIndex(x=>x.url===current.url);if(i>=0){rows.splice(i,1);toast('تمت إزالة الصفحة من المفضلة')}else{rows.unshift({...current,added_at:new Date().toISOString()});toast('تم حفظ الصفحة في المفضلة ❤️');trackEvent('favorite_add',current)}writeJson(PAGE_KEY,rows.slice(0,80));syncButtons()}
 function syncButtons(){document.querySelectorAll('[data-v20-favorite]').forEach(b=>{b.textContent=isFavorite()?'♥':'♡';b.title=isFavorite()?'إزالة من المفضلة':'حفظ في المفضلة'})}
@@ -30,5 +39,6 @@ let lastReported='';async function reportClientError(error,source='browser'){try
 window.addEventListener('error',event=>reportClientError(event.error||event.message,'window.error'));
 window.addEventListener('unhandledrejection',event=>reportClientError(event.reason,'unhandledrejection'));
 const isAdminPage=document.body.classList.contains('admin-page')||/\/admin(?:\.html)?\/?$/.test(location.pathname);
+trackRecentPage();
 if(!isAdminPage){applyManagedFooter();setupNotifications()}
-window.UON_V20={favorites,toggleFavorite,contributions:()=>readJson(contributionKey,[]),reportClientError};
+window.UON_V20={favorites,toggleFavorite,recentPages,contributions:()=>readJson(contributionKey,[]),reportClientError};
