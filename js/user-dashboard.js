@@ -1,6 +1,6 @@
-import {esc,toast} from './core.js?v=61.1.0';
-import {nextClass,currentAcademicPulse,formatClassTime,readSchedule} from './student-pulse.js?v=61.1.0';
-import {STUDENT_TASKS_KEY,readStudentTasks,nextStudentTask,formatTaskDue,taskDueState} from './student-tasks-data.js?v=61.1.0';
+import {esc,toast} from './core.js?v=61.2.0';
+import {nextClass,currentAcademicPulse,formatClassTime,readSchedule} from './student-pulse.js?v=61.2.0';
+import {STUDENT_TASKS_KEY,readStudentTasks,nextStudentTask,formatTaskDue,taskDueState} from './student-tasks-data.js?v=61.2.0';
 
 const FAVORITES_KEY='uon_favorites_v20';
 const RECENT_KEY='uon_recent_pages_v61';
@@ -24,10 +24,10 @@ const pref=read(PREF_KEY,{});
 const schedule=readSchedule();
 const tasks=readStudentTasks();
 const openTasks=tasks.filter(task=>!task.done);
-const uniqueCourses=new Set(schedule.map(row=>String(row.course||'').trim()).filter(Boolean));
+const courseRows=[...new Map(schedule.map(row=>[String(row.course||'').trim().toUpperCase(),row]).filter(([code])=>code)).entries()].map(([code,row])=>({code,row}));
 
 setText('#favCount',favorites.length);
-setText('#courseCount',uniqueCourses.size);
+setText('#courseCount',courseRows.length);
 setText('#taskCount',openTasks.length);
 setText('#recentCount',recents.length);
 setText('#prefCount',(pref.topics||[]).length);
@@ -61,6 +61,11 @@ else{
  setText('#academicPulseIcon',academic.icon||'📅');
  if(academic.state==='active')setText('#academicPulseText',`${academic.title} • جاري الآن${academic.start!==academic.end?` حتى ${academic.dateLabel.split(' – ')[1]}`:''}`);
  else{const prefix=academic.daysUntilStart===0?'اليوم':academic.daysUntilStart===1?'بكرة':`بعد ${academic.daysUntilStart} أيام`;setText('#academicPulseText',`${academic.title} • ${prefix} • ${academic.dateLabel}`)}
+}
+
+const coursesBox=document.querySelector('#dashboardCourses');
+if(coursesBox){
+ coursesBox.innerHTML=courseRows.length?courseRows.map(({code,row})=>`<a class="dashboard-course-card" href="course.html?code=${encodeURIComponent(code)}"><strong>${esc(code)}</strong><span>${esc([row.teacher,row.room].filter(Boolean).join(' • ')||'مركز المقرر')}</span><small>ملخصات • اختبارات • مجموعات ←</small></a>`).join(''):'<div class="dashboard-empty" style="grid-column:1/-1">أضف موادك في الجدول الدراسي وبتظهر لك هنا تلقائيًا.</div>';
 }
 
 function listMarkup(rows,{empty}){
