@@ -3,6 +3,7 @@ import {esc} from './core.js?v=61.0.0';
 const STORAGE_KEY='uon-v7-schedule';
 const DAYS=['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس'];
 const DAY_START=8*60,DAY_END=18*60;
+const DAY_BY_INDEX={0:'الأحد',1:'الاثنين',2:'الثلاثاء',3:'الأربعاء',4:'الخميس'};
 let refreshTimer=null;
 
 function readRows(){try{const rows=JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]');return Array.isArray(rows)?rows:[]}catch{return[]}}
@@ -10,6 +11,7 @@ function minutes(value){const m=/^(\d{1,2}):(\d{2})$/.exec(String(value||''));re
 function time(total){const hour24=Math.floor(total/60),minute=String(total%60).padStart(2,'0'),hour12=hour24%12||12;return `${hour12}:${minute} ${hour24<12?'ص':'م'}`}
 function duration(total){const h=Math.floor(total/60),m=total%60;return [h?`${h}س`:'',m?`${m}د`:''].filter(Boolean).join(' ')||'0د'}
 function rowsFor(day){return readRows().filter(row=>row.day===day).map(row=>({...row,startMin:minutes(row.start),endMin:minutes(row.end)})).filter(row=>row.endMin>row.startMin).sort((a,b)=>a.startMin-b.startMin)}
+function muscatNow(){const parts=new Intl.DateTimeFormat('en-US',{timeZone:'Asia/Muscat',weekday:'short',hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).formatToParts(new Date());const map=Object.fromEntries(parts.map(p=>[p.type,p.value]));const index={Sun:0,Mon:1,Tue:2,Wed:3,Thu:4,Fri:5,Sat:6}[map.weekday]??6;return {day:DAY_BY_INDEX[index]||null,minutes:(Number(map.hour)||0)*60+(Number(map.minute)||0)}}
 
 function conflicts(){
  const out=[];
@@ -25,17 +27,46 @@ function freeWindows(day,minGap){
 function dayLoad(day){const rows=rowsFor(day);return rows.reduce((sum,row)=>sum+(row.endMin-row.startMin),0)}
 function allFree(minGap){return DAYS.flatMap(day=>freeWindows(day,minGap)).sort((a,b)=>b.duration-a.duration||DAYS.indexOf(a.day)-DAYS.indexOf(b.day)||a.start-b.start)}
 function activeDays(){return DAYS.filter(day=>rowsFor(day).length)}
+function todayPulse(){const now=muscatNow();if(!now.day)return {day:null,current:null,next:null,rows:[]};const rows=rowsFor(now.day);const current=rows.find(row=>row.startMin<=now.minutes&&row.endMin>now.minutes)||null;const next=rows.find(row=>row.startMin>now.minutes)||null;return {day:now.day,current,next,rows,nowMinutes:now.minutes}}
+function focusHref(course){return `study-focus.html?course=${encodeURIComponent(course||'')}`}
+function planForFreeWindows(minGap){
+ const pulse=todayPulse();const windows=pulse.day?freeWindows(pulse.day,minGap).filter(w=>w.end>pulse.nowMinutes):[];
+ if(!windows.length)return [];
+ const courses=[...new Set(readRows().map(row=>String(row.course||'').trim()).filter(Boolean))];
+ return windows.slice(0,4).map((window,index)=>{const usable=Math.min(window.duration>=60?50:25,Math.max(25,window.duration-5));return {...window,course:courses[index%Math.max(1,courses.length)]||'',focusMinutes:usable}})
+}
 
 function inject(){
  if(document.querySelector('#scheduleInsights61'))return;
  const shell=document.querySelector('.schedule-shell');if(!shell)return;
  const card=document.createElement('section');card.id='scheduleInsights61';card.className='card schedule61-insights';
- card.innerHTML=`<div class="schedule61-head"><div><span class="badge">Smart Schedule</span><h2>تحليل الجدول</h2><p>اكتشاف التعارضات والفترات الفاضية واقتراح أفضل وقت للمذاكرة.</p></div><label>أقل مدة للفراغ<select id="schedule61MinGap"><option value="30">30 دقيقة</option><option value="45" selected>45 دقيقة</option><option value="60">ساعة</option><option value="90">ساعة ونصف</option><option value="120">ساعتان</option></select></label></div><div id="schedule61Metrics" class="schedule61-metrics"></div><div id="schedule61Recommendation" class="schedule61-recommendation"></div><div class="schedule61-panels"><section class="schedule61-panel"><h3>⚠️ التعارضات</h3><div id="schedule61Conflicts" class="schedule61-list"></div></section><section class="schedule61-panel"><h3>🕒 أوقات الفراغ</h3><div id="schedule61Free" class="schedule61-list"></div></section></div>`;
+ card.innerHTML=`<div class="schedule61-head"><div><span class="badge">Smart Schedule V63</span><h2>تحليل الجدول</h2><p>محاضرتك الحالية والقادمة، التعارضات، الفراغات، وخطة مذاكرة من وقتك الفاضي.</p></div><label>أقل مدة للفراغ<select id="schedule61MinGap"><option value="30">30 دقيقة</option><option value="45" selected>45 دقيقة</option><option value="60">ساعة</option><option value="90">ساعة ونصف</option><option value="120">ساعتان</option></select></label></div><div id="schedule63Today" class="schedule63-today"></div><div id="schedule61Metrics" class="schedule61-metrics"></div><div id="schedule61Recommendation" class="schedule61-recommendation"></div><div class="schedule61-panels"><section class="schedule61-panel"><h3>⚠️ التعارضات</h3><div id="schedule61Conflicts" class="schedule61-list"></div></section><section class="schedule61-panel"><h3>🕒 أوقات الفراغ</h3><div id="schedule61Free" class="schedule61-list"></div></section></div><section class="schedule63-plan"><div class="schedule63-plan-head"><div><h3>🎯 خطط فراغاتي</h3><p>حوّل الفراغات المتبقية اليوم إلى جلسات مذاكرة قصيرة.</p></div><button class="btn" id="schedule63PlanBtn" type="button">توليد الخطة</button></div><div id="schedule63PlanRows" class="schedule63-plan-rows"></div></section>`;
  const board=document.querySelector('.schedule-board-card');if(board)board.before(card);else shell.append(card);
  document.querySelector('#schedule61MinGap')?.addEventListener('change',render);
+ document.querySelector('#schedule63PlanBtn')?.addEventListener('click',renderPlan);
  render();
- const week=document.querySelector('#week');if(week)new MutationObserver(()=>{clearTimeout(refreshTimer);refreshTimer=setTimeout(render,180)}).observe(week,{childList:true,subtree:true});
- window.addEventListener('storage',event=>{if(event.key===STORAGE_KEY)render()});
+ const week=document.querySelector('#week');if(week)new MutationObserver(()=>{clearTimeout(refreshTimer);refreshTimer=setTimeout(()=>{render();renderPlan(false)},180)}).observe(week,{childList:true,subtree:true});
+ window.addEventListener('storage',event=>{if(event.key===STORAGE_KEY){render();renderPlan(false)}});
+ setInterval(()=>renderToday(),60000);
+}
+
+function renderToday(){
+ const box=document.querySelector('#schedule63Today');if(!box)return;
+ const pulse=todayPulse();
+ if(!pulse.day){box.innerHTML='<div class="schedule63-today-empty"><strong>اليوم عطلة من أيام الجدول.</strong><span>استخدم Focus أو خطط الأسبوع القادم.</span></div>';return}
+ if(!pulse.rows.length){box.innerHTML=`<div class="schedule63-today-empty"><strong>${esc(pulse.day)} فاضي 🎉</strong><span>ما عندك محاضرات محفوظة اليوم.</span><a class="btn" href="study-focus.html">ابدأ Focus</a></div>`;return}
+ const headline=pulse.current?`الآن: ${esc(pulse.current.course)}`:pulse.next?`القادمة: ${esc(pulse.next.course)}`:'خلصت محاضرات اليوم ✅';
+ const detail=pulse.current?`${time(pulse.current.startMin)} – ${time(pulse.current.endMin)}${pulse.current.room?` • ${esc(pulse.current.room)}`:''}`:pulse.next?`${time(pulse.next.startMin)} – ${time(pulse.next.endMin)}${pulse.next.room?` • ${esc(pulse.next.room)}`:''}`:`${pulse.rows.length} محاضرات اليوم`;
+ const focusCourse=(pulse.current||pulse.next||pulse.rows[0])?.course||'';
+ box.innerHTML=`<div class="schedule63-today-main"><span class="schedule63-live-dot" aria-hidden="true"></span><div><small>${esc(pulse.day)} · يومك الآن</small><strong>${headline}</strong><span>${detail}</span></div></div><div class="schedule63-today-actions"><a class="btn" href="${focusHref(focusCourse)}">Focus للمادة</a><a class="btn" href="tasks.html">مهامي</a><a class="btn" href="assistant.html?prompt=${encodeURIComponent('خطط لي يومي حسب جدولي ومهامي')}">اسأل UON AI</a></div>`;
+}
+
+function renderPlan(showToast=true){
+ const box=document.querySelector('#schedule63PlanRows');if(!box)return;
+ const minGap=Number(document.querySelector('#schedule61MinGap')?.value||45);const plan=planForFreeWindows(minGap);
+ if(!plan.length){box.innerHTML='<div class="schedule61-empty">ما لقينا فراغات متبقية اليوم بالمُدة المختارة.</div>';return}
+ box.innerHTML=plan.map((item,index)=>`<article class="schedule63-plan-row"><span class="schedule63-plan-index">${index+1}</span><div><strong>${time(item.start)} – ${time(item.end)}</strong><small>${item.course?`مقترح: ${esc(item.course)} • `:''}${item.focusMinutes} دقيقة تركيز</small></div><a class="btn" href="${focusHref(item.course)}">ابدأ Focus</a></article>`).join('');
+ if(showToast){const button=document.querySelector('#schedule63PlanBtn');if(button){button.textContent='تم توليد الخطة ✓';setTimeout(()=>button.textContent='توليد الخطة',1300)}}
 }
 
 function render(){
@@ -48,7 +79,8 @@ function render(){
  const recommendation=document.querySelector('#schedule61Recommendation');
  if(!readRows().length)recommendation.innerHTML='<strong>ابدأ بإضافة موادك.</strong> بعدها بنحلل الجدول تلقائيًا.';
  else if(clashes.length)recommendation.innerHTML=`<strong>عندك ${clashes.length} تعارض${clashes.length>1?'ات':''}.</strong> عدّل الأوقات المتداخلة أولًا قبل اعتماد الجدول.`;
- else{const preferred=free.find(item=>rowsFor(item.day).length)||free[0];recommendation.innerHTML=preferred?`<strong>وقت مذاكرة مقترح:</strong> ${esc(preferred.day)} من ${time(preferred.start)} إلى ${time(preferred.end)} (${duration(preferred.duration)}).`:'<strong>جدولك متقارب.</strong> ما لقينا فترة طويلة حسب المدة المختارة.'}
+ else{const pulse=todayPulse();const preferred=pulse.day?freeWindows(pulse.day,minGap).find(item=>item.end>pulse.nowMinutes):null;const fallback=preferred||free.find(item=>rowsFor(item.day).length)||free[0];recommendation.innerHTML=fallback?`<strong>وقت مذاكرة مقترح:</strong> ${esc(fallback.day)} من ${time(fallback.start)} إلى ${time(fallback.end)} (${duration(fallback.duration)}).`:'<strong>جدولك متقارب.</strong> ما لقينا فترة طويلة حسب المدة المختارة.'}
+ renderToday();
 }
 
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',inject,{once:true});else inject();
