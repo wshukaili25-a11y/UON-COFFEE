@@ -9,6 +9,9 @@ const CONNECTOR_SECRET=Deno.env.get('UON_AI_CONNECTOR_SECRET')||'';
 const GOOGLE_OAUTH_CLIENT_ID=Deno.env.get('GOOGLE_OAUTH_CLIENT_ID')||'';
 const GOOGLE_OAUTH_CLIENT_SECRET=Deno.env.get('GOOGLE_OAUTH_CLIENT_SECRET')||'';
 const GOOGLE_SERVICE_ACCOUNT_JSON=Deno.env.get('GOOGLE_SERVICE_ACCOUNT_JSON')||'';
+const GEMINI_API_KEY=Deno.env.get('GEMINI_API_KEY')||'';
+const GEMINI_PRIMARY_MODEL=Deno.env.get('GEMINI_PRIMARY_MODEL')||'gemini-3.7-flash';
+const GEMINI_FALLBACK_MODEL=Deno.env.get('GEMINI_FALLBACK_MODEL')||'gemini-3.5-flash-lite';
 const db=createClient(SUPABASE_URL,SERVICE_ROLE_KEY,{auth:{persistSession:false,autoRefreshToken:false}});
 const SYNC_URL=`${SUPABASE_URL}/functions/v1/uon-ai-source-sync-v64`;
 const allowed=new Set(['https://uonhub.space','https://www.uonhub.space']);
@@ -29,6 +32,9 @@ async function healthData(){const [googleAuth,chunks,activeChunks,hiddenParents]
  google_maps_live_configured:Boolean(GOOGLE_MAPS_API_KEY&&CONNECTOR_SECRET),
  google_oauth_refresh_configured:Boolean(GOOGLE_OAUTH_CLIENT_ID&&GOOGLE_OAUTH_CLIENT_SECRET),
  google_drive_service_account_configured:Boolean(GOOGLE_SERVICE_ACCOUNT_JSON),
+ gemini_api_configured:Boolean(GEMINI_API_KEY),
+ gemini_primary_model:GEMINI_PRIMARY_MODEL,
+ gemini_fallback_model:GEMINI_FALLBACK_MODEL,
  university_chunks:Number(chunks.count||0),
  active_university_chunks:Number(activeChunks.count||0),
  hidden_university_parents:Number(hiddenParents.count||0)
