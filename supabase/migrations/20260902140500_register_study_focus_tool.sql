@@ -1,0 +1,7 @@
+insert into public.platform_features (key,name,status,sort_order,is_visible)
+values ('study-focus','وضع المذاكرة','active',55,true)
+on conflict (key) do update set name=excluded.name,status=excluded.status,sort_order=excluded.sort_order,is_visible=excluded.is_visible,updated_at=now();
+
+insert into public.tool_registry (key,category_id,name_ar,name_en,description_ar,description_en,url,icon,status,is_visible,is_platform,placement,sort_order,publish_status,version_no,short_slug,audience,published_at,created_at,updated_at)
+values ('study-focus','platform','وضع المذاكرة','Study Focus','مؤقت مذاكرة مرتبط بموادك مع جلسات وإحصائيات يومية وأسبوعية محفوظة على جهازك.','A course-aware focus timer with local daily and weekly study statistics.','study-focus.html','⏱️','active',true,true,'home_primary',55,'published',1,'focus','{"type":"all"}'::jsonb,now(),now(),now())
+on conflict (key) do update set category_id=excluded.category_id,name_ar=excluded.name_ar,name_en=excluded.name_en,description_ar=excluded.description_ar,description_en=excluded.description_en,url=excluded.url,icon=excluded.icon,status=excluded.status,is_visible=excluded.is_visible,is_platform=excluded.is_platform,placement=excluded.placement,sort_order=excluded.sort_order,publish_status=excluded.publish_status,version_no=greatest(public.tool_registry.version_no,excluded.version_no),short_slug=excluded.short_slug,audience=excluded.audience,updated_at=now();
