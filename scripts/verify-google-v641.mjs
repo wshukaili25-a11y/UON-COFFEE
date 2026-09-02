@@ -37,7 +37,11 @@ const failures=[];
 for(const check of checks){
   let source='';
   try{source=await readFile(check.file,'utf8')}catch(error){failures.push(`${check.file}: ${error.message}`);continue}
-  for(const expected of check.must||[])if(!source.includes(expected))failures.push(`${check.file}: missing invariant ${JSON.stringify(expected)}`);
+  const compact=source.replace(/\s+/g,'');
+  for(const expected of check.must||[]){
+    const found=expected==='private:true'?compact.includes(expected):source.includes(expected);
+    if(!found)failures.push(`${check.file}: missing invariant ${JSON.stringify(expected)}`);
+  }
   for(const forbidden of check.mustNot||[])if(source.includes(forbidden))failures.push(`${check.file}: forbidden pattern ${JSON.stringify(forbidden)}`);
 }
 
