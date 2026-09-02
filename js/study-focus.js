@@ -1,6 +1,7 @@
-import {toast,esc} from './core.js?v=62.0.0';
+import {toast,esc,enforceUonMaintenance,watchUonMaintenance} from './core.js?v=62.0.0';
 import {STUDY_ACTIVE_KEY,addStudySession,formatStudyDuration,readStudySessions,readStudySettings,saveStudySettings,scheduleCourses,studyStats} from './study-focus-data.js?v=62.0.0';
 
+await enforceUonMaintenance();watchUonMaintenance();
 const $=selector=>document.querySelector(selector);
 const timer=$('#focusTimer'),statusNode=$('#focusStatus'),ring=$('#focusRing'),course=$('#focusCourse'),kind=$('#focusKind');
 const startBtn=$('#focusStart'),pauseBtn=$('#focusPause'),finishBtn=$('#focusFinish'),resetBtn=$('#focusReset');
