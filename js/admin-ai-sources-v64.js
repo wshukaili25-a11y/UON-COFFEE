@@ -10,7 +10,7 @@ async function call(action,payload={}){const response=await fetch(API,{method:'P
 function setBusy(text=''){const node=$('#sourceStatus');if(node)node.textContent=text||'جاهز'}
 function stats(){const sources=state.sources||[],runs=state.runs||[],health=state.health||{};$('#sourceCount').textContent=String(sources.length);$('#sourceActiveCount').textContent=String(sources.filter(x=>x.active).length);$('#sourceChunkCount').textContent=String(health.active_university_chunks??health.university_chunks??0);$('#sourcePendingCount').textContent=String(state.pending_count||0);$('#sourceErrorCount').textContent=String(runs.filter(x=>x.status==='failed').slice(0,20).length)}
 function healthCards(){const host=$('#sourceHealth');if(!host)return;const h=state.health||{};const rows=[
- ['Gemini AI',Boolean(h.gemini_api_configured),h.gemini_api_configured?`${h.gemini_primary_model||'gemini-3.7-flash'} · fallback ${h.gemini_fallback_model||'gemini-3.5-flash-lite'}`:'GEMINI_API_KEY غير مهيأ'],
+ ['Gemini AI',Boolean(h.gemini_api_configured),h.gemini_api_configured?`${h.gemini_primary_model||'gemini-3.5-flash-lite'} · fallback ${h.gemini_fallback_model||'gemini-3.1-flash-lite'}`:'GEMINI_API_KEY غير مهيأ'],
  ['Google Auth',Boolean(h.google_auth_enabled),'ربط الطالب بـCalendar وDrive'],
  ['Google Maps Live',Boolean(h.google_maps_live_configured),'Places API + connector secret'],
  ['OAuth Refresh',Boolean(h.google_oauth_refresh_configured),'تجديد توكن Google الشخصي'],
