@@ -11,7 +11,7 @@ function headers(req:Request){return{'Access-Control-Allow-Origin':origin(req),'
 function out(req:Request,b:any,s=200){return new Response(JSON.stringify(b),{status:s,headers:headers(req)})}
 const clean=(v:any,n=1000)=>String(v??'').replace(/\s+/g,' ').trim().slice(0,n);
 async function admin(req:Request){const password=req.headers.get('x-admin-password')||'';if(!password)return{ok:false,password};const{data,error}=await db.rpc('uon_admin_authorized',{p_password:password});return{ok:!error&&data===true,password}}
-const PROVIDERS=new Set(['university_page','university_rss','google_drive','google_calendar_public']);
+const PROVIDERS=new Set(['university_page','google_drive','google_calendar_public']);
 async function listData(){const[{data:sources},{data:runs},{data:pending},{count:pendingCount}]=await Promise.all([
  db.from('import_sources').select('*').order('provider').order('source_name'),
  db.from('uon_ai_source_sync_runs').select('*').order('started_at',{ascending:false}).limit(40),
