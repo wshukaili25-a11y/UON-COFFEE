@@ -1,10 +1,11 @@
-import {esc,toast} from './core.js?v=61.0.0';
-import {nextClass,currentAcademicPulse,formatClassTime,readSchedule} from './student-pulse.js?v=61.0.0';
+import {esc,toast} from './core.js?v=61.1.0';
+import {nextClass,currentAcademicPulse,formatClassTime,readSchedule} from './student-pulse.js?v=61.1.0';
+import {STUDENT_TASKS_KEY,readStudentTasks,nextStudentTask,formatTaskDue,taskDueState} from './student-tasks-data.js?v=61.1.0';
 
 const FAVORITES_KEY='uon_favorites_v20';
 const RECENT_KEY='uon_recent_pages_v61';
 const PREF_KEY='uon_notification_preferences';
-const BACKUP_KEYS=['uon-v7-schedule','uon-v44-schedule-profiles','uon-v44-active-schedule',FAVORITES_KEY,RECENT_KEY,PREF_KEY,'uon_contributions_v20'];
+const BACKUP_KEYS=['uon-v7-schedule','uon-v44-schedule-profiles','uon-v44-active-schedule',STUDENT_TASKS_KEY,FAVORITES_KEY,RECENT_KEY,PREF_KEY,'uon_contributions_v20'];
 const DAY_LABEL={0:'الأحد',1:'الاثنين',2:'الثلاثاء',3:'الأربعاء',4:'الخميس',5:'الجمعة',6:'السبت'};
 
 function read(key,fallback){try{return JSON.parse(localStorage.getItem(key)||JSON.stringify(fallback))}catch{return fallback}}
@@ -21,10 +22,13 @@ const favorites=read(FAVORITES_KEY,[]).filter(Boolean);
 const recents=read(RECENT_KEY,[]).filter(item=>item?.url&&item.url!=='user-dashboard.html').slice(0,8);
 const pref=read(PREF_KEY,{});
 const schedule=readSchedule();
+const tasks=readStudentTasks();
+const openTasks=tasks.filter(task=>!task.done);
 const uniqueCourses=new Set(schedule.map(row=>String(row.course||'').trim()).filter(Boolean));
 
 setText('#favCount',favorites.length);
 setText('#courseCount',uniqueCourses.size);
+setText('#taskCount',openTasks.length);
 setText('#recentCount',recents.length);
 setText('#prefCount',(pref.topics||[]).length);
 
@@ -39,6 +43,16 @@ else if(klass.state==='now')setText('#nextClassText',`${klass.course} الآن �
 else{
  const when=klass.deltaDays===0?'اليوم':klass.deltaDays===1?'بكرة':DAY_LABEL[(clock.dayIndex+klass.deltaDays)%7]||klass.day;
  setText('#nextClassText',`${klass.course} • ${when} ${formatClassTime(klass.start)}${klass.room?` • ${klass.room}`:''}${klass.teacher?` • ${klass.teacher}`:''}`);
+}
+
+const task=nextStudentTask();
+const taskCard=document.querySelector('#nextTaskCard');
+if(!task)setText('#nextTaskText','ما عندك مهام مفتوحة حاليًا 🎉 أضف واجب أو اختبار وبيظهر هنا تلقائيًا.');
+else{
+ const state=taskDueState(task);
+ const stateText=state==='overdue'?'متأخرة':state==='today'?'اليوم':state==='tomorrow'?'بكرة':state==='undated'?'بدون موعد':'قادمة';
+ setText('#nextTaskText',`${task.title}${task.course?` • ${task.course}`:''} • ${stateText}${task.due?` • ${formatTaskDue(task)}`:''}`);
+ if(state==='overdue')taskCard?.classList.add('is-urgent');
 }
 
 const academic=currentAcademicPulse();
@@ -71,7 +85,7 @@ document.querySelector('#importLocalData')?.addEventListener('change',async even
  try{
   const payload=JSON.parse(await file.text());
   if(payload?.format!=='uonhub-local-backup'||payload?.version!==1||!payload.data||typeof payload.data!=='object')throw new Error('الملف مو نسخة UON Hub صالحة');
-  if(!confirm('استرجاع النسخة بيستبدل جدولك ومفضلتك وتفضيلاتك الحالية. نكمل؟'))return;
+  if(!confirm('استرجاع النسخة بيستبدل جدولك ومهامك ومفضلتك وتفضيلاتك الحالية. نكمل؟'))return;
   let restored=0;
   for(const key of BACKUP_KEYS){if(typeof payload.data[key]==='string'){localStorage.setItem(key,payload.data[key]);restored++}}
   if(!restored)throw new Error('النسخة ما تحتوي بيانات قابلة للاسترجاع');
