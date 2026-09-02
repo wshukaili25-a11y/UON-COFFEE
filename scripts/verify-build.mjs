@@ -1,30 +1,25 @@
-import { access, readFile } from 'node:fs/promises';
+import { access, readFile, readdir } from 'node:fs/promises';
 import { spawnSync } from 'node:child_process';
 import { dirname, resolve, relative } from 'node:path';
 
-const modules = [
+const modules = new Set([
   'js/core.js','js/pwa-init.js','js/tool-registry-v44.js','js/platform-experience-v44.js',
   'js/tools.js','js/tools-primary-v46.js','js/useful-sites.js','js/search.js','js/go.js',
   'js/tool-preview-v44.js','js/schedule-profile-boot-v44.js','js/schedule.js',
   'js/schedule-extras-v44.js','js/tools-control-v44.js','sw.js',
   'js/admin-v30.js','js/admin-edge-v30.js','js/admin-operations-v31.js','js/admin-courses-v323.js',
   'js/owner-dashboard.js','js/owner-sessions-v48.js','js/telegram-bot-control-fix.js',
-  'js/assistant.js','js/assistant-history.js'
-];
+  'js/assistant.js','js/assistant-history.js','js/contact-directory.js','js/support-centers.js'
+]);
 
-const htmlFiles = [
-  'index.html','admin.html','owner-dashboard.html','questions.html','marketplace.html','assistant.html',
-  'tools-control.html','tool-preview.html','go.html','schedule.html','tools.html','useful-sites.html',
-  'academic-calendar.html','summaries.html','groups.html','projects.html','ratings.html','gpa.html',
-  'university-guide.html','feedback.html','confessions.html','about.html','status.html','offline.html',
-  'maintenance.html','coming-soon.html','upload-summary.html','user-dashboard.html','course.html','courses.html'
-];
+const rootEntries=await readdir(process.cwd(),{withFileTypes:true});
+const htmlFiles=rootEntries.filter(entry=>entry.isFile()&&entry.name.endsWith('.html')).map(entry=>entry.name).sort();
 
 const requiredFiles = [
   ...htmlFiles,
   'css/admin-v53.css','css/student-tools-v53.css','css/community-v53.css',
   'css/tool-registry-v44.css','css/tools-control-v44.css','css/tool-preview-v44.css',
-  'css/schedule-extras-v44.css','css/tools-primary-v46.css','css/useful-sites-v46.css'
+  'css/schedule-extras-v44.css','css/tools-primary-v46.css','css/useful-sites-v46.css','css/support-centers.css'
 ];
 
 const failures = [];
@@ -54,6 +49,11 @@ const localPathForRef = (htmlFile, rawRef) => {
     : resolve(process.cwd(), dirname(htmlFile), cleanRef);
 };
 
+const repoRelativeRef=(htmlFile,rawRef)=>{
+ const localPath=localPathForRef(htmlFile,rawRef);
+ return localPath?relative(process.cwd(),localPath).replaceAll('\\','/'):null;
+};
+
 const socialImageLocalRef = rawRef => {
   const value = String(rawRef || '').trim();
   if (!value || value.startsWith('data:') || value.startsWith('blob:')) return null;
@@ -81,6 +81,8 @@ for (const htmlFile of htmlFiles) {
     if (!localPath) continue;
     try { await access(localPath); }
     catch { failures.push(`${htmlFile}\nmissing local reference: ${rawRef}`); }
+    const modulePath=repoRelativeRef(htmlFile,rawRef);
+    if(modulePath&&/\.(?:m?js)$/i.test(modulePath))modules.add(modulePath);
   }
 
   for (const match of html.matchAll(/<meta\b[^>]*>/gi)) {
@@ -169,12 +171,12 @@ async function verifyStyleImports(file) {
 }
 
 const styleEntries = new Set(requiredFiles.filter(file => file.endsWith('.css')));
-for (const refs of htmlLocalRefs.values()) {
+for (const [htmlFile,refs] of htmlLocalRefs.entries()) {
   for (const rawRef of refs) {
     const cleanRef = rawRef.split('#')[0].split('?')[0];
     if (!cleanRef.endsWith('.css')) continue;
-    const normalized = cleanRef.startsWith('/') ? cleanRef.slice(1) : cleanRef;
-    styleEntries.add(normalized);
+    const normalized = repoRelativeRef(htmlFile,rawRef);
+    if(normalized)styleEntries.add(normalized);
   }
 }
 for (const file of styleEntries) await verifyStyleImports(file);
@@ -184,4 +186,4 @@ if (failures.length) {
   process.exit(1);
 }
 
-console.log(`Production verification passed (${modules.length} entry modules, ${checkedModules.size} modules checked, ${checkedStyles.size} styles checked, ${requiredFiles.length} required files, local HTML and social-image references checked).`);
+console.log(`Production verification passed (${htmlFiles.length} HTML pages, ${modules.size} entry modules, ${checkedModules.size} modules checked, ${checkedStyles.size} styles checked, ${requiredFiles.length} required files, local HTML and social-image references checked).`);
