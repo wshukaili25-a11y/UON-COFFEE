@@ -17,6 +17,7 @@ declare
   v_total integer := 0;
   v_chunk text;
   v_external_id text;
+  v_child_active boolean := false;
 begin
   select * into p
   from public.uon_ai_knowledge
@@ -41,6 +42,10 @@ begin
     return 0;
   end if;
 
+  -- Child visibility follows review state rather than the parent active flag,
+  -- because a chunked parent is intentionally hidden from retrieval.
+  v_child_active := p.verification_status = 'approved';
+
   -- A 1500-char window advances by 1300 chars, giving ~200 chars of overlap.
   -- Calculate only the windows actually needed so a tiny redundant tail is never created.
   v_total := least(20, 1 + ceil(greatest(v_length - v_size, 0)::numeric / v_step)::integer);
@@ -53,27 +58,10 @@ begin
       v_external_id := p.source_external_id || '#chunk:' || lpad(v_index::text, 2, '0');
 
       insert into public.uon_ai_knowledge (
-        title,
-        content,
-        category,
-        source_url,
-        source_title,
-        official,
-        active,
-        tags,
-        source_provider,
-        source_external_id,
-        source_type,
-        fetched_at,
-        source_updated_at,
-        expires_at,
-        content_hash,
-        confidence,
-        verification_status,
-        metadata,
-        last_verified_at,
-        updated_at,
-        created_at
+        title, content, category, source_url, source_title, official, active, tags,
+        source_provider, source_external_id, source_type, fetched_at, source_updated_at,
+        expires_at, content_hash, confidence, verification_status, metadata,
+        last_verified_at, updated_at, created_at
       ) values (
         p.title || ' · جزء ' || v_index || '/' || v_total,
         v_chunk,
@@ -81,7 +69,7 @@ begin
         p.source_url,
         p.source_title,
         p.official,
-        p.active,
+        v_child_active,
         array(select distinct x from unnest(coalesce(p.tags, '{}'::text[]) || array['derived_chunk','v64.2']) as x where x <> ''),
         p.source_provider,
         v_external_id,
@@ -166,7 +154,7 @@ begin
      and (
        tg_op = 'INSERT'
        or old.content_hash is distinct from new.content_hash
-       or old.active is distinct from new.active
+       or (new.active = true and old.active = false)
      ) then
     perform public.uon_ai_refresh_knowledge_chunks_v642(new.id);
   end if;
