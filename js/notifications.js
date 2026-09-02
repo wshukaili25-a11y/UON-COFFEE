@@ -23,7 +23,11 @@ $('#saveNotifications').onclick=async()=>{
   task_lead_hours:Number($('#taskLeadHours')?.value||12),
   saved_at:new Date().toISOString()
  };
+ const collegeChanged=String(saved.college||'')!==String(data.college||'');
  localStorage.setItem('uon_notification_preferences',JSON.stringify(data));
+ if(collegeChanged)localStorage.removeItem('uon_content_alert_state_v61');
+ localStorage.removeItem('uon_content_alert_checked_v61');
+ saved=data;
  if('Notification' in window&&Notification.permission==='default'){
   try{await Notification.requestPermission()}catch{}
  }
