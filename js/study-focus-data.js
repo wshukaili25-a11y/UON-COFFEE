@@ -10,7 +10,7 @@ function muscatDate(value=new Date()){
  return new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Muscat',year:'numeric',month:'2-digit',day:'2-digit'}).format(value);
 }
 function startOfMuscatWeek(now=new Date()){
- const dateLabel=muscatDate(now);const noon=new Date(`${dateLabel}T12:00:00+04:00`);const day=noon.getDay();const delta=day===6?0:day+1;noon.setDate(noon.getDate()-delta);return muscatDate(noon);
+ const dateLabel=muscatDate(now);const noon=new Date(`${dateLabel}T12:00:00+04:00`);noon.setDate(noon.getDate()-noon.getDay());return muscatDate(noon);
 }
 export function readStudySessions(){const rows=readJson(STUDY_SESSIONS_KEY,[]);return Array.isArray(rows)?rows.filter(Boolean):[]}
 export function saveStudySessions(rows){writeJson(STUDY_SESSIONS_KEY,(Array.isArray(rows)?rows:[]).slice(0,1000))}
