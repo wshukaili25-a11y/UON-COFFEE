@@ -41,9 +41,11 @@ begin
     return 0;
   end if;
 
-  v_total := least(20, ceil(v_length::numeric / v_step)::integer);
+  -- A 1500-char window advances by 1300 chars, giving ~200 chars of overlap.
+  -- Calculate only the windows actually needed so a tiny redundant tail is never created.
+  v_total := least(20, 1 + ceil(greatest(v_length - v_size, 0)::numeric / v_step)::integer);
 
-  while v_position <= v_length and v_index < 20 loop
+  while v_position <= v_length and v_index < v_total loop
     v_index := v_index + 1;
     v_chunk := btrim(substring(p.content from v_position for v_size));
 
