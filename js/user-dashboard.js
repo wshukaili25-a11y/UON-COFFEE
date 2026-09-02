@@ -1,11 +1,12 @@
-import {esc,toast} from './core.js?v=61.2.0';
-import {nextClass,currentAcademicPulse,formatClassTime,readSchedule} from './student-pulse.js?v=61.2.0';
-import {STUDENT_TASKS_KEY,readStudentTasks,nextStudentTask,formatTaskDue,taskDueState} from './student-tasks-data.js?v=61.2.0';
+import {esc,toast} from './core.js?v=62.0.0';
+import {nextClass,currentAcademicPulse,formatClassTime,readSchedule} from './student-pulse.js?v=62.0.0';
+import {STUDENT_TASKS_KEY,readStudentTasks,nextStudentTask,formatTaskDue,taskDueState} from './student-tasks-data.js?v=62.0.0';
+import {STUDY_SESSIONS_KEY,STUDY_SETTINGS_KEY,studyStats,formatStudyDuration} from './study-focus-data.js?v=62.0.0';
 
 const FAVORITES_KEY='uon_favorites_v20';
 const RECENT_KEY='uon_recent_pages_v61';
 const PREF_KEY='uon_notification_preferences';
-const BACKUP_KEYS=['uon-v7-schedule','uon-v44-schedule-profiles','uon-v44-active-schedule',STUDENT_TASKS_KEY,FAVORITES_KEY,RECENT_KEY,PREF_KEY,'uon_contributions_v20'];
+const BACKUP_KEYS=['uon-v7-schedule','uon-v44-schedule-profiles','uon-v44-active-schedule',STUDENT_TASKS_KEY,STUDY_SESSIONS_KEY,STUDY_SETTINGS_KEY,FAVORITES_KEY,RECENT_KEY,PREF_KEY,'uon_contributions_v20'];
 const DAY_LABEL={0:'الأحد',1:'الاثنين',2:'الثلاثاء',3:'الأربعاء',4:'الخميس',5:'الجمعة',6:'السبت'};
 
 function read(key,fallback){try{return JSON.parse(localStorage.getItem(key)||JSON.stringify(fallback))}catch{return fallback}}
@@ -24,11 +25,13 @@ const pref=read(PREF_KEY,{});
 const schedule=readSchedule();
 const tasks=readStudentTasks();
 const openTasks=tasks.filter(task=>!task.done);
+const study=studyStats();
 const courseRows=[...new Map(schedule.map(row=>[String(row.course||'').trim().toUpperCase(),row]).filter(([code])=>code)).entries()].map(([code,row])=>({code,row}));
 
 setText('#favCount',favorites.length);
 setText('#courseCount',courseRows.length);
 setText('#taskCount',openTasks.length);
+setText('#studyTodayCount',formatStudyDuration(study.todayMinutes));
 setText('#recentCount',recents.length);
 setText('#prefCount',(pref.topics||[]).length);
 
@@ -63,6 +66,10 @@ else{
  else{const prefix=academic.daysUntilStart===0?'اليوم':academic.daysUntilStart===1?'بكرة':`بعد ${academic.daysUntilStart} أيام`;setText('#academicPulseText',`${academic.title} • ${prefix} • ${academic.dateLabel}`)}
 }
 
+if(study.todayMinutes>0){
+ const top=study.topCourses[0];setText('#studyPulseText',`${formatStudyDuration(study.todayMinutes)} اليوم • ${study.todaySessions} جلسة${top?` • أكثر مادة: ${top.course}`:''}`);
+}else setText('#studyPulseText','ما سجلت جلسة مذاكرة اليوم. ابدأ Focus واختر مادة من جدولك.');
+
 const coursesBox=document.querySelector('#dashboardCourses');
 if(coursesBox){
  coursesBox.innerHTML=courseRows.length?courseRows.map(({code,row})=>`<a class="dashboard-course-card" href="course.html?code=${encodeURIComponent(code)}"><strong>${esc(code)}</strong><span>${esc([row.teacher,row.room].filter(Boolean).join(' • ')||'مركز المقرر')}</span><small>ملخصات • اختبارات • مجموعات ←</small></a>`).join(''):'<div class="dashboard-empty" style="grid-column:1/-1">أضف موادك في الجدول الدراسي وبتظهر لك هنا تلقائيًا.</div>';
@@ -90,7 +97,7 @@ document.querySelector('#importLocalData')?.addEventListener('change',async even
  try{
   const payload=JSON.parse(await file.text());
   if(payload?.format!=='uonhub-local-backup'||payload?.version!==1||!payload.data||typeof payload.data!=='object')throw new Error('الملف مو نسخة UON Hub صالحة');
-  if(!confirm('استرجاع النسخة بيستبدل جدولك ومهامك ومفضلتك وتفضيلاتك الحالية. نكمل؟'))return;
+  if(!confirm('استرجاع النسخة بيستبدل جدولك ومهامك وجلسات مذاكرتك ومفضلتك وتفضيلاتك الحالية. نكمل؟'))return;
   let restored=0;
   for(const key of BACKUP_KEYS){if(typeof payload.data[key]==='string'){localStorage.setItem(key,payload.data[key]);restored++}}
   if(!restored)throw new Error('النسخة ما تحتوي بيانات قابلة للاسترجاع');
