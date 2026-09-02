@@ -46,6 +46,26 @@ const ignoredRef = value =>
   value.startsWith('http://') || value.startsWith('https://') || value.startsWith('//') ||
   value.startsWith('tel:') || value.startsWith('mailto:') || value.startsWith('javascript:');
 
+const localPathForRef = (htmlFile, rawRef) => {
+  const cleanRef = rawRef.split('#')[0].split('?')[0];
+  if (!cleanRef || cleanRef.endsWith('/')) return null;
+  return cleanRef.startsWith('/')
+    ? resolve(process.cwd(), `.${cleanRef}`)
+    : resolve(process.cwd(), dirname(htmlFile), cleanRef);
+};
+
+const socialImageLocalRef = rawRef => {
+  const value = String(rawRef || '').trim();
+  if (!value || value.startsWith('data:') || value.startsWith('blob:')) return null;
+  try {
+    const url = new URL(value, 'https://uonhub.space/');
+    if (!['uonhub.space','www.uonhub.space'].includes(url.hostname)) return null;
+    return `${url.pathname}${url.search}`;
+  } catch {
+    return value;
+  }
+};
+
 const htmlLocalRefs = new Map();
 for (const htmlFile of htmlFiles) {
   let html = '';
@@ -57,15 +77,23 @@ for (const htmlFile of htmlFiles) {
 
   for (const rawRef of refs) {
     if (ignoredRef(rawRef)) continue;
-    const cleanRef = rawRef.split('#')[0].split('?')[0];
-    if (!cleanRef || cleanRef.endsWith('/')) continue;
-
-    const localPath = cleanRef.startsWith('/')
-      ? resolve(process.cwd(), `.${cleanRef}`)
-      : resolve(process.cwd(), dirname(htmlFile), cleanRef);
-
+    const localPath = localPathForRef(htmlFile, rawRef);
+    if (!localPath) continue;
     try { await access(localPath); }
     catch { failures.push(`${htmlFile}\nmissing local reference: ${rawRef}`); }
+  }
+
+  for (const match of html.matchAll(/<meta\b[^>]*>/gi)) {
+    const tag = match[0];
+    const key = tag.match(/\b(?:property|name)=["']([^"']+)["']/i)?.[1]?.toLowerCase();
+    if (key !== 'og:image' && key !== 'twitter:image') continue;
+    const rawRef = tag.match(/\bcontent=["']([^"']+)["']/i)?.[1];
+    const localRef = socialImageLocalRef(rawRef);
+    if (!localRef) continue;
+    const localPath = localPathForRef(htmlFile, localRef);
+    if (!localPath) continue;
+    try { await access(localPath); }
+    catch { failures.push(`${htmlFile}\nmissing social image reference: ${rawRef}`); }
   }
 }
 
@@ -156,4 +184,4 @@ if (failures.length) {
   process.exit(1);
 }
 
-console.log(`Production verification passed (${modules.length} entry modules, ${checkedModules.size} modules checked, ${checkedStyles.size} styles checked, ${requiredFiles.length} required files, local HTML references checked).`);
+console.log(`Production verification passed (${modules.length} entry modules, ${checkedModules.size} modules checked, ${checkedStyles.size} styles checked, ${requiredFiles.length} required files, local HTML and social-image references checked).`);
