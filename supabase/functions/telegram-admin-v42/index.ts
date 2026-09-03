@@ -68,6 +68,7 @@ Deno.serve(async(req:Request)=>{
  const contactOrGroup=text==='/contacts'||text==='/groupsreview'||text==='📞 أرقام التواصل'||text==='💬 مراجعة المجموعات'||data==='contacts'||data==='groupsreview'||data.startsWith('cn:')||data.startsWith('gr:');
  if(contactOrGroup)return forward(req,'telegram-admin',body);
 
+ if(data.startsWith('maintenance:'))return forward(req,'telegram-admin-core',body);
  if(data==='services'||data.startsWith('t44:')||data==='course:sync:official')return forward(req,'telegram-admin-full',body);
 
  if(message?.text){const target=await conversationTarget(chatId);if(target)return forward(req,target,body)}
