@@ -1,9 +1,10 @@
 import './admin.js?v=30.0.3';
-import './admin-questions-v53.js?v=53.3.0';
-import './admin-marketplace-v53.js?v=53.3.0';
-import './admin-review-summary-v53.js?v=53.3.0';
-import './admin-support-centers-v60.js?v=60.0.0';
-import {rpc,toast} from './core.js?v=30.0.1';
+import './admin-questions-v53.js?v=53.4.0';
+import './admin-marketplace-v53.js?v=53.4.0';
+import './admin-review-summary-v53.js?v=53.4.0';
+import './admin-support-centers-v60.js?v=60.1.0';
+import {toast} from './core.js?v=30.0.1';
+import {adminRpc} from './admin-rpc-client.js?v=1.0.0';
 
 const passwordKey='uon_admin_password';
 const SUPABASE_URL='https://irkhvydgxpseflggbeqq.supabase.co';
@@ -68,8 +69,7 @@ document.addEventListener('click',event=>{
  if(!button)return;
  event.preventDefault();
  event.stopImmediatePropagation();
- run(button,async()=>rpc('uon_admin_save_site_settings',{
-  p_password:await requirePassword(),
+ run(button,async()=>adminRpc('uon_admin_save_site_settings',{
   p_settings:{
    maintenance_enabled:document.querySelector('#maintenance')?.checked||false,
    maintenance_message:document.querySelector('#maintenanceMessage')?.value||'',
@@ -85,14 +85,14 @@ document.addEventListener('change',event=>{
  if(!(select instanceof HTMLSelectElement))return;
  if(select.matches('[data-feature]')){
   event.stopImmediatePropagation();
-  run(select,async()=>rpc('uon_admin_set_feature',{
-   p_password:await requirePassword(),p_key:select.dataset.feature,p_status:select.value
+  run(select,async()=>adminRpc('uon_admin_set_feature',{
+   p_key:select.dataset.feature,p_status:select.value
   }),'تم تحديث الخدمة');
  }
  if(select.matches('[data-tool]')){
   event.stopImmediatePropagation();
-  run(select,async()=>rpc('uon_admin_set_tool',{
-   p_password:await requirePassword(),p_tool_id:select.dataset.tool,p_status:select.value
+  run(select,async()=>adminRpc('uon_admin_set_tool',{
+   p_tool_id:select.dataset.tool,p_status:select.value
   }),'تم تحديث الأداة');
  }
 },true);
@@ -112,8 +112,8 @@ document.addEventListener('click',event=>{
   if(table==='summaries'&&(action==='approve'||action==='reject')){
    return callAdminApi({action:'summary_moderate',id:String(id),moderation_action:action});
   }
-  return rpc('uon_admin_moderate',{
-   p_password:await requirePassword(),p_table:table,p_id:String(id),p_action:action
+  return adminRpc('uon_admin_moderate',{
+   p_table:table,p_id:String(id),p_action:action
   });
  },action==='approve'?'تم القبول':action==='review'?'تمت المراجعة':action==='delete'?'تم الحذف':'تم الرفض');
 },true);
@@ -135,8 +135,8 @@ document.addEventListener('click',event=>{
   ends_at:document.querySelector('#adEndsAt')?.value||'',
   priority:10
  }:{};
- run(target,async()=>rpc('uon_admin_announcement',{
-  p_password:await requirePassword(),p_action:action,p_id:id,p_payload:payload
+ run(target,async()=>adminRpc('uon_admin_announcement',{
+  p_action:action,p_id:id,p_payload:payload
  }),action==='create'?'تمت إضافة الإعلان':action==='toggle'?'تم تحديث حالة الإعلان':'تم حذف الإعلان');
 },true);
 
@@ -152,8 +152,8 @@ document.addEventListener('click',event=>{
   chat_id:document.querySelector('#tgChat')?.value||'',
   role:document.querySelector('#tgRole')?.value||'moderator'
  }:{};
- run(target,async()=>rpc('uon_admin_catalog_action',{
-  p_password:await requirePassword(),p_entity:'telegram_admins',p_action:action,
+ run(target,async()=>adminRpc('uon_admin_catalog_action',{
+  p_entity:'telegram_admins',p_action:action,
   p_id:del?.dataset.deltg||null,p_payload:payload
  }),action==='create'?'تمت إضافة المشرف':'تم حذف المشرف');
 },true);
@@ -168,8 +168,8 @@ document.addEventListener('click',event=>{
   const target=event.target.closest(selector);
   if(!target)continue;
   event.preventDefault();event.stopImmediatePropagation();
-  run(target,async()=>rpc('uon_admin_catalog_action',{
-   p_password:await requirePassword(),p_entity:entity,p_action:'delete',p_id:target.dataset[key],p_payload:{}
+  run(target,async()=>adminRpc('uon_admin_catalog_action',{
+   p_entity:entity,p_action:'delete',p_id:target.dataset[key],p_payload:{}
   }),message);
   return;
  }
@@ -206,8 +206,8 @@ document.addEventListener('submit',event=>{
   message='تم نشر الإشعار';
  }
  const submit=form.querySelector('[type="submit"],button');
- run(submit,async()=>rpc('uon_admin_catalog_action',{
-  p_password:await requirePassword(),p_entity:entity,p_action:'create',p_id:null,p_payload:payload
+ run(submit,async()=>adminRpc('uon_admin_catalog_action',{
+  p_entity:entity,p_action:'create',p_id:null,p_payload:payload
  }),message);
 },true);
 
@@ -218,8 +218,7 @@ document.addEventListener('submit',event=>{
  const prefix=form.id==='anjizSettings'?'anjiz':'masalik';
  const data=formPayload(form);
  const submit=form.querySelector('[type="submit"],button');
- run(submit,async()=>rpc('uon_admin_save_site_settings',{
-  p_password:await requirePassword(),
+ run(submit,async()=>adminRpc('uon_admin_save_site_settings',{
   p_settings:{
    [`${prefix}_title`]:data.title||'',
    [`${prefix}_description`]:data.description||'',
