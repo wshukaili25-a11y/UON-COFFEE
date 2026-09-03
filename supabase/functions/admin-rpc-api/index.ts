@@ -13,6 +13,7 @@ const ADMIN_RPCS=new Set([
  'uon_admin_announcement',
  'uon_admin_catalog_action',
  'uon_admin_import_course_sections',
+ 'uon_admin_login',
  'uon_admin_moderate',
  'uon_admin_pending_counts',
  'uon_admin_pending_exam_questions',
