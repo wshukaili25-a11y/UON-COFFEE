@@ -1,0 +1,5 @@
+declare const Deno:any;
+const allowed=new Set(['https://uonhub.space','https://www.uonhub.space']);
+function origin(req:Request){const value=req.headers.get('origin')||'';try{const host=new URL(value).hostname;if(allowed.has(value)||(host.endsWith('.vercel.app')&&(host.startsWith('uon-')||host.startsWith('uon-hub-'))))return value}catch{}return'https://uonhub.space'}
+function headers(req:Request){return{'Access-Control-Allow-Origin':origin(req),'Access-Control-Allow-Headers':'content-type, authorization, apikey, x-client-info','Access-Control-Allow-Methods':'POST, OPTIONS','Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store',Vary:'Origin','X-Content-Type-Options':'nosniff'}}
+Deno.serve((req:Request)=>{if(req.method==='OPTIONS')return new Response(null,{status:204,headers:headers(req)});return new Response(JSON.stringify({error:'AI_ROUTE_RETIRED',message:'This legacy UON AI endpoint has been retired. Use the current UON AI gateway.'}),{status:410,headers:headers(req)})});
