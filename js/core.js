@@ -130,7 +130,17 @@ export function fillCollege(select,{other=false}={}){
 export function openModal(id){$('#'+id)?.classList.add('open')} export function closeModal(id){$('#'+id)?.classList.remove('open')}
 
 export async function notifyPending(table,id){
- try{await edge({source:'web-submit',table,id})}catch(e){console.warn('Notification fallback failed',e)}
+ try{
+  const res=await fetch(`${SUPABASE_URL}/functions/v1/public-submit-notify`,{
+   method:'POST',headers,body:JSON.stringify({table,id}),cache:'no-store'
+  });
+  const text=await res.text();
+  if(!res.ok)throw new Error(text||'Notification service error');
+  return text?JSON.parse(text):null;
+ }catch(e){
+  console.warn('Notification delivery skipped',e);
+  return null;
+ }
 }
 
 const UON_STATE_TTL=2500;
