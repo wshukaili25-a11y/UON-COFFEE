@@ -1,3 +1,5 @@
+@import url('/css/uon-green-system-v1.css?v=1.0.0');
+
 /* UON Hub homepage — next visual polish */
 .v18-home .v18-section{position:relative}
 .v18-home .v18-section:not(.v18-soft-section)+.v18-soft-section{margin-top:2px}
