@@ -2,7 +2,7 @@ import './assistant-schedule-actions-v63.js?v=63.0.0';
 const SESSION_KEY='uon_ai_session_v46';
 const STORE_KEY='uon_ai_history_v47';
 const CLIENT_KEY='uon_ai_client_v55';
-const CHAT_API='https://irkhvydgxpseflggbeqq.supabase.co/functions/v1/uon-ai-chat';
+const CHAT_API='https://irkhvydgxpseflggbeqq.supabase.co/functions/v1/uon-ai-chat-v64';
 const qs=new URLSearchParams(location.search),requested=qs.get('chat')||'';
 const isUuid=v=>/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(v||'');
 const makeId=()=>{try{return crypto.randomUUID()}catch{return'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,c=>{const r=Math.random()*16|0,v=c==='x'?r:(r&3|8);return v.toString(16)})}};
