@@ -1,0 +1,11 @@
+revoke execute on function public.uon_admin_announcement(text,text,uuid,jsonb) from anon, authenticated;
+revoke execute on function public.uon_admin_catalog_action(text,text,text,uuid,jsonb) from anon, authenticated;
+revoke execute on function public.uon_admin_import_course_sections(text,text,jsonb,text,boolean) from anon, authenticated;
+revoke execute on function public.uon_admin_moderate(text,text,text,text) from anon, authenticated;
+revoke execute on function public.uon_admin_pending_counts(text) from anon, authenticated;
+revoke execute on function public.uon_admin_pending_exam_questions(text) from anon, authenticated;
+revoke execute on function public.uon_admin_pending_marketplace(text) from anon, authenticated;
+revoke execute on function public.uon_admin_save_site_settings(text,jsonb) from anon, authenticated;
+revoke execute on function public.uon_admin_set_feature(text,text,text) from anon, authenticated;
+revoke execute on function public.uon_admin_set_tool(text,text,text) from anon, authenticated;
+revoke execute on function public.uon_security_dashboard(text) from anon, authenticated;
