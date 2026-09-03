@@ -92,7 +92,7 @@ function render(){
 async function load(){
  try{
   const [courses,colleges,departments,programs,links]=await Promise.all([
-   read('courses','select=*&active=eq.true&order=code.asc'),
+   read('public_courses','select=*&order=code.asc'),
    read('academic_colleges','select=*&active=eq.true&order=sort_order.asc'),
    read('academic_departments','select=*&active=eq.true&order=sort_order.asc'),
    read('academic_programs','select=*&active=eq.true&order=sort_order.asc'),
