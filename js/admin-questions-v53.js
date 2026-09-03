@@ -1,4 +1,5 @@
-import {rpc,esc,toast} from './core.js?v=53.3.0';
+import {esc,toast} from './core.js?v=53.3.0';
+import {adminRpc} from './admin-rpc-client.js?v=1.0.0';
 
 const select=document.querySelector('#pendingTable');
 const list=document.querySelector('#pendingList');
@@ -12,8 +13,7 @@ async function loadExamQuestions(){
   if(!list) return;
   list.innerHTML='<div class="empty">جاري تحميل الأسئلة…</div>';
   try{
-    const password=sessionStorage.getItem('uon_admin_password')||'';
-    const rows=await rpc('uon_admin_pending_exam_questions',{p_password:password});
+    const rows=await adminRpc('uon_admin_pending_exam_questions');
     list.innerHTML=rows?.length?rows.map(x=>`<div class="list-row"><div><strong>${esc(x.subject||'بدون مادة')} — ${esc(x.text||'')}</strong><small>${esc(x.college||'عام')} • ${esc(x.type||'')} ${x.year?`• ${esc(x.year)}`:''}</small>${x.answer?`<small>الإجابة: ${esc(x.answer)}</small>`:''}</div><div class="actions"><button class="btn success" data-ok="${x.id}">قبول</button><button class="btn danger" data-no="${x.id}">رفض</button></div></div>`).join(''):'<div class="empty">لا توجد أسئلة بانتظار المراجعة</div>';
   }catch(error){list.innerHTML=`<div class="empty">${esc(error.message||'تعذر تحميل الأسئلة')}</div>`;}
 }
@@ -33,8 +33,7 @@ document.addEventListener('click',async event=>{
   event.preventDefault();event.stopImmediatePropagation();
   target.disabled=true;
   try{
-    const password=sessionStorage.getItem('uon_admin_password')||'';
-    await rpc('uon_admin_moderate',{p_password:password,p_table:'exam_questions',p_id:String(approve?.dataset.ok||reject?.dataset.no),p_action:approve?'approve':'reject'});
+    await adminRpc('uon_admin_moderate',{p_table:'exam_questions',p_id:String(approve?.dataset.ok||reject?.dataset.no),p_action:approve?'approve':'reject'});
     toast(approve?'تم اعتماد السؤال':'تم رفض السؤال');
     await loadExamQuestions();
   }catch(error){toast(error.message||'تعذر تنفيذ العملية',true)}finally{target.disabled=false}
