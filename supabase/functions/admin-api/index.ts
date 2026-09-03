@@ -10,6 +10,8 @@ const ALLOWED_ORIGINS = new Set([
   'https://uonhub.space',
   'https://www.uonhub.space',
 ]);
+const PENDING_SUMMARY_BUCKET = 'summary-submissions';
+const PUBLIC_SUMMARY_BUCKET = 'summaries';
 
 const ADMIN_TABLES = new Set([
   'academic_calendar_events',
@@ -102,6 +104,15 @@ function assertIdentifier(value: string, label = 'identifier') {
   if (!IDENTIFIER.test(value)) throw new Error(`Invalid ${label}`);
 }
 
+function safeStorageName(value: string) {
+  return String(value || '')
+    .toLowerCase()
+    .replace(/[^a-z0-9._-]+/g, '-')
+    .replace(/-+/g, '-')
+    .replace(/^[-.]+|[-.]+$/g, '')
+    .slice(0, 90);
+}
+
 async function adminRead(body: Record<string, unknown>) {
   const table = String(body.table || '');
   if (!ADMIN_TABLES.has(table)) throw new Error('Table is not available to the admin API');
@@ -177,6 +188,97 @@ async function adminRead(body: Record<string, unknown>) {
   return data || [];
 }
 
+async function moderateSummary(body: Record<string, unknown>) {
+  const id = String(body.id || '').trim();
+  const action = String(body.moderation_action || '').trim();
+  if (!/^[0-9a-f-]{36}$/i.test(id)) throw new Error('Invalid summary id');
+  if (!['approve', 'reject', 'delete'].includes(action)) throw new Error('Invalid summary moderation action');
+
+  const { data: row, error: readError } = await db
+    .from('summaries')
+    .select('id,title,course_code,original_filename,pending_storage_path,approved,url,pdf_url')
+    .eq('id', id)
+    .maybeSingle();
+  if (readError) throw readError;
+  if (!row) throw new Error('Summary not found');
+
+  const pendingPath = String(row.pending_storage_path || '').trim();
+  if (pendingPath && (!pendingPath.startsWith('pending/') || pendingPath.includes('..'))) {
+    throw new Error('Invalid pending storage path');
+  }
+
+  if (action !== 'approve') {
+    if (pendingPath) {
+      const { error: removeError } = await db.storage.from(PENDING_SUMMARY_BUCKET).remove([pendingPath]);
+      if (removeError) throw removeError;
+    }
+    const { error: deleteError } = await db.from('summaries').delete().eq('id', id);
+    if (deleteError) throw deleteError;
+    await db.from('admin_audit_log').insert({
+      admin_name: 'web-admin', action: 'summary_reject', entity: 'summaries', entity_id: id,
+      details: { had_private_upload: Boolean(pendingPath) },
+    });
+    return { id, action, removed_private_upload: Boolean(pendingPath) };
+  }
+
+  if (!pendingPath) {
+    const { data, error } = await db
+      .from('summaries')
+      .update({ approved: true, updated_at: new Date().toISOString() })
+      .eq('id', id)
+      .select('id')
+      .single();
+    if (error) throw error;
+    await db.from('admin_audit_log').insert({
+      admin_name: 'web-admin', action: 'summary_approve_link', entity: 'summaries', entity_id: id,
+      details: { source: 'external-link' },
+    });
+    return { id: data.id, action, promoted: false };
+  }
+
+  const { data: blob, error: downloadError } = await db.storage.from(PENDING_SUMMARY_BUCKET).download(pendingPath);
+  if (downloadError || !blob) throw downloadError || new Error('Pending PDF not found');
+
+  const filename = safeStorageName(String(row.original_filename || '')) || `${String(row.course_code || 'resource').toLowerCase()}.pdf`;
+  const month = new Date().toISOString().slice(0, 7);
+  const publicPath = `approved/${month}/${crypto.randomUUID()}-${filename.endsWith('.pdf') ? filename : `${filename}.pdf`}`;
+  let publicUploaded = false;
+  try {
+    const bytes = new Uint8Array(await blob.arrayBuffer());
+    if (new TextDecoder().decode(bytes.slice(0, 5)) !== '%PDF-') throw new Error('Pending file is not a valid PDF');
+
+    const { error: uploadError } = await db.storage.from(PUBLIC_SUMMARY_BUCKET).upload(publicPath, bytes, {
+      contentType: 'application/pdf', upsert: false, cacheControl: '3600',
+    });
+    if (uploadError) throw uploadError;
+    publicUploaded = true;
+
+    const { data: publicData } = db.storage.from(PUBLIC_SUMMARY_BUCKET).getPublicUrl(publicPath);
+    const publicUrl = publicData.publicUrl;
+    const { error: updateError } = await db.from('summaries').update({
+      approved: true,
+      url: publicUrl,
+      pdf_url: publicUrl,
+      link: publicUrl,
+      pending_storage_path: null,
+      updated_at: new Date().toISOString(),
+    }).eq('id', id);
+    if (updateError) throw updateError;
+
+    const { error: removeError } = await db.storage.from(PENDING_SUMMARY_BUCKET).remove([pendingPath]);
+    if (removeError) console.warn('Approved summary left an orphan private object', removeError.message);
+
+    await db.from('admin_audit_log').insert({
+      admin_name: 'web-admin', action: 'summary_approve_upload', entity: 'summaries', entity_id: id,
+      details: { public_path: publicPath },
+    });
+    return { id, action, promoted: true, public_url: publicUrl };
+  } catch (error) {
+    if (publicUploaded) await db.storage.from(PUBLIC_SUMMARY_BUCKET).remove([publicPath]).catch(() => {});
+    throw error;
+  }
+}
+
 Deno.serve(async (req: Request) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { status: 204, headers: corsHeaders(req) });
@@ -207,6 +309,9 @@ Deno.serve(async (req: Request) => {
       return reply(req, { ok: true, data: await adminRead(body) });
     }
 
+    if (body.action === 'summary_moderate') {
+      return reply(req, { ok: true, data: await moderateSummary(body) });
+    }
 
     if (body.action === 'course_upsert') {
       const course = body.course || {};
@@ -290,7 +395,7 @@ Deno.serve(async (req: Request) => {
     return reply(req, { ok: false, error: 'unknown_action' }, 400);
   } catch (error) {
     const message = String((error as Error)?.message || error);
-    const clientError = /Invalid|Unsupported|not available|required/i.test(message);
+    const clientError = /Invalid|Unsupported|not available|required|not found/i.test(message);
     return reply(req, { ok: false, error: message }, clientError ? 400 : 500);
   }
 });
