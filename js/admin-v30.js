@@ -6,6 +6,8 @@ import './admin-support-centers-v60.js?v=60.0.0';
 import {rpc,toast} from './core.js?v=30.0.1';
 
 const passwordKey='uon_admin_password';
+const SUPABASE_URL='https://irkhvydgxpseflggbeqq.supabase.co';
+const PUBLISHABLE_KEY='sb_publishable_gZ9tyM1udrkuQIXHqDtToQ_FyFmePgH';
 const getPassword=()=>sessionStorage.getItem(passwordKey)||'';
 const reload=()=>location.reload();
 
@@ -26,6 +28,25 @@ async function requirePassword(){
  const password=getPassword();
  if(!password)throw new Error('انتهت جلسة الإدارة، سجّل الدخول مرة ثانية');
  return password;
+}
+
+async function callAdminApi(payload={}){
+ const password=await requirePassword();
+ const response=await fetch(`${SUPABASE_URL}/functions/v1/admin-api`,{
+  method:'POST',
+  headers:{apikey:PUBLISHABLE_KEY,'Content-Type':'application/json','x-admin-password':password},
+  body:JSON.stringify(payload),
+  cache:'no-store'
+ });
+ const text=await response.text();
+ let data={};try{data=text?JSON.parse(text):{}}catch{data={error:text}}
+ if(response.status===401){
+  sessionStorage.removeItem(passwordKey);
+  sessionStorage.removeItem('uon_admin');
+  sessionStorage.removeItem('uon_admin_session');
+ }
+ if(!response.ok||data?.ok===false)throw new Error(data?.error||`HTTP ${response.status}`);
+ return data;
 }
 
 async function run(button,task,success,{refresh=true}={}){
@@ -87,9 +108,14 @@ document.addEventListener('click',event=>{
  const table=suggestionReview||suggestionDelete?'feature_suggestions':document.querySelector('#pendingTable')?.value;
  const id=approve?.dataset.ok||reject?.dataset.no||suggestionReview?.dataset.sugOk||suggestionDelete?.dataset.sugDel;
  const action=approve?'approve':reject?'reject':suggestionReview?'review':'delete';
- run(target,async()=>rpc('uon_admin_moderate',{
-  p_password:await requirePassword(),p_table:table,p_id:String(id),p_action:action
- }),action==='approve'?'تم القبول':action==='review'?'تمت المراجعة':action==='delete'?'تم الحذف':'تم الرفض');
+ run(target,async()=>{
+  if(table==='summaries'&&(action==='approve'||action==='reject')){
+   return callAdminApi({action:'summary_moderate',id:String(id),moderation_action:action});
+  }
+  return rpc('uon_admin_moderate',{
+   p_password:await requirePassword(),p_table:table,p_id:String(id),p_action:action
+  });
+ },action==='approve'?'تم القبول':action==='review'?'تمت المراجعة':action==='delete'?'تم الحذف':'تم الرفض');
 },true);
 
 document.addEventListener('click',event=>{
@@ -151,17 +177,37 @@ document.addEventListener('click',event=>{
 
 document.addEventListener('submit',event=>{
  const form=event.target;
- const map={
-  calendarForm:['academic_calendar_events','تمت إضافة الموعد'],
-  notificationForm:['site_notifications','تم نشر الإشعار']
- };
- const config=map[form.id];
- if(!config)return;
+ if(!['calendarForm','siteNotificationForm'].includes(form.id))return;
  event.preventDefault();event.stopImmediatePropagation();
- const [entity,message]=config;
+ let entity,payload,message;
+ if(form.id==='calendarForm'){
+  const raw=formPayload(form);
+  const start=String(raw.start_at||'');
+  const end=String(raw.end_at||'');
+  entity='academic_calendar_events';
+  payload={
+   title:String(raw.title||'').trim(),
+   start_date:start.slice(0,10),
+   end_date:(end||start).slice(0,10),
+   event_type:'other',
+   description:[String(raw.description||'').trim(),raw.location?`الموقع: ${String(raw.location).trim()}`:''].filter(Boolean).join('\n')
+  };
+  message='تمت إضافة الموعد';
+ }else{
+  const type=document.querySelector('#siteNotificationType')?.value||'info';
+  const icons={info:'🔔',important:'⚠️',urgent:'🚨'};
+  entity='site_notifications';
+  payload={
+   title:document.querySelector('#siteNotificationTitle')?.value.trim()||'',
+   body:document.querySelector('#siteNotificationMessage')?.value.trim()||'',
+   url:document.querySelector('#siteNotificationUrl')?.value.trim()||'',
+   icon:icons[type]||'🔔'
+  };
+  message='تم نشر الإشعار';
+ }
  const submit=form.querySelector('[type="submit"],button');
  run(submit,async()=>rpc('uon_admin_catalog_action',{
-  p_password:await requirePassword(),p_entity:entity,p_action:'create',p_id:null,p_payload:formPayload(form)
+  p_password:await requirePassword(),p_entity:entity,p_action:'create',p_id:null,p_payload:payload
  }),message);
 },true);
 
