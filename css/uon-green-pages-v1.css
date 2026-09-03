@@ -1,0 +1,57 @@
+/* Page-specific polish for UON Green v1 */
+/* Course catalog + course detail */
+body:not(.admin-page) .course-center-shell{background:transparent!important;color:var(--uon-text)!important}
+body:not(.admin-page) .course-center-hero,body:not(.admin-page) .course-detail-hero{background:radial-gradient(circle at 82% 0,rgba(15,155,96,.12),transparent 38%),transparent!important;border-color:var(--uon-border)!important}
+body:not(.admin-page) .course-center-hero h1,body:not(.admin-page) .course-detail-top h1,body:not(.admin-page) .course-summary-row strong{color:var(--uon-text)!important}
+body:not(.admin-page) .course-center-hero p,body:not(.admin-page) .course-summary-row,body:not(.admin-page) .course-panel-card p,body:not(.admin-page) .course-resource p{color:var(--uon-muted)!important}
+body:not(.admin-page) .course-toolbar{background:color-mix(in srgb,var(--uon-surface) 94%,transparent)!important;border-color:var(--uon-border)!important;box-shadow:0 14px 34px rgba(0,0,0,.10)!important;top:78px!important}
+body:not(.admin-page) .course-toolbar input,body:not(.admin-page) .course-toolbar select{background:var(--uon-surface-2)!important;color:var(--uon-text)!important;border-color:var(--uon-border)!important}
+body:not(.admin-page) .view-toggle button,body:not(.admin-page) .course-tabs button{background:var(--uon-surface-2)!important;color:var(--uon-muted)!important;border-color:var(--uon-border)!important}
+body:not(.admin-page) .view-toggle button.active,body:not(.admin-page) .course-tabs button.active{background:rgba(15,155,96,.14)!important;color:#9ce4bf!important;border-color:rgba(15,155,96,.35)!important}
+body:not(.admin-page) .v31-course-card,body:not(.admin-page) .course-side-card,body:not(.admin-page) .course-panel-card,body:not(.admin-page) .course-resource,body:not(.admin-page) .course-empty{background:linear-gradient(145deg,var(--uon-surface),var(--uon-surface-2))!important;border-color:var(--uon-border)!important;color:var(--uon-text)!important;box-shadow:0 12px 32px rgba(0,0,0,.09)!important}
+body:not(.admin-page) .v31-course-card:hover{border-color:rgba(15,155,96,.34)!important;box-shadow:0 18px 42px rgba(0,0,0,.15)!important}
+body:not(.admin-page) .v31-course-code,body:not(.admin-page) .v31-course-card h2,body:not(.admin-page) .course-side-card h3,body:not(.admin-page) .course-panel-card h2,body:not(.admin-page) .course-panel-card h3,body:not(.admin-page) .course-resource h3{color:var(--uon-text)!important}
+body:not(.admin-page) .v31-course-hours,body:not(.admin-page) .course-detail-meta span,body:not(.admin-page) .course-prereq-list a{background:rgba(15,155,96,.10)!important;color:#91e0b7!important}
+body:not(.admin-page) .v31-course-college,body:not(.admin-page) .course-side-stats strong{color:#7edaa9!important}
+body:not(.admin-page) .v31-course-card footer{background:rgba(255,255,255,.025)!important;border-color:var(--uon-border)!important}
+body:not(.admin-page) .course-side-stats div{background:rgba(255,255,255,.035)!important}
+body:not(.admin-page) .course-tabs{background:var(--uon-surface)!important;border-color:var(--uon-border)!important}
+body:not(.admin-page) .course-skeleton{background:linear-gradient(90deg,var(--uon-surface) 25%,var(--uon-surface-2) 37%,var(--uon-surface) 63%)!important;background-size:400% 100%!important}
+
+/* University guide + useful sites + projects */
+body:not(.admin-page) .guide-card,body:not(.admin-page) .guide-college,body:not(.admin-page) .guide-contact-card,body:not(.admin-page) .useful46-card,body:not(.admin-page) .project-card,body:not(.admin-page) .projects-grid .card{background:linear-gradient(145deg,var(--uon-surface),var(--uon-surface-2))!important;border-color:var(--uon-border)!important;color:var(--uon-text)!important;box-shadow:0 12px 32px rgba(0,0,0,.08)!important}
+body:not(.admin-page) .guide-card:hover,body:not(.admin-page) .guide-contact-card:hover,body:not(.admin-page) .useful46-card:hover,body:not(.admin-page) .project-card:hover{border-color:rgba(15,155,96,.32)!important}
+body:not(.admin-page) .guide-summary>div{background:rgba(15,155,96,.055)!important;border-color:rgba(15,155,96,.16)!important}
+body:not(.admin-page) .guide-summary strong,body:not(.admin-page) .useful46-card strong{color:var(--uon-text)!important}
+body:not(.admin-page) .guide-college-tabs button,body:not(.admin-page) .useful46-filters button{background:var(--uon-surface-2)!important;color:var(--uon-muted)!important;border-color:var(--uon-border)!important}
+body:not(.admin-page) .guide-college-tabs button.active,body:not(.admin-page) .useful46-filters button.active{background:rgba(15,155,96,.12)!important;color:#9ce4bf!important;border-color:rgba(15,155,96,.32)!important}
+body:not(.admin-page) .useful46-open{background:rgba(15,155,96,.10)!important;color:#9ce4bf!important}
+
+/* GPA */
+body[data-uon-page="gpa"] .stat,body[data-uon-page="gpa"] .gpa-card,body[data-uon-page="gpa"] .gpa-summary{background:linear-gradient(145deg,var(--uon-surface),var(--uon-surface-2))!important;border-color:var(--uon-border)!important;box-shadow:0 12px 32px rgba(0,0,0,.08)!important}
+body[data-uon-page="gpa"] .stat strong,body[data-uon-page="gpa"] .gpa-result{color:#83dbad!important}
+body[data-uon-page="gpa"] #addCourse{background:linear-gradient(135deg,var(--uon-green-2),var(--uon-green))!important;color:#fff!important}
+
+/* Academic calendar */
+body[data-uon-page="calendar"] .calendar-actions{background:color-mix(in srgb,var(--uon-surface) 92%,transparent)!important;border-color:var(--uon-border)!important}
+body[data-uon-page="calendar"] .calendar-event,body:not(.admin-page) .academic-event,body:not(.admin-page) .academic-calendar-card{background:linear-gradient(145deg,var(--uon-surface),var(--uon-surface-2))!important;border-color:var(--uon-border)!important;color:var(--uon-text)!important}
+body[data-uon-page="calendar"] #downloadAll{background:linear-gradient(135deg,var(--uon-green-2),var(--uon-green))!important;color:#fff!important}
+
+/* Notifications / status */
+body:not(.admin-page) .notification-card,body:not(.admin-page) .notification-preference-card,body:not(.admin-page) .status-card,body:not(.admin-page) .status-service,body:not(.admin-page) .platform-status-card{background:linear-gradient(145deg,var(--uon-surface),var(--uon-surface-2))!important;border-color:var(--uon-border)!important;color:var(--uon-text)!important;box-shadow:0 12px 30px rgba(0,0,0,.08)!important}
+body:not(.admin-page) .status-ok,body:not(.admin-page) .is-online{color:#87ddb0!important}
+
+/* Feedback / about / general info */
+body:not(.admin-page) .about-card,body:not(.admin-page) .about-cta,body:not(.admin-page) .feedback-card,body:not(.admin-page) .feedback-form,body:not(.admin-page) .info-card{background:linear-gradient(145deg,var(--uon-surface),var(--uon-surface-2))!important;border-color:var(--uon-border)!important;color:var(--uon-text)!important;box-shadow:0 12px 30px rgba(0,0,0,.08)!important}
+body:not(.admin-page) .about-card p,body:not(.admin-page) .about-cta p{color:var(--uon-muted)!important}
+body:not(.admin-page) .about-card strong{color:#8de0b5!important}
+
+/* Compact student-first mobile behavior */
+@media(max-width:700px){
+ body:not(.admin-page) .course-toolbar{position:static!important;padding:10px!important;border-radius:16px!important}
+ body:not(.admin-page) .course-center-main{padding-top:18px!important}
+ body:not(.admin-page) .course-catalog{gap:10px!important}
+ body:not(.admin-page) .v31-course-card{min-height:210px!important;border-radius:17px!important}
+ body:not(.admin-page) .v31-course-card>a:first-child{padding:16px!important}
+ body:not(.admin-page) .course-detail-grid{padding-top:18px!important}
+}
