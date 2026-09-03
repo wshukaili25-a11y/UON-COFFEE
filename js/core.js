@@ -303,20 +303,39 @@ export function whatsappShare(title,url=location.href){
  return `https://wa.me/?text=${encodeURIComponent(text)}`;
 }
 
+function getAnonymousSessionId(){
+ const key='uon_anon_session';
+ let sessionId='';
+ try{sessionId=localStorage.getItem(key)||''}catch{}
+ if(!/^[0-9a-f-]{36}$/i.test(sessionId)){
+  try{sessionId=crypto.randomUUID()}catch{sessionId='xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,c=>{const r=Math.random()*16|0,v=c==='x'?r:(r&3|8);return v.toString(16)})}
+  try{localStorage.setItem(key,sessionId)}catch{}
+ }
+ return sessionId;
+}
+
 export async function reportBrokenLink({sourceTable,sourceId,title,url}){
  const reason=prompt('ما المشكلة في الرابط؟','الرابط لا يعمل');
  if(reason===null)return false;
- const report=await submitPending('broken_link_reports',{
-  source_table:sourceTable,
-  source_id:String(sourceId),
-  source_title:title||'',
-  source_url:url||'',
-  reason,
-  status:'pending'
- });
- toast('تم إرسال البلاغ للمشرف');
- try{await notifyPending('broken_link_reports',report.id)}catch{}
- return true;
+ try{
+  const id=await rpc('uon_submit_broken_link_report',{
+   p_source_table:String(sourceTable||''),
+   p_source_id:String(sourceId||''),
+   p_source_title:String(title||''),
+   p_source_url:String(url||''),
+   p_reason:String(reason||''),
+   p_session_id:getAnonymousSessionId()
+  });
+  toast('تم إرسال البلاغ للمشرف');
+  try{await notifyPending('broken_link_reports',id)}catch{}
+  return true;
+ }catch(error){
+  const message=String(error?.message||'');
+  if(message.includes('already_reported'))toast('هذا الرابط مُبلّغ عنه بالفعل، وبنراجعه 👍');
+  else if(message.includes('rate_limited'))toast('وصلت للحد المؤقت للبلاغات، جرّب بعد شوي',true);
+  else toast(message||'تعذر إرسال البلاغ، حاول مرة ثانية',true);
+  return false;
+ }
 }
 
 export function installErrorCapture(){
