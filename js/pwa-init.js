@@ -1,4 +1,4 @@
-const APP_VERSION='64.4.5';
+const APP_VERSION='64.4.6';
 const TEST_KEY='uonhub_pwa_test_mode';
 let deferredInstallPrompt=null;
 function pagePath(){return location.pathname.replace(/\/+$/,'')||'/'}
