@@ -10,8 +10,8 @@ const importQuiet=async(spec,label)=>{try{await import(spec)}catch(error){consol
 const runAfterPaint=()=>{
  // Stage 1: only runtime/PWA work shortly after the page is visually ready.
  idle(()=>{void Promise.allSettled([
-  importQuiet('./runtime-guard.js?v=49.0.1','Runtime guard'),
-  importQuiet('./pwa-init.js?v=49.0.1','PWA')
+  importQuiet('./runtime-guard.js?v=64.4.1','Runtime guard'),
+  importQuiet('./pwa-init.js?v=64.4.1','PWA')
  ])},1400);
 
  // Stage 2: optional experience/reporting code waits longer so it cannot compete
@@ -19,8 +19,8 @@ const runAfterPaint=()=>{
  const stageTwo=()=>{
   loadDeferredCss('css/content-reports.css?v=31.2.0','contentReportsDeferredStyle');
   void Promise.allSettled([
-   importQuiet('./v20-experience.js?v=49.0.1','Home experience'),
-   importQuiet('./content-reports.js?v=49.0.1','Content reports')
+   importQuiet('./v20-experience.js?v=64.4.1','Home experience'),
+   importQuiet('./content-reports.js?v=64.4.1','Content reports')
   ]);
  };
  let started=false;
