@@ -53,7 +53,7 @@ function render(){
  bind();
 }
 async function load(){
- try{hub=await rpc('uon_course_hub_v42',{p_code:code,p_language:lang()});if(!hub?.course)throw new Error(t('المقرر غير موجود','Course not found'));render();trackEvent('course_view_v42',{code})}
+ try{hub=await rpc('uon_course_hub_v65',{p_code:code,p_language:lang()});if(!hub?.course)throw new Error(t('المقرر غير موجود','Course not found'));render();trackEvent('course_view_v42',{code})}
  catch(error){console.error(error);toast(error.message,true);document.querySelector('.course-detail-grid').innerHTML=`<div class="course-empty"><strong>${esc(error.message)}</strong><a class="btn primary" href="courses.html">${t('العودة للمقررات','Back to courses')}</a></div>`}
 }
 $('#copyCourseLink').addEventListener('click',async()=>{try{await navigator.clipboard.writeText(location.href);toast(t('تم نسخ رابط المقرر','Course link copied'))}catch{toast(t('تعذر نسخ الرابط','Could not copy link'),true)}});
