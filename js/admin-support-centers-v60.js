@@ -1,18 +1,11 @@
-import {rpc,toast,esc} from './core.js?v=60.0.0';
+import {toast,esc} from './core.js?v=60.0.0';
+import {adminRpc} from './admin-rpc-client.js?v=1.0.0';
 
-const passwordKey='uon_admin_password';
 const form=document.querySelector('#centerForm');
 const list=document.querySelector('#centersAdminList');
 
-function password(){
- const value=sessionStorage.getItem(passwordKey)||'';
- if(!value)throw new Error('انتهت جلسة الإدارة، سجّل الدخول مرة ثانية');
- return value;
-}
-
 async function action(name,{id=null,payload={}}={}){
- return rpc('uon_admin_catalog_action',{
-  p_password:password(),
+ return adminRpc('uon_admin_catalog_action',{
   p_entity:'support_centers',
   p_action:name,
   p_id:id,
