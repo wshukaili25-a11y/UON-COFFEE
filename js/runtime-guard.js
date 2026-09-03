@@ -1,5 +1,16 @@
 const shown=new Set();
 
+(function installGreenRedesign(){
+ const body=document.body;
+ if(body?.classList.contains('admin-page')||body?.classList.contains('owner42')||body?.classList.contains('admin53'))return;
+ if(document.querySelector('link[data-uon-green-system]'))return;
+ const link=document.createElement('link');
+ link.rel='stylesheet';
+ link.href='/css/uon-green-system-v1.css?v=1.0.0';
+ link.dataset.uonGreenSystem='1';
+ document.head.append(link);
+})();
+
 function showMessage(message,type='error'){
  const key=`${type}:${message}`;
  if(shown.has(key))return;
