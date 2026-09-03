@@ -1,4 +1,5 @@
 @import url('/css/uon-green-system-v1.css?v=1.0.0');
+@import url('/css/uon-green-pages-v1.css?v=1.0.0');
 
 /* UON Hub homepage — next visual polish */
 .v18-home .v18-section{position:relative}
@@ -13,6 +14,7 @@
 .v18-home .v18-panel{min-height:250px}
 .v18-home .v20-stat-card{transition:transform .18s ease,box-shadow .18s ease}
 .v18-home .v20-stat-card:hover{transform:translateY(-2px);box-shadow:0 16px 38px rgba(23,32,51,.08)!important}
+.uon-green-menu-section{display:grid;gap:7px;padding:5px 0 12px}.uon-green-menu-section>small{padding-inline:8px;color:var(--uon-muted,#9fb0a7);font-size:10px;font-weight:900;letter-spacing:.02em}.uon-green-menu-section nav{display:grid;gap:3px}.uon-green-menu-section nav a{display:flex!important;align-items:center;gap:10px}.uon-green-menu-section nav a>span{width:24px;min-width:24px;text-align:center;font-size:13px}.uon-green-menu-section nav a>b{font-weight:700}.uon-menu-open{overflow:hidden}
 @media(max-width:980px){
   .v18-home .v18-primary-tools{grid-template-columns:repeat(2,minmax(0,1fr))!important}
 }
