@@ -1,4 +1,5 @@
-import{rpc,toast,esc}from'./core.js?v=53.3.0';
+import{toast,esc}from'./core.js?v=53.3.0';
+import{adminRpc}from'./admin-rpc-client.js?v=1.0.0';
 
 function host(){return document.querySelector('#sec-overview')||document.querySelector('main')||document.body}
 function sample(){return JSON.stringify([
@@ -28,10 +29,9 @@ function render(){
   const button=event.submitter||card.querySelector('button[type="submit"]');button.disabled=true;
   const result=card.querySelector('#sectionsImportResult');
   try{
-   const password=sessionStorage.getItem('uon_admin_password')||'';if(!password)throw new Error('سجّل الدخول كإدارة أولًا');
    let parsed;try{parsed=JSON.parse(rows.value)}catch{throw new Error('صيغة JSON غير صحيحة')}
    if(!Array.isArray(parsed))throw new Error('البيانات يجب أن تكون قائمة JSON');
-   const data=await rpc('uon_admin_import_course_sections',{p_password:password,p_term:card.querySelector('#sectionsTerm').value.trim(),p_rows:parsed,p_source_url:card.querySelector('#sectionsSource').value.trim()||null,p_verified:card.querySelector('#sectionsVerified').checked});
+   const data=await adminRpc('uon_admin_import_course_sections',{p_term:card.querySelector('#sectionsTerm').value.trim(),p_rows:parsed,p_source_url:card.querySelector('#sectionsSource').value.trim()||null,p_verified:card.querySelector('#sectionsVerified').checked});
    result.innerHTML=`تم الاستيراد: <strong>${Number(data?.imported||0)}</strong> • تم تجاهل: ${Number(data?.skipped||0)} • ${data?.verified?'موثقة':'بانتظار التوثيق'}`;
    toast(`تم استيراد ${Number(data?.imported||0)} سجل للشعب`);
   }catch(error){result.textContent=error.message||'تعذر الاستيراد';toast(error.message||'تعذر الاستيراد',true)}finally{button.disabled=false}
