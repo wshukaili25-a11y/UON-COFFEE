@@ -1,4 +1,4 @@
-const VERSION = '64.4.4';
+const VERSION = '64.4.5';
 const STATIC_CACHE = `uonhub-static-${VERSION}`;
 const PAGE_CACHE = `uonhub-pages-${VERSION}`;
 const DATA_CACHE = `uonhub-data-${VERSION}`;
