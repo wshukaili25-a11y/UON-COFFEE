@@ -18,10 +18,10 @@ async function authorizedPassword(req:Request){const password=req.headers.get('x
 function homeKeyboard(){return[
  [{text:'📊 لوحة المالك',callback_data:'v42:dashboard'}],
  [{text:'🕓 المراجعة',callback_data:'v42:pending'},{text:'🗂 المحتوى',callback_data:'manage:menu'}],
- [{text:'🛠 الأدوات والخدمات',callback_data:'services'},{text:'📘 المقررات',callback_data:'v42:courses'}],
- [{text:'🤖 UON AI',callback_data:'v42:aihandoffs'},{text:'📤 الرفع والاستيراد',callback_data:'v42:uploads'}],
- [{text:'☎️ أرقام التواصل',callback_data:'contacts'},{text:'⚙️ الإعدادات',callback_data:'settings:menu'}],
- [{text:'💾 النسخ والصلاحيات',callback_data:'backup:menu'}],
+ [{text:'🛠 الأدوات والخدمات',callback_data:'services'},{text:'🔧 صيانة الموقع',callback_data:'maintenance:menu'}],
+ [{text:'📘 المقررات',callback_data:'v42:courses'},{text:'🤖 UON AI',callback_data:'v42:aihandoffs'}],
+ [{text:'📤 الرفع والاستيراد',callback_data:'v42:uploads'},{text:'☎️ أرقام التواصل',callback_data:'contacts'}],
+ [{text:'⚙️ الإعدادات',callback_data:'settings:menu'},{text:'💾 النسخ والصلاحيات',callback_data:'backup:menu'}],
  [{text:'🌐 لوحة الإدارة',url:`${SITE}/admin.html`},{text:'📈 Dashboard',url:`${SITE}/owner-dashboard.html`}]
 ]}
 async function home(chatId:string,messageId=0,name=''){const text=`لوحة إدارة UON Hub${name?`\nمرحبًا ${name} 👋`:''}\n\nاختر القسم المطلوب. الإدارة مرتبة الآن بمسار واحد لكل وظيفة.`;const body:any={chat_id:chatId,text,disable_web_page_preview:true,reply_markup:{inline_keyboard:homeKeyboard()}};if(messageId){body.message_id=messageId;return tg('editMessageText',body)}return tg('sendMessage',body)}
