@@ -86,7 +86,23 @@ export async function submitPending(table,body){
 }
 export const update=(t,q,b)=>api(t,{method:'PATCH',query:q,body:b});
 export const remove=(t,q)=>api(t,{method:'DELETE',query:q,prefer:''});
+async function adminLoginRpc(body={}){
+ const password=String(body?.p_password||'');
+ const res=await fetch(`${SUPABASE_URL}/functions/v1/admin-rpc-api`,{
+  method:'POST',
+  headers:{...headers,'x-admin-password':password},
+  body:JSON.stringify({action:'rpc',name:'uon_admin_login',args:{p_password:password}}),
+  cache:'no-store'
+ });
+ const text=await res.text();let data=null;try{data=text?JSON.parse(text):null}catch{data=text}
+ if(!res.ok||data?.ok===false){
+  if(res.status===401)throw new Error('كلمة المرور غير صحيحة');
+  throw new Error(data?.error||data?.message||data||`HTTP ${res.status}`);
+ }
+ return data?.data;
+}
 export async function rpc(name,body){
+ if(name==='uon_admin_login')return adminLoginRpc(body);
  const res=await fetch(`${SUPABASE_URL}/rest/v1/rpc/${name}`,{method:'POST',headers,body:JSON.stringify(body),cache:'no-store'});
  const text=await res.text();let data=null;try{data=text?JSON.parse(text):null}catch{data=text}
  if(!res.ok)throw new Error(data?.message||data||`HTTP ${res.status}`);return data;
