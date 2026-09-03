@@ -1,6 +1,7 @@
 import './admin-schedule-sections-v54.js?v=54.0.0';
 import './admin-notifications-v65.js?v=65.0.0';
-import {rpc,esc} from './core.js?v=53.3.0';
+import {esc} from './core.js?v=53.3.0';
+import {adminRpc} from './admin-rpc-client.js?v=1.0.0';
 
 const labels={
  summaries:'الملخصات',
@@ -15,10 +16,8 @@ const labels={
 async function renderPendingSummary(){
  const host=document.querySelector('#stats');
  if(!host)return;
- const password=sessionStorage.getItem('uon_admin_password')||'';
- if(!password)return;
  try{
-  const counts=await rpc('uon_admin_pending_counts',{p_password:password});
+  const counts=await adminRpc('uon_admin_pending_counts');
   const total=Object.values(counts||{}).reduce((sum,value)=>sum+Number(value||0),0);
   let card=document.querySelector('#adminPendingSummaryV53');
   if(!card){
