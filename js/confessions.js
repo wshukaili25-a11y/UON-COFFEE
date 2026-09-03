@@ -21,7 +21,7 @@ $('#submitConfession').onclick=async()=>{
  const program=$('#confessionProgram').value.trim()||null;
  const btn=$('#submitConfession');btn.disabled=true;btn.textContent='جاري النشر...';
  try{
-  await rpc('uon_submit_confession',{p_text:text,p_college:college,p_program:program});
+  await rpc('uon_submit_confession_v2',{p_text:text,p_college:college,p_program:program,p_session_id:sessionId});
   $('#confessionText').value='';$('#confessionCount').textContent='0';$('#confessionProgram').value='';
   toast('تم نشر اعترافك مباشرة 👀');
   trackEvent('confession_published',{college:college||''});
