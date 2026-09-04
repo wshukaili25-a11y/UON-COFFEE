@@ -22,18 +22,23 @@ const dayAliases: Record<string, string> = {
 function clean(v: unknown, max = 200) {
   return String(v ?? '').replace(/\s+/g, ' ').trim().slice(0, max);
 }
-function origin(req: Request) {
-  const value = req.headers.get('origin') || '';
-  if (allowedOrigins.has(value)) return value;
+function requestOrigin(req: Request) {
+  return req.headers.get('origin') || '';
+}
+function isAllowedOrigin(req: Request) {
+  const value = requestOrigin(req);
+  if (allowedOrigins.has(value)) return true;
   try {
     const host = new URL(value).hostname;
-    if (host.endsWith('.vercel.app') && (host.startsWith('uon-') || host.startsWith('uon-hub-'))) return value;
-  } catch {}
-  return 'https://uonhub.space';
+    return host.endsWith('.vercel.app') && (host.startsWith('uon-') || host.startsWith('uon-hub-'));
+  } catch { return false; }
+}
+function corsOrigin(req: Request) {
+  return isAllowedOrigin(req) ? requestOrigin(req) : 'https://uonhub.space';
 }
 function headers(req: Request) {
   return {
-    'Access-Control-Allow-Origin': origin(req),
+    'Access-Control-Allow-Origin': corsOrigin(req),
     'Access-Control-Allow-Headers': 'content-type, authorization, apikey, x-client-info',
     'Access-Control-Allow-Methods': 'POST, OPTIONS',
     'Content-Type': 'application/json; charset=utf-8',
@@ -53,9 +58,9 @@ function normalizeDay(v: unknown) {
 }
 function normalizeTime(v: unknown) {
   const raw = clean(v, 20).replace(/[.]/g, ':');
-  let m = raw.match(/^(\d{1,2}):(\d{2})\s*(am|pm|ص|م)?$/i);
+  const m = raw.match(/^(\d{1,2}):(\d{2})\s*(am|pm|ص|م)?$/i);
   if (!m) return '';
-  let h = Number(m[1]), min = Number(m[2]);
+  let h = Number(m[1]); const min = Number(m[2]);
   if (min > 59 || h > 23) return '';
   const p = (m[3] || '').toLowerCase();
   if (p === 'pm' || p === 'م') { if (h < 12) h += 12; }
@@ -68,6 +73,36 @@ function minutes(v: string) {
 }
 function overlaps(a: any, b: any) {
   return a.day === b.day && minutes(a.start) < minutes(b.end) && minutes(b.start) < minutes(a.end);
+}
+async function digest(v: string) {
+  const bytes = new TextEncoder().encode(v);
+  const hash = await crypto.subtle.digest('SHA-256', bytes);
+  return [...new Uint8Array(hash)].map(x => x.toString(16).padStart(2, '0')).join('');
+}
+function clientIp(req: Request) {
+  for (const key of ['cf-connecting-ip', 'x-real-ip', 'x-forwarded-for']) {
+    const raw = req.headers.get(key) || '';
+    const first = raw.split(',')[0]?.trim();
+    if (first && first.length <= 80) return first;
+  }
+  return '';
+}
+async function rateHit(key: string, limit: number) {
+  const d = new Date(); d.setSeconds(0, 0);
+  try {
+    const { data, error } = await db.rpc('uon_ai_rate_limit', { p_client_key: key, p_window_start: d.toISOString(), p_limit: limit });
+    if (error) throw error;
+    const row = (Array.isArray(data) ? data[0] : data) || {};
+    return Boolean(row?.allowed);
+  } catch {
+    return false;
+  }
+}
+async function allowedByRate(req: Request, clientToken: string) {
+  if (!(await rateHit(`schedule-image-client:${clientToken}`, 6))) return false;
+  const ip = clientIp(req);
+  if (!ip) return false;
+  return rateHit(`schedule-image-ip:${await digest(ip)}`, 12);
 }
 
 function normalizeCourses(raw: any) {
@@ -109,9 +144,7 @@ function selectionScore(rows: any[], preference: string) {
     if (!days.has(r.day)) days.set(r.day, []);
     days.get(r.day)!.push(r);
   }
-  let gaps = 0;
-  let startSum = 0;
-  let count = 0;
+  let gaps = 0, startSum = 0, count = 0;
   for (const list of days.values()) {
     list.sort((a, b) => minutes(a.start) - minutes(b.start));
     for (let i = 0; i < list.length; i++) {
@@ -134,7 +167,6 @@ function optimize(courses: any[], preference: string) {
   let bestScore = Number.POSITIVE_INFINITY;
   let visited = 0;
   const MAX_VISITS = 50000;
-
   function walk(index: number, chosenRows: any[]) {
     if (++visited > MAX_VISITS) return;
     if (index >= ordered.length) {
@@ -145,11 +177,7 @@ function optimize(courses: any[], preference: string) {
     const course = ordered[index];
     for (const sec of course.sections) {
       const rows = sec.meetings.map((m: any) => ({ ...m, course: course.course, title: course.title, section: sec.section }));
-      let conflict = false;
-      for (const row of rows) {
-        if (chosenRows.some(existing => overlaps(row, existing))) { conflict = true; break; }
-      }
-      if (!conflict) walk(index + 1, chosenRows.concat(rows));
+      if (!rows.some((row: any) => chosenRows.some(existing => overlaps(row, existing)))) walk(index + 1, chosenRows.concat(rows));
     }
   }
   walk(0, []);
@@ -180,17 +208,12 @@ Rules:
 - If a value is unreadable, leave room/teacher empty; never guess times or section numbers.
 - warnings may briefly mention screenshots that are unreadable or incomplete.`;
   const parts: any[] = [{ text: prompt }];
-  for (const img of images) {
-    parts.push({ inlineData: { mimeType: img.mime_type, data: img.data } });
-  }
+  for (const img of images) parts.push({ inlineData: { mimeType: img.mime_type, data: img.data } });
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`;
   const res = await fetch(url, {
     method: 'POST',
     headers: { 'content-type': 'application/json', 'x-goog-api-key': GEMINI_API_KEY },
-    body: JSON.stringify({
-      contents: [{ role: 'user', parts }],
-      generationConfig: { temperature: 0.05, responseMimeType: 'application/json' }
-    }),
+    body: JSON.stringify({ contents: [{ role: 'user', parts }], generationConfig: { temperature: 0.05, responseMimeType: 'application/json' } }),
     signal: AbortSignal.timeout(45000)
   });
   const data = await res.json().catch(() => ({}));
@@ -200,25 +223,19 @@ Rules:
   return extractJson(text);
 }
 
-async function rateAllowed(clientToken: string) {
-  try {
-    const { data, error } = await db.rpc('uon_public_rate_allow', {
-      p_bucket: 'schedule_image_ai_v66', p_key: clientToken, p_limit: 12, p_window_seconds: 3600
-    });
-    if (error) return true;
-    return Boolean(data);
-  } catch { return true; }
-}
-
 Deno.serve(async (req: Request) => {
-  if (req.method === 'OPTIONS') return new Response('', { status: 204, headers: headers(req) });
+  if (req.method === 'OPTIONS') {
+    if (!isAllowedOrigin(req)) return out(req, { error: 'origin_not_allowed' }, 403);
+    return new Response('', { status: 204, headers: headers(req) });
+  }
   if (req.method !== 'POST') return out(req, { error: 'method_not_allowed' }, 405);
+  if (!isAllowedOrigin(req)) return out(req, { error: 'origin_not_allowed' }, 403);
   if (!GEMINI_API_KEY || !SUPABASE_URL || !SERVICE_ROLE_KEY) return out(req, { error: 'service_not_configured' }, 503);
 
   const body = await req.json().catch(() => ({}));
   const clientToken = clean(body?.client_token, 80);
   if (!validClientToken(clientToken)) return out(req, { error: 'invalid_client' }, 400);
-  if (!(await rateAllowed(clientToken))) return out(req, { error: 'rate_limited' }, 429);
+  if (!(await allowedByRate(req, clientToken))) return out(req, { error: 'rate_limited' }, 429);
 
   const images = (Array.isArray(body?.images) ? body.images : []).slice(0, 12).map((x: any) => ({
     mime_type: clean(x?.mime_type, 40), data: String(x?.data || '')
