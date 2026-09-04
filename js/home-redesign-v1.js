@@ -45,10 +45,18 @@ function applyTheme(){
  if(button){button.textContent=theme==='dark'?'☀':'☾';button.setAttribute('aria-label',theme==='dark'?t('الوضع الفاتح','Light mode'):t('الوضع الداكن','Dark mode'))}
 }
 function toggleTheme(){localStorage.setItem(THEME_KEY,document.documentElement.dataset.theme==='dark'?'light':'dark');applyTheme()}
+function dayCount(value){
+ const days=Math.max(0,Math.trunc(Number(value)||0));
+ if(en)return `${days} ${days===1?'day':'days'}`;
+ if(days===1)return'يوم';
+ if(days===2)return'يومين';
+ if(days>=3&&days<=10)return`${days} أيام`;
+ return`${days} يوم`;
+}
 function academicData(){
  const academic=currentAcademicPulse();
  if(!academic)return{icon:'📅',text:t('ما فيه موعد أكاديمي قريب حاليًا.','No upcoming academic date right now.')};
- const text=academic.state==='active'?`${academic.title} • ${t('جاري الآن','Happening now')}`:academic.daysUntilStart===0?`${academic.title} • ${t('اليوم','Today')}`:academic.daysUntilStart===1?`${academic.title} • ${t('بكرة','Tomorrow')}`:`${academic.title} • ${t('بعد','in')} ${academic.daysUntilStart} ${t('أيام','days')}`;
+ const text=academic.state==='active'?`${academic.title} • ${t('جاري الآن','Happening now')}`:academic.daysUntilStart===0?`${academic.title} • ${t('اليوم','Today')}`:`${academic.title} • ${t('بعد','in')} ${dayCount(academic.daysUntilStart)}`;
  return{icon:academic.icon||'📅',text};
 }
 function card(x){return`<a class="uon-rd-card${x.feature==='gpa'?' uon-rd-card-featured':''}" href="${x.url}" data-feature="${x.feature}"><span class="uon-rd-card-icon">${x.icon}</span><div><strong>${esc(x.title)}</strong><small>${esc(x.desc)}</small></div><span class="uon-rd-card-arrow">←</span></a>`}
@@ -92,7 +100,7 @@ async function loadFooterSettings(){
 function header(){
  const node=document.querySelector('.site-header');if(!node)return;
  node.className='uon-rd-header';
- node.innerHTML=`<div class="uon-rd-container uon-rd-nav"><a class="uon-rd-brand" href="index.html"><span class="uon-rd-logo"><img src="/assets/uonhub-logo-header-v1.svg" alt="" width="42" height="42"></span><span><strong>UON Hub</strong><small>${t('مجتمع طلاب جامعة نزوى','University of Nizwa Students')}</small></span></a><nav class="uon-rd-links"><a class="active" href="index.html">${t('الرئيسية','Home')}</a><a href="summaries.html" data-feature="summaries">${t('الملخصات','Summaries')}</a><a href="groups.html" data-feature="groups">${t('المجموعات','Groups')}</a><a href="university-guide.html" data-feature="university-guide">${t('دليل الجامعة','University Guide')}</a><a href="tools.html" data-feature="tools">${t('الأدوات','Tools')}</a></nav><div class="uon-rd-actions"><button class="uon-rd-icon" id="rdTheme" type="button"></button><button class="uon-rd-icon" id="rdLang" type="button">${en?'ع':'EN'}</button><button class="uon-rd-icon uon-rd-menu-btn" id="rdMenu" type="button" aria-label="${t('القائمة','Menu')}">☰</button></div></div><nav class="uon-rd-mobile-panel" id="rdMobile"><a href="summaries.html" data-feature="summaries">${t('الملخصات والاختبارات','Summaries & Exams')}</a><a href="groups.html" data-feature="groups">${t('المجموعات','Groups')}</a><a href="assistant.html" data-feature="assistant">UON AI</a><a href="schedule.html" data-feature="schedule">${t('الجدول الدراسي','Study Schedule')}</a><a href="gpa.html" data-feature="gpa">${t('حاسبة المعدل','GPA Calculator')}</a><a href="university-guide.html" data-feature="university-guide">${t('دليل الجامعة','University Guide')}</a><a href="tools.html" data-feature="tools">${t('كل الأدوات','All Tools')}</a></nav>`;
+ node.innerHTML=`<div class="uon-rd-container uon-rd-nav"><a class="uon-rd-brand" href="index.html"><span class="uon-rd-logo"><img src="/assets/uonhub-logo-original-20260904.jpeg" alt="" width="42" height="42"></span><span><strong>UON Hub</strong><small>${t('مجتمع طلاب جامعة نزوى','University of Nizwa Students')}</small></span></a><nav class="uon-rd-links"><a class="active" href="index.html">${t('الرئيسية','Home')}</a><a href="summaries.html" data-feature="summaries">${t('الملخصات','Summaries')}</a><a href="groups.html" data-feature="groups">${t('المجموعات','Groups')}</a><a href="university-guide.html" data-feature="university-guide">${t('دليل الجامعة','University Guide')}</a><a href="tools.html" data-feature="tools">${t('الأدوات','Tools')}</a></nav><div class="uon-rd-actions"><button class="uon-rd-icon" id="rdTheme" type="button"></button><button class="uon-rd-icon" id="rdLang" type="button">${en?'ع':'EN'}</button><button class="uon-rd-icon uon-rd-menu-btn" id="rdMenu" type="button" aria-label="${t('القائمة','Menu')}">☰</button></div></div><nav class="uon-rd-mobile-panel" id="rdMobile"><a href="summaries.html" data-feature="summaries">${t('الملخصات والاختبارات','Summaries & Exams')}</a><a href="groups.html" data-feature="groups">${t('المجموعات','Groups')}</a><a href="assistant.html" data-feature="assistant">UON AI</a><a href="schedule.html" data-feature="schedule">${t('الجدول الدراسي','Study Schedule')}</a><a href="gpa.html" data-feature="gpa">${t('حاسبة المعدل','GPA Calculator')}</a><a href="university-guide.html" data-feature="university-guide">${t('دليل الجامعة','University Guide')}</a><a href="tools.html" data-feature="tools">${t('كل الأدوات','All Tools')}</a></nav>`;
  document.querySelector('#rdTheme')?.addEventListener('click',toggleTheme);
  document.querySelector('#rdLang')?.addEventListener('click',()=>{localStorage.setItem(LANG_KEY,en?'ar':'en');location.reload()});
  const menu=document.querySelector('#rdMobile');document.querySelector('#rdMenu')?.addEventListener('click',()=>menu?.classList.toggle('open'));
