@@ -1,0 +1,41 @@
+.schedule-redesign .schedule-event{
+  padding:18px!important;
+  border:1px solid rgba(122,194,159,.18)!important;
+  border-inline-end:1px solid rgba(122,194,159,.18)!important;
+  border-inline-start:4px solid color-mix(in srgb,var(--event-accent) 72%,#19c77a 28%)!important;
+  border-radius:22px!important;
+  background:linear-gradient(145deg,rgba(10,38,27,.98),rgba(6,28,19,.98))!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.025),0 18px 48px rgba(0,0,0,.12)!important;
+  gap:14px!important;
+}
+.schedule-redesign .schedule-event-top{gap:12px;align-items:flex-start}
+.schedule-redesign .schedule-event-title{gap:8px}
+.schedule-redesign .schedule-course{font-size:clamp(1.12rem,3vw,1.34rem);font-weight:900;letter-spacing:.01em}
+.schedule-redesign .schedule-badges{gap:7px}
+.schedule-redesign .schedule-type-badge,.schedule-redesign .schedule-repeat-badge{min-height:28px;padding:4px 10px;border-radius:999px;font-size:.76rem;font-weight:900}
+.schedule-redesign .schedule-type-badge{background:rgba(25,199,122,.11);border-color:rgba(25,199,122,.28);color:#baf5d3}
+.schedule-redesign .schedule-repeat-badge{background:rgba(126,229,173,.07);border-color:rgba(126,229,173,.2);color:#c8f6dc}
+.schedule-redesign .schedule-time{font-size:1rem;font-weight:900;color:#d8e8df;letter-spacing:.01em}
+.schedule-redesign .schedule-meta{display:grid;gap:8px;padding:12px 0 2px;border-top:1px solid rgba(122,194,159,.12)}
+.schedule-redesign .schedule-meta-row{font-size:.92rem;gap:10px}
+.schedule-redesign .schedule-meta-row dt{color:#8ea99b;font-weight:800}
+.schedule-redesign .schedule-meta-row dd{color:#d3e2da}
+.schedule-redesign .schedule-event-actions,.schedule-redesign .schedule-event-actions.three-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+.schedule-redesign .schedule-event-button{min-height:45px;border-radius:14px;background:rgba(255,255,255,.018);border-color:rgba(122,194,159,.18);font-size:.84rem}
+.schedule-redesign .schedule-event-button:hover{background:rgba(255,255,255,.045)}
+.schedule-redesign .schedule-event-button.edit{border-color:rgba(25,199,122,.24);color:#bdf2d3;background:rgba(25,199,122,.045)}
+.schedule-redesign .schedule-event-button.delete{border-color:rgba(255,123,140,.18);background:rgba(255,123,140,.045);color:#ffc1ca}
+.schedule-redesign .schedule-event-button.delete-series{grid-column:1/-1;border-color:rgba(255,181,71,.16);background:rgba(255,181,71,.035);color:#f4d49a}
+.schedule-redesign .eduwave-privacy.knowledge-enabled{padding:12px 14px;border:1px solid rgba(126,229,173,.14);border-radius:14px;background:rgba(126,229,173,.035)}
+.schedule-redesign .eduwave-privacy.knowledge-enabled b{color:#c9f6dc}
+@media(max-width:760px){
+  .schedule-redesign .schedule-event{padding:16px!important;border-radius:20px!important}
+  .schedule-redesign .schedule-event-top{display:grid;grid-template-columns:1fr;gap:10px}
+  .schedule-redesign .schedule-time{font-size:.96rem}
+  .schedule-redesign .schedule-meta{padding-top:11px}
+}
+@media(max-width:430px){
+  .schedule-redesign .schedule-event-actions,.schedule-redesign .schedule-event-actions.three-actions{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+  .schedule-redesign .schedule-event-button.delete-series{grid-column:1/-1}
+  .schedule-redesign .schedule-event-button{min-height:43px;padding:8px 7px}
+}
