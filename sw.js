@@ -1,4 +1,4 @@
-const VERSION = '64.6.0';
+const VERSION = '64.6.1';
 const STATIC_CACHE = `uonhub-static-${VERSION}`;
 const PAGE_CACHE = `uonhub-pages-${VERSION}`;
 const DATA_CACHE = `uonhub-data-${VERSION}`;
@@ -15,7 +15,7 @@ const PRECACHE = [
   '/js/useful-sites.js','/js/student-tools-ui-v47.js','/js/schedule-time-fix-v44.js','/js/schedule-profile-boot-v44.js','/js/schedule.js','/js/schedule-main.js','/js/schedule-ai-import.js','/js/schedule-ai-applied-toast.js','/js/schedule-ai-sync-v54.js','/js/schedule-extras-v44.js',
   '/js/schedule-insights-v61.js','/js/schedule-smart-v63.js','/js/schedule-prefill-v63.js','/js/assistant-smart-v63.js','/js/assistant-schedule-actions-v63.js','/js/assistant.js','/js/assistant-history.js','/js/google-connect-v641.js','/js/google-auth-session-v641.js','/js/google-auth-status-v641.js','/js/student-tasks-data.js','/js/tasks.js','/js/study-focus-data.js','/js/study-focus.js','/js/search.js','/js/go.js','/js/pwa-init.js','/js/tool-registry-v44.js','/js/platform-experience-v44.js',
   '/js/app-capabilities-v48.js','/js/support-centers.js','/js/academic-calendar-data.js','/js/academic-calendar-page.js','/js/student-pulse.js','/js/user-dashboard.js','/js/notifications.js','/js/v20-experience.js','/js/security-guard-v48.js',
-  '/assets/uonhub-instagram-logo.svg','/assets/whatsapp-official.svg','/assets/icons/icon-192.png','/assets/icons/icon-512.png'
+  '/assets/uonhub-instagram-logo.svg','/assets/uonhub-logo-header-v1.svg','/assets/whatsapp-official.svg','/assets/icons/icon-192.png','/assets/icons/icon-512.png'
 ];
 
 self.addEventListener('install',event=>{event.waitUntil(caches.open(STATIC_CACHE).then(cache=>Promise.allSettled(PRECACHE.map(url=>cache.add(new Request(url,{cache:'reload'}))))).then(()=>self.skipWaiting()))});
