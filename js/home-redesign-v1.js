@@ -8,6 +8,7 @@ const THEME_KEY='uon_theme';
 const lang=localStorage.getItem(LANG_KEY)==='en'?'en':'ar';
 const en=lang==='en';
 const t=(ar,enText)=>en?enText:ar;
+const FOOTER_KEYS=['footer_top_text','footer_credit_prefix','footer_credit_label','footer_credit_url','footer_rights'];
 
 const services=[
  {feature:'summaries',url:'summaries.html',icon:'📚',title:t('الملخصات والاختبارات','Summaries & Exams'),desc:t('ملفات المواد والاختبارات مرتبة وسريعة الوصول.','Course files and exams, organized and easy to reach.')},
@@ -28,6 +29,13 @@ const supportFallback=[
  {name:'مركز أنجز',description:'دعم مخصص لطلاب السنة التأسيسية في الإنجليزية والرياضيات والحاسب ومهارات الدراسة.',booking_url:'https://portal.unizwa.edu.om/twc/',icon:'🚀',audience:'لطلاب السنة التأسيسية'},
  {name:'مركز تعزيز مسالك التعلم',description:'جلسات دعم أكاديمي وورش صغيرة لطلاب التخصص في المواد الأساسية.',booking_url:'https://portal.unizwa.edu.om/twc/',icon:'🎓',audience:'لطلاب التخصص'}
 ];
+const footerFallback={
+ footer_top_text:'رَبِّ زِدْنِي عِلْمًا',
+ footer_credit_prefix:'صمم بحب من طلاب جامعة نزوى❤️.',
+ footer_credit_label:'@uonhub',
+ footer_credit_url:'https://www.instagram.com/uonhub',
+ footer_rights:'جميع الحقوق محفوظة © 2026 UON Hub'
+};
 
 function applyTheme(){
  const theme=localStorage.getItem(THEME_KEY)==='light'?'light':'dark';
@@ -45,12 +53,41 @@ function academicData(){
 }
 function card(x){return`<a class="uon-rd-card${x.feature==='gpa'?' uon-rd-card-featured':''}" href="${x.url}" data-feature="${x.feature}"><span class="uon-rd-card-icon">${x.icon}</span><div><strong>${esc(x.title)}</strong><small>${esc(x.desc)}</small></div><span class="uon-rd-card-arrow">←</span></a>`}
 function mini(x){return`<a class="uon-rd-mini" href="${x.url}" data-feature="${x.feature}"><span>${x.icon}</span><strong>${esc(x.title)}</strong></a>`}
-function supportCard(center,index=0){
+function supportCard(center){
  const booking=safeHref(center.booking_url,'support-centers.html');
  const isAnjiz=String(center.name||'').includes('أنجز');
  const icon=center.icon||(isAnjiz?'🚀':'🎓');
  const audience=center.audience||(isAnjiz?t('لطلاب السنة التأسيسية','Foundation students'):t('لطلاب التخصص','Major students'));
- return`<article class="uon-rd-support-card ${isAnjiz?'anjiz':'masalik'}"><div class="uon-rd-support-top"><span class="uon-rd-support-label">${esc(audience)}</span><span class="uon-rd-support-icon">${icon}</span></div><h3>${esc(center.name)}</h3><p>${esc(center.description||t('دعم أكاديمي متاح لطلبة جامعة نزوى.','Academic support for University of Nizwa students.'))}</p><div class="uon-rd-support-actions"><a class="uon-rd-btn primary" href="${esc(booking)}" target="_blank" rel="noopener noreferrer">${t('احجز موعدك','Book a session')}</a><a class="uon-rd-btn" href="support-centers.html">${t('التفاصيل','Details')}</a></div></article>`;
+ return`<article class="uon-rd-support-card ${isAnjiz?'anjiz':'masalik'}"><div class="uon-rd-support-top"><span class="uon-rd-support-label">${esc(audience)}</span><span class="uon-rd-support-icon">${icon}</span></div><h3>${esc(center.name)}</h3><p>${esc(center.description||t('دعم أكاديمي متاح لطلبة جامعة نزوى.','Academic support for University of Nizwa students.'))}</p><div class="uon-rd-support-actions"><a class="uon-rd-btn primary" href="${esc(booking)}" target="_blank" rel="noopener noreferrer">${t('احجز موعدك','Book a session')}</a></div></article>`;
+}
+function normalizeFooterValue(value,fallback=''){
+ if(typeof value==='string')return value.trim()||fallback;
+ if(value==null)return fallback;
+ return String(value).trim()||fallback;
+}
+function normalizeFooterUrl(value){
+ let url=normalizeFooterValue(value,footerFallback.footer_credit_url);
+ if(/^www\./i.test(url))url=`https://${url}`;
+ return safeHref(url,footerFallback.footer_credit_url);
+}
+function renderFooter(settings=footerFallback){
+ const footer=document.querySelector('#rdManagedFooter');if(!footer)return;
+ const top=normalizeFooterValue(settings.footer_top_text,footerFallback.footer_top_text);
+ const prefix=normalizeFooterValue(settings.footer_credit_prefix,footerFallback.footer_credit_prefix);
+ const label=normalizeFooterValue(settings.footer_credit_label,footerFallback.footer_credit_label);
+ const url=normalizeFooterUrl(settings.footer_credit_url);
+ const rights=normalizeFooterValue(settings.footer_rights,footerFallback.footer_rights);
+ footer.innerHTML=`<div class="uon-rd-container uon-rd-footer-main"><p class="uon-rd-footer-prayer">${esc(top)}</p><p class="uon-rd-footer-credit">${esc(prefix)}</p><a class="uon-rd-footer-handle" href="${esc(url)}" target="_blank" rel="noopener noreferrer">${esc(label)}</a><p class="uon-rd-footer-rights">${esc(rights)}</p></div>`;
+ footer.removeAttribute('aria-busy');
+}
+async function loadFooterSettings(){
+ renderFooter(footerFallback);
+ try{
+  const rows=await get('site_settings',`select=key,value&key=in.(${FOOTER_KEYS.join(',')})`);
+  const settings={...footerFallback};
+  for(const row of Array.isArray(rows)?rows:[])if(FOOTER_KEYS.includes(row.key))settings[row.key]=row.value;
+  renderFooter(settings);
+ }catch(error){console.warn('Footer settings unavailable',error)}
 }
 function header(){
  const node=document.querySelector('.site-header');if(!node)return;
@@ -79,5 +116,5 @@ async function loadSupportCenters(){
 async function syncVisibility(){
  try{const state=await getUonState();const visibility=state?.visibility||{};document.querySelectorAll('[data-feature]').forEach(node=>{const key=node.dataset.feature;const hidden=visibility[key]===false;node.dataset.uonHidden=hidden?'true':'false';node.toggleAttribute('aria-hidden',hidden)})}catch(error){console.warn('Visibility state unavailable',error)}
 }
-header();mount();void loadSupportCenters();await syncVisibility();await applyFeatureStates(document).catch(()=>{});trackClicks();watchUonMaintenance();void trackEvent('page_view',{page:'home_redesign_green_v2',language:lang});
-window.addEventListener('focus',()=>{void loadSupportCenters();void syncVisibility();void applyFeatureStates(document)});
+header();mount();void loadSupportCenters();void loadFooterSettings();await syncVisibility();await applyFeatureStates(document).catch(()=>{});trackClicks();watchUonMaintenance();void trackEvent('page_view',{page:'home_redesign_green_v2',language:lang});
+window.addEventListener('focus',()=>{void loadSupportCenters();void loadFooterSettings();void syncVisibility();void applyFeatureStates(document)});
