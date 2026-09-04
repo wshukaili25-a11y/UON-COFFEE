@@ -14,14 +14,32 @@
  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
  <link rel="manifest" href="/manifest.webmanifest">
  <link rel="apple-touch-icon" href="/assets/icons/icon-192.png">
- <link rel="stylesheet" href="/css/home-redesign-v1.css?v=1.0.1">
+ <link rel="stylesheet" href="/css/home-redesign-v1.css?v=1.0.2">
+ <style>
+  .uon-rd-hero-grid{grid-template-columns:1fr!important;text-align:center}
+  .uon-rd-hero-grid>div{display:flex;flex-direction:column;align-items:center}
+  .uon-rd-kicker,.uon-rd-hero h1,.uon-rd-lead,.uon-rd-search{margin-inline:auto}
+  .uon-rd-hero h1{max-width:980px}
+  .uon-rd-shortcuts{justify-content:center}
+  .uon-rd-academic{width:min(100%,760px);margin-inline:auto;text-align:start}
+  .uon-rd-footer-row{justify-content:center!important;align-items:center!important;flex-direction:column!important;text-align:center!important}
+  .uon-rd-footer-row>*{width:100%;text-align:center}
+ </style>
 </head>
 <body>
  <header class="site-header"></header>
  <main aria-busy="true"></main>
  <div class="uon-rd-note" role="note"><strong>تنبيه:</strong> UON Hub مشروع طلابي مستقل وغير تابع رسميًا لجامعة نزوى. جميع الشعارات والأسماء المستخدمة تعود لمالكيها، ويهدف الموقع إلى تسهيل وصول الطلبة إلى الخدمات والمعلومات.</div>
  <footer class="uon-rd-footer"><div class="uon-rd-container uon-rd-footer-row"><span><strong>UON Hub</strong> · مجتمع طلاب جامعة نزوى</span><span>Designed with ❤️ By @uonhub · © 2026</span></div></footer>
- <script type="module" src="/js/home-redesign-v1.js?v=1.0.1"></script>
+ <script type="module" src="/js/home-redesign-v1.js?v=1.0.2"></script>
+ <script>
+  window.addEventListener('load',()=>{
+   const heading=document.querySelector('.uon-rd-hero h1');
+   if(!heading)return;
+   const isEnglish=(localStorage.getItem('uon_language')==='en');
+   heading.innerHTML=isEnglish?'Everything University of Nizwa students need <span>in one place</span>':'كل الي يحتاجه طلبة <span>جامعة نزوى</span> في مكان واحد';
+  },{once:true});
+ </script>
  <script type="module" src="/js/pwa-init.js?v=64.5.0"></script>
 </body>
 </html>
