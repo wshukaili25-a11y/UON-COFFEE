@@ -12,7 +12,7 @@ const FOOTER_KEYS=['footer_top_text','footer_credit_prefix','footer_credit_label
 
 const services=[
  {feature:'summaries',url:'summaries.html',icon:'📚',title:t('الملخصات والاختبارات','Summaries & Exams'),desc:t('ملفات المواد والاختبارات مرتبة وسريعة الوصول.','Course files and exams, organized and easy to reach.')},
- {feature:'groups',url:'groups.html',icon:'<img src="/assets/whatsapp-official.svg" alt="" width="29" height="29">',title:t('مجموعات المواد','Course Groups'),desc:t('ادخل مجموعة مادتك بدون بحث طويل.','Jump into your course group without the hunt.')},
+ {feature:'groups',url:'groups.html',icon:'<img src="/assets/whatsapp-official.svg" alt="" width="40" height="40">',title:t('مجموعات المواد','Course Groups'),desc:t('ادخل مجموعة مادتك بدون بحث طويل، وشارك مجموعتك لزملائك.','Join your course group quickly, and share your group with classmates.')},
  {feature:'assistant',url:'assistant.html',icon:'🤖',title:'UON AI',desc:t('اسأل عن الجامعة والمقررات والخدمات.','Ask about university, courses, and services.')},
  {feature:'schedule',url:'schedule.html',icon:'🗓️',title:t('الجدول الدراسي','Study Schedule'),desc:t('رتب أسبوعك وشوف محاضراتك بوضوح.','Plan your week and see classes clearly.')},
  {feature:'university-guide',url:'university-guide.html',icon:'🎓',title:t('دليل الجامعة','University Guide'),desc:t('الكليات والتخصصات والمعلومات المهمة.','Colleges, majors, and essential information.')},
@@ -59,7 +59,7 @@ function academicData(){
  const text=academic.state==='active'?`${academic.title} • ${t('جاري الآن','Happening now')}`:academic.daysUntilStart===0?`${academic.title} • ${t('اليوم','Today')}`:`${academic.title} • ${t('بعد','in')} ${dayCount(academic.daysUntilStart)}`;
  return{icon:academic.icon||'📅',text};
 }
-function card(x){return`<a class="uon-rd-card${x.feature==='gpa'?' uon-rd-card-featured':''}" href="${x.url}" data-feature="${x.feature}"><span class="uon-rd-card-icon">${x.icon}</span><div><strong>${esc(x.title)}</strong><small>${esc(x.desc)}</small></div><span class="uon-rd-card-arrow">←</span></a>`}
+function card(x){return`<a class="uon-rd-card uon-rd-card-${x.feature}${x.feature==='gpa'?' uon-rd-card-featured':''}" href="${x.url}" data-feature="${x.feature}"><span class="uon-rd-card-icon">${x.icon}</span><div><strong>${esc(x.title)}</strong><small>${esc(x.desc)}</small></div><span class="uon-rd-card-arrow">←</span></a>`}
 function mini(x){return`<a class="uon-rd-mini" href="${x.url}" data-feature="${x.feature}"><span>${x.icon}</span><strong>${esc(x.title)}</strong></a>`}
 function supportCard(center){
  const booking=safeHref(center.booking_url,'support-centers.html');
