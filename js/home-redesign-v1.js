@@ -12,8 +12,8 @@ const FOOTER_KEYS=['footer_top_text','footer_credit_prefix','footer_credit_label
 
 const services=[
  {feature:'summaries',url:'summaries.html',icon:'📚',title:t('الملخصات والاختبارات','Summaries & Exams'),desc:t('ملفات المواد والاختبارات مرتبة وسريعة الوصول.','Course files and exams, organized and easy to reach.')},
- {feature:'groups',url:'groups.html',icon:'💬',title:t('مجموعات المواد','Course Groups'),desc:t('ادخل مجموعة مادتك بدون بحث طويل.','Jump into your course group without the hunt.')},
- {feature:'assistant',url:'assistant.html',icon:'AI',title:'UON AI',desc:t('اسأل عن الجامعة والمقررات والخدمات.','Ask about university, courses, and services.')},
+ {feature:'groups',url:'groups.html',icon:'<img src="/assets/whatsapp-official.svg" alt="" width="29" height="29">',title:t('مجموعات المواد','Course Groups'),desc:t('ادخل مجموعة مادتك بدون بحث طويل.','Jump into your course group without the hunt.')},
+ {feature:'assistant',url:'assistant.html',icon:'🤖',title:'UON AI',desc:t('اسأل عن الجامعة والمقررات والخدمات.','Ask about university, courses, and services.')},
  {feature:'schedule',url:'schedule.html',icon:'🗓️',title:t('الجدول الدراسي','Study Schedule'),desc:t('رتب أسبوعك وشوف محاضراتك بوضوح.','Plan your week and see classes clearly.')},
  {feature:'university-guide',url:'university-guide.html',icon:'🎓',title:t('دليل الجامعة','University Guide'),desc:t('الكليات والتخصصات والمعلومات المهمة.','Colleges, majors, and essential information.')},
  {feature:'gpa',url:'gpa.html',icon:'🧮',title:t('حاسبة المعدل التراكمي','GPA Calculator'),desc:t('احسب معدلك الحالي وخطط للفصل القادم بسهولة.','Calculate your GPA and plan the next semester.')},
