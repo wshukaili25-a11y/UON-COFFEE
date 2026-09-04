@@ -11,7 +11,7 @@ export default async function handler(req,res){
     body.public_key=PUBLIC_KEY;
 
     const controller=new AbortController();
-    const timer=setTimeout(()=>controller.abort(),48000);
+    const timer=setTimeout(()=>controller.abort(),70000);
     try{
       const response=await fetch(ENDPOINT,{
         method:'POST',
