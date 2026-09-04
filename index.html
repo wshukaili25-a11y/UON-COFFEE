@@ -15,13 +15,23 @@
  <link rel="manifest" href="/manifest.webmanifest">
  <link rel="apple-touch-icon" href="/assets/icons/icon-192.png">
  <link rel="stylesheet" href="/css/home-redesign-v1.css?v=2.1.0">
+ <style>
+  #rdManagedFooter .uon-rd-footer-main{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;text-align:center;padding:14px 0 4px}
+  #rdManagedFooter p{margin:0;text-align:center}
+  #rdManagedFooter .uon-rd-footer-prayer{font-size:clamp(20px,3vw,28px);line-height:1.8;color:var(--uon-muted);font-weight:500}
+  #rdManagedFooter .uon-rd-footer-credit{font-size:clamp(18px,2.6vw,25px);line-height:1.8;color:var(--uon-muted);font-weight:500}
+  #rdManagedFooter .uon-rd-footer-handle{display:inline-flex;align-items:center;justify-content:center;color:var(--uon-text);font-size:clamp(21px,2.8vw,28px);font-weight:900;text-decoration:none;padding:2px 10px;border-radius:12px;transition:.18s ease}
+  #rdManagedFooter .uon-rd-footer-handle:hover{color:var(--uon-green-soft);background:rgba(22,167,101,.07)}
+  #rdManagedFooter .uon-rd-footer-rights{font-size:clamp(19px,2.8vw,27px);line-height:1.7;color:var(--uon-text);font-weight:900}
+  @media(max-width:620px){#rdManagedFooter{padding-top:26px;padding-bottom:34px}#rdManagedFooter .uon-rd-footer-main{gap:12px}#rdManagedFooter .uon-rd-footer-prayer{font-size:20px}#rdManagedFooter .uon-rd-footer-credit{font-size:18px}#rdManagedFooter .uon-rd-footer-handle{font-size:22px}#rdManagedFooter .uon-rd-footer-rights{font-size:19px}}
+ </style>
 </head>
 <body>
  <header class="site-header"></header>
  <main aria-busy="true"></main>
  <div class="uon-rd-note" role="note"><strong>تنبيه:</strong> UON Hub مشروع طلابي مستقل وغير تابع رسميًا لجامعة نزوى. جميع الشعارات والأسماء المستخدمة تعود لمالكيها، ويهدف الموقع إلى تسهيل وصول الطلبة إلى الخدمات والمعلومات.</div>
- <footer class="uon-rd-footer"><div class="uon-rd-container uon-rd-footer-row"><span><strong>UON Hub</strong> · مجتمع طلاب جامعة نزوى</span><span>Designed with ❤️ By @uonhub · © 2026</span></div></footer>
- <script type="module" src="/js/home-redesign-v1.js?v=2.1.0"></script>
+ <footer id="rdManagedFooter" class="uon-rd-footer" aria-busy="true"><div class="uon-rd-container uon-rd-footer-main"><p class="uon-rd-footer-prayer">رَبِّ زِدْنِي عِلْمًا</p><p class="uon-rd-footer-credit">صمم بحب من طلاب جامعة نزوى❤️.</p><a class="uon-rd-footer-handle" href="https://www.instagram.com/uonhub" target="_blank" rel="noopener noreferrer">@uonhub</a><p class="uon-rd-footer-rights">جميع الحقوق محفوظة © 2026 UON Hub</p></div></footer>
+ <script type="module" src="/js/home-redesign-v1.js?v=2.2.0"></script>
  <script type="module" src="/js/pwa-init.js?v=64.5.0"></script>
 </body>
 </html>
