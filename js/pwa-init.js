@@ -1,4 +1,4 @@
-const APP_VERSION='64.6.6';
+const APP_VERSION='64.7.0';
 const TEST_KEY='uonhub_pwa_test_mode';
 const THEME_KEY='uon_theme';
 const LEGACY_THEME_KEY='uonhub_theme';
