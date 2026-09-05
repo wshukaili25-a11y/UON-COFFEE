@@ -11,17 +11,6 @@ const shown=new Set();
  document.head.append(link);
 })();
 
-(function simplifyAssistantGoogleUi(){
- if(!/\/assistant\.html$/i.test(location.pathname))return;
- const clean=()=>{
-  document.querySelector('.assistant-google-connect')?.remove();
-  document.querySelector('.assistant-smart-actions')?.remove();
-  const copy=document.querySelector('.assistant-side-head p');
-  if(copy)copy.textContent='اسأل عن الجامعة والمقررات والخدمات والمصادر الموثوقة، واستفد من جدولك ومهامك المحلية داخل UON Hub.';
- };
- if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',clean,{once:true});else clean();
-})();
-
 function showMessage(message,type='error'){
  const key=`${type}:${message}`;
  if(shown.has(key))return;
