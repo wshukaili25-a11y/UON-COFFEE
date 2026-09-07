@@ -1,6 +1,7 @@
 const KEY='uon_ai_client_v55';
 const API_PATH='/functions/v1/uon-ai-chat';
 const DIRECT_API='https://irkhvydgxpseflggbeqq.supabase.co/functions/v1/uon-ai-chat-v64';
+const PLACES_API='https://irkhvydgxpseflggbeqq.supabase.co/functions/v1/uon-ai-google-v64';
 const SESSION_KEY='uon_ai_session_v46';
 function uuid(){try{return crypto.randomUUID()}catch{return'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,c=>{const r=Math.random()*16|0,v=c==='x'?r:(r&3|8);return v.toString(16)})}}
 function token(){let value='';try{value=localStorage.getItem(KEY)||''}catch{}if(!/^[0-9a-f-]{36}$/i.test(value)){value=uuid();try{localStorage.setItem(KEY,value)}catch{}}return value}
@@ -17,7 +18,7 @@ return response};
 (function installAssistantHardFix(){
  if(!/\/assistant(?:\.html)?$/i.test(location.pathname))return;
  const style=document.createElement('style');
- style.textContent='.assistant-google-connect,.assistant-side-head>.assistant-google-connect,.assistant-side-head .assistant-smart-actions{display:none!important}.message-content{white-space:pre-wrap}.assistant-google-places{margin-top:12px}';
+ style.textContent='.assistant-google-connect,.assistant-side-head>.assistant-google-connect,.assistant-side-head .assistant-smart-actions{display:none!important}.message-content{white-space:pre-wrap}.assistant-google-places{margin-top:12px}.assistant-google-place small{display:block}.assistant-place-distance{opacity:.78;font-size:.75rem}';
  document.head.appendChild(style);
  const lang=()=>{try{return localStorage.getItem('uon_language')==='en'?'en':'ar'}catch{return'ar'}};
  const tr=(ar,en)=>lang()==='en'?en:ar;
@@ -88,41 +89,57 @@ return response};
   chat.scrollTop=chat.scrollHeight;
   return article;
  }
+ function distanceLabel(value){const m=Number(value);if(!Number.isFinite(m)||m<=0)return'';if(m<1000)return lang()==='en'?`${Math.round(m)} m away`:`يبعد ${Math.round(m)} م`;const km=(m/1000).toFixed(m<10000?1:0);return lang()==='en'?`${km} km away`:`يبعد ${km} كم`}
  function addGooglePlaces(article,data){
-  const places=Array.isArray(data?.google_places)?data.google_places.filter(Boolean).slice(0,4):[];
+  const places=Array.isArray(data?.google_places)?data.google_places.filter(Boolean).slice(0,5):[];
   if(!article||!places.length)return;
+  const usingOsm=places.some(p=>String(p?.source_provider||'').toLowerCase().includes('openstreetmap'));
   const wrap=document.createElement('section');
   wrap.className='assistant-google-places';
   const head=document.createElement('div');
   head.className='assistant-google-places-head';
   const strong=document.createElement('strong');
-  strong.textContent=tr('أماكن قريبة','Nearby places');
+  strong.textContent=tr('أماكن قريبة من جامعة نزوى','Nearby places around the University of Nizwa');
   const small=document.createElement('small');
-  small.textContent=tr('نتائج مباشرة من Google Maps','Live results from Google Maps');
+  small.textContent=usingOsm?tr('بيانات الأماكن من OpenStreetMap — اضغط لفتح المكان في Google Maps','Place data from OpenStreetMap — tap to open in Google Maps'):tr('نتائج مباشرة من Google Maps','Live results from Google Maps');
   head.append(strong,small);
   wrap.appendChild(head);
   for(const place of places){
    const card=document.createElement('a');
    card.className='assistant-google-place';
-   card.href=place.maps_url||place.url||'#';
+   card.href=place.maps_url||place.directions_url||place.url||'#';
    card.target='_blank';
    card.rel='noopener noreferrer';
    const info=document.createElement('span');
    const name=document.createElement('strong');
    name.textContent=place.name||tr('مكان قريب','Nearby place');
    const address=document.createElement('small');
-   address.textContent=place.address||'';
+   const distance=distanceLabel(place.distance_m);
+   address.textContent=[place.address||'',distance].filter(Boolean).join(' · ');
    info.append(name,address);
    const state=document.createElement('b');
    if(typeof place.open_now==='boolean')state.textContent=place.open_now?tr('مفتوح الآن','Open now'):tr('مغلق الآن','Closed now');
+   else state.textContent=tr('فتح بالخريطة','Open map');
    card.append(info,state);
    wrap.appendChild(card);
   }
   const attribution=document.createElement('div');
   attribution.className='assistant-google-attribution';
-  attribution.textContent='Google Maps';
+  attribution.textContent=usingOsm?'© OpenStreetMap contributors':'Google Maps';
   wrap.appendChild(attribution);
   article.appendChild(wrap);
+ }
+ function isPlaceQuestion(q){return/(قريب|اقرب|أقرب|مطعم|مقهى|كافيه|صيدل|بنك|صراف|سوبرماركت|مستشفى|عياد|مسجد|near|nearby|restaurant|cafe|pharmacy|bank|atm|supermarket|hospital|clinic|mosque)/i.test(String(q||''))}
+ function isNearbyQuestion(q){return/(قريب|اقرب|أقرب|مطعم|مقهى|كافيه|صيدل|بنك|صراف|سوبرماركت|مستشفى|عياد|near|nearby|restaurant|cafe|pharmacy|bank|atm|supermarket|hospital|clinic)/i.test(String(q||''))}
+ async function fetchPlaceFallback(q){
+  if(!isPlaceQuestion(q))return null;
+  try{
+   const timeout=AbortSignal.timeout?AbortSignal.timeout(6500):undefined;
+   const res=await nativeFetch(PLACES_API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({query:q,limit:5}),cache:'no-store',signal:timeout});
+   const data=await res.json().catch(()=>({}));
+   if(!res.ok||!data.available||!Array.isArray(data.places)||!data.places.length)return null;
+   return data;
+  }catch{return null}
  }
  function addTyping(){
   const chat=document.querySelector('#chat');
@@ -156,6 +173,10 @@ return response};
    const response=await window.fetch(DIRECT_API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({question:raw,history:history.slice(-12),language:lang(),page_context:location.pathname,session_id:SESSION_TOKEN,client_token:CLIENT_TOKEN,channel:'web'}),cache:'no-store',signal:controller.signal});
    const data=await response.json().catch(()=>({}));
    if(!response.ok||!data.answer)throw new Error(data.error||('AI HTTP '+response.status));
+   if((!Array.isArray(data.google_places)||!data.google_places.length)&&isPlaceQuestion(raw)){
+    const fallback=await fetchPlaceFallback(raw);
+    if(fallback?.places?.length){data.google_places=fallback.places;data.places_provider=fallback.provider;data.places_attribution=fallback.attribution;data.links=(Array.isArray(data.links)?data.links:[]).filter(x=>x?.official||!(x?.type==='Google Maps'||/google\.[^/]+\/maps|maps\.google/i.test(String(x?.url||''))));if(isNearbyQuestion(raw))data.answer=tr('حصلت لك أماكن قريبة من جامعة نزوى. اختر أي مكان بالأسفل لفتحه مباشرة في Google Maps.','I found nearby places around the University of Nizwa. Choose a place below to open it directly in Google Maps.')}
+   }
    typing?.remove();
    const article=addMessage('bot',data.answer,data.links||[]);
    addGooglePlaces(article,data);
