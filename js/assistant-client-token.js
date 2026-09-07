@@ -17,7 +17,7 @@ return response};
 (function installAssistantHardFix(){
  if(!/\/assistant(?:\.html)?$/i.test(location.pathname))return;
  const style=document.createElement('style');
- style.textContent='.assistant-google-connect,.assistant-side-head>.assistant-google-connect,.assistant-side-head .assistant-smart-actions{display:none!important}';
+ style.textContent='.assistant-google-connect,.assistant-side-head>.assistant-google-connect,.assistant-side-head .assistant-smart-actions{display:none!important}.message-content{white-space:pre-wrap}.assistant-google-places{margin-top:12px}';
  document.head.appendChild(style);
  const lang=()=>{try{return localStorage.getItem('uon_language')==='en'?'en':'ar'}catch{return'ar'}};
  const tr=(ar,en)=>lang()==='en'?en:ar;
@@ -34,6 +34,45 @@ return response};
    copy.textContent=lang()==='en'?copy.dataset.en:copy.dataset.ar;
   }
  }
+ function extractUrls(text){return [...String(text||'').matchAll(/https?:\/\/[^\s)\]}>,]+/gi)].map(m=>m[0].replace(/[.,،؛;:]+$/,''))}
+ function normalizeLinks(links,text){
+  const all=[...(Array.isArray(links)?links:[])];
+  for(const url of extractUrls(text)){if(!all.some(x=>x?.url===url))all.push({url,title:'',official:/unizwa\.edu\.om/i.test(url)})}
+  const seen=new Set();
+  return all.filter(x=>{const url=String(x?.url||'').trim();if(!url)return false;const key=url.replace(/\/$/,'').toLowerCase();if(seen.has(key))return false;seen.add(key);return true});
+ }
+ function cleanAnswer(text){
+  return String(text||'')
+   .replace(/^#{1,6}\s*/gm,'')
+   .replace(/\*\*(.*?)\*\*/g,'$1')
+   .replace(/__(.*?)__/g,'$1')
+   .replace(/https?:\/\/[^\s)\]}>,]+/gi,'')
+   .replace(/(?:عبر الرابط|على الرابط|الرابط|via the link|at the link)\s*[:：]?\s*$/gim,'')
+   .replace(/[ \t]+\n/g,'\n')
+   .replace(/\n{3,}/g,'\n\n')
+   .trim();
+ }
+ function addLinks(article,links){
+  if(!article||!Array.isArray(links)||!links.length)return;
+  const official=links.find(x=>x?.official&&x?.url);
+  const maps=links.find(x=>x?.url&&(x.type==='Google Maps'||/google\.[^/]+\/maps|maps\.google/i.test(x.url)));
+  const first=links.find(x=>x?.url);
+  const items=[official,maps,first].filter(Boolean).filter((x,i,a)=>a.findIndex(y=>String(y.url).replace(/\/$/,'').toLowerCase()===String(x.url).replace(/\/$/,'').toLowerCase())===i).slice(0,2);
+  if(!items.length)return;
+  const row=document.createElement('div');
+  row.className='assistant-links assistant-links-minimal';
+  for(const item of items){
+   const a=document.createElement('a');
+   a.href=item.url;
+   a.target=/^https?:/i.test(item.url)?'_blank':'_self';
+   a.rel='noopener noreferrer';
+   if(item.type==='Google Maps'||/google\.[^/]+\/maps|maps\.google/i.test(item.url))a.textContent=tr('فتح في Google Maps','Open in Google Maps');
+   else if(item.official||/unizwa\.edu\.om/i.test(item.url))a.textContent=tr('المصدر الرسمي','Official source');
+   else a.textContent=item.title||tr('فتح المصدر','Open source');
+   row.appendChild(a);
+  }
+  article.appendChild(row);
+ }
  function addMessage(role,text,links){
   const chat=document.querySelector('#chat');
   if(!chat)return null;
@@ -41,27 +80,49 @@ return response};
   article.className='message '+role;
   const body=document.createElement('div');
   body.className='message-content';
-  body.textContent=String(text||'').trim();
+  const normalized=role==='bot'?normalizeLinks(links,text):(Array.isArray(links)?links:[]);
+  body.textContent=role==='bot'?cleanAnswer(text):String(text||'').trim();
   article.appendChild(body);
-  if(role==='bot'&&Array.isArray(links)&&links.length){
-   const usable=links.filter(x=>x&&x.url).slice(0,2);
-   if(usable.length){
-    const row=document.createElement('div');
-    row.className='assistant-links assistant-links-minimal';
-    usable.forEach(item=>{
-     const a=document.createElement('a');
-     a.href=item.url;
-     a.target=/^https?:/i.test(item.url)?'_blank':'_self';
-     a.rel='noopener noreferrer';
-     a.textContent=item.official?tr('المصدر الرسمي','Official source'):(item.title||tr('فتح المصدر','Open source'));
-     row.appendChild(a);
-    });
-    article.appendChild(row);
-   }
-  }
+  if(role==='bot')addLinks(article,normalized);
   chat.appendChild(article);
   chat.scrollTop=chat.scrollHeight;
   return article;
+ }
+ function addGooglePlaces(article,data){
+  const places=Array.isArray(data?.google_places)?data.google_places.filter(Boolean).slice(0,4):[];
+  if(!article||!places.length)return;
+  const wrap=document.createElement('section');
+  wrap.className='assistant-google-places';
+  const head=document.createElement('div');
+  head.className='assistant-google-places-head';
+  const strong=document.createElement('strong');
+  strong.textContent=tr('أماكن قريبة','Nearby places');
+  const small=document.createElement('small');
+  small.textContent=tr('نتائج مباشرة من Google Maps','Live results from Google Maps');
+  head.append(strong,small);
+  wrap.appendChild(head);
+  for(const place of places){
+   const card=document.createElement('a');
+   card.className='assistant-google-place';
+   card.href=place.maps_url||place.url||'#';
+   card.target='_blank';
+   card.rel='noopener noreferrer';
+   const info=document.createElement('span');
+   const name=document.createElement('strong');
+   name.textContent=place.name||tr('مكان قريب','Nearby place');
+   const address=document.createElement('small');
+   address.textContent=place.address||'';
+   info.append(name,address);
+   const state=document.createElement('b');
+   if(typeof place.open_now==='boolean')state.textContent=place.open_now?tr('مفتوح الآن','Open now'):tr('مغلق الآن','Closed now');
+   card.append(info,state);
+   wrap.appendChild(card);
+  }
+  const attribution=document.createElement('div');
+  attribution.className='assistant-google-attribution';
+  attribution.textContent='Google Maps';
+  wrap.appendChild(attribution);
+  article.appendChild(wrap);
  }
  function addTyping(){
   const chat=document.querySelector('#chat');
@@ -96,7 +157,8 @@ return response};
    const data=await response.json().catch(()=>({}));
    if(!response.ok||!data.answer)throw new Error(data.error||('AI HTTP '+response.status));
    typing?.remove();
-   addMessage('bot',data.answer,data.links||[]);
+   const article=addMessage('bot',data.answer,data.links||[]);
+   addGooglePlaces(article,data);
    history.push({role:'assistant',content:data.answer});
   }catch(error){
    typing?.remove();
