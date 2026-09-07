@@ -63,7 +63,7 @@ function buildOverpass(category, radius = 12000) {
   return `[out:json][timeout:12];(${clauses.join('')});out center tags;`;
 }
 
-const CAMPUS_GENERIC = /(male|female|staff|stuff|student|students|boys|girls|faculty|campus|university|uon|college|hostel|dorm|cafeteria|canteen|restaurant\s*\d*|مطعم\s*(الطلاب|الطالبات|الموظفين|الموظفات|الجامعه|الجامعة)?$|كافتيريا|كافتريا|مقصف|سكن|طلاب|طالبات|موظفين|موظفات)/i;
+const CAMPUS_GENERIC = /(male|female|staff|stuff|student|students|boys|girls|faculty|campus|university|uon|college|hostel|dorm|cafeteria|canteen|مطعم\s*(الطلاب|الطالبات|الموظفين|الموظفات|الجامعه|الجامعة)?$|كافتيريا|كافتريا|مقصف|سكن|طلاب|طالبات|موظفين|موظفات)/i;
 const FOOD_BAD = /(medical|clinic|hospital|health|center|centre|school|office|mosque|مسجد|مركز صحي|عياد|مستشفى|مكتب)/i;
 const CAFE_BAD = /(medical|clinic|hospital|health|school|office|mosque|مسجد|مركز صحي|عياد|مستشفى|مكتب)/i;
 
@@ -109,31 +109,19 @@ function qualityScore({ name, tags, distance, category }) {
   const n = normalize(name);
   if (categoryMatches(tags, category)) score += 35;
   score += commercialSignals(tags);
-
-  // Prefer a specific business-like name over a generic facility label.
   if (n.split(' ').length >= 2) score += 8;
   if (/مطعم|restaurant|cafe|coffee|كافيه|مقهى|burger|pizza|grill|kitchen|مطابخ|مشاوي|برجر|بيتزا/i.test(n)) score += 5;
-
-  // Close is useful, but it should never beat quality by itself.
   score += Math.max(0, 30 - distance / 220);
-
-  // The University centroid sits inside the campus. Food POIs extremely close to
-  // it are usually internal cafeterias, not businesses a student means by "nearby restaurants".
   if ((category === 'food' || category === 'cafe') && distance < 350) score -= 90;
   if ((category === 'food' || category === 'cafe') && distance >= 350 && distance < 1500) score += 12;
   if (distance > 9000) score -= 18;
-
   return score;
 }
 
 function acceptable({ name, tags, distance, category }) {
   if (isGenericName(name, category)) return false;
   if (!categoryMatches(tags, category) && category !== 'general') return false;
-
-  // Hard reject campus-style food labels near the campus centroid.
   if ((category === 'food' || category === 'cafe') && distance < 300) return false;
-
-  // A named commercial place a little farther away is better than an unnamed/internal POI.
   if ((category === 'food' || category === 'cafe') && distance < 650 && commercialSignals(tags) === 0) return false;
   return true;
 }
@@ -197,7 +185,6 @@ export default async function handler(req, res) {
       });
     }
 
-    // Deduplicate nearby records with the same/near-identical business name.
     candidates.sort((a, b) => b._score - a._score || a.distance_m - b.distance_m);
     const places = [];
     for (const place of candidates) {
