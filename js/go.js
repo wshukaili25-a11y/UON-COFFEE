@@ -1,4 +1,4 @@
-import{rpc}from'./core.js?v=67.0.1';
+import{rpc}from'./core.js?v=67.0.2';
 const title=document.querySelector('#goTitle'),message=document.querySelector('#goMessage'),spinner=document.querySelector('#goSpinner'),home=document.querySelector('#goHome');
 const lang=(()=>{try{return localStorage.getItem('uon_language')==='en'?'en':'ar'}catch{return'ar'}})();
 const theme=(()=>{try{return localStorage.getItem('uon_theme')==='light'?'light':'dark'}catch{return'dark'}})();
