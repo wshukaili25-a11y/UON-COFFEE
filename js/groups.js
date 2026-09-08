@@ -62,23 +62,25 @@ $('#closeForm')?.addEventListener('click',()=>closeModal('submitModal'));
 
 $('#submitForm')?.addEventListener('submit',async event=>{
  event.preventDefault();
- if(event.currentTarget.dataset.submitting==='1')return;
- const raw=Object.fromEntries(new FormData(event.currentTarget));
+ const form=event.currentTarget;
+ if(!form||form.dataset.submitting==='1')return;
+ const raw=Object.fromEntries(new FormData(form));
  const body={subject:String(raw.subject||'').trim(),course_code:String(raw.course_code||'').trim().toUpperCase().replace(/\s+/g,''),college:String(raw.college||'').trim(),link:String(raw.link||'').trim(),description:String(raw.description||'').trim()};
  if(!body.subject||!body.college||!body.link){toast(t('أكمل البيانات المطلوبة','Complete the required fields'),true);return}
- const button=event.currentTarget.querySelector('[type="submit"]');
- event.currentTarget.dataset.submitting='1';button.disabled=true;
+ const button=form.querySelector('[type="submit"]');
+ if(!button)return;
+ form.dataset.submitting='1';button.disabled=true;
  const original=button.textContent;button.textContent=t('جاري الإرسال...','Submitting...');
  try{
   const id=await rpc('uon_submit_whatsapp_group_v2',{p_subject:body.subject,p_course_code:body.course_code||null,p_college:body.college,p_link:body.link,p_description:body.description||null,p_session_id:sessionId});
   await notifyPending('whatsapp_groups',id);
   toast(t('تم إرسال المجموعة للمراجعة','Group submitted for review'));
-  event.currentTarget.reset();fillCollegeWithOther(collegeInput);closeModal('submitModal');
+  form.reset();fillCollegeWithOther(collegeInput);closeModal('submitModal');
  }catch(error){
   console.error('WhatsApp group submit error',error);
-  toast(error.message||t('تعذر إرسال المجموعة للمراجعة','Could not submit the group'),true);
+  toast(error?.message||t('تعذر إرسال المجموعة للمراجعة','Could not submit the group'),true);
  }finally{
-  event.currentTarget.dataset.submitting='0';button.disabled=false;button.textContent=original;
+  form.dataset.submitting='0';button.disabled=false;button.textContent=original;
  }
 });
 
