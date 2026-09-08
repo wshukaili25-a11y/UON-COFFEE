@@ -35,6 +35,21 @@ function localTarget(from,value){
  return target;
 }
 
+const pwaInitPath=path.join(root,'js/pwa-init.js');
+const pwaInitText=fs.existsSync(pwaInitPath)?fs.readFileSync(pwaInitPath,'utf8'):'';
+const autoShellPaths=new Set();
+const autoShellMatch=pwaInitText.match(/AUTO_SHELL_PATHS\s*=\s*new Set\s*\(\s*\[([\s\S]*?)\]\s*\)/);
+if(autoShellMatch){
+ for(const match of autoShellMatch[1].matchAll(/["']([^"']+)["']/g))autoShellPaths.add(match[1]);
+}
+function hasLegacyIdentityBridge(from,text){
+ const pathname='/'+path.posix.basename(from);
+ const directBridge=/uon-identity-bridge-v1\.css/i.test(text);
+ const explicitShell=/setupV14Shell/.test(text);
+ const autoShell=autoShellPaths.has(pathname)&&/pwa-init\.js/i.test(text);
+ return directBridge||explicitShell||autoShell;
+}
+
 for(const file of files){
  const ext=path.extname(file).toLowerCase();
  if(!textExt.has(ext))continue;
@@ -47,7 +62,10 @@ for(const file of files){
    if(!exists(target))errors.push(`${from}: missing local reference -> ${match[1]} (${target})`);
   }
   const oldU=(text.match(/class=["'][^"']*brand-mark[^"']*["'][^>]*>\s*U\s*</gi)||[]).length;
-  if(oldU)warnings.push(`${from}: ${oldU} legacy U brand marker(s); identity bridge should replace them visually.`);
+  const adminLike=/(?:^|\/)(?:admin|owner-dashboard|tools-control|reset|security-test)/i.test(from);
+  if(oldU&&!adminLike&&!hasLegacyIdentityBridge(from,text)){
+   warnings.push(`${from}: ${oldU} legacy U brand marker(s) without a verified identity bridge.`);
+  }
  }
  if(ext==='.js'||ext==='.mjs'){
   const patterns=[/\bfrom\s*["']([^"']+)["']/g,/\bimport\s*\(\s*["']([^"']+)["']\s*\)/g];
@@ -84,6 +102,7 @@ if(appVersion&&swVersion&&appVersion!==swVersion)errors.push(`PWA version mismat
 
 console.log(`UON Hub release audit: ${files.length} files scanned`);
 if(appVersion&&swVersion)console.log(`PWA version: ${appVersion}`);
+if(autoShellPaths.size)console.log(`Unified legacy shell paths: ${autoShellPaths.size}`);
 if(warnings.length){
  console.log(`\nWarnings (${warnings.length}):`);
  for(const item of warnings)console.log(`- ${item}`);
