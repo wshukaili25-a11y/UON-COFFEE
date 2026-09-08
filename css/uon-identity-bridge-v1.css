@@ -1,4 +1,5 @@
 /* UON Hub identity bridge — upgrades legacy student pages without touching their logic */
+@import url('/css/uon-personal-tools-v1.css?v=67.0.1');
 body:not(.admin-page) .brand-mark,
 body:not(.admin-page) .v176-brand>span:first-child{
   width:42px!important;
