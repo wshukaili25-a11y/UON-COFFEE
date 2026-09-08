@@ -92,13 +92,52 @@ function readVersion(file,regex,label){
  if(!m){errors.push(`${file}: could not detect ${label}`);return null}
  return m[1];
 }
+function readRequired(file,label){
+ const full=path.join(root,file);
+ if(!fs.existsSync(full)){errors.push(`${file}: missing ${label}`);return ''}
+ return fs.readFileSync(full,'utf8');
+}
+function requirePattern(text,pattern,label){
+ if(!pattern.test(text))errors.push(`Backend release guard: ${label}`);
+}
+
 const appVersion=readVersion('js/pwa-init.js',/APP_VERSION\s*=\s*['"]([^'"]+)['"]/,'APP_VERSION');
 const swVersion=readVersion('sw.js',/VERSION\s*=\s*['"]([^'"]+)['"]/,'service worker VERSION');
 if(appVersion&&swVersion&&appVersion!==swVersion)errors.push(`PWA version mismatch: pwa-init=${appVersion}, sw=${swVersion}`);
 
+const contactMigration='supabase/migrations/20260908203500_public_visible_contact_numbers_rpc.sql';
+const contactSql=readRequired(contactMigration,'contact-number public projection migration');
+requirePattern(contactSql,/create\s+or\s+replace\s+function\s+public\.uon_public_contact_numbers\s*\(\s*\)/i,'contact RPC definition missing');
+requirePattern(contactSql,/security\s+definer/i,'contact RPC must remain SECURITY DEFINER');
+requirePattern(contactSql,/set\s+search_path\s*=\s*''/i,'contact RPC must use an empty search_path');
+requirePattern(contactSql,/from\s+public\.contact_numbers\s+c/i,'contact RPC must read only the qualified contact_numbers table');
+requirePattern(contactSql,/c\.is_visible\s*=\s*true/i,'contact RPC must expose visible rows only');
+requirePattern(contactSql,/revoke\s+all\s+on\s+function\s+public\.uon_public_contact_numbers\s*\(\s*\)\s+from\s+public/i,'contact RPC public privileges must be revoked before grant');
+requirePattern(contactSql,/grant\s+execute\s+on\s+function\s+public\.uon_public_contact_numbers\s*\(\s*\)\s+to\s+anon\s*,\s*authenticated/i,'contact RPC execute grant missing');
+
+const questionMigration='supabase/migrations/20260908224500_secure_exam_question_submission_v2.sql';
+const questionSql=readRequired(questionMigration,'secure exam-question submission migration');
+requirePattern(questionSql,/create\s+or\s+replace\s+function\s+public\.uon_submit_exam_question_v2/i,'question submission RPC definition missing');
+requirePattern(questionSql,/security\s+definer/i,'question submission RPC must remain SECURITY DEFINER');
+requirePattern(questionSql,/set\s+search_path\s*=\s*''/i,'question submission RPC must use an empty search_path');
+requirePattern(questionSql,/public\.uon_public_rate_allow\s*\(\s*'exam_question_submit_total'/i,'question submission RPC global rate limit missing');
+requirePattern(questionSql,/insert\s+into\s+public\.exam_questions\s*\(college,subject,text,answer,type,year,votes,approved\)/i,'question submission must target the approved review schema explicitly');
+requirePattern(questionSql,/values\s*\(v_college,v_subject,v_text,v_answer,v_type,v_year,0,false\)/i,'question submissions must remain pending (approved=false)');
+requirePattern(questionSql,/grant\s+execute\s+on\s+function\s+public\.uon_submit_exam_question_v2[\s\S]*to\s+anon\s*,\s*authenticated/i,'question RPC execute grant missing');
+
+const questionsPage=readRequired('questions.html','questions-bank page');
+requirePattern(questionsPage,/rpc\s*\(\s*['"]uon_submit_exam_question_v2['"]/i,'questions page must submit through uon_submit_exam_question_v2');
+if(/rest\/v1\/exam_questions[\s\S]{0,1200}method\s*:\s*['"]POST['"]/i.test(questionsPage))errors.push('Backend release guard: questions page must not POST directly to exam_questions');
+
+const telegramCore=readRequired('supabase/functions/telegram-admin-core/index.ts','Telegram admin core wrapper');
+requirePattern(telegramCore,/message is not modified/i,'Telegram no-op edit protection missing');
+requirePattern(telegramCore,/status:\s*200/i,'Telegram no-op edit protection must return HTTP 200');
+requirePattern(telegramCore,/raw\.githubusercontent\.com\/wshukaili25-a11y\/UON-COFFEE\/[0-9a-f]{40}\/supabase\/functions\/telegram-admin\/index\.ts/i,'Telegram core import must stay pinned to an immutable commit');
+
 console.log(`UON Hub release audit: ${files.length} files scanned`);
 if(appVersion&&swVersion)console.log(`PWA version: ${appVersion}`);
 if(autoShellPaths.size)console.log(`Unified legacy shell paths: ${autoShellPaths.size}`);
+console.log('Backend release guards: contacts + questions + Telegram checked');
 if(warnings.length){
  console.log(`\nWarnings (${warnings.length}):`);
  for(const item of warnings)console.log(`- ${item}`);
