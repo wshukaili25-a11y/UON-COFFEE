@@ -4,6 +4,7 @@ declare const Deno:any;
 const URL=Deno.env.get('SUPABASE_URL')||'';
 const SERVICE=Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')||'';
 const GEMINI=Deno.env.get('GEMINI_API_KEY')||'';
+const PUBLIC_KEY='sb_publishable_gZ9tyM1udrkuQIXHqDtToQ_FyFmePgH';
 const MODEL='gemini-3.7-flash';
 const db=createClient(URL,SERVICE,{auth:{persistSession:false,autoRefreshToken:false}});
 
@@ -12,7 +13,7 @@ function clean(v:any,max=160){return String(v??'').replace(/\s+/g,' ').trim().sl
 function allowedOrigin(req:Request){const value=req.headers.get('origin')||'';if(allowedOrigins.has(value))return value;try{const host=new URL(value).hostname;if(host.endsWith('.vercel.app')&&(host.startsWith('uon-')||host.startsWith('uon-hub-')))return value}catch{}return''}
 function headers(req:Request){return{'access-control-allow-origin':allowedOrigin(req)||'https://uonhub.space','access-control-allow-headers':'authorization, apikey, content-type, x-client-info','access-control-allow-methods':'POST, OPTIONS','content-type':'application/json; charset=utf-8','cache-control':'no-store','vary':'Origin'}}
 function out(req:Request,body:any,status=200){return new Response(JSON.stringify(body),{status,headers:headers(req)})}
-function validPublishable(req:Request){const key=req.headers.get('apikey')||'';if(!key)return false;try{const keys=JSON.parse(Deno.env.get('SUPABASE_PUBLISHABLE_KEYS')||'{}');return Object.values(keys).includes(key)}catch{return key===Deno.env.get('SUPABASE_ANON_KEY')}}
+function validPublishable(req:Request){const key=req.headers.get('apikey')||'';if(!key)return false;if(key===PUBLIC_KEY||key===Deno.env.get('SUPABASE_ANON_KEY'))return true;try{const keys=JSON.parse(Deno.env.get('SUPABASE_PUBLISHABLE_KEYS')||'{}');return Object.values(keys).includes(key)}catch{return false}}
 const uuid=(v:any)=>/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(String(v||''));
 function imagePart(v:any){const m=/^data:(image\/(?:png|jpeg|webp));base64,([A-Za-z0-9+/=]+)$/.exec(String(v||''));return m?{inlineData:{mimeType:m[1],data:m[2]}}:null}
 function normalizeDay(v:any){const raw=clean(v,30).replace(/[أإآ]/g,'ا').toLowerCase();const map:any={'ح':'الأحد','الاحد':'الأحد','الأحد':'الأحد','sun':'الأحد','sunday':'الأحد','ن':'الاثنين','الاثنين':'الاثنين','mon':'الاثنين','monday':'الاثنين','ث':'الثلاثاء','الثلاثاء':'الثلاثاء','tue':'الثلاثاء','tuesday':'الثلاثاء','ر':'الأربعاء','الاربعاء':'الأربعاء','الأربعاء':'الأربعاء','wed':'الأربعاء','wednesday':'الأربعاء','خ':'الخميس','الخميس':'الخميس','thu':'الخميس','thursday':'الخميس'};return map[raw]||''}
