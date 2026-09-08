@@ -26,9 +26,10 @@ function translateDynamic(){
   if(tag&&degrees[tag.textContent.trim()])tag.textContent=degrees[tag.textContent.trim()];
   card.querySelectorAll('.guide-program-actions a').forEach(a=>{const text=a.textContent.trim();if(text==='الخطة الدراسية')a.textContent='Study plan';if(text==='المصدر الرسمي')a.textContent='Official source'});
  });
- const items=document.querySelector('#items');if(items&&items.textContent.trim()==='لا توجد برامج مطابقة للبحث.')items.textContent='No programs match your search.';
+ const items=document.querySelector('#items');if(items&&['لا توجد برامج مطابقة للبحث.','لا توجد نتائج مطابقة'].includes(items.textContent.trim()))items.textContent='No programs match your search.';
 }
-function schedule(){requestAnimationFrame(()=>requestAnimationFrame(translateDynamic));setTimeout(translateDynamic,120)}
+function schedule(){requestAnimationFrame(()=>requestAnimationFrame(translateDynamic));[120,450,1000,2200].forEach(delay=>setTimeout(translateDynamic,delay))}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',schedule,{once:true});else schedule();
-['search','collegeFilter','degreeFilter'].forEach(id=>document.querySelector('#'+id)?.addEventListener('input',schedule));
+['search','collegeFilter','degreeFilter'].forEach(id=>{const el=document.querySelector('#'+id);el?.addEventListener('input',schedule);el?.addEventListener('change',schedule)});
 document.querySelector('#collegeTabs')?.addEventListener('click',schedule);
+window.addEventListener('pageshow',schedule);
