@@ -1,4 +1,5 @@
 /* Page-specific polish for UON Green v1 */
+@import url('/css/uon-identity-bridge-v1.css?v=67.0.1');
 /* Course catalog + course detail */
 body:not(.admin-page) .course-center-shell{background:transparent!important;color:var(--uon-text)!important}
 body:not(.admin-page) .course-center-hero,body:not(.admin-page) .course-detail-hero{background:radial-gradient(circle at 82% 0,rgba(15,155,96,.12),transparent 38%),transparent!important;border-color:var(--uon-border)!important}
