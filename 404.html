@@ -27,7 +27,7 @@
     @media(max-width:460px){.card{padding:34px 18px;border-radius:26px}.actions{display:grid}.btn{width:100%}.logo-wrap{width:72px;height:72px;border-radius:23px}.logo{width:55px;height:55px}}
   </style>
 </head>
-<body>
+<body data-uon-page="404">
   <main class="shell">
     <section class="card">
       <div class="logo-wrap"><img class="logo" src="/assets/uonhub-logo-original-20260904.jpeg" alt="UON Hub"></div>
@@ -44,7 +44,7 @@
   <script>
     (()=>{let lang='ar',theme='dark';try{lang=localStorage.getItem('uon_language')==='en'?'en':'ar';theme=localStorage.getItem('uon_theme')==='light'?'light':'dark'}catch{}document.documentElement.lang=lang;document.documentElement.dir=lang==='en'?'ltr':'rtl';document.documentElement.dataset.theme=theme;document.querySelectorAll('[data-ar][data-en]').forEach(n=>n.textContent=lang==='en'?n.dataset.en:n.dataset.ar);document.title=lang==='en'?'Page not found | UON Hub':'الصفحة غير موجودة | UON Hub';const m=document.querySelector('meta[name="theme-color"]');if(m)m.content=theme==='light'?'#f2f7f4':'#07110d'})();
   </script>
-  <script type="module" src="/js/runtime-guard.js?v=67.0.1"></script>
-  <script type="module" src="/js/pwa-init.js?v=67.0.1"></script>
+  <script type="module" src="/js/runtime-guard.js?v=67.0.2"></script>
+  <script type="module" src="/js/pwa-init.js?v=67.0.2"></script>
 </body>
 </html>
