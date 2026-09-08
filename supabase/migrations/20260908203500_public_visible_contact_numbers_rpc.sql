@@ -7,7 +7,7 @@ returns table (
 language sql
 stable
 security definer
-set search_path = public, extensions
+set search_path = ''
 as $$
   select
     c.label,
