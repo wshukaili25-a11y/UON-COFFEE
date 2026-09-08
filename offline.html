@@ -23,7 +23,7 @@
     @media(max-width:440px){.card{padding:32px 18px;border-radius:25px}.actions{grid-template-columns:1fr}.logo-wrap{width:74px;height:74px;border-radius:23px}.logo{width:56px;height:56px}}
   </style>
 </head>
-<body>
+<body data-uon-page="offline">
   <main class="shell">
     <section class="card">
       <div class="logo-wrap"><img class="logo" src="/assets/uonhub-logo-original-20260904.jpeg" alt="UON Hub"></div>
@@ -41,6 +41,6 @@
   <script>
     (()=>{const L='uon_language',T='uon_theme';const lang=()=>{try{return localStorage.getItem(L)==='en'?'en':'ar'}catch{return'ar'}};const theme=()=>{try{return localStorage.getItem(T)==='light'?'light':'dark'}catch{return'dark'}};function apply(){const en=lang()==='en';document.documentElement.lang=en?'en':'ar';document.documentElement.dir=en?'ltr':'rtl';document.documentElement.dataset.theme=theme();document.querySelectorAll('[data-ar][data-en]').forEach(n=>n.textContent=en?n.dataset.en:n.dataset.ar);document.querySelector('#languageText').textContent=en?'العربية':'English';document.title=en?'Offline | UON Hub':'غير متصل | UON Hub';const m=document.querySelector('meta[name="theme-color"]');if(m)m.content=theme()==='light'?'#f2f7f4':'#07110d'}apply();document.querySelector('#language').onclick=()=>{try{localStorage.setItem(L,lang()==='en'?'ar':'en')}catch{}apply()};document.querySelector('#retry').onclick=()=>location.reload();window.addEventListener('online',()=>location.reload())})();
   </script>
-  <script type="module" src="/js/pwa-init.js?v=67.0.1"></script>
+  <script type="module" src="/js/pwa-init.js?v=67.0.2"></script>
 </body>
 </html>
