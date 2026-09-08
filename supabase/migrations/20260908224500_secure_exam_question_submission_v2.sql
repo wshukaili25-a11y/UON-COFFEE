@@ -22,7 +22,7 @@ create or replace function public.uon_submit_exam_question_v2(
 returns text
 language plpgsql
 security definer
-set search_path = public, pg_temp
+set search_path = ''
 as $$
 declare
   v_id text;
@@ -74,6 +74,10 @@ begin
     raise exception 'rate_limited' using errcode = 'P0001';
   end if;
 
+  if not public.uon_public_rate_allow('exam_question_submit_total',null,30,3600) then
+    raise exception 'rate_limited' using errcode = 'P0001';
+  end if;
+
   insert into public.exam_questions(college,subject,text,answer,type,year,votes,approved)
   values (v_college,v_subject,v_text,v_answer,v_type,v_year,0,false)
   returning id::text into v_id;
@@ -84,5 +88,8 @@ $$;
 
 revoke all on function public.uon_submit_exam_question_v2(text,text,text,uuid,text,text,text) from public;
 grant execute on function public.uon_submit_exam_question_v2(text,text,text,uuid,text,text,text) to anon, authenticated;
+
+comment on function public.uon_submit_exam_question_v2(text,text,text,uuid,text,text,text) is
+  'Validated, rate-limited public submission path for pending exam questions.';
 
 commit;
