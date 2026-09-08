@@ -1,1 +1,84 @@
-<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#07130f"><title>ربط Google | UON Hub</title><meta name="description" content="اربط Google Calendar وGoogle Drive مع UON Hub بشكل اختياري وخاص."><meta name="robots" content="noindex,nofollow"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet"><link rel="stylesheet" href="css/app.css?v=64.4.0"><link rel="stylesheet" href="css/ui-refresh-v24.css?v=64.4.0"><link rel="stylesheet" href="css/google-connect-v641.css?v=64.4.0"><link rel="manifest" href="/manifest.webmanifest"></head><body data-feature="google-connect"><header class="site-header"><div class="container nav"><a class="brand" href="index.html"><span class="brand-mark" aria-hidden="true">U</span><span class="brand-name">UON <b>Hub</b></span></a><ul class="nav-links" id="navLinks"><li><a href="assistant.html">UON AI</a></li><li><a href="user-dashboard.html">لوحتي</a></li><li><a href="tools.html">الأدوات</a></li></ul><div class="nav-actions"><button class="icon-btn mobile-menu" id="menuBtn">☰</button></div></div></header><main class="google-connect-page"><section class="google-connect-hero"><div class="container"><span class="eyebrow">Google × UON Hub · V64.4</span><h1>اربط Google باختيارك</h1><p>خلِّ UON AI يستفيد من مواعيدك القادمة وملفات Drive التي تختارها، بدون ما تدخل بياناتك الشخصية في قاعدة المعرفة العامة وبدون إعطاء صلاحيات أوسع من الحاجة.</p></div></section><section><div class="container google-connect-grid"><div class="google-side"><article class="google-card" id="googleConnectionCard"><div class="google-status"><div class="google-status-main"><span class="google-status-pill" id="googleStatusPill">غير مربوط</span><h2>حساب Google</h2><span class="google-account" id="googleAccount">ما فيه حساب مربوط حاليًا</span><p id="googleStatusText">الربط اختياري. UON Hub يظل يشتغل طبيعي إذا ما ربطت حسابك.</p></div></div><div class="google-actions"><button class="btn primary" type="button" id="googleConnectBtn">ربط Google</button><button class="btn" type="button" id="googleRefreshBtn" hidden>تحديث الحالة</button><button class="btn danger" type="button" id="googleDisconnectBtn" hidden>فصل Google</button></div><div class="google-scope-list"><div class="google-scope"><span>📅</span><div><strong>Google Calendar — قراءة فقط</strong><small>نطلب صلاحية عرض أحداث التقويم فقط حتى يقدر المساعد يعرف مواعيدك القادمة. ما نطلب إنشاء أو تعديل أو حذف الأحداث في هذا الإصدار.</small></div></div><div class="google-scope"><span>📁</span><div><strong>Google Drive — ملفات محددة للتطبيق</strong><small>نستخدم <code>drive.file</code>، لذلك ما نعطي UON Hub وصولًا عامًا لكل ملفات Drive. تظهر فقط الملفات التي سمحت باستخدامها مع التطبيق.</small></div></div></div><div class="google-privacy"><strong>خصوصيتك:</strong> Google tokens تُرسل مباشرة للسيرفر بعد الرجوع من Google وتُحفظ عبر Supabase Vault. بيانات Calendar وDrive الشخصية لا تُضاف إلى <code>uon_ai_knowledge</code> ولا تُرسل إلى Gemini، ولا تستخدم لتغذية قاعدة المعرفة العامة.</div></article><article class="google-card"><div class="google-data-head"><div><h3>مواعيدي القادمة</h3><small>حتى 12 حدثًا من تقويمك الأساسي</small></div><button class="btn" type="button" id="googleCalendarLoad" disabled>تحميل</button></div><div class="google-list" id="googleCalendarList"><div class="google-empty">اربط Google أولًا لعرض المواعيد.</div></div></article><article class="google-card"><div class="google-data-head"><div><h3>ملفات Drive المسموح بها</h3><small>ضمن صلاحية drive.file فقط</small></div><button class="btn" type="button" id="googleDriveLoad" disabled>تحميل</button></div><div class="google-list" id="googleDriveList"><div class="google-empty">اربط Google أولًا لعرض الملفات المتاحة للتطبيق.</div></div></article></div><aside class="google-side"><article class="google-card"><h3>وش راح يستفيد UON AI؟</h3><div class="google-note-list"><div class="google-note"><b>✓</b><span>يقدر يقول لك وش عندك اليوم ويقارن وقتك الفاضي مع جدول المذاكرة.</span></div><div class="google-note"><b>✓</b><span>يقدر يفتح الملفات التي اخترت مشاركتها مع UON Hub وقت ما تطلب منه.</span></div><div class="google-note"><b>✓</b><span>المعلومات الشخصية تظل مرتبطة بحسابك فقط وتخضع لـRLS.</span></div><div class="google-note"><b>×</b><span>ما ننشر تقويمك أو ملفاتك في قاعدة المعرفة العامة.</span></div><div class="google-note"><b>×</b><span>ما نرسل محتوى Calendar أو Drive الشخصي إلى Gemini.</span></div><div class="google-note"><b>×</b><span>ما نطلب صلاحية تعديل التقويم في هذا الإصدار.</span></div></div></article><article class="google-card"><h3>Google Maps</h3><p>Google Maps ما يحتاج ربط حسابك. أسئلة الأماكن داخل UON AI تفتح بحث Google Maps واتجاهاته مباشرة، وإذا Places API متاح تظهر نتائج Live داخل المحادثة.</p><a class="btn" href="assistant.html?prompt=%D9%88%D9%8A%D9%86%20%D8%A3%D9%82%D8%B1%D8%A8%20%D9%85%D8%B7%D8%A8%D8%B9%D8%A9%20%D9%85%D9%86%20%D8%AC%D8%A7%D9%85%D8%B9%D8%A9%20%D9%86%D8%B2%D9%88%D9%89">جرب سؤال موقع</a></article><article class="google-card"><h3>الفصل الكامل</h3><p>زر «فصل Google» يلغي صلاحية Google المخزنة عندنا ويحذف التوكنات من Vault. تقدر تربطه من جديد لاحقًا.</p></article></aside></div></section></main><div class="uon-independent-notice"><span class="uon-independent-notice__icon">i</span><p><strong>تنبيه:</strong> UON Hub مشروع طلابي مستقل وغير تابع رسميًا لجامعة نزوى.</p></div><footer class="site-footer"><div class="container footer-row"><span>UON Hub · 2026</span><span>منصة طلابية مستقلة لطلاب جامعة نزوى</span></div></footer><div id="toast" class="toast"></div><script type="module" src="js/google-connect-v641.js?v=64.4.0"></script></body></html>
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#07110d">
+  <meta name="color-scheme" content="dark light">
+  <meta name="robots" content="noindex,nofollow">
+  <title>ربط Google | UON Hub</title>
+  <meta name="description" content="اربط Google Calendar وGoogle Drive مع UON Hub بشكل اختياري وخاص.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/app.css?v=67.0.1">
+  <link rel="stylesheet" href="css/google-connect-v641.css?v=67.0.1">
+  <link rel="stylesheet" href="css/uon-green-system-v1.css?v=67.0.1">
+  <link rel="stylesheet" href="css/uon-green-pages-v1.css?v=67.0.1">
+  <link rel="stylesheet" href="/css/pwa.css?v=67.0.1">
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="apple-touch-icon" href="/assets/icons/icon-192.png">
+</head>
+<body data-feature="google-connect" data-uon-page="google-connect">
+<header class="site-header">
+  <div class="container nav">
+    <a class="brand" href="index.html" aria-label="UON Hub"><span class="brand-mark" aria-hidden="true">U</span><span class="brand-name">UON <b>Hub</b></span></a>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="assistant.html">UON AI</a></li>
+      <li><a href="user-dashboard.html" data-ar="لوحتي" data-en="Dashboard">لوحتي</a></li>
+      <li><a href="tools.html" data-ar="الأدوات" data-en="Tools">الأدوات</a></li>
+    </ul>
+    <div class="nav-actions"><button class="icon-btn mobile-menu" id="menuBtn" type="button" aria-label="فتح القائمة" data-label-ar="فتح القائمة" data-label-en="Open menu">☰</button></div>
+  </div>
+</header>
+<main class="google-connect-page">
+  <section class="google-connect-hero">
+    <div class="container">
+      <span class="eyebrow">Google × UON Hub</span>
+      <h1 data-ar="اربط Google باختيارك" data-en="Connect Google only if you want to">اربط Google باختيارك</h1>
+      <p data-ar="خيار إضافي لعرض مواعيدك وملفات Drive التي تسمح بها داخل أدواتك الشخصية. UON Hub يعمل طبيعيًا بدون ربط Google." data-en="An optional connection for your personal Calendar events and permitted Drive files. UON Hub works normally without connecting Google.">خيار إضافي لعرض مواعيدك وملفات Drive التي تسمح بها داخل أدواتك الشخصية. UON Hub يعمل طبيعيًا بدون ربط Google.</p>
+    </div>
+  </section>
+  <section>
+    <div class="container google-connect-grid">
+      <div class="google-side">
+        <article class="google-card" id="googleConnectionCard">
+          <div class="google-status"><div class="google-status-main">
+            <span class="google-status-pill" id="googleStatusPill" data-ar="غير مربوط" data-en="Not connected">غير مربوط</span>
+            <h2 data-ar="حساب Google" data-en="Google account">حساب Google</h2>
+            <span class="google-account" id="googleAccount" data-ar="ما فيه حساب مربوط حاليًا" data-en="No Google account is connected">ما فيه حساب مربوط حاليًا</span>
+            <p id="googleStatusText" data-ar="الربط اختياري. UON Hub يظل يشتغل طبيعي إذا ما ربطت حسابك." data-en="Connecting is optional. UON Hub continues to work normally without it.">الربط اختياري. UON Hub يظل يشتغل طبيعي إذا ما ربطت حسابك.</p>
+          </div></div>
+          <div class="google-actions">
+            <button class="btn primary" type="button" id="googleConnectBtn" data-ar="ربط Google" data-en="Connect Google">ربط Google</button>
+            <button class="btn" type="button" id="googleRefreshBtn" hidden data-ar="تحديث الحالة" data-en="Refresh status">تحديث الحالة</button>
+            <button class="btn danger" type="button" id="googleDisconnectBtn" hidden data-ar="فصل Google" data-en="Disconnect Google">فصل Google</button>
+          </div>
+          <div class="google-scope-list">
+            <div class="google-scope"><span>📅</span><div><strong data-ar="Google Calendar — قراءة فقط" data-en="Google Calendar — read only">Google Calendar — قراءة فقط</strong><small data-ar="نطلب عرض أحداث التقويم فقط، بدون إنشاء أو تعديل أو حذف المواعيد." data-en="Only calendar event viewing is requested; UON Hub does not create, edit, or delete your events.">نطلب عرض أحداث التقويم فقط، بدون إنشاء أو تعديل أو حذف المواعيد.</small></div></div>
+            <div class="google-scope"><span>📁</span><div><strong data-ar="Google Drive — ملفات محددة" data-en="Google Drive — selected files">Google Drive — ملفات محددة</strong><small data-ar="نستخدم صلاحية drive.file حتى لا يحصل UON Hub على وصول عام لكل ملفاتك." data-en="The drive.file scope is used so UON Hub does not receive general access to your whole Drive.">نستخدم صلاحية drive.file حتى لا يحصل UON Hub على وصول عام لكل ملفاتك.</small></div></div>
+          </div>
+          <div class="google-privacy"><strong data-ar="خصوصيتك:" data-en="Privacy:">خصوصيتك:</strong> <span data-ar="بيانات Calendar وDrive الشخصية لا تدخل قاعدة المعرفة العامة في UON Hub، والربط قابل للفصل في أي وقت." data-en="Your personal Calendar and Drive data is not added to UON Hub's public knowledge base, and you can disconnect at any time.">بيانات Calendar وDrive الشخصية لا تدخل قاعدة المعرفة العامة في UON Hub، والربط قابل للفصل في أي وقت.</span></div>
+        </article>
+        <article class="google-card"><div class="google-data-head"><div><h3 data-ar="مواعيدي القادمة" data-en="Upcoming events">مواعيدي القادمة</h3><small data-ar="حتى 12 حدثًا من تقويمك الأساسي" data-en="Up to 12 events from your primary calendar">حتى 12 حدثًا من تقويمك الأساسي</small></div><button class="btn" type="button" id="googleCalendarLoad" disabled data-ar="تحميل" data-en="Load">تحميل</button></div><div class="google-list" id="googleCalendarList"><div class="google-empty" data-ar="اربط Google أولًا لعرض المواعيد." data-en="Connect Google first to view events.">اربط Google أولًا لعرض المواعيد.</div></div></article>
+        <article class="google-card"><div class="google-data-head"><div><h3 data-ar="ملفات Drive المسموح بها" data-en="Allowed Drive files">ملفات Drive المسموح بها</h3><small data-ar="ضمن صلاحية drive.file فقط" data-en="Only within the drive.file scope">ضمن صلاحية drive.file فقط</small></div><button class="btn" type="button" id="googleDriveLoad" disabled data-ar="تحميل" data-en="Load">تحميل</button></div><div class="google-list" id="googleDriveList"><div class="google-empty" data-ar="اربط Google أولًا لعرض الملفات المتاحة للتطبيق." data-en="Connect Google first to view files available to the app.">اربط Google أولًا لعرض الملفات المتاحة للتطبيق.</div></div></article>
+      </div>
+      <aside class="google-side">
+        <article class="google-card"><h3 data-ar="وش راح يستفيد UON AI؟" data-en="What can UON AI use it for?">وش راح يستفيد UON AI؟</h3><div class="google-note-list">
+          <div class="google-note"><b>✓</b><span data-ar="يعرف مواعيدك القادمة لما تطلب منه ذلك." data-en="It can use your upcoming events when you ask it to.">يعرف مواعيدك القادمة لما تطلب منه ذلك.</span></div>
+          <div class="google-note"><b>✓</b><span data-ar="يستخدم الملفات التي سمحت للتطبيق بالوصول إليها فقط." data-en="It only uses files you allowed the app to access.">يستخدم الملفات التي سمحت للتطبيق بالوصول إليها فقط.</span></div>
+          <div class="google-note"><b>×</b><span data-ar="ما ننشر تقويمك أو ملفاتك في قاعدة المعرفة العامة." data-en="Your calendar or files are not published to the public knowledge base.">ما ننشر تقويمك أو ملفاتك في قاعدة المعرفة العامة.</span></div>
+        </div></article>
+        <article class="google-card"><h3>Google Maps</h3><p data-ar="البحث عن الأماكن داخل UON AI ما يحتاج ربط حساب Google." data-en="Place searches inside UON AI do not require connecting a Google account.">البحث عن الأماكن داخل UON AI ما يحتاج ربط حساب Google.</p><a class="btn" href="assistant.html?prompt=%D9%88%D9%8A%D9%86%20%D8%A3%D9%82%D8%B1%D8%A8%20%D9%85%D8%B7%D8%A8%D8%B9%D8%A9%20%D9%85%D9%86%20%D8%AC%D8%A7%D9%85%D8%B9%D8%A9%20%D9%86%D8%B2%D9%88%D9%89" data-ar="جرب سؤال موقع" data-en="Try a place question">جرب سؤال موقع</a></article>
+        <article class="google-card"><h3 data-ar="الفصل الكامل" data-en="Full disconnect">الفصل الكامل</h3><p data-ar="زر فصل Google يلغي الربط المحفوظ، وتقدر تربطه من جديد لاحقًا." data-en="Disconnecting removes the saved connection. You can connect again later.">زر فصل Google يلغي الربط المحفوظ، وتقدر تربطه من جديد لاحقًا.</p></article>
+      </aside>
+    </div>
+  </section>
+</main>
+<div class="uon-independent-notice" role="note"><span class="uon-independent-notice__icon" aria-hidden="true">i</span><p data-ar="تنبيه: UON Hub مشروع طلابي مستقل وغير تابع رسميًا لجامعة نزوى." data-en="Notice: UON Hub is an independent student project and is not officially affiliated with the University of Nizwa.">تنبيه: UON Hub مشروع طلابي مستقل وغير تابع رسميًا لجامعة نزوى.</p></div>
+<footer class="site-footer"><div class="container footer-row"><span data-ar="رَبِّ زِدْنِي عِلْمًا" data-en="My Lord, increase me in knowledge">رَبِّ زِدْنِي عِلْمًا</span><span data-ar="صمم بحب من طلاب جامعة نزوى❤️." data-en="Designed with love by University of Nizwa students ❤️.">صمم بحب من طلاب جامعة نزوى❤️.</span><a href="https://www.instagram.com/uonhub" target="_blank" rel="noopener noreferrer">@uonhub</a><span>© 2026 UON Hub</span></div></footer>
+<div id="toast" class="toast"></div>
+<script type="module" src="js/google-connect-v641.js?v=67.0.1"></script>
+<script type="module" src="/js/pwa-init.js?v=67.0.1"></script>
+</body>
+</html>
