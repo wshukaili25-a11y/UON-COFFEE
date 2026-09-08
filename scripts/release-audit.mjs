@@ -62,8 +62,11 @@ for(const file of files){
  if(!/(?:^|\/)(?:admin|owner-dashboard|tools-control|admin-|supabase\/functions)/i.test(from)&&/functions\/v1\/telegram-admin(?:['"/?]|$)/.test(text)){
   warnings.push(`${from}: direct telegram-admin reference found; verify it is not a public notification path.`);
  }
- if(!/(?:^|\/)(?:admin|owner-dashboard|tools-control|supabase\/functions)/i.test(from)&&/rest\/v1\/[A-Za-z0-9_?-]+/.test(text)&&/method\s*:\s*["'](?:POST|PATCH|DELETE)["']/i.test(text)){
-  warnings.push(`${from}: direct public PostgREST write detected; confirm RLS/RPC safety.`);
+ const publicFile=!/(?:^|\/)(?:admin|owner-dashboard|tools-control|supabase\/functions)/i.test(from);
+ const directTableWrite=/rest\/v1\/(?!rpc(?:\/|['"?]))[A-Za-z0-9_?-]+/.test(text)&&/method\s*:\s*["'](?:POST|PATCH|DELETE)["']/i.test(text);
+ if(publicFile&&directTableWrite){
+  const suffix=from==='questions.html'?' (temporary guarded-RPC fallback is intentional until migration deploys).':'';
+  warnings.push(`${from}: direct public PostgREST write detected; confirm RLS/RPC safety.${suffix}`);
  }
 }
 
