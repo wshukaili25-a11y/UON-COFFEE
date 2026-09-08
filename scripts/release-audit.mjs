@@ -49,6 +49,10 @@ function hasLegacyIdentityBridge(from,text){
  const autoShell=autoShellPaths.has(pathname)&&/pwa-init\.js/i.test(text);
  return directBridge||explicitShell||autoShell;
 }
+function hasDirectPublicTableWrite(text){
+ const fetchCalls=[...text.matchAll(/fetch\s*\(([\s\S]{0,1400}?)\)\s*(?:;|\n|\}|$)/g)].map(match=>match[1]);
+ return fetchCalls.some(call=>/rest\/v1\/(?!rpc(?:\/|['"?]))[A-Za-z0-9_?-]+/i.test(call)&&/method\s*:\s*["'](?:POST|PATCH|DELETE)["']/i.test(call));
+}
 
 for(const file of files){
  const ext=path.extname(file).toLowerCase();
@@ -63,9 +67,7 @@ for(const file of files){
   }
   const oldU=(text.match(/class=["'][^"']*brand-mark[^"']*["'][^>]*>\s*U\s*</gi)||[]).length;
   const adminLike=/(?:^|\/)(?:admin|owner-dashboard|tools-control|reset|security-test)/i.test(from);
-  if(oldU&&!adminLike&&!hasLegacyIdentityBridge(from,text)){
-   warnings.push(`${from}: ${oldU} legacy U brand marker(s) without a verified identity bridge.`);
-  }
+  if(oldU&&!adminLike&&!hasLegacyIdentityBridge(from,text))warnings.push(`${from}: ${oldU} legacy U brand marker(s) without a verified identity bridge.`);
  }
  if(ext==='.js'||ext==='.mjs'){
   const patterns=[/\bfrom\s*["']([^"']+)["']/g,/\bimport\s*\(\s*["']([^"']+)["']\s*\)/g];
@@ -77,15 +79,9 @@ for(const file of files){
    if(!exists(target))errors.push(`${from}: missing JS import -> ${spec} (${target})`);
   }
  }
- if(!/(?:^|\/)(?:admin|owner-dashboard|tools-control|admin-|supabase\/functions)/i.test(from)&&/functions\/v1\/telegram-admin(?:['"/?]|$)/.test(text)){
-  warnings.push(`${from}: direct telegram-admin reference found; verify it is not a public notification path.`);
- }
+ if(!/(?:^|\/)(?:admin|owner-dashboard|tools-control|admin-|supabase\/functions)/i.test(from)&&/functions\/v1\/telegram-admin(?:['"/?]|$)/.test(text))warnings.push(`${from}: direct telegram-admin reference found; verify it is not a public notification path.`);
  const publicFile=!/(?:^|\/)(?:admin|owner-dashboard|tools-control|supabase\/functions)/i.test(from);
- const directTableWrite=/rest\/v1\/(?!rpc(?:\/|['"?]))[A-Za-z0-9_?-]+/.test(text)&&/method\s*:\s*["'](?:POST|PATCH|DELETE)["']/i.test(text);
- if(publicFile&&directTableWrite){
-  const suffix=from==='questions.html'?' (temporary guarded-RPC fallback is intentional until migration deploys).':'';
-  warnings.push(`${from}: direct public PostgREST write detected; confirm RLS/RPC safety.${suffix}`);
- }
+ if(publicFile&&hasDirectPublicTableWrite(text))warnings.push(`${from}: direct public PostgREST write detected; confirm RLS/RPC safety.`);
 }
 
 function readVersion(file,regex,label){
