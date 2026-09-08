@@ -32,8 +32,14 @@ export default async function handler(req,res){
   probe('schedule_parser_post',`${SUPABASE_URL}/functions/v1/uon-schedule-image-parser`,{method:'POST',headers:{...common,origin:'https://uonhub.space'},body:'{}'}),
   probe('telegram_admin_core',`${SUPABASE_URL}/functions/v1/telegram-admin-core`,{method:'POST',headers:common,body:'{}'})
  ]);
+ const serverCredentials={
+  SUPABASE_SERVICE_ROLE_KEY:Boolean(process.env.SUPABASE_SERVICE_ROLE_KEY),
+  SUPABASE_SERVICE_KEY:Boolean(process.env.SUPABASE_SERVICE_KEY),
+  SUPABASE_SECRET_KEY:Boolean(process.env.SUPABASE_SECRET_KEY),
+  SUPABASE_URL:Boolean(process.env.SUPABASE_URL)
+ };
  const required=['schedule_observations_table','schedule_confirm_rpc','schedule_ingest_rpc','schedule_parser_options'];
  const ok=required.every(name=>{const state=checks.find(item=>item.name===name)?.state;return state&&state!=='missing'&&state!=='network_error'});
  res.setHeader('Cache-Control','no-store');
- return res.status(ok?200:503).json({ok,checked_at:new Date().toISOString(),checks});
+ return res.status(ok?200:503).json({ok,checked_at:new Date().toISOString(),serverCredentials,checks});
 }
