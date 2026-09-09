@@ -1,0 +1,3 @@
+[functions.telegram-admin-core]
+verify_jwt = false
+entrypoint = "./functions/telegram-admin-core/index.ts"
