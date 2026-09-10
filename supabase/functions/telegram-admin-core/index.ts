@@ -1,3 +1,4 @@
+// UON Hub Admin bot runtime hotfix v67.0.3.
 // Canonical legacy/admin command engine restored as a pinned, immutable fallback.
 // Telegram returns HTTP 400 when an edit is identical to the current message.
 // That is a harmless no-op, so normalize it to success before the legacy engine sees it.
@@ -11,7 +12,10 @@ globalThis.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
     try {
       const text = await result.clone().text();
       const description = text.toLowerCase();
-      if (description.includes('message is not modified')) {
+      if (
+        description.includes('message is not modified') ||
+        description.includes('specified new message content and reply markup are exactly the same')
+      ) {
         return new Response(JSON.stringify({ ok: true, result: true, unchanged: true }), {
           status: 200,
           headers: { 'content-type': 'application/json; charset=utf-8' }
