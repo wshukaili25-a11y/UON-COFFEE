@@ -1,6 +1,9 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.110.8';
-import { $, setupNav, toast, enforceUonMaintenance, watchUonMaintenance } from './core.js?v=64.1.0';
-import { getGoogleAuthStatus, googleAuthStatusText } from './google-auth-status-v641.js?v=64.1.0';
+import { $, setupNav, toast, enforceUonMaintenance, watchUonMaintenance } from './core.js?v=67.0.1';
+import { setupV14Shell } from './v14-ui.js?v=67.0.1';
+import { getGoogleAuthStatus, googleAuthStatusText } from './google-auth-status-v641.js?v=67.0.1';
+
+setupV14Shell();
 
 const SUPABASE_URL='https://irkhvydgxpseflggbeqq.supabase.co';
 const SUPABASE_KEY='sb_publishable_gZ9tyM1udrkuQIXHqDtToQ_FyFmePgH';
@@ -12,7 +15,7 @@ let currentSession=null;
 let currentConnection=null;
 let providerStatus=null;
 let capturing=false;
-const fmt=new Intl.DateTimeFormat('ar-OM',{timeZone:'Asia/Muscat',weekday:'short',month:'short',day:'numeric',hour:'numeric',minute:'2-digit'});
+const fmt=new Intl.DateTimeFormat(localStorage.getItem('uon_language')==='en'?'en-GB':'ar-OM',{timeZone:'Asia/Muscat',weekday:'short',month:'short',day:'numeric',hour:'numeric',minute:'2-digit'});
 function safeDate(v){if(!v)return'';const d=new Date(v);return Number.isNaN(d.getTime())?String(v):fmt.format(d)}
 function setBusy(active){document.body.classList.toggle('google-loading',active)}
 function empty(el,text){if(!el)return;el.replaceChildren();const d=document.createElement('div');d.className='google-empty';d.textContent=text;el.appendChild(d)}

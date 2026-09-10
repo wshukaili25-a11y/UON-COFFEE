@@ -73,6 +73,8 @@ for(const [version,names] of byVersion){
   }
 }
 
+// Mixed-length prefix collisions are especially dangerous for migration tools:
+// e.g. an 8-digit date version and a timestamp version beginning with that date.
 for(let i=0;i<parsed.length;i++){
   for(let j=i+1;j<parsed.length;j++){
     const a=parsed[i];

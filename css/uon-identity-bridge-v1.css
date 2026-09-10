@@ -1,0 +1,67 @@
+/* UON Hub identity bridge — upgrades legacy student pages without touching their logic */
+@import url('/css/uon-personal-tools-v1.css?v=67.0.2');
+body:not(.admin-page) .brand-mark,
+body:not(.admin-page) .v176-brand>span:first-child{
+  width:42px!important;
+  height:42px!important;
+  min-width:42px!important;
+  flex:0 0 42px!important;
+  border-radius:50%!important;
+  background:url('/assets/uonhub-logo-original-20260904.jpeg') center/cover no-repeat!important;
+  color:transparent!important;
+  font-size:0!important;
+  line-height:0!important;
+  border:1px solid var(--uon-border,rgba(255,255,255,.10))!important;
+  box-shadow:0 9px 24px rgba(0,0,0,.18)!important;
+  overflow:hidden!important;
+}
+body:not(.admin-page) .brand-mark::before,
+body:not(.admin-page) .brand-mark::after,
+body:not(.admin-page) .v176-brand>span:first-child::before,
+body:not(.admin-page) .v176-brand>span:first-child::after{content:none!important;display:none!important}
+body:not(.admin-page) .brand{gap:10px!important;text-decoration:none!important}
+body:not(.admin-page) .brand-name{font-weight:900!important;letter-spacing:-.02em!important}
+body:not(.admin-page) .brand-name b{color:var(--uon-green-2,#0f9b60)!important}
+
+body:not(.admin-page) .site-footer{
+  border-top:1px solid var(--uon-border,rgba(255,255,255,.10))!important;
+  background:transparent!important;
+  color:var(--uon-muted,#9fb0a7)!important;
+}
+body:not(.admin-page) .site-footer .footer-row{
+  min-height:86px!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:10px 18px!important;
+  flex-wrap:wrap!important;
+  text-align:center!important;
+}
+body:not(.admin-page) .site-footer a{color:var(--uon-text,#f7faf8)!important}
+body:not(.admin-page) .uon-independent-notice{border-color:rgba(15,155,96,.15)!important}
+
+/* Legacy student/community surfaces */
+body:not(.admin-page) .community-card,
+body:not(.admin-page) .community-stat,
+body:not(.admin-page) .dashboard-stat,
+body:not(.admin-page) .dashboard-pulse-card,
+body:not(.admin-page) .dashboard-quick-link,
+body:not(.admin-page) .dashboard-backup-card,
+body:not(.admin-page) .focus-timer-card,
+body:not(.admin-page) .focus-side-card,
+body:not(.admin-page) .tasks-stat,
+body:not(.admin-page) .tasks-form-card,
+body:not(.admin-page) .google-card{
+  background:linear-gradient(145deg,var(--uon-surface,#0d1812),var(--uon-surface-2,#111f17))!important;
+  border-color:var(--uon-border,rgba(255,255,255,.10))!important;
+  color:var(--uon-text,#f7faf8)!important;
+  box-shadow:0 14px 38px rgba(0,0,0,.10)!important;
+}
+body:not(.admin-page) .community-card:hover,
+body:not(.admin-page) .dashboard-quick-link:hover{border-color:rgba(15,155,96,.34)!important;transform:translateY(-2px)}
+
+@media(max-width:560px){
+  body:not(.admin-page) .brand-mark,
+  body:not(.admin-page) .v176-brand>span:first-child{width:39px!important;height:39px!important;min-width:39px!important;flex-basis:39px!important}
+  body:not(.admin-page) .site-footer .footer-row{padding-block:20px!important}
+}

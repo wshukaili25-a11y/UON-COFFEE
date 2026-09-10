@@ -1,6 +1,15 @@
 const RIGHTS_VERSION='UONH-RIGHTS-2026-08-v1';
 const OFFICIAL_HOSTS=new Set(['uonhub.space','www.uonhub.space','uon-hub.vercel.app','localhost','127.0.0.1']);
 
+function isAuthorizedProjectHost(hostname){
+  const host=String(hostname||'').toLowerCase();
+  if(OFFICIAL_HOSTS.has(host))return true;
+  // Allow only UON Hub preview/deployment hosts that belong to the project's Vercel team.
+  // This keeps the anti-copy notice active on unrelated third-party hosts, including other Vercel accounts.
+  const ownedVercelSuffix='-wshukaili25-1447s-projects.vercel.app';
+  return host.endsWith(ownedVercelSuffix)&&(host.startsWith('uon-')||host.startsWith('uon-hub-'));
+}
+
 function addRightsMetadata(){
   const entries={
     'application-name':'UON Hub',
@@ -30,7 +39,7 @@ function addVisibleRightsLink(){
 
 function warnOnlyOnUnauthorizedCopy(){
   const host=location.hostname.toLowerCase();
-  if(OFFICIAL_HOSTS.has(host))return;
+  if(isAuthorizedProjectHost(host))return;
   // This notice only appears when these exact project files are copied and served on another host.
   // It does not contact, alter, or inject anything into third-party websites.
   const notice=document.createElement('aside');

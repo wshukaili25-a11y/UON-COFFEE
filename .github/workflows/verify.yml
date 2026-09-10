@@ -19,6 +19,8 @@ jobs:
         uses: actions/setup-node@v5
         with:
           node-version: '24'
+      - name: Static release audit
+        run: node scripts/release-audit.mjs
       - name: Supabase migration history audit
         run: node scripts/audit-supabase-migrations.mjs
       - name: Verify modules and configuration

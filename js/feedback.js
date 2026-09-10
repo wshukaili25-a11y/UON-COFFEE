@@ -50,6 +50,7 @@
       method: 'POST',
       headers: {
         apikey: SUPABASE_KEY,
+        Authorization: `Bearer ${SUPABASE_KEY}`,
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
@@ -70,23 +71,27 @@
     if (!response.ok) {
       throw new Error(parsed?.message || parsed?.error_description || parsed || `HTTP ${response.status}`);
     }
-    return typeof parsed === 'string' ? parsed : parsed;
+    return parsed;
   }
 
   async function notifyAdmin(id) {
-    if (!id) return;
+    if (!id) return null;
     try {
-      await fetch(`${SUPABASE_URL}/functions/v1/telegram-admin`, {
+      const response = await fetch(`${SUPABASE_URL}/functions/v1/public-submit-notify`, {
         method: 'POST',
         headers: {
           apikey: SUPABASE_KEY,
+          Authorization: `Bearer ${SUPABASE_KEY}`,
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ source: 'web-submit', table: 'feature_suggestions', id }),
+        body: JSON.stringify({ table: 'feature_suggestions', id }),
         cache: 'no-store'
       });
+      if (!response.ok) throw new Error((await response.text()) || `HTTP ${response.status}`);
+      return response.text().catch(() => '');
     } catch (error) {
       console.warn('Suggestion notification skipped', error);
+      return null;
     }
   }
 
@@ -126,7 +131,7 @@
 
       try {
         const id = await submitSuggestion(payload);
-        void notifyAdmin(id);
+        await notifyAdmin(id);
         form.reset();
         populateColleges(collegeSelect);
         toast('وصل اقتراحك للمشرف، شكرًا لك 🤍');
