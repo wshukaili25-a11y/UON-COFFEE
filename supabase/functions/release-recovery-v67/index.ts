@@ -2,6 +2,7 @@ import postgres from 'npm:postgres@3.4.7';
 
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL') || '';
 const DB_URL = Deno.env.get('SUPABASE_DB_URL') || '';
+const GH_MIGRATIONS = 'https://api.github.com/repos/wshukaili25-a11y/UON-COFFEE/contents/supabase/migrations?ref=main';
 
 function secretKey() {
   const raw = Deno.env.get('SUPABASE_SECRET_KEYS') || '';
@@ -57,21 +58,70 @@ async function adminAuthorized(password: string) {
   }
 }
 
-function migrationHealth(rows: Array<{version:string;name:string}>) {
-  const versions = rows.map(x => String(x.version || ''));
-  const nonCanonical = rows.filter(x => !/^\d{14}$/.test(String(x.version || '')));
-  const prefixCollisions: Array<{short:string;long:string}> = [];
-  for (const short of versions) {
-    for (const long of versions) {
+type RemoteMigration = { version: string; name: string };
+type LocalMigration = { version: string; file: string; name: string; canonical: boolean };
+
+function duplicateLocalVersions(local: LocalMigration[]) {
+  const grouped = new Map<string, LocalMigration[]>();
+  for (const item of local) {
+    if (!grouped.has(item.version)) grouped.set(item.version, []);
+    grouped.get(item.version)!.push(item);
+  }
+  return [...grouped.entries()]
+    .filter(([, items]) => items.length > 1)
+    .map(([version, items]) => ({ version, files: items.map(x => x.file) }));
+}
+
+function prefixCollisions(versions: string[]) {
+  const unique = [...new Set(versions)].sort();
+  const found: Array<{ short: string; long: string }> = [];
+  for (const short of unique) {
+    for (const long of unique) {
       if (short !== long && short.length < long.length && long.startsWith(short)) {
-        prefixCollisions.push({ short, long });
+        found.push({ short, long });
       }
     }
   }
+  return found;
+}
+
+async function loadLocalMigrations(): Promise<LocalMigration[]> {
+  const r = await fetch(GH_MIGRATIONS, {
+    headers: {
+      'accept': 'application/vnd.github+json',
+      'user-agent': 'uon-hub-release-recovery-v67'
+    },
+    signal: AbortSignal.timeout(8000)
+  });
+  if (!r.ok) throw new Error(`github_migrations_${r.status}`);
+  const data = await r.json();
+  if (!Array.isArray(data)) throw new Error('github_migrations_invalid');
+
+  return data
+    .map((item: any) => String(item?.name || ''))
+    .filter((file: string) => file.endsWith('.sql'))
+    .map((file: string) => {
+      const stem = file.slice(0, -4);
+      const underscore = stem.indexOf('_');
+      const version = underscore === -1 ? stem : stem.slice(0, underscore);
+      const name = underscore === -1 ? '' : stem.slice(underscore + 1);
+      return { version, file, name, canonical: /^\d{14}$/.test(version) };
+    })
+    .filter((x: LocalMigration) => /^\d+$/.test(x.version));
+}
+
+function compareHistory(remote: RemoteMigration[], local: LocalMigration[]) {
+  const remoteSet = new Set(remote.map(x => x.version));
+  const localSet = new Set(local.map(x => x.version));
+
   return {
-    total: rows.length,
-    non_canonical: nonCanonical,
-    prefix_collisions: prefixCollisions
+    remote_only: remote.filter(x => !localSet.has(x.version)),
+    local_only: local.filter(x => !remoteSet.has(x.version)),
+    local_noncanonical: local.filter(x => !x.canonical),
+    remote_noncanonical: remote.filter(x => !/^\d{14}$/.test(x.version)),
+    duplicate_local_versions: duplicateLocalVersions(local),
+    local_prefix_collisions: prefixCollisions(local.map(x => x.version)),
+    remote_prefix_collisions: prefixCollisions(remote.map(x => x.version))
   };
 }
 
@@ -85,18 +135,21 @@ Deno.serve(async (req) => {
 
   let sql: ReturnType<typeof postgres> | null = null;
   try {
+    const local = await loadLocalMigrations();
     sql = postgres(DB_URL, { max: 1, prepare: false, idle_timeout: 2, connect_timeout: 8 });
-    const rows = await sql<{version:string;name:string}[]>`
+    const remote = await sql<RemoteMigration[]>`
       select version::text, coalesce(name,'')::text as name
       from supabase_migrations.schema_migrations
       order by version
     `;
+    const comparison = compareHistory(remote, local);
 
     return json(req, {
       ok: true,
-      mode: 'inspect',
-      rows,
-      health: migrationHealth(rows),
+      mode: 'inspect_compare',
+      counts: { remote: remote.length, local_files: local.length, local_versions: new Set(local.map(x => x.version)).size },
+      comparison,
+      remote_rows: remote,
       generated_at: new Date().toISOString()
     });
   } catch (error) {
