@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="robots" content="noindex,nofollow,noarchive">
+  <title>UON Hub · Release Recovery</title>
+  <style>
+    :root{color-scheme:dark;--bg:#061510;--card:#0d211a;--line:#244338;--text:#f5f2e9;--muted:#a7b7af;--green:#61d095;--danger:#ff9189;--warn:#f2c66d}
+    *{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at top,#123328 0,#061510 42%);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Tahoma,sans-serif;min-height:100vh;padding:env(safe-area-inset-top) 16px env(safe-area-inset-bottom)}
+    main{max-width:760px;margin:36px auto}.brand{display:flex;align-items:center;gap:12px;margin-bottom:18px}.brand img{width:54px;height:54px;border-radius:50%;object-fit:cover}.brand strong{font-size:1.1rem}.card{background:color-mix(in srgb,var(--card) 94%,transparent);border:1px solid var(--line);border-radius:22px;padding:20px;box-shadow:0 18px 60px #0005}h1{font-size:1.55rem;margin:0 0 8px}p{color:var(--muted);line-height:1.8;margin:0 0 18px}label{display:block;font-weight:700;margin:14px 0 7px}input{width:100%;padding:14px 15px;border-radius:14px;border:1px solid var(--line);background:#071b14;color:var(--text);font-size:16px;outline:none}input:focus{border-color:var(--green)}button{width:100%;margin-top:12px;padding:14px;border:0;border-radius:14px;background:var(--green);color:#042014;font-weight:900;font-size:16px;cursor:pointer}.status{margin-top:16px;padding:12px 14px;border:1px solid var(--line);border-radius:14px;color:var(--muted)}.status.ok{color:var(--green)}.status.err{color:var(--danger)}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:16px}.metric{padding:12px;border-radius:14px;background:#071b14;border:1px solid var(--line);text-align:center}.metric b{display:block;font-size:1.3rem}.metric span{color:var(--muted);font-size:.8rem}.section{margin-top:16px;border-top:1px solid var(--line);padding-top:14px}.section h2{font-size:1rem;margin:0 0 8px}.pill{display:block;padding:9px 10px;margin:6px 0;border-radius:10px;background:#071b14;border:1px solid var(--line);direction:ltr;text-align:left;font:12px ui-monospace,SFMono-Regular,Menlo,monospace;overflow-wrap:anywhere}.empty{color:var(--green);font-size:.9rem}.warn{color:var(--warn)}.danger{color:var(--danger)}small{display:block;margin-top:15px;color:var(--muted);line-height:1.7}@media(max-width:560px){main{margin:18px auto}.card{padding:16px}.grid{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+<main>
+  <div class="brand"><img src="/assets/uonhub-logo-original-20260904.jpeg" alt="UON Hub"><div><strong>UON Hub</strong><div style="color:var(--muted);font-size:.82rem">Release recovery · temporary</div></div></div>
+  <section class="card">
+    <h1>فحص سجل Supabase قبل الدمج</h1>
+    <p>أدخل كلمة مرور إدارة UON Hub هنا فقط. لا تُحفظ في المتصفح ولا تُرسل إلى GitHub أو ChatGPT؛ ستذهب مباشرة إلى وظيفة الاستعادة داخل مشروع Supabase للتحقق من سجل migrations قراءةً فقط.</p>
+    <label for="pw">كلمة مرور الإدارة</label>
+    <input id="pw" type="password" autocomplete="current-password" spellcheck="false">
+    <button id="run" type="button">فحص سجل قاعدة البيانات</button>
+    <div id="status" class="status">جاهز للفحص.</div>
+    <div id="results" hidden></div>
+    <small>هذه الصفحة مؤقتة وستُحذف بعد إصلاح سجل migrations وإعادة تفعيل النشر الطبيعي.</small>
+  </section>
+</main>
+<script>
+(() => {
+  const endpoint='https://irkhvydgxpseflggbeqq.supabase.co/functions/v1/release-recovery-v67';
+  const pw=document.getElementById('pw'),run=document.getElementById('run'),status=document.getElementById('status'),results=document.getElementById('results');
+  const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const list=(title,items,render)=>`<div class="section"><h2>${esc(title)} <span class="warn">(${items.length})</span></h2>${items.length?items.map(render).join(''):'<div class="empty">لا يوجد ✅</div>'}</div>`;
+  run.addEventListener('click',async()=>{
+    const password=pw.value;
+    if(!password){status.className='status err';status.textContent='اكتب كلمة مرور الإدارة أولًا.';return;}
+    run.disabled=true;status.className='status';status.textContent='جارٍ قراءة ومقارنة سجل migrations…';results.hidden=true;results.innerHTML='';
+    try{
+      const r=await fetch(endpoint,{method:'POST',headers:{'content-type':'application/json','x-admin-password':password},body:'{}',cache:'no-store'});
+      const data=await r.json().catch(()=>({ok:false,error:'invalid_response'}));
+      pw.value='';
+      if(!r.ok||!data.ok)throw new Error(data.error==='unauthorized'?'كلمة مرور الإدارة غير صحيحة أو غير مخوّلة.':(data.detail||data.error||`HTTP ${r.status}`));
+      const c=data.comparison||{},counts=data.counts||{};
+      status.className='status ok';status.textContent='تم الفحص بنجاح ✅';
+      results.innerHTML=`<div class="grid"><div class="metric"><b>${esc(counts.remote??'—')}</b><span>Remote versions</span></div><div class="metric"><b>${esc(counts.local_files??'—')}</b><span>Local files</span></div><div class="metric"><b>${esc(counts.local_versions??'—')}</b><span>Local versions</span></div></div>`+
+        list('Remote فقط',c.remote_only||[],x=>`<span class="pill danger">${esc(x.version)} · ${esc(x.name)}</span>`)+
+        list('Local فقط',c.local_only||[],x=>`<span class="pill">${esc(x.version)} · ${esc(x.file)}</span>`)+
+        list('Local غير قياسي',c.local_noncanonical||[],x=>`<span class="pill warn">${esc(x.version)} · ${esc(x.file)}</span>`)+
+        list('Remote غير قياسي',c.remote_noncanonical||[],x=>`<span class="pill warn">${esc(x.version)} · ${esc(x.name)}</span>`)+
+        list('Versions مكررة محليًا',c.duplicate_local_versions||[],x=>`<span class="pill danger">${esc(x.version)} → ${esc((x.files||[]).join(' | '))}</span>`)+
+        list('Prefix collisions محليًا',c.local_prefix_collisions||[],x=>`<span class="pill warn">${esc(x.short)} → ${esc(x.long)}</span>`)+
+        list('Prefix collisions في Remote',c.remote_prefix_collisions||[],x=>`<span class="pill warn">${esc(x.short)} → ${esc(x.long)}</span>`);
+      results.hidden=false;
+    }catch(e){pw.value='';status.className='status err';status.textContent='تعذر الفحص: '+(e?.message||e);}
+    finally{run.disabled=false;}
+  });
+})();
+</script>
+</body>
+</html>
