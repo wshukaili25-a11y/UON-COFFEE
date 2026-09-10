@@ -24,3 +24,7 @@ entrypoint = "./functions/telegram-admin-modern-hotfix/index.ts"
 [functions.uon-migration-history-read-v67]
 verify_jwt = false
 entrypoint = "./functions/uon-migration-history-read-v67/index.ts"
+
+[functions.uon-release-db-v67]
+verify_jwt = false
+entrypoint = "./functions/uon-release-db-v67/index.ts"
