@@ -1,4 +1,4 @@
-import {getUonState,$} from './core.js?v=67.0.1';
+import {getUonState,$} from './core.js?v=67.0.2';
 
 const LANG_KEY='uon_language';
 const LEGACY_LANG_KEY='uon_hub_lang';
