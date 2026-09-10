@@ -20,3 +20,7 @@ entrypoint = "./functions/telegram-admin-full-hotfix/index.ts"
 [functions.telegram-admin-modern]
 verify_jwt = false
 entrypoint = "./functions/telegram-admin-modern-hotfix/index.ts"
+
+[functions.uon-migration-history-read-v67]
+verify_jwt = false
+entrypoint = "./functions/uon-migration-history-read-v67/index.ts"
