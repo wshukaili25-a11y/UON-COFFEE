@@ -4,7 +4,3 @@ enabled = false
 [functions.telegram-admin-core]
 verify_jwt = false
 entrypoint = "./functions/telegram-admin-core/index.ts"
-
-[functions.release-recovery-v67]
-verify_jwt = false
-entrypoint = "./functions/release-recovery-v67/index.ts"
