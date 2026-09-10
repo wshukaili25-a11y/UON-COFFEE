@@ -1,5 +1,18 @@
+const APP_VERSION='67.0.2';
 const SAVED_KEY='uonhub_saved_pages_v1';
 const MAX_SAVED=30;
+
+const maintenanceGuardPromise=(async()=>{
+ try{
+  const{enforceUonMaintenance,watchUonMaintenance}=await import(`./core.js?v=${APP_VERSION}`);
+  const blocked=await enforceUonMaintenance();
+  watchUonMaintenance();
+  return blocked;
+ }catch(error){
+  console.warn('Global maintenance guard unavailable',error);
+  return false;
+ }
+})();
 
 function readSaved(){
  try{return JSON.parse(localStorage.getItem(SAVED_KEY)||'[]')}catch{return []}
@@ -69,4 +82,9 @@ function createActions(){
  document.addEventListener('keydown',event=>{if(event.key==='Escape')close()});
  menu.addEventListener('click',event=>{if(event.target.closest('.uon-quick-item'))setTimeout(close,80)});
 }
-export function bootAppCapabilities(){createActions();window.UONApp={getSavedPages:readSaved,saveCurrentPage:cacheCurrentPage,removeCurrentPage}}
+export async function bootAppCapabilities(){
+ const blocked=await maintenanceGuardPromise;
+ if(blocked)return;
+ createActions();
+ window.UONApp={getSavedPages:readSaved,saveCurrentPage:cacheCurrentPage,removeCurrentPage};
+}
