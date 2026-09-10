@@ -4,3 +4,7 @@ enabled = false
 [functions.telegram-admin-core]
 verify_jwt = false
 entrypoint = "./functions/telegram-admin-core/index.ts"
+
+[functions.telegram-admin-v42]
+verify_jwt = false
+entrypoint = "./functions/telegram-admin-v42-hotfix/index.ts"
