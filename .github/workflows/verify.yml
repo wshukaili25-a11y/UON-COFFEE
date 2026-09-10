@@ -14,10 +14,12 @@ jobs:
     timeout-minutes: 5
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: '24'
+      - name: Supabase migration history audit
+        run: node scripts/audit-supabase-migrations.mjs
       - name: Verify modules and configuration
         run: npm run vercel-build
