@@ -8,3 +8,15 @@ entrypoint = "./functions/telegram-admin-core/index.ts"
 [functions.telegram-admin-v42]
 verify_jwt = false
 entrypoint = "./functions/telegram-admin-v42-hotfix/index.ts"
+
+[functions.telegram-admin]
+verify_jwt = false
+entrypoint = "./functions/telegram-admin-hotfix/index.ts"
+
+[functions.telegram-admin-full]
+verify_jwt = false
+entrypoint = "./functions/telegram-admin-full-hotfix/index.ts"
+
+[functions.telegram-admin-modern]
+verify_jwt = false
+entrypoint = "./functions/telegram-admin-modern-hotfix/index.ts"
