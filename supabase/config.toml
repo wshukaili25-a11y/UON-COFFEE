@@ -1,5 +1,5 @@
 [db.migrations]
-enabled = false
+enabled = true
 
 [functions.telegram-admin-core]
 verify_jwt = false
