@@ -1,4 +1,4 @@
-import {getUonState,$} from './core.js?v=67.0.2';
+import {getUonState,$} from './core.js?v=67.0.3';
 
 const LANG_KEY='uon_language';
 const LEGACY_LANG_KEY='uon_hub_lang';
@@ -23,7 +23,7 @@ function theme(){
 }
 function normalizeMaintenanceMessage(value){
  return String(value||'')
-  .replace(/🔜/gu,'')
+  .replace(/\s*(?:🔜|➡️?|⏩|⏭️?)\s*/gu,' ')
   .replace(/\buon\s*hub\b/gi,'UON Hub')
   .replace(/\buonhub\b/gi,'UON Hub')
   .replace(/[ \t]{2,}/g,' ')
