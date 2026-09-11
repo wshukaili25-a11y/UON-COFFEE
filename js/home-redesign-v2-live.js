@@ -3,6 +3,7 @@ import{currentAcademicPulse}from'./student-pulse.js?v=61.2.0';
 const LANG_KEY='uon_language';
 const en=localStorage.getItem(LANG_KEY)==='en';
 const t=(ar,enText)=>en?enText:ar;
+const setText=(node,value)=>{if(node&&node.textContent!==value)node.textContent=value};
 
 document.documentElement.lang=en?'en':'ar';
 document.documentElement.dir=en?'ltr':'rtl';
@@ -65,17 +66,17 @@ function refreshAcademicCard(){
  if(!card)return;
  const icon=card.querySelector('.uon-rd-academic-icon');
  const text=card.querySelector('strong');
- if(icon)icon.textContent=data.icon;
- if(text){text.textContent=data.text;text.dir=en?'ltr':'rtl'}
+ setText(icon,data.icon);
+ if(text){setText(text,data.text);text.dir=en?'ltr':'rtl'}
 }
 function normalizeHomeCards(){
  document.querySelectorAll('.uon-rd-card-featured').forEach(card=>card.classList.remove('uon-rd-card-featured'));
 }
 function refreshHomeControls(){
  const ai=document.querySelector('.uon-rd-shortcuts a[href*="assistant"]');
- if(ai)ai.textContent='🤖 UON AI';
+ setText(ai,'🤖 UON AI');
  const search=document.querySelector('#rdSearch button[type="submit"]');
- if(search)search.textContent=`🔍 ${t('بحث','Search')}`;
+ setText(search,`🔍 ${t('بحث','Search')}`);
 }
 function refreshSupportCards(){
  document.querySelectorAll('.uon-rd-support-card').forEach(card=>{
@@ -85,25 +86,26 @@ function refreshSupportCards(){
   const entry=SUPPORT_COPY.find(item=>item.match.test(current));
   if(!entry)return;
   const copy=en?entry.en:entry.ar;
-  heading.textContent=copy.name;
-  const label=card.querySelector('.uon-rd-support-label');if(label)label.textContent=copy.audience;
-  const description=card.querySelector('p');if(description)description.textContent=copy.description;
+  setText(heading,copy.name);
+  setText(card.querySelector('.uon-rd-support-label'),copy.audience);
+  setText(card.querySelector('p'),copy.description);
   card.dir=en?'ltr':'rtl';
  });
 }
 function refreshLegalNotice(){
  const note=document.querySelector('.uon-rd-note');
  if(!note)return;
- note.innerHTML=en
+ const html=en
   ?'<strong>Notice:</strong> UON Hub is an independent student project and is not officially affiliated with the University of Nizwa. All logos and names belong to their respective owners. The website aims to make student services and information easier to access.'
   :'<strong>تنبيه:</strong> UON Hub مشروع طلابي مستقل وغير تابع رسميًا لجامعة نزوى. جميع الشعارات والأسماء المستخدمة تعود لمالكيها، ويهدف الموقع إلى تسهيل وصول الطلبة إلى الخدمات والمعلومات.';
+ if(note.innerHTML!==html)note.innerHTML=html;
 }
 function refreshEnglishFooter(){
  if(!en)return;
  const footer=document.querySelector('#rdManagedFooter');if(!footer)return;
- const prayer=footer.querySelector('.uon-rd-footer-prayer');if(prayer)prayer.textContent='My Lord, increase me in knowledge';
- const credit=footer.querySelector('.uon-rd-footer-credit');if(credit)credit.textContent='Designed with love by University of Nizwa students ❤️.';
- const rights=footer.querySelector('.uon-rd-footer-rights');if(rights)rights.textContent='All rights reserved © 2026 UON Hub';
+ setText(footer.querySelector('.uon-rd-footer-prayer'),'My Lord, increase me in knowledge');
+ setText(footer.querySelector('.uon-rd-footer-credit'),'Designed with love by University of Nizwa students ❤️.');
+ setText(footer.querySelector('.uon-rd-footer-rights'),'All rights reserved © 2026 UON Hub');
  footer.dir='ltr';
 }
 function refresh(){
