@@ -21,6 +21,14 @@ function theme(){
   return current==='light'||current==='dark'?current:(legacy==='light'||legacy==='dark'?legacy:'dark');
  }catch{return'dark'}
 }
+function normalizeMaintenanceMessage(value){
+ return String(value||'')
+  .replace(/🔜/gu,'')
+  .replace(/\buon\s*hub\b/gi,'UON Hub')
+  .replace(/\buonhub\b/gi,'UON Hub')
+  .replace(/[ \t]{2,}/g,' ')
+  .trim();
+}
 function setLanguage(value){
  try{localStorage.setItem(LANG_KEY,value);localStorage.setItem(LEGACY_LANG_KEY,value)}catch{}
  applyLanguage();
@@ -58,10 +66,13 @@ function renderState(state){
  const en=language()==='en';
  const defaultAr='نعمل حاليًا على تحسين المنصة وتجهيز التحديث الجديد. بنرجع لك قريبًا بتجربة أسرع وأرتب.';
  const defaultEn="We're improving the platform and preparing the new update. We'll be back soon with a faster, cleaner experience.";
- const configuredAr=String(state.maintenance_message||'').trim();
- const configuredEn=String(state.maintenance_message_en||'').trim();
+ const configuredAr=normalizeMaintenanceMessage(state.maintenance_message);
+ const configuredEn=normalizeMaintenanceMessage(state.maintenance_message_en);
  const message=$('#message');
- if(message)message.textContent=en?(configuredEn||defaultEn):(configuredAr||defaultAr);
+ if(message){
+  message.textContent=en?(configuredEn||defaultEn):(configuredAr||defaultAr);
+  message.dir=en?'ltr':'rtl';
+ }
  const wrap=$('#maintenanceUntil'),value=$('#maintenanceUntilValue');
  const formatted=state.maintenance_until?formatReturn(state.maintenance_until):'';
  if(wrap&&value&&formatted){value.textContent=formatted;wrap.hidden=false;wrap.classList.add('show')}
