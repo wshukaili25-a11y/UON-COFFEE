@@ -48,6 +48,6 @@ const modal=$('#addModal');$('#openAdd').onclick=()=>modal.classList.add('show')
 $('#submitItem').onclick=async()=>{const title=$('#mTitle').value.trim(),phone=$('#mPhone').value.replace(/\D/g,'');if(!title||phone.length<8)return toast('أدخل عنوان الإعلان ورقم واتساب صحيح',true);const button=$('#submitItem');button.disabled=true;try{await rpc('uon_submit_marketplace_item_v2',{p_title:title,p_description:$('#mDesc').value.trim(),p_type:$('#mType').value,p_price:Number($('#mPrice').value||0),p_condition:$('#mCondition').value,p_phone:phone,p_session_id:SESSION_ID});modal.classList.remove('show');['mTitle','mDesc','mPrice','mPhone'].forEach(id=>document.getElementById(id).value='');toast('تم إرسال الإعلان للمراجعة ✅')}catch(error){toast(String(error?.message||'').includes('rate_limited')?'وصلت للحد المؤقت للإرسال، جرّب بعد شوي':'تعذر إرسال الإعلان، حاول مرة ثانية',true)}finally{button.disabled=false}};
 load();
 </script>
-<script type="module" src="/js/pwa-init.js?v=53.2.0"></script>
+<script type="module" src="/js/pwa-init.js?v=67.0.2"></script>
 </body>
 </html>
