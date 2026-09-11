@@ -164,7 +164,7 @@ let maintenanceRedirecting=false;
 
 function isReleasePreview(){
  const host=String(location.hostname||'').toLowerCase();
- return host.includes('git-redesign-uon-green-v2')||sessionStorage.getItem('uon_release_student_preview')==='1';
+ return host.includes('git-redesign-uon-green-v2');
 }
 
 export async function enforceUonMaintenance(){
