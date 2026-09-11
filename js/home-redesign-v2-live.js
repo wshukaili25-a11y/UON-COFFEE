@@ -7,6 +7,7 @@ const setText=(node,value)=>{if(node&&node.textContent!==value)node.textContent=
 
 document.documentElement.lang=en?'en':'ar';
 document.documentElement.dir=en?'ltr':'rtl';
+document.body?.setAttribute('data-language',en?'en':'ar');
 
 const ACADEMIC_TITLES={
  'فترة التسجيل الثانية':'Second registration period',
@@ -78,18 +79,27 @@ function refreshHomeControls(){
  const search=document.querySelector('#rdSearch button[type="submit"]');
  setText(search,`🔍 ${t('بحث','Search')}`);
 }
+function supportEntry(card){
+ const heading=card.querySelector('h3');
+ const paragraph=card.querySelector('p');
+ const current=`${heading?.textContent||''} ${paragraph?.textContent||''}`;
+ return SUPPORT_COPY.find(item=>item.match.test(current))||null;
+}
 function refreshSupportCards(){
  document.querySelectorAll('.uon-rd-support-card').forEach(card=>{
   const heading=card.querySelector('h3');
-  if(!heading)return;
-  const current=`${heading.textContent||''} ${card.querySelector('p')?.textContent||''}`;
-  const entry=SUPPORT_COPY.find(item=>item.match.test(current));
+  const paragraph=card.querySelector('p');
+  const entry=supportEntry(card);
+  card.dir=en?'ltr':'rtl';
+  if(heading){heading.dir='auto';heading.style.unicodeBidi='plaintext'}
+  if(paragraph){paragraph.dir='auto';paragraph.style.unicodeBidi='plaintext'}
   if(!entry)return;
   const copy=en?entry.en:entry.ar;
   setText(heading,copy.name);
   setText(card.querySelector('.uon-rd-support-label'),copy.audience);
-  setText(card.querySelector('p'),copy.description);
-  card.dir=en?'ltr':'rtl';
+  setText(paragraph,copy.description);
+  const button=card.querySelector('.uon-rd-support-actions a,.uon-rd-support-actions button');
+  setText(button,t('احجز موعدك','Book a session'));
  });
 }
 function refreshLegalNotice(){
@@ -125,6 +135,9 @@ function watchAsyncContent(){
 
 refresh();
 watchAsyncContent();
+requestAnimationFrame(refresh);
+setTimeout(refresh,150);
+setTimeout(refresh,700);
 setInterval(refreshAcademicCard,60*1000);
 window.addEventListener('focus',refresh);
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)refresh()});
