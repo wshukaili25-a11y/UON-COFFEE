@@ -1,0 +1,20 @@
+name: audit-public-auth-headers
+
+on:
+  push:
+    branches:
+      - diagnostic/public-auth-header-audit-v67
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - name: Find publishable key used as Bearer
+        shell: bash
+        run: |
+          echo '=== PUBLISHABLE KEY / AUTHORIZATION PATTERNS ==='
+          grep -RInE --exclude-dir=.git --exclude='*.map' "Authorization[^\n]{0,100}Bearer|Bearer[^\n]{0,100}(KEY|SUPABASE_KEY|sb_publishable)|sb_publishable_[A-Za-z0-9_-]+" . || true
