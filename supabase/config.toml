@@ -1,5 +1,9 @@
 [db.migrations]
-enabled = true
+enabled = false
+
+[functions.public-api-v67]
+verify_jwt = false
+entrypoint = "./functions/public-api-v67/index.ts"
 
 [functions.telegram-admin-core]
 verify_jwt = false
