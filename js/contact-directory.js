@@ -1,4 +1,4 @@
-import {rpc,esc} from './core.js?v=67.0.0';
+import {rpc,esc} from './core.js?v=67.0.2';
 
 const lang=localStorage.getItem('uon_language')==='en'?'en':'ar',en=lang==='en';
 const labels={
