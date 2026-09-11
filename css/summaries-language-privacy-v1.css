@@ -1,0 +1,14 @@
+/* UON Hub summaries: keep UI language clean and hide public popularity counters. */
+.sum-meta>span:nth-child(2),
+.sum-meta>span:nth-child(3){display:none!important}
+
+.sum-card h3,
+.sum-card .sum-desc{
+  unicode-bidi:plaintext;
+  text-align:start;
+}
+
+body[data-uon-page="summaries"][data-language="en"] .sum-card,
+body[data-uon-page="summaries"].is-english .sum-card{direction:ltr}
+
+body[data-uon-page="summaries"][data-language="ar"] .sum-card:not(.is-english){direction:rtl}
