@@ -84,7 +84,11 @@ for(let i=0;i<parsed.length;i++){
     const long=short===a?b:a;
     if(!long.version.startsWith(short.version))continue;
     const knownLegacy=short.file==='20260804_owner_session_security.sql' &&
-      (long.file==='20260804043000_reorganize_student_tools_v46.sql' || long.file==='202608040530_security_ui_cleanup.sql');
+      (
+        long.file==='20260804043000_reorganize_student_tools_v46.sql' ||
+        long.file==='20260804043100_reorganize_student_tools_v46_note.sql' ||
+        long.file==='202608040530_security_ui_cleanup.sql'
+      );
     if(knownLegacy){
       warnings.push(`Legacy mixed-version prefix collision retained: ${short.file} <-> ${long.file}`);
     }else{
