@@ -162,10 +162,15 @@ export async function getUonState(){
 let maintenanceInitialCheck=true;
 let maintenanceRedirecting=false;
 
+function isReleasePreview(){
+ const host=String(location.hostname||'').toLowerCase();
+ return host.includes('git-redesign-uon-green-v2');
+}
+
 export async function enforceUonMaintenance(){
  const isAdmin=location.pathname.endsWith('/admin.html');
  const isMaintenance=location.pathname.endsWith('/maintenance.html');
- if(isAdmin)return false;
+ if(isAdmin||isReleasePreview())return false;
 
  if(maintenanceInitialCheck && document.readyState==='loading'){
   document.documentElement.classList.add('maintenance-check');
