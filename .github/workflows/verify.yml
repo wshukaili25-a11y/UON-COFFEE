@@ -19,6 +19,8 @@ jobs:
         uses: actions/setup-node@v5
         with:
           node-version: '24'
+      - name: Assistant regression tests
+        run: node --test tests/assistant-conversation.test.mjs
       - name: Static release audit
         run: node scripts/release-audit.mjs
       - name: Supabase migration history audit
