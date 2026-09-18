@@ -24,3 +24,32 @@ test('history rejects system messages, bounds size and removes duplicate current
  assert.equal(retrievalQuestion('الدكتور محمد الكندي',h),'الدكتور محمد الكندي');
  assert.equal(rankStaff(retrievalQuestion('وين مكتبه؟',h),staff)[0].email,'verified@example.org');
 });
+
+import {intent,resolveStaff,selectionIndex,staffCard} from '../supabase/functions/uon-ai-chat-v64/conversation.mjs';
+const directory=[{id:1,full_name:'Dr. Abdullah Saif Al-Ghafri',email:'ghafri@example.org',phone:'25446415',office_location:"'''' 25"},{id:2,full_name:'Dr. Abdullah Al Hatmi',email:'hatmi@example.org',office_location:'Building 4'},{id:3,full_name:'Dr. Abdullah Sulieman Al-Kindi',email:'kindi@example.org'}];
+const choices=[{role:'user',content:'الدكتور عبدالله'},{role:'assistant',content:'أي واحد تقصد؟',staff_ids:['1','2','3']}];
+test('Omani and English ordinal corrections use the displayed candidate order',()=>{
+ for(const q of ['الثاني','لا أقصد الثاني','قصدي الثاني','second','the second','2','٢'])assert.equal(resolveStaff(q,choices,directory).rows[0].id,2,q);
+ assert.equal(selectionIndex('ما موعد الاختبار الثاني؟'),-1);
+});
+test('a missing or forged selection does not invent a person',()=>{
+ assert.equal(resolveStaff('السادس',choices,directory).needsSelection,true);
+ assert.equal(resolveStaff('الثاني',[{role:'assistant',staff_ids:['999','998']}],directory).rows.length,0);
+});
+test('multiple follow-ups retain the selected doctor and current requested field',()=>{
+ const h=[...choices,{role:'user',content:'الثاني'},{role:'assistant',content:'Dr. Abdullah Al Hatmi',staff_ids:['2']}];
+ for(const q of ['رقمه؟','وين مكتبه؟','ايميله؟','عطني رقمه'])assert.equal(resolveStaff(q,h,directory).rows[0].email,'hatmi@example.org');
+ assert.equal(resolveStaff('أقصد عبدالله الغافري',h,directory).rows[0].id,1);
+});
+test('an ambiguous follow-up asks rather than guessing a candidate',()=>{
+ const r=resolveStaff('ايميله؟',choices,directory);assert.equal(r.needsSelection,true);assert.equal(r.selected,false);assert.equal(r.rows.length,3);
+});
+test('cards omit corrupted source fields but retain valid professional contacts',()=>{
+ const card=staffCard(directory[0]);assert.equal(card.office,'');assert.equal(card.email,'ghafri@example.org');assert.equal(staffCard(directory[1]).office,'Building 4');
+});
+test('question routes preserve calculators and distinguish staff, course, dates and ordinary chat',()=>{
+ for(const [q,r] of [['احسب معدلي','gpa'],['وش اسجل الفصل الجاي','plan'],['متى اختبار تحديد المستوى','calendar'],['متطلبات INFS205','course'],['دكتور عبدالله','people'],['هلا كيفك','chat'],['لائحة الغياب','policy']])assert.equal(intent(q),r,q);
+});
+test('history carries only bounded directory identifiers, never arbitrary client metadata',()=>{
+ const h=conversationHistory([{role:'assistant',content:'names',staff_ids:[1,'2','invalid',-1],secret:'ignore'}],'next');assert.deepEqual(h[0].staff_ids,['1','2']);assert.equal(h[0].secret,undefined);
+});

@@ -3,7 +3,7 @@ export function normalize(value) {
   return String(value ?? '').normalize('NFKD').toLowerCase().replace(/[\u064b-\u065f\u0670\u0640]/g, '').replace(/[أإآ]/g, 'ا').replace(/ى/g, 'ي').replace(/ة/g, 'ه');
 }
 export function conversationHistory(input, question) {
-  const rows = (Array.isArray(input) ? input : []).slice(-12).filter(x => x && ['user', 'assistant'].includes(x.role) && typeof x.content === 'string').map(x => ({role: x.role, content: x.content.slice(0, 1800)}));
+  const rows = (Array.isArray(input) ? input : []).slice(-12).filter(x => x && ['user', 'assistant'].includes(x.role) && typeof x.content === 'string').map(x => ({role: x.role, content: x.content.slice(0, 1800), ...(x.role==='assistant'&&Array.isArray(x.staff_ids)?{staff_ids:x.staff_ids.filter(id=>Number.isSafeInteger(Number(id))&&Number(id)>0).slice(0,6).map(String)}:{})}));
   if (rows.at(-1)?.role === 'user' && rows.at(-1).content.trim() === question.trim()) rows.pop();
   return rows;
 }
@@ -43,4 +43,46 @@ export function rankStaff(question, rows) {
 export function isCasual(question) {
   const q = normalize(question).trim();
   return /^(?:هلا|هلا والله|هلا كيفك|مرحبا|السلام عليكم|وعليكم السلام|كيفك|كيف حالك|شكرا|شكرا لك|مشكور|تسلم|hi|hello|hey|thanks|thank you|how are you)[!؟?.\s]*$/.test(q) || /(?:متوتر|متوتره|قلقان|قلقانه|مضغوط|مضغوطه|طفشان|تعبان|نصيحه|تنصحني|نظم وقتي|انظم وقتي|نكتة|نكته|stressed|anxious|study tips|motivat)/.test(q);
+}
+
+export function intent(question) {
+  const q=normalize(question);
+  if (/معدل|\bgpa\b|تراكمي|فصلي/.test(q)) return 'gpa';
+  if (/خطتي|وش اسجل|ويش اسجل|الفصل القادم|الفصل الجاي|رتب.*جدول|مواد.*متبقي/.test(q)) return 'plan';
+  if (/دكتور|دكاتر|استاذ|موظف|ايميل|بريد|مكتبه|رقمه|عميد|رئيس|\bdr\b|professor|staff|email|his office|her office/.test(q)) return 'people';
+  if (/موعد|تقويم|متي|تاريخ|اختبار|اجازه|calendar|exam|semester/.test(q)) return 'calendar';
+  if (/ماده|مساق|مقرر|متطلب|\b[a-z]{2,10}\s*\d{2,4}[a-z]?\b|course|prerequisite/.test(q)) return 'course';
+  if (/لائحه|قانون|سياسه|غياب|حرمان|انسحاب|حذف|اضافه|policy|regulation/.test(q)) return 'policy';
+  if(isCasual(q))return 'chat';
+  return 'general';
+}
+export function staffFollowup(question) {
+  return /^(?:و?ايميله|و?بريده|و?رقمه|و?تخصصه|و?مكتبه|وين مكتبه|وين مكانه|عطني رقمه|عطني ايميله|عطيني رقمه|عطيني ايميله|ايميلها|رقمها|وين مكتبها|his email|her email|his phone|her phone|where is his office)[؟?!.\s]*$/i.test(normalize(question).trim());
+}
+export function selectionIndex(question) {
+  const q=normalize(question).replace(/[؟?!.،]/g,'').trim();
+  const match=q.match(/^(?:(?:لا|اقصد|قصدي|ابغي|اريد|اختار|اختيار|عطني|ايميل|رقم|مكتب|the|i mean)\s+)*(الاول|الاولي|الثاني|الثانيه|الثالث|الثالثه|الرابع|الخامس|السادس|first|second|third|fourth|fifth|sixth|[1-6١-٦])(?:\s+(?:واحد|وحده|one))?$/);
+  if(!match)return -1;
+  const groups=[['الاول','الاولي','first','1','١'],['الثاني','الثانيه','second','2','٢'],['الثالث','الثالثه','third','3','٣'],['الرابع','fourth','4','٤'],['الخامس','fifth','5','٥'],['السادس','sixth','6','٦']];
+  return groups.findIndex(g=>g.includes(match[1]));
+}
+export function resolveStaff(question, history, rows) {
+  const index=selectionIndex(question),follow=staffFollowup(question);
+  if(index>=0||follow){
+    const last=[...history].reverse().find(x=>x.role==='assistant');
+    const ids=Array.isArray(last?.staff_ids)?last.staff_ids:[];
+    // Client-supplied IDs select only from the current public, active directory.
+    const candidates=ids.map(id=>rows.find(r=>String(r.id)===String(id))).filter(Boolean);
+    if(index>=0)return {rows:candidates[index]?[candidates[index]]:[],selected:Boolean(candidates[index]),needsSelection:!candidates[index]};
+    if(candidates.length)return {rows:candidates,selected:candidates.length===1,needsSelection:candidates.length>1};
+  }
+  const q=question.replace(/^\s*(?:لا[،,]?\s*)?(?:أقصد|اقصد|قصدي)\s*/,'');
+  return {rows:rankStaff(retrievalQuestion(q,history),rows),selected:false,needsSelection:false};
+}
+export function publicField(value) {
+  const s=String(value??'').trim().slice(0,500);
+  return !s||/['�]{3,}/.test(s)||/^[.\s]+$/.test(s)?'':s;
+}
+export function staffCard(row) {
+  return {id:row.id,name:publicField(row.full_name),title:publicField(row.job_title),department:publicField(row.department),college:publicField(row.college),email:publicField(row.email),phone:publicField(row.phone),extension:publicField(row.extension),office:publicField(row.office_location),url:publicField(row.source_url)};
 }

@@ -1,6 +1,6 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.110.8';
 
-import { conversationHistory, retrievalQuestion, rankStaff, isCasual } from './conversation.mjs';
+import { conversationHistory, retrievalQuestion, rankStaff, isCasual, intent, resolveStaff, staffFollowup, selectionIndex, staffCard, publicField } from './conversation.mjs';
 
 declare const Deno: any;
 const SUPABASE_URL=Deno.env.get('SUPABASE_URL')!;
@@ -55,7 +55,7 @@ async function staffDirectory(){
   if(staffCache && Date.now()-staffCache.at<5*60*1000)return staffCache.rows;
   const rows:any[]=[];
   for(let offset=0;offset<10000;offset+=500){
-    const {data,error}=await db.from('uon_staff_directory').select('full_name,job_title,department,college,email,phone,extension,office_location,source_url,official').eq('active',true).eq('official',true).order('id').range(offset,offset+499);
+    const {data,error}=await db.from('uon_staff_directory').select('id,full_name,job_title,department,college,email,phone,extension,office_location,source_url,official').eq('active',true).eq('official',true).order('id').range(offset,offset+499);
     if(error)throw error;
     rows.push(...(data||[]));
     if(!data || data.length<500){staffCache={at:Date.now(),rows};return rows;}
@@ -63,16 +63,17 @@ async function staffDirectory(){
   throw new Error('staff_directory_incomplete');
 }
 function plainAnswer(answer:string,modeName:string,links:any[]=[],grounded=false){return{answer,links,actions:[],suggestions:[],grounded,confidence:grounded?.9:.5,sources_count:links.length,mode:modeName,used_model:false};}
-async function staffAnswer(q:string,lang:string){
-  let matches:any[];
-  try{matches=rankStaff(q,await staffDirectory())}catch(e){console.error('staff_lookup_failed');return null;}
-  if(!matches.length)return null;
-  const top=matches[0],candidates=matches.filter(x=>x.name_score===top.name_score);
+async function staffAnswer(q:string,lang:string,history:any[]){
+  let matches:any[],resolved:any;
+  try{resolved=resolveStaff(q,history,await staffDirectory());matches=resolved.rows}catch(e){console.error('staff_lookup_failed');return null;}
+  if(!matches.length){if(resolved.needsSelection)return plainAnswer(lang==='en'?'Which person do you mean? Please give me the name.':'أي شخص تقصد؟ اكتب اسمه عشان أحدده بدقة.','staff_clarification');return null;}
+  const top=matches[0],candidates=(resolved.selected?matches:matches.filter(x=>x.name_score===top.name_score)).slice(0,6);
+  const cards=candidates.map(staffCard),meta={staff_cards:cards,staff_ids:cards.map((x:any)=>String(x.id))};
   const links=candidates.slice(0,4).map(x=>({title:x.full_name,url:safeUrl(x.source_url)||'https://www.unizwa.edu.om/staff.php',official:true,type:'Staff directory'}));
-  if(candidates.length>1 || top.query_tokens<2){
-    return plainAnswer((lang==='en'?'I found these possible matches. Which person do you mean?':'حصلت هذي الأسماء المحتملة في الدليل. أي واحد تقصد؟')+'\n'+candidates.slice(0,6).map(x=>`${x.full_name}${x.department?' — '+x.department:''}`).join('\n'),'staff_clarification',links,true);
+  if(!resolved.selected&&(candidates.length>1 || top.query_tokens<2)){
+    return {...plainAnswer((lang==='en'?'I found these possible matches. Which person do you mean?':'حصلت هذي الأسماء المحتملة في الدليل. أي واحد تقصد؟')+'\n'+candidates.map((x:any,i:number)=>`${i+1}. ${x.full_name}${publicField(x.department)?' — '+publicField(x.department):''}`).join('\n'),'staff_clarification',links,true),...meta};
   }
-  const field=(v:any)=>{const t=String(v||'').trim();return /['�]{3,}/.test(t)||/^\.+$/.test(t)?'':t};
+  const field=publicField;
   const emailOnly=/ايميل|بريد|email/i.test(norm(q));
   const officeOnly=/مكتب|office/i.test(q)&&!emailOnly;
   const phoneOnly=/هاتف|رقم|تحويل|phone|extension/i.test(q)&&!emailOnly&&!officeOnly;
@@ -84,14 +85,16 @@ async function staffAnswer(q:string,lang:string){
     (!specific||phoneOnly)&&top.extension?(lang==='en'?'Extension: ':'التحويلة: ')+top.extension:'',
     (!specific||officeOnly)&&field(top.office_location)?(lang==='en'?'Office: ':'المكتب: ')+field(top.office_location):''].filter(Boolean);
   if((emailOnly&&!top.email)||(phoneOnly&&!top.phone&&!top.extension)||(officeOnly&&!field(top.office_location)))details.push(lang==='en'?'The person is listed, but I cannot verify the requested contact field.':'الشخص موجود في الدليل، لكن ما أقدر أتأكد من بيانات التواصل المطلوبة حاليًا.');
-  const intro=top.exact_name?(lang==='en'?'From the university directory:':'حسب دليل الجامعة:'):(lang==='en'?'The closest name match in the university directory is:':'أقرب تطابق للاسم في دليل الجامعة:');
-  return plainAnswer(intro+'\n'+details.join('\n'),'people',links,true);
+  const intro=(top.exact_name||resolved.selected)?(lang==='en'?'From the university directory:':'حسب دليل الجامعة:'):(lang==='en'?'The closest name match in the university directory is:':'أقرب تطابق للاسم في دليل الجامعة:');
+  return {...plainAnswer(intro+'\n'+details.join('\n'),'people',links,true),...meta};
 }
 async function gemini(q:string,lang:string,history:any[],searchQ:string){
-  const staff=await staffAnswer(searchQ,lang);
+  const route=intent(q);
+  const staff=route==='chat'||['gpa','plan','calendar','course','policy'].includes(route)?null:await staffAnswer(q,lang,history);
   if(staff)return staff;
-  if(legacySpecial(q))return null;
-  const ctx=isCasual(q)?[]:await context(searchQ);
+  if(route==='gpa'||route==='plan')return null;
+  const ctx=route==='chat'?[]:await context(searchQ);
+  if(route==='people'&&!ctx.some((x:any)=>/موظف|staff|دكتور/.test(x.type+' '+x.title)))return plainAnswer(lang==='en'?'I could not match that name in the directory. What is the full name or department?':'ما قدرت أطابق الاسم في الدليل. عطيني الاسم الكامل أو القسم، وببحث عنه بدقة.','staff_clarification');
   const unavailable=()=>plainAnswer(lang==='en'?'I could not verify an answer right now. Could you give me the full name or clarify what you need? A missing search result does not mean the person or information does not exist.':'ما قدرت أتأكد من الإجابة حاليًا. ممكن توضح طلبك أو تعطيني الاسم الكامل؟ عدم ظهور نتيجة عندي ما يعني إن الشخص أو المعلومة غير موجودة.','clarification');
   if(!GEMINI_API_KEY)return unavailable();
   let state=await modelState();
@@ -103,9 +106,21 @@ async function gemini(q:string,lang:string,history:any[],searchQ:string){
   if(!attempt.ok)return unavailable();
   await markSuccess(used);
   const links=ctx.filter((x:any)=>x.url).slice(0,4).map((x:any)=>({type:x.official?(lang==='en'?'Official source':'مصدر رسمي'):x.type,title:x.title,url:x.url,official:x.official}));
-  return{answer:attempt.text,links,actions:[],suggestions:[],visual_guide:null,grounded:ctx.length>0,confidence:ctx.length?.85:.5,sources_count:ctx.length,mode:ctx.length?mode(q):'chat',used_model:true,ai_provider:'google_gemini',ai_model:used,ai_model_version:attempt.modelVersion||undefined,connectors:{gemini:{used:true,provider:'Google Gemini',model:used,fallback,discovery:state.source}}};
+  return{answer:attempt.text,links,source_cards:ctx.filter((x:any)=>x.url).slice(0,4).map((x:any)=>({title:x.title,description:x.description.slice(0,500),url:x.url,type:x.type,official:x.official})),actions:[],suggestions:[],visual_guide:null,grounded:ctx.length>0,confidence:ctx.length?.85:.5,sources_count:ctx.length,mode:ctx.length?route:'chat',used_model:true,ai_provider:'google_gemini',ai_model:used,ai_model_version:attempt.modelVersion||undefined,connectors:{gemini:{used:true,provider:'Google Gemini',model:used,fallback,discovery:state.source}}};
 }
-async function conversation(body:any,q:string){if(!uuid(body.session_id))return null;const sid=String(body.session_id),channel=['web','instagram','telegram'].includes(body.channel)?body.channel:'web';const{data:ex}=await db.from('uon_ai_conversations').select('id').eq('session_id',sid).maybeSingle();if(ex?.id){await db.from('uon_ai_conversations').update({last_message_at:new Date().toISOString(),updated_at:new Date().toISOString()}).eq('id',ex.id);await db.from('uon_ai_messages').insert({conversation_id:ex.id,role:'user',content:q});return ex.id}const{data}=await db.from('uon_ai_conversations').insert({session_id:sid,channel,status:'ai',page_context:clean(body.page_context,240)||null,last_message_at:new Date().toISOString()}).select('id').single();if(data?.id)await db.from('uon_ai_messages').insert({conversation_id:data.id,role:'user',content:q});return data?.id||null}
+async function conversation(body:any,q:string){
+  if(!uuid(body.session_id)||!uuid(body.client_token))return null;
+  const {data:binding,error}=await db.rpc('uon_ai_bind_conversation_client',{p_session_id:body.session_id,p_client_token:body.client_token});
+  const bound=Array.isArray(binding)?binding[0]:binding;
+  if(error||!bound?.allowed)return null;
+  let cid=bound.conversation_id;
+  if(!cid){
+    const {data:created,error:insertError}=await db.from('uon_ai_conversations').insert({session_id:body.session_id,client_token_hash:await digest(body.client_token),channel:['web','instagram','telegram'].includes(body.channel)?body.channel:'web',status:'ai',page_context:clean(body.page_context,240)||null,last_message_at:new Date().toISOString()}).select('id').single();
+    if(insertError)return null;cid=created?.id;
+  }
+  if(cid){await db.from('uon_ai_messages').insert({conversation_id:cid,role:'user',content:q});await db.from('uon_ai_conversations').update({last_message_at:new Date().toISOString(),updated_at:new Date().toISOString()}).eq('id',cid);}
+  return cid||null;
+}
 async function save(cid:string|null,a:string,rid:string){if(!cid)return;await db.from('uon_ai_messages').insert({conversation_id:cid,role:'assistant',content:a,request_id:rid});await db.from('uon_ai_conversations').update({last_message_at:new Date().toISOString(),updated_at:new Date().toISOString()}).eq('id',cid)}
 async function learn(q:string,a:string,conf:number,sources:number){const n=learnNorm(q);if(!n)return;const{data}=await db.from('uon_ai_learning_patterns').select('*').eq('normalized_question',n).maybeSingle();const patch:any={sample_question:q,times_seen:Number(data?.times_seen||0)+1,last_seen_at:new Date().toISOString(),updated_at:new Date().toISOString()};if(conf>=.86&&sources>=3){patch.best_answer_preview=a.slice(0,900);patch.best_confidence=conf;patch.best_sources_count=sources}if(data)await db.from('uon_ai_learning_patterns').update(patch).eq('normalized_question',n);else await db.from('uon_ai_learning_patterns').insert({normalized_question:n,first_seen_at:new Date().toISOString(),positive_count:0,negative_count:0,...patch})}
 function googleQuery(q:string){return/جامعه نزوى|جامعة نزوى|university of nizwa|uon/i.test(q)?clean(q,220):`${clean(q,220)} near University of Nizwa Oman`}
@@ -113,4 +128,4 @@ function mapsUrl(q:string){return`https://www.google.com/maps/search/?api=1&quer
 function directionsUrl(q:string){return`https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent('University of Nizwa, Oman')}&destination=${encodeURIComponent(googleQuery(q))}`}
 async function callPlaces(q:string){if(!CONNECTOR_SECRET)return null;try{const r=await fetch(GOOGLE,{method:'POST',headers:{'content-type':'application/json','x-connector-secret':CONNECTOR_SECRET},body:JSON.stringify({query:googleQuery(q),limit:5}),signal:AbortSignal.timeout(8000)});return r.ok?await r.json():null}catch{return null}}
 function addMaps(base:any,google:any,q:string,lang:string){const links=[...(Array.isArray(base?.links)?base.links:[])];if(google?.available&&Array.isArray(google.places)&&google.places.length){const places=google.places.slice(0,5);for(const p of places)if(p.maps_url&&!links.some((x:any)=>x.url===p.maps_url))links.push({type:'Google Maps',title:p.name,url:p.maps_url,official:false,provider:'google_maps'});return{...base,links:links.slice(0,10),google_places:places.map((p:any)=>({...p,provider:'Google Maps'})),connectors:{...(base.connectors||{}),google_maps:{used:true,live:true,count:places.length,attribution:'Google Maps'}}}}const s=mapsUrl(q),d=directionsUrl(q);links.push({type:'Google Maps',title:lang==='en'?'Search in Google Maps':'البحث في Google Maps',url:s,official:false,provider:'google_maps_fallback'},{type:'Google Maps',title:lang==='en'?'Directions from University of Nizwa':'الاتجاهات من جامعة نزوى',url:d,official:false,provider:'google_maps_fallback'});return{...base,links:links.slice(0,10),connectors:{...(base.connectors||{}),google_maps:{used:false,live:false,fallback:true,attribution:'Google Maps'}}}}
-Deno.serve(async(req:Request)=>{if(req.method==='OPTIONS')return new Response(null,{status:204,headers:headers(req)});if(req.method!=='POST')return new Response(JSON.stringify({error:'method_not_allowed'}),{status:405,headers:headers(req)});try{const body=await req.json().catch(()=>({}));let rl:any;try{rl=await enforceRateLimit(req,body)}catch(e){console.error('uon-ai-rate-limit',e);return new Response(JSON.stringify({error:'rate_limit_unavailable'}),{status:503,headers:headers(req)})}if(!rl.allowed){return new Response(JSON.stringify({error:'rate_limited',retry_after:rl.retry_after}),{status:429,headers:{...headers(req),'Retry-After':String(rl.retry_after)}})}if(body.action==='gemini-health'){const s=await modelState(true);return new Response(JSON.stringify({ok:true,configured:Boolean(GEMINI_API_KEY),selected:s.selected,fallback:s.fallback,preferred:MODEL_PRIORITY[0],preferred_available:s.models.includes(MODEL_PRIORITY[0])&&!s.blocked.includes(MODEL_PRIORITY[0]),available_count:s.models.length,discovery:s.source,quarantined:s.blocked}),{status:200,headers:headers(req)})}const q=clean(body.question,800);if(body.action==='history'||body.action==='feedback'||!q){const b=await callBase(req,body);return new Response(b.text,{status:b.r.status,headers:headers(req)})}const lang=body.language==='en'?'en':'ar',p=privateIntent(q);if(p)return new Response(JSON.stringify(await privateAnswer(req,p,q,lang)),{status:200,headers:headers(req)});const history=conversationHistory(body.history,q),cq=canonical(retrievalQuestion(q,history)),useMaps=placeIntent(q)&&mode(cq)!=='people'&&!/دكتور|دكتوره|ايميل|بريد|\bdr\b|professor/i.test(norm(cq)),[g,places]=await Promise.all([gemini(q,lang,history,cq),useMaps?callPlaces(q):Promise.resolve(null)]);let result:any=g;if(!result){const b=await callBase(req,{...body,question:cq});if(!b.r.ok)return new Response(b.text,{status:b.r.status,headers:headers(req)});result=b.data;result.connectors={...(result.connectors||{}),gemini:{used:false,fallback_to_legacy:true,reason:GEMINI_API_KEY?'no_grounded_context_or_special_mode':'api_key_not_configured'}}}else{const rid=crypto.randomUUID(),cid=await conversation(body,q).catch(()=>null);result.request_id=rid;await save(cid,result.answer,rid).catch(()=>null);await learn(q,result.answer,Number(result.confidence||0),Number(result.sources_count||0)).catch(()=>null)}if(useMaps)result=addMaps(result,places,q,lang);if(cq!==q)result.resolved_question=cq;result.ai_gateway='v64.6';return new Response(JSON.stringify(result),{status:200,headers:headers(req)})}catch(e){console.error('uon-ai-chat-v64',e);return new Response(JSON.stringify({error:'assistant_unavailable'}),{status:500,headers:headers(req)})}});
+Deno.serve(async(req:Request)=>{if(req.method==='OPTIONS')return new Response(null,{status:204,headers:headers(req)});if(req.method!=='POST')return new Response(JSON.stringify({error:'method_not_allowed'}),{status:405,headers:headers(req)});try{const body=await req.json().catch(()=>({}));let rl:any;try{rl=await enforceRateLimit(req,body)}catch(e){console.error('uon-ai-rate-limit',e);return new Response(JSON.stringify({error:'rate_limit_unavailable'}),{status:503,headers:headers(req)})}if(!rl.allowed){return new Response(JSON.stringify({error:'rate_limited',retry_after:rl.retry_after}),{status:429,headers:{...headers(req),'Retry-After':String(rl.retry_after)}})}if(body.action==='gemini-health'){const s=await modelState(true);return new Response(JSON.stringify({ok:true,configured:Boolean(GEMINI_API_KEY),selected:s.selected,fallback:s.fallback,preferred:MODEL_PRIORITY[0],preferred_available:s.models.includes(MODEL_PRIORITY[0])&&!s.blocked.includes(MODEL_PRIORITY[0]),available_count:s.models.length,discovery:s.source,quarantined:s.blocked}),{status:200,headers:headers(req)})}const q=clean(body.question,800);if(body.action==='history'||body.action==='feedback'||!q){const b=await callBase(req,body);return new Response(b.text,{status:b.r.status,headers:headers(req)})}const lang=body.language==='en'?'en':'ar',p=privateIntent(q);if(p)return new Response(JSON.stringify(await privateAnswer(req,p,q,lang)),{status:200,headers:headers(req)});const history=conversationHistory(body.history,q),cq=canonical(retrievalQuestion(q,history)),useMaps=placeIntent(q)&&mode(cq)!=='people'&&!/دكتور|دكتوره|ايميل|بريد|\bdr\b|professor/i.test(norm(cq)),[g,places]=await Promise.all([gemini(q,lang,history,cq),useMaps?callPlaces(q):Promise.resolve(null)]);let result:any=g;if(!result){const b=await callBase(req,{...body,question:cq});if(!b.r.ok)return new Response(b.text,{status:b.r.status,headers:headers(req)});result=b.data;result.connectors={...(result.connectors||{}),gemini:{used:false,fallback_to_legacy:true,reason:GEMINI_API_KEY?'no_grounded_context_or_special_mode':'api_key_not_configured'}}}else{const rid=crypto.randomUUID(),cid=await conversation(body,q).catch(()=>null);result.request_id=rid;await save(cid,result.answer,rid).catch(()=>null);if(cid)await db.from('uon_ai_response_snapshots').upsert({request_id:rid,conversation_id:cid,payload:{links:result.links||[],staff_cards:result.staff_cards||[],staff_ids:result.staff_ids||[],source_cards:result.source_cards||[],mode:result.mode}},{onConflict:'request_id'});await learn(q,result.answer,Number(result.confidence||0),Number(result.sources_count||0)).catch(()=>null)}if(useMaps)result=addMaps(result,places,q,lang);if(cq!==q)result.resolved_question=cq;result.ai_gateway='v64.7';return new Response(JSON.stringify(result),{status:200,headers:headers(req)})}catch(e){console.error('uon-ai-chat-v64',e);return new Response(JSON.stringify({error:'assistant_unavailable'}),{status:500,headers:headers(req)})}});

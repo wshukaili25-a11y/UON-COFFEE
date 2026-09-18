@@ -170,7 +170,7 @@ return response};
   controller=new AbortController();
   const timer=setTimeout(()=>controller?.abort(),30000);
   try{
-   const response=await window.fetch(DIRECT_API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({question:raw,history:[...document.querySelectorAll('#chat .message:not(.typing-message)')].slice(-12).map(el=>({role:el.classList.contains('user')?'user':'assistant',content:el.querySelector('.message-content')?.textContent||''})).filter(x=>x.content),language:lang(),page_context:location.pathname,session_id:SESSION_TOKEN,client_token:CLIENT_TOKEN,channel:'web'}),cache:'no-store',signal:controller.signal});
+   const response=await window.fetch(DIRECT_API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({question:raw,history:[...document.querySelectorAll('#chat .message:not(.typing-message)')].slice(-12).map(el=>({role:el.classList.contains('user')?'user':'assistant',content:el.querySelector('.message-content')?.textContent||'',staff_ids:el.uonMeta?.staff_ids||[]})).filter(x=>x.content),language:lang(),page_context:location.pathname,session_id:SESSION_TOKEN,client_token:CLIENT_TOKEN,channel:'web'}),cache:'no-store',signal:controller.signal});
    const data=await response.json().catch(()=>({}));
    if(!response.ok||!data.answer)throw new Error(data.error||('AI HTTP '+response.status));
    if((!Array.isArray(data.google_places)||!data.google_places.length)&&isPlaceQuestion(raw)){
@@ -179,6 +179,7 @@ return response};
    }
    typing?.remove();
    const article=addMessage('bot',data.answer,data.links||[]);
+   window.UonAssistantCards?.render(article,data);
    addGooglePlaces(article,data);
    history.push({role:'assistant',content:data.answer});
   }catch(error){
@@ -205,6 +206,7 @@ return response};
   button.addEventListener('click',event=>{event.preventDefault();event.stopImmediatePropagation();void sendDirect()},true);
   form.addEventListener('submit',event=>{event.preventDefault();event.stopImmediatePropagation();void sendDirect()},true);
   input.addEventListener('keydown',event=>{if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();event.stopImmediatePropagation();void sendDirect()}},true);
+  document.addEventListener('uon-assistant-ask',event=>{if(sending||!event.detail?.question)return;input.value=String(event.detail.question).slice(0,800);void sendDirect()});
   document.querySelector('#assistantStop')?.addEventListener('click',()=>controller?.abort());
   document.querySelector('#assistantNewChat')?.addEventListener('click',()=>{history.length=0});
  }

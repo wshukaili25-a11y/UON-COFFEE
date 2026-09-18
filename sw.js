@@ -6,6 +6,7 @@ const USER_SAVED_CACHE = 'uonhub-user-saved-v1';
 const OFFLINE_URL = '/offline.html';
 
 const PRECACHE = [
+  '/js/assistant-cards.js','/css/assistant-cards.css',
   '/index.html','/tools.html','/useful-sites.html','/schedule.html','/tasks.html','/study-focus.html','/user-dashboard.html','/assistant.html','/google-connect.html',
   '/groups.html','/summaries.html','/gpa.html','/university-guide.html','/notifications.html','/academic-calendar.html','/search.html','/go.html','/support-centers.html','/maintenance.html',
   '/questions.html','/marketplace.html','/courses.html','/status.html','/rights.html',
