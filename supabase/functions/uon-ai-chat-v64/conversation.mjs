@@ -86,3 +86,14 @@ export function publicField(value) {
 export function staffCard(row) {
   return {id:row.id,name:publicField(row.full_name),title:publicField(row.job_title),department:publicField(row.department),college:publicField(row.college),email:publicField(row.email),phone:publicField(row.phone),extension:publicField(row.extension),office:publicField(row.office_location),url:publicField(row.source_url)};
 }
+
+export function relevantContext(question, rows) {
+  const verified=rows.filter(x=>!/غير معتمده|غير معتمد|unverified|not yet approved/i.test(normalize(x.description)));
+  const codes=String(question).toUpperCase().match(/\b[A-Z]{2,10}[ -]*\d{2,4}[A-Z]?\b/g)||[];
+  if(!codes.length)return verified;
+  const normalized=codes.map(x=>x.replace(/[ -]/g,''));
+  return verified.filter(row=>{
+    const found=String(row.title+' '+row.description).toUpperCase().match(/\b[A-Z]{2,10}[ -]*\d{2,4}[A-Z]?\b/g)||[];
+    return found.some(code=>normalized.includes(code.replace(/[ -]/g,'')));
+  });
+}

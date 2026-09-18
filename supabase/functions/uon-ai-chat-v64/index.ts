@@ -1,6 +1,6 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.110.8';
 
-import { conversationHistory, retrievalQuestion, rankStaff, isCasual, intent, resolveStaff, staffFollowup, selectionIndex, staffCard, publicField } from './conversation.mjs';
+import { conversationHistory, retrievalQuestion, rankStaff, isCasual, intent, resolveStaff, staffFollowup, selectionIndex, staffCard, publicField, relevantContext } from './conversation.mjs';
 
 declare const Deno: any;
 const SUPABASE_URL=Deno.env.get('SUPABASE_URL')!;
@@ -93,7 +93,7 @@ async function gemini(q:string,lang:string,history:any[],searchQ:string){
   const staff=route==='chat'||['gpa','plan','calendar','course','policy'].includes(route)?null:await staffAnswer(q,lang,history);
   if(staff)return staff;
   if(route==='gpa'||route==='plan')return null;
-  const ctx=route==='chat'?[]:await context(searchQ);
+  const ctx=route==='chat'?[]:relevantContext(searchQ,await context(searchQ));
   if(route==='people'&&!ctx.some((x:any)=>/موظف|staff|دكتور/.test(x.type+' '+x.title)))return plainAnswer(lang==='en'?'I could not match that name in the directory. What is the full name or department?':'ما قدرت أطابق الاسم في الدليل. عطيني الاسم الكامل أو القسم، وببحث عنه بدقة.','staff_clarification');
   const unavailable=()=>plainAnswer(lang==='en'?'I could not verify an answer right now. Could you give me the full name or clarify what you need? A missing search result does not mean the person or information does not exist.':'ما قدرت أتأكد من الإجابة حاليًا. ممكن توضح طلبك أو تعطيني الاسم الكامل؟ عدم ظهور نتيجة عندي ما يعني إن الشخص أو المعلومة غير موجودة.','clarification');
   if(!GEMINI_API_KEY)return unavailable();

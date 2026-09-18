@@ -181,6 +181,7 @@ return response};
    const article=addMessage('bot',data.answer,data.links||[]);
    window.UonAssistantCards?.render(article,data);
    addGooglePlaces(article,data);
+   const chat=document.querySelector('#chat');if(chat)chat.scrollTop=chat.scrollHeight;
    history.push({role:'assistant',content:data.answer});
   }catch(error){
    typing?.remove();

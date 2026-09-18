@@ -53,3 +53,10 @@ test('question routes preserve calculators and distinguish staff, course, dates 
 test('history carries only bounded directory identifiers, never arbitrary client metadata',()=>{
  const h=conversationHistory([{role:'assistant',content:'names',staff_ids:[1,'2','invalid',-1],secret:'ignore'}],'next');assert.deepEqual(h[0].staff_ids,['1','2']);assert.equal(h[0].secret,undefined);
 });
+import {relevantContext} from '../supabase/functions/uon-ai-chat-v64/conversation.mjs';
+test('course facts exclude other course codes and unapproved OCR records',()=>{
+ const rows=[{title:'INFS205 — Security',description:'confirmed'},{title:'INFS201 — Business',description:'confirmed'},{title:'INFS205 — section 2',description:'بيانات غير معتمدة بعد'}];
+ assert.deepEqual(relevantContext('وش مادة INFS205؟',rows),[rows[0]]);
+ assert.deepEqual(relevantContext('INFS-205',rows),[rows[0]]);
+ assert.deepEqual(relevantContext('INFS999',rows),[]);
+});
