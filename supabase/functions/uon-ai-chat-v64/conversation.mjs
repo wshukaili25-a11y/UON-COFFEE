@@ -40,6 +40,20 @@ export function rankStaff(question, rows, fuzzy = true) {
   return /دكتور|دكتوره|\bdr\b|doctor|professor/.test(normalize(question)) && doctors.length ? doctors : ranked;
 }
 
+export function greetingReply(question, lang = 'ar') {
+  const q = normalize(question).replace(/[!؟?.,،\s]+$/g,'').trim();
+  const groups = [
+    [/^(?:حياك|حياك الله|الله يحييك|حيالله|يا هلا|هلا|هلا والله|مرحبا|مرحبتين|hi|hello|hey)$/, 'الله يحييك! كيف أقدر أساعدك؟', 'Hello! How can I help?'],
+    [/^(?:السلام عليكم|وعليكم السلام)$/, 'وعليكم السلام ورحمة الله! كيف أقدر أساعدك؟', 'Peace be upon you! How can I help?'],
+    [/^(?:صباح الخير|صباح النور)$/, 'صباح النور! كيف أقدر أساعدك؟', 'Good morning! How can I help?'],
+    [/^(?:مساء الخير|مساء النور)$/, 'مساء النور! كيف أقدر أساعدك؟', 'Good evening! How can I help?'],
+    [/^(?:هلا كيفك|كيفك|كيف حالك|شخبارك|وش اخبارك|كيف امورك|how are you)$/, 'هلا فيك! جاهز أساعدك، شخبارك أنت؟', 'Hello! Ready to help. How are you?'],
+    [/^(?:شكرا|شكرا لك|مشكور|تسلم|يعطيك العافيه|thanks|thank you)$/, 'العفو، حاضرين!', 'You’re welcome!'],
+    [/^(?:مع السلامه|باي|bye)$/, 'في أمان الله!', 'Goodbye!']
+  ];
+  const match = groups.find(([pattern]) => pattern.test(q));
+  return match ? match[lang === 'en' ? 2 : 1] : null;
+}
 export function isCasual(question) {
   const q = normalize(question).trim();
   return /^(?:حياك|حياك الله|الله يحييك|حيالله|يا هلا|هلا|هلا والله|هلا كيفك|مرحبا|مرحبتين|صباح الخير|صباح النور|مساء الخير|مساء النور|شخبارك|وش اخبارك|كيف امورك|تمام|زين|اوكي|مع السلامه|باي|العفو|يعطيك العافيه|الله يعافيك|السلام عليكم|وعليكم السلام|كيفك|كيف حالك|شكرا|شكرا لك|مشكور|تسلم|hi|hello|hey|thanks|thank you|how are you)[!؟?.\s]*$/.test(q) || /(?:متوتر|متوتره|قلقان|قلقانه|مضغوط|مضغوطه|طفشان|تعبان|نصيحه|تنصحني|نظم وقتي|انظم وقتي|نكتة|نكته|stressed|anxious|study tips|motivat)/.test(q);

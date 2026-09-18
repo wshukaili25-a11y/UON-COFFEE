@@ -78,3 +78,10 @@ test('fuzzy matching requires staff intent or a name correction in staff context
  assert.equal(resolveStaff('Abdullah Saif Al-Ghafri',[],directory).rows[0].id,1);
  assert.deepEqual(resolveStaff('Haq',[],collisionDirectory).rows,[]);
 });
+
+import {greetingReply} from '../supabase/functions/uon-ai-chat-v64/conversation.mjs';
+test('simple greetings respond without model availability, mixed requests still use routing',()=>{
+ for(const q of ['حياك','حياك الله!','شخبارك','السلام عليكم','شكراً']) assert.ok(greetingReply(q),q);
+ for(const q of ['هلا عطني ايميل الدكتور عبدالله','مرحبا متى التسجيل؟','أنا متوتر']) assert.equal(greetingReply(q),null,q);
+ assert.match(greetingReply('hello','en'),/Hello/);
+});
