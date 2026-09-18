@@ -23,7 +23,7 @@ function phonetic(value) {
   s = [...s].map(c => arabic[c] ?? c).join('').replace(/kh/g,'h').replace(/gh/g,'g').replace(/sh/g,'s').replace(/th/g,'t').replace(/dh/g,'d').replace(/q/g,'k');
   return s.replace(/[aeiouwy]/g, '').replace(/(.)\1+/g, '$1');
 }
-export function rankStaff(question, rows) {
+export function rankStaff(question, rows, fuzzy = true) {
   const tokens = nameTokens(question);
   if (!tokens.length || tokens.length > 6) return [];
   const unique = [...new Map(rows.map(row => [nameTokens(row.full_name).join(' '), row])).values()];
@@ -32,7 +32,7 @@ export function rankStaff(question, rows) {
     let exact = 0, matched = 0;
     for (const token of tokens) {
       if (names.includes(token)) { exact++; matched++; }
-      else if (phonetic(token).length >= 2 && names.some(n => phonetic(n) === phonetic(token))) matched++;
+      else if (fuzzy && phonetic(token).length >= 2 && names.some(n => phonetic(n) === phonetic(token))) matched++;
     }
     return {...row, name_score: exact * 3 + (matched - exact) * 2, exact_name: exact === tokens.length, query_tokens: tokens.length, matched};
   }).filter(row => row.matched === tokens.length).sort((a,b) => b.name_score-a.name_score || a.full_name.localeCompare(b.full_name));
@@ -42,7 +42,7 @@ export function rankStaff(question, rows) {
 
 export function isCasual(question) {
   const q = normalize(question).trim();
-  return /^(?:هلا|هلا والله|هلا كيفك|مرحبا|السلام عليكم|وعليكم السلام|كيفك|كيف حالك|شكرا|شكرا لك|مشكور|تسلم|hi|hello|hey|thanks|thank you|how are you)[!؟?.\s]*$/.test(q) || /(?:متوتر|متوتره|قلقان|قلقانه|مضغوط|مضغوطه|طفشان|تعبان|نصيحه|تنصحني|نظم وقتي|انظم وقتي|نكتة|نكته|stressed|anxious|study tips|motivat)/.test(q);
+  return /^(?:حياك|حياك الله|الله يحييك|حيالله|يا هلا|هلا|هلا والله|هلا كيفك|مرحبا|مرحبتين|صباح الخير|صباح النور|مساء الخير|مساء النور|شخبارك|وش اخبارك|كيف امورك|تمام|زين|اوكي|مع السلامه|باي|العفو|يعطيك العافيه|الله يعافيك|السلام عليكم|وعليكم السلام|كيفك|كيف حالك|شكرا|شكرا لك|مشكور|تسلم|hi|hello|hey|thanks|thank you|how are you)[!؟?.\s]*$/.test(q) || /(?:متوتر|متوتره|قلقان|قلقانه|مضغوط|مضغوطه|طفشان|تعبان|نصيحه|تنصحني|نظم وقتي|انظم وقتي|نكتة|نكته|stressed|anxious|study tips|motivat)/.test(q);
 }
 
 export function intent(question) {
@@ -66,7 +66,20 @@ export function selectionIndex(question) {
   const groups=[['الاول','الاولي','first','1','١'],['الثاني','الثانيه','second','2','٢'],['الثالث','الثالثه','third','3','٣'],['الرابع','fourth','4','٤'],['الخامس','fifth','5','٥'],['السادس','sixth','6','٦']];
   return groups.findIndex(g=>g.includes(match[1]));
 }
+export function staffLookupMode(question, history = []) {
+  const route = intent(question);
+  if (['chat','gpa','plan','calendar','course','policy'].includes(route)) return null;
+  const last = [...history].reverse().find(x => x.role === 'assistant');
+  const hasStaff = Array.isArray(last?.staff_ids) && last.staff_ids.length > 0;
+  if (hasStaff && (selectionIndex(question) >= 0 || staffFollowup(question) || /^(?:لا[،,]?\s*)?(?:أقصد|اقصد|قصدي)\s/.test(question.trim()))) return 'context';
+  if (route === 'people') return 'explicit';
+  const tokens = nameTokens(question);
+  // No phonetic search for bare ordinary text, even if it resembles a surname.
+  return tokens.length >= 2 && tokens.length <= 6 ? 'exact' : null;
+}
 export function resolveStaff(question, history, rows) {
+  const lookup = staffLookupMode(question, history);
+  if (!lookup) return {rows:[],selected:false,needsSelection:false};
   const index=selectionIndex(question),follow=staffFollowup(question);
   if(index>=0||follow){
     const last=[...history].reverse().find(x=>x.role==='assistant');
@@ -76,8 +89,8 @@ export function resolveStaff(question, history, rows) {
     if(index>=0)return {rows:candidates[index]?[candidates[index]]:[],selected:Boolean(candidates[index]),needsSelection:!candidates[index]};
     if(candidates.length)return {rows:candidates,selected:candidates.length===1,needsSelection:candidates.length>1};
   }
-  const q=question.replace(/^\s*(?:لا[،,]?\s*)?(?:أقصد|اقصد|قصدي)\s*/,'');
-  return {rows:rankStaff(retrievalQuestion(q,history),rows),selected:false,needsSelection:false};
+  const q=question.replace(/^\s*(?:هلا(?: والله)?|مرحبا|حياك(?: الله)?|السلام عليكم|hi|hello)[،,!\s]+/i,'').replace(/^\s*(?:لا[،,]?\s*)?(?:أقصد|اقصد|قصدي)\s*/,'');
+  return {rows:rankStaff(retrievalQuestion(q,history),rows,lookup !== 'exact'),selected:false,needsSelection:false};
 }
 export function publicField(value) {
   const s=String(value??'').trim().slice(0,500);

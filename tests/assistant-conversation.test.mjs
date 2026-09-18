@@ -60,3 +60,21 @@ test('course facts exclude other course codes and unapproved OCR records',()=>{
  assert.deepEqual(relevantContext('INFS-205',rows),[rows[0]]);
  assert.deepEqual(relevantContext('INFS999',rows),[]);
 });
+
+import {staffLookupMode} from '../supabase/functions/uon-ai-chat-v64/conversation.mjs';
+const collisionDirectory=[...directory,{id:415,full_name:'Dr.Quazi Mohammad Imranul Haq'}];
+test('reported حياك regression and ordinary messages never resolve to a phonetic staff match',()=>{
+ assert.equal(rankStaff('حياك',collisionDirectory)[0].id,415,'fixture reproduces the original collision');
+ for(const q of ['حياك','حياك الله','الله يحييك','هلا والله','مرحبتين','صباح الخير','مساء النور','شخبارك','كيف امورك','تمام','زين','اوكي','يعطيك العافية','مشكور','مع السلامة','حق','حياك يا صاحبي','hello','thanks']) {
+  for (const h of [[],choices]) assert.deepEqual(resolveStaff(q,h,collisionDirectory).rows,[],q);
+ }
+ assert.equal(staffLookupMode('حياك',choices),null);
+});
+test('fuzzy matching requires staff intent or a name correction in staff context',()=>{
+ assert.deepEqual(resolveStaff('عبدالله الغافري',[],directory).rows,[]);
+ assert.equal(resolveStaff('دكتور عبدالله الغافري',[],directory).rows[0].id,1);
+ assert.equal(resolveStaff('هلا عطني ايميل الدكتور عبدالله الغافري',[],directory).rows[0].id,1);
+ assert.equal(resolveStaff('أقصد عبدالله الغافري',choices,directory).rows[0].id,1);
+ assert.equal(resolveStaff('Abdullah Saif Al-Ghafri',[],directory).rows[0].id,1);
+ assert.deepEqual(resolveStaff('Haq',[],collisionDirectory).rows,[]);
+});
