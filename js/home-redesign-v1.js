@@ -68,8 +68,11 @@ function supportCard(center){
  const booking=safeHref(center.booking_url,'support-centers.html');
  const isAnjiz=String(center.name||'').includes('أنجز');
  const icon=center.icon||(isAnjiz?'🚀':'🎓');
- const audience=center.audience||(isAnjiz?t('لطلاب السنة التأسيسية','Foundation students'):t('لطلاب التخصص','Major students'));
- return`<article class="uon-rd-support-card ${isAnjiz?'anjiz':'masalik'}"><div class="uon-rd-support-top"><span class="uon-rd-support-label">${esc(audience)}</span><span class="uon-rd-support-icon">${icon}</span></div><h3>${esc(center.name)}</h3><p>${esc(center.description||t('دعم أكاديمي متاح لطلبة جامعة نزوى.','Academic support for University of Nizwa students.'))}</p><div class="uon-rd-support-actions"><a class="uon-rd-btn primary" href="${esc(booking)}" target="_blank" rel="noopener noreferrer">${t('احجز موعدك','Book a session')}</a></div></article>`;
+ const isMasalik=/مسالك|learning pathways/i.test(String(center.name||''));
+ const audience=en?(isAnjiz?'Foundation students':isMasalik?'Major students':center.audience||'Students'):(center.audience||(isAnjiz?'لطلاب السنة التأسيسية':'لطلاب التخصص'));
+ const name=en?(isAnjiz?'Anjiz Center':isMasalik?'Learning Pathways Enhancement Center':center.name):center.name;
+ const description=en?(isAnjiz?'Support for foundation-year students in English, mathematics, computing, and study skills.':isMasalik?'Academic support sessions and small workshops for major students in foundational courses.':center.description):center.description;
+ return`<article class="uon-rd-support-card ${isAnjiz?'anjiz':'masalik'}"><div class="uon-rd-support-top"><span class="uon-rd-support-label">${esc(audience)}</span><span class="uon-rd-support-icon">${icon}</span></div><h3>${esc(name)}</h3><p>${esc(description||t('دعم أكاديمي متاح لطلبة جامعة نزوى.','Academic support for University of Nizwa students.'))}</p><div class="uon-rd-support-actions"><a class="uon-rd-btn primary" href="${esc(booking)}" target="_blank" rel="noopener noreferrer">${t('احجز موعدك','Book a session')}</a></div></article>`;
 }
 function normalizeFooterValue(value,fallback=''){
  if(typeof value==='string')return value.trim()||fallback;
