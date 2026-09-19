@@ -14,3 +14,15 @@ body.schedule-redesign{background:radial-gradient(circle at 80% 0,rgba(24,159,99
 @media(max-width:760px){.schedule-app{padding-top:28px}.schedule-top{align-items:stretch;flex-direction:column;gap:20px}.schedule-primary-actions{display:grid;grid-template-columns:1fr 1fr}.schedule-toolbar{display:grid;grid-template-columns:1fr auto;gap:10px}.schedule-profile-control{min-width:0}.schedule-quick-stats{grid-column:1/-1;display:grid;grid-template-columns:repeat(3,1fr);width:100%}.schedule-quick-stats span{justify-content:center;padding:7px 4px}.schedule-sync-state{display:none}.schedule-actions-menu{grid-column:2;grid-row:1}.schedule-redesign-tabs{gap:5px;overflow:auto}.schedule-redesign-tabs button{min-width:62px;display:grid;gap:2px;font-size:.77rem}.schedule-redesign-tabs button.today:after{display:none}.schedule-redesign .schedule-day-events{grid-template-columns:1fr}.schedule-insight-body{grid-template-columns:1fr}.eduwave-head{padding:0 34px}.eduwave-steps span b{display:none}.eduwave-preview{grid-template-columns:repeat(2,1fr)}.eduwave-guide ol{padding-inline-start:34px}.eduwave-course-fields,.eduwave-proposal-list{grid-template-columns:1fr}.schedule-brand-logo{width:40px;height:40px}}
 @media(max-width:430px){.schedule-primary-actions{grid-template-columns:1fr}.schedule-empty-cta>div{display:grid}.schedule-title-block h1{font-size:2.65rem}.schedule-redesign-tabs{margin-inline:-8px;padding-inline:8px}.schedule-redesign .schedule-event-actions,.schedule-redesign .schedule-event-actions.three-actions{grid-template-columns:repeat(2,1fr)}}
 @media print{.schedule-toolbar,.schedule-redesign-tabs,.schedule-insights-card,.schedule-top,.site-header,.site-footer,.uon-independent-notice{display:none!important}.schedule-redesign .schedule-day{display:block!important}.schedule-redesign .schedule-week{display:grid!important;grid-template-columns:repeat(5,1fr)!important}}
+
+/* Upload/review controls remain usable at phone widths. */
+.eduwave-file span{inset:auto 0 0;pointer-events:none;padding:7px}
+.eduwave-file button{width:44px;height:44px;z-index:2;font-size:22px}
+.eduwave-analysis-status{line-height:1.7;overflow-wrap:anywhere;color:var(--schedule-mint)}
+.eduwave-warning{color:#f5c879;font-size:.85rem;line-height:1.7}
+.eduwave-section-row:has(input:disabled){cursor:default;border-style:dashed}
+.eduwave-section-row>span{min-width:0;overflow-wrap:anywhere}
+#cancelEduwaveAnalysis{width:100%;min-height:44px;margin-top:10px}
+#cancelEduwaveAnalysis[hidden]{display:none}
+.eduwave-dropzone:focus-visible{outline:3px solid var(--schedule-mint);outline-offset:3px}
+@media(max-width:430px){.eduwave-section-row{grid-template-columns:24px minmax(0,1fr);padding:10px}.eduwave-section-row em{grid-column:2}.eduwave-flow-actions .btn{min-height:48px;white-space:normal}.eduwave-course-fields input{width:100%;min-width:0}.schedule-modal{max-height:calc(100dvh - 16px);max-height:calc(100svh - 16px)}.eduwave-head{padding-inline:28px 0}.eduwave-head h2{font-size:1.5rem;line-height:1.5}}
