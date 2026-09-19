@@ -1,4 +1,5 @@
 import { setupNav,enforceUonMaintenance,watchUonMaintenance,$,get,notifyPending,toast,fillCollege,esc,openModal,closeModal,rpc } from './core.js?v=26.1';
+import{courseHref}from'./student-workspace.js?v=68.0.0';
 setupNav(); await enforceUonMaintenance(); watchUonMaintenance();
 
 const LANG_KEY='uon_language',LEGACY_LANG_KEY='uon_hub_lang';
@@ -51,9 +52,10 @@ function render(){
  const query=(searchInput?.value||'').trim().toLowerCase(),college=collegeFilter?.value||'';
  const filtered=rows.filter(item=>(!college||item.college===college)&&`${item.subject||''} ${item.course_code||''} ${item.college||''}`.toLowerCase().includes(query));
  if(!itemsContainer)return;
- itemsContainer.innerHTML=filtered.length?filtered.map(item=>`<article class="simple-group-card"><div class="simple-group-head"><span class="wa-logo-wrap">${whatsappLogo}</span><span class="badge">${esc(collegeLabel(item.college||t('مجموعة','Group')))}</span></div><div><h3>${esc(item.subject||t('مجموعة واتساب','WhatsApp group'))}</h3><p>${esc(item.course_code||'')}</p></div><a class="whatsapp-join-button" target="_blank" rel="noopener" href="${esc(item.link)}">${whatsappLogo}<span>${t('دخول المجموعة','Join group')}</span></a></article>`).join(''):`<div class="group-empty">${t('لا توجد مجموعات مطابقة حاليًا','No matching groups right now')}</div>`;
+ itemsContainer.innerHTML=filtered.length?filtered.map(item=>`<article class="simple-group-card"><div class="simple-group-head"><span class="wa-logo-wrap">${whatsappLogo}</span><span class="badge">${esc(collegeLabel(item.college||t('مجموعة','Group')))}</span></div><div><h3>${esc(item.subject||t('مجموعة واتساب','WhatsApp group'))}</h3><p>${courseHref(item.course_code)?`<a href="${courseHref(item.course_code)}">${esc(item.course_code)} · ${t('صفحة المادة','Course hub')} ↗</a>`:esc(item.course_code||'')}</p></div><a class="whatsapp-join-button" target="_blank" rel="noopener" href="${esc(item.link)}">${whatsappLogo}<span>${t('دخول المجموعة','Join group')}</span></a></article>`).join(''):`<div class="group-empty">${t('لا توجد مجموعات مطابقة حاليًا','No matching groups right now')}</div>`;
 }
 
+if(searchInput)searchInput.value=new URLSearchParams(location.search).get('q')||'';
 searchInput?.addEventListener('input',render);
 collegeFilter?.addEventListener('change',render);
 $('#clearGroupFilters')?.addEventListener('click',()=>{if(searchInput)searchInput.value='';if(collegeFilter)collegeFilter.value='';render()});

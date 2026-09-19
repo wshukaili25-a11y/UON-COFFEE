@@ -9,6 +9,10 @@ export function conversationHistory(input, question) {
 }
 export function retrievalQuestion(question, history) {
   const q = normalize(question);
+  if (/^(?:و?الرابط|عطني الرابط|عطيني الرابط|اريد الرابط|الرابط الرسمي|وين احصله|كيف احجز|the link|booking link|send (?:me )?the link)[؟?!.\s]*$/.test(q.trim())) {
+    const previous = [...history].reverse().find(x => x.role === 'user' && !/^(?:و?الرابط|عطني الرابط|عطيني الرابط|the link)[؟?!.\s]*$/.test(normalize(x.content).trim()));
+    return previous ? `${previous.content.slice(0, 500)} — ${question}` : question;
+  }
   if (!/^(?:و?ايميله|و?بريده|و?رقمه|و?تخصصه|و?مكتبه|وين مكتبه|وين مكانه|وش اسمه|ما اسمه|ومتي|متي يبدا|وضح اكثر|اشرح اكثر|كم مدته|وش شروطه|و?ايميلها|وين مكتبها|his email|her email|his office|her office|where is his office|tell me more)[؟?!.\s]*$/.test(q.trim())) return question;
   const previous = [...history].reverse().find(x => x.role === 'user' && !/^(?:و?ايميله|و?رقمه|وين مكتبه|وضح اكثر)[؟?!.\s]*$/.test(normalize(x.content)));
   return previous ? `${previous.content.slice(0, 500)} — ${question}` : question;
@@ -115,12 +119,43 @@ export function staffCard(row) {
 }
 
 export function relevantContext(question, rows) {
-  const verified=rows.filter(x=>!/غير معتمده|غير معتمد|unverified|not yet approved/i.test(normalize(x.description)));
+  // Scores from buildings, OCR schedules and knowledge search use different
+  // scales. Check relevance before applying any result limit or score cutoff.
+  const verified=rows.filter(x=>!/غير معتمده|غير معتمد|unverified|not yet approved/i.test(normalize(x.description)) && !/ذاكره UON AI|ذاكره uon ai|learning.pattern|ai memory/i.test(normalize(x.type)));
   const codes=String(question).toUpperCase().match(/\b[A-Z]{2,10}[ -]*\d{2,4}[A-Z]?\b/g)||[];
-  if(!codes.length)return verified;
-  const normalized=codes.map(x=>x.replace(/[ -]/g,''));
-  return verified.filter(row=>{
-    const found=String(row.title+' '+row.description).toUpperCase().match(/\b[A-Z]{2,10}[ -]*\d{2,4}[A-Z]?\b/g)||[];
-    return found.some(code=>normalized.includes(code.replace(/[ -]/g,'')));
-  });
+  if(codes.length){
+    const normalized=codes.map(x=>x.replace(/[ -]/g,''));
+    return verified.filter(row=>{
+      const found=String(row.title+' '+row.description).toUpperCase().match(/\b[A-Z]{2,10}[ -]*\d{2,4}[A-Z]?\b/g)||[];
+      return found.some(code=>normalized.includes(code.replace(/[ -]/g,'')));
+    });
+  }
+  const q=normalize(question),topic=serviceTopic(q);
+  const tokens=searchTokens(q);
+  if(!tokens.length&&!topic)return [];
+  return verified.map(row=>{
+    const title=normalize(row.title),body=normalize(row.description),text=`${title} ${body}`;
+    if(topic && serviceTopic(text)!==topic)return null;
+    // Shared course data must never become the student's schedule or crowd out
+    // a booking, placement, contact or policy answer.
+    if(/eduwave|بيانات شعب/.test(normalize(row.type)) && !tokens.some(token=>title.includes(token) && token.length>=4))return null;
+    const titleTerms=searchTokens(title),bodyTerms=searchTokens(body);
+    const match=(term,list)=>list.some(word=>word===term || (term.length>=4 && (word.startsWith(term)||term.startsWith(word))));
+    const titleHits=tokens.filter(term=>match(term,titleTerms)).length;
+    const bodyHits=tokens.filter(term=>match(term,bodyTerms)).length;
+    if(!topic&&!titleHits&&bodyHits<Math.min(2,tokens.length))return null;
+    return {...row,relevance:(topic?30:0)+titleHits*6+bodyHits+(row.official?2:0)};
+  }).filter(Boolean).sort((a,b)=>b.relevance-a.relevance);
+}
+
+const searchStop=new Set(normalize('هلا مرحبا السلام عليكم كيف وين اين متى وش ويش ايش ما هو هي هل في من عن على الي الى لي لنا انا عندك عندي اريد ابغي ابي ممكن لو سمحت عطني عطيني اعطني احصل اعرف جامعه الجامعه نزوى رابط الرابط الرسمي رسمي تفاصيل معلومات موعد قاعه حجز مركز the a an to of for in at on and or please tell me my how what where when can could i you university nizwa official link details center centre').split(/\s+/));
+export function searchTokens(value){
+  return [...new Set(normalize(value).replace(/[^\p{L}\p{N}\s]/gu,' ').split(/\s+/).map(word=>word.replace(/^ال(?=.{3})/,'')).filter(word=>word.length>1&&!searchStop.has(word)&&!searchStop.has('ال'+word)))];
+}
+export function serviceTopic(value){
+  const q=normalize(value);
+  if(/تحديد\s*(?:ال)?مستوي|placement\s*(?:test|exam)|linguaskill/.test(q))return 'placement';
+  if(/انجز|انجاز|anj[ai]z|anjaz|an\s*jiz/.test(q))return 'anjiz';
+  if(/مسالك|learning pathways/.test(q))return 'masalik';
+  return '';
 }

@@ -1,0 +1,40 @@
+/* A shared, compact navigation for the student workspace. */
+.uon-student-dock{display:none}
+:where(a,button,input,select):focus-visible{outline:3px solid #37b879;outline-offset:4px}
+.course-back{display:inline-flex;gap:8px;margin-bottom:16px;text-decoration:none;font-weight:700}
+.course-workspace-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:20px}
+.course-week{display:grid;gap:9px;margin:16px 0}
+.course-week-row{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;padding:12px 14px;border:1px solid var(--cw-border);border-radius:12px}
+.course-week-row small{display:block;margin-top:5px;color:var(--cw-muted)}
+.course-hub-shortcuts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.course-hub-shortcuts button{text-align:start;cursor:pointer;border:1px solid var(--cw-border);border-radius:14px;background:var(--cw-surface);padding:18px;color:var(--cw-text);font:inherit}
+.course-hub-shortcuts strong{display:block;font-size:1.6rem;color:var(--cw-accent);margin-bottom:6px}
+.course-hub-shortcuts button:hover{border-color:var(--cw-accent)}
+.course-ai-link{display:flex;align-items:center;justify-content:space-between;gap:12px;text-decoration:none}
+.course-ai-link strong{display:block;margin:8px 0}.course-ai-link p{margin:0}
+body[data-uon-page="course"],body[data-uon-page="courses"]{--cw-bg:#f5f9f6;--cw-surface:#fff;--cw-text:#163426;--cw-muted:#526d5d;--cw-border:#d9e6dd;--cw-accent:#087844;background:var(--cw-bg);color:var(--cw-text)}
+html[data-theme="dark"] body[data-uon-page="course"],html[data-theme="dark"] body[data-uon-page="courses"]{--cw-bg:#06100c;--cw-surface:#0d1c14;--cw-text:#edf7f0;--cw-muted:#a3b7a9;--cw-border:#263d2f;--cw-accent:#77dba4}
+body[data-uon-page] .course-center-shell{background:var(--cw-bg)}
+body[data-uon-page] :is(.course-detail-hero,.course-center-hero){background:radial-gradient(ellipse at 90% 0,rgba(37,157,89,.12),transparent 65%),var(--cw-bg);border-color:var(--cw-border);padding-top:34px}
+body[data-uon-page] :is(.course-detail-top h1,.course-center-hero h1){color:var(--cw-text);font-size:clamp(1.8rem,4vw,3rem);line-height:1.4;overflow-wrap:anywhere}
+body[data-uon-page] :is(.course-side-card,.course-panel-card,.course-resource,.course-tabs,.course-empty,.v31-course-card,.course-toolbar){background:var(--cw-surface);border-color:var(--cw-border);color:var(--cw-text)}
+body[data-uon-page] :is(.course-panel-card h2,.course-panel-card h3,.course-side-card h3,.course-resource h3,.course-empty strong,.v31-course-card h2,.v31-course-code,.course-summary-row strong){color:var(--cw-text)}
+body[data-uon-page] :is(.course-panel-card p,.course-resource p,.course-detail-meta span,.course-tabs button,.course-center-hero p,.v31-course-card p,.course-summary-row,.course-side-stats span){color:var(--cw-muted)}
+body[data-uon-page] :is(.course-detail-meta span,.course-side-stats div,.v31-course-card footer){background:var(--cw-bg);border-color:var(--cw-border)}
+body[data-uon-page] :is(.course-tabs button.active,.course-summary-row button.active){background:#0b7a4b;color:#fff}
+body[data-uon-page] :is(.course-side-stats strong,.v31-course-college){color:var(--cw-accent)}
+body[data-uon-page] .course-prereq-list a{background:var(--cw-bg);color:var(--cw-accent)}
+body[data-uon-page] .course-toolbar :is(input,select){background:var(--cw-bg);color:var(--cw-text);border-color:var(--cw-border)}
+.course-detail-main{min-width:0}.course-tabs{scrollbar-width:thin}.course-tabs [role="tab"]{min-height:44px}
+@media(max-width:700px){
+ .has-student-dock{padding-bottom:calc(78px + env(safe-area-inset-bottom))}
+ .uon-student-dock{display:flex;position:fixed;inset:auto 0 0;z-index:90;justify-content:space-around;gap:4px;padding:8px 12px calc(8px + env(safe-area-inset-bottom));background:#f6faf7;border-top:1px solid #cbded0;box-shadow:0 -8px 24px #0000000a}
+ html[data-theme="dark"] .uon-student-dock{background:#0b1911;border-color:#294030}
+ .uon-student-dock a{display:flex;flex:1;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-height:48px;border-radius:12px;color:#43634f;text-decoration:none;font:700 12px Tajawal,system-ui,sans-serif}
+ html[data-theme="dark"] .uon-student-dock a{color:#aec5b6}
+ .uon-student-dock a[aria-current="page"]{color:#087844;background:#168e5014}
+ html[data-theme="dark"] .uon-student-dock a[aria-current="page"]{color:#8ce8b2;background:#168e5020}
+ .uon-student-dock a>span{font-size:23px;line-height:1}
+ .course-hub-shortcuts{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .has-student-dock .toast{bottom:100px}.course-detail-grid{padding-top:18px}
+}

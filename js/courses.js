@@ -1,12 +1,13 @@
-import {$,get,esc,enforceUonMaintenance,watchUonMaintenance,trackEvent,debounce,installErrorCapture} from './core.js?v=32.4.1';
+import {$,get,esc,enforceUonMaintenance,watchUonMaintenance,trackEvent,debounce,installErrorCapture,applyFeatureStates} from './core.js?v=32.4.1';
 
+import{normalizeCourseCode,mountStudentDock}from'./student-workspace.js?v=68.0.0';
 await enforceUonMaintenance();
 watchUonMaintenance();
 installErrorCapture();
 
-const state={courses:[],colleges:[],departments:[],programs:[],links:[],search:'',collegeId:'',departmentId:'',programId:'',sort:'code',view:localStorage.getItem('uon_course_view')||'grid'};
+const state={courses:[],colleges:[],departments:[],programs:[],links:[],search:new URLSearchParams(location.search).get('q')||'',collegeId:'',departmentId:'',programId:'',sort:'code',view:localStorage.getItem('uon_course_view')||'grid'};
 const text=value=>String(value??'').trim();
-const normalize=value=>text(value).toLowerCase();
+const normalize=value=>text(value).normalize('NFKD').toLowerCase().replace(/[\u064b-\u065f\u0670]/g,'').replace(/[أإآ]/g,'ا');
 const nameAr=row=>text(row?.name_ar||row?.name_en||row?.name);
 const nameEn=row=>text(row?.name_en||row?.name_ar||row?.name);
 const programLabel=row=>text(row?.degree_ar)?`${nameAr(row)} — ${text(row.degree_ar)}`:nameAr(row);
@@ -64,7 +65,7 @@ function visibleCourses(){
  const query=normalize(state.search),linked=linkedCourseCodes(),academicFilter=Boolean(state.collegeId||state.departmentId||state.programId);
  return state.courses.filter(course=>{
   const code=text(course.code).toUpperCase();
-  const searchMatch=!query||normalize([code,course.name_ar,course.name_en,course.description,requirementLabels[course.requirement_type]].join(' ')).includes(query);
+  const searchMatch=!query||(normalizeCourseCode(query)&&normalizeCourseCode(query)===normalizeCourseCode(code))||normalize([code,course.name_ar,course.name_en,course.description,requirementLabels[course.requirement_type]].join(' ')).includes(query);
   const academicMatch=!academicFilter||Boolean(linked?.has(code))||(!state.programId&&directAcademicMatch(course));
   return searchMatch&&academicMatch;
  }).sort((a,b)=>state.sort==='name'?nameAr(a).localeCompare(nameAr(b),'ar'):state.sort==='hours'?Number(b.credit_hours||0)-Number(a.credit_hours||0):text(a.code).localeCompare(text(b.code),'en'));
@@ -109,6 +110,8 @@ async function load(){
  }
 }
 
+$('#courseSearch').value=state.search;
+mountStudentDock('courses',localStorage.getItem('uon_language')==='en');void applyFeatureStates(document);
 $('#courseSearch').addEventListener('input',debounce(event=>{state.search=event.target.value;render()},180));
 $('#courseCollege').addEventListener('change',event=>{state.collegeId=event.target.value;state.departmentId='';state.programId='';refreshAcademicFilters();render()});
 $('#courseDepartment').addEventListener('change',event=>{state.departmentId=event.target.value;state.programId='';refreshAcademicFilters();render()});
