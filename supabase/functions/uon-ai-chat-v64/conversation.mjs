@@ -159,3 +159,9 @@ export function serviceTopic(value){
   if(/مسالك|learning pathways/.test(q))return 'masalik';
   return '';
 }
+
+// Source cards carry verified destinations; the plain-text answer must not
+// display empty Markdown links if the model omits a destination.
+export function cleanAnswerLinks(value){
+  return String(value||'').replace(/\[([^\]\n]+)\]\(\s*\)/g,'$1');
+}

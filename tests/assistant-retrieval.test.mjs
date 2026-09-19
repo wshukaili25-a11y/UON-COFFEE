@@ -1,12 +1,17 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { relevantContext, retrievalQuestion, serviceTopic } from '../supabase/functions/uon-ai-chat-v64/conversation.mjs';
+import { relevantContext, retrievalQuestion, serviceTopic, cleanAnswerLinks } from '../supabase/functions/uon-ai-chat-v64/conversation.mjs';
 import { placementSources, directServiceAnswer } from '../supabase/functions/uon-ai-chat-v64/services.mjs';
 
 const schedules=[{type:'بيانات شعب EduWave',title:'INFS205 — مقدمة لأمن الكمبيوتر · شعبة 2',description:'بيانات مؤكدة من جدول اعتمده طالب • القاعة: 17A',url:'/schedule.html',score:121}];
 const anjiz={type:'مركز دعم',title:'مركز أنجز',description:'دعم مخصص لطلاب السنة التأسيسية',url:'https://portal.unizwa.edu.om/twc/',official:false,score:46};
 const masalik={...anjiz,title:'مركز تعزيز مسالك التعلم'};
 const unrelated={type:'مبنى',title:'مبنى 20-A — المكتبة',description:'Library الحرم المبدئي',url:'https://www.unizwa.edu.om/',score:180};
+
+test('missing model link destinations do not render broken Markdown',()=>{
+  assert.equal(cleanAnswerLinks('المصدر: [تفاصيل المقرر]()'),'المصدر: تفاصيل المقرر');
+  assert.equal(cleanAnswerLinks('[المصدر](https://www.unizwa.edu.om/)'),'[المصدر](https://www.unizwa.edu.om/)');
+});
 
 test('high-scoring schedules and buildings cannot displace the named support centre',()=>{
   for(const q of ['كيف أحجز موعد في مركز أنجز؟ عطِني رابط الحجز.','أريد حجز انجاز','Anjiz booking link']){
