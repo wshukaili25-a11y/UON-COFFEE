@@ -88,3 +88,28 @@ test('course overview distinguishes ready questions, an unanswered choice zero, 
  assert.deepEqual(practiceSummary({...bank,attempt:{questions:bank.questions,answers:[0,null],index:1}}),{state:'in_progress',count:2,total:2,answered:1,question:2});
  assert.deepEqual(practiceSummary({...bank,attempt:{questions:[question],answers:[2],index:0,complete:true}}),{state:'complete',count:2,total:1,answered:1,question:1,correct:1});
 });
+
+import {loadPracticeDraft,savePracticeDraft,clearPracticeDraft} from '../js/course-practice-data.js';
+test('incomplete editor drafts survive reopening without changing the saved quiz or attempt',()=>{
+ const data=new Map(),storage={getItem:k=>data.get(k),setItem:(k,v)=>data.set(k,v),removeItem:k=>data.delete(k)};
+ const saved=savePractice(storage,'COMP101',{questions:[question]});
+ saveAttempt(storage,'COMP101',saved,{questions:[question],answers:[0],index:0});
+ const before=loadPractice(storage,'COMP101');
+ const draft={questions:[{prompt:'سؤال لم يكتمل',options:['خيار','','',''],answer:3,explanation:''}]};
+ savePracticeDraft(storage,'COMP101',draft);
+ assert.deepEqual(loadPracticeDraft(storage,'COMP101'),draft);
+ assert.deepEqual(loadPractice(storage,'COMP101'),before);
+ assert.equal(loadPracticeDraft(storage,'MATH101'),null);
+ clearPracticeDraft(storage,'COMP101');
+ assert.equal(loadPracticeDraft(storage,'COMP101'),null);
+ assert.deepEqual(loadPractice(storage,'COMP101'),before);
+});
+test('draft storage failures and invalid drafts preserve prior data',()=>{
+ const data=new Map(),storage={getItem:k=>data.get(k),setItem:(k,v)=>data.set(k,v)};
+ savePracticeDraft(storage,'COMP101',{questions:[question]});const before=new Map(data);
+ assert.throws(()=>savePracticeDraft({...storage,setItem:()=>{throw Error('quota');}},'COMP101',{questions:[{...question,prompt:'edited'}]}));
+ assert.deepEqual(data,before);
+ assert.throws(()=>savePracticeDraft(storage,'COMP101',{questions:[{...question,options:['only one']}]}));
+ assert.throws(()=>savePracticeDraft(storage,'COMP101',{questions:[{...question,prompt:'a'.repeat(1001)}]}));
+ assert.deepEqual(data,before);
+});

@@ -87,3 +87,25 @@ export function practiceSummary(value) {
     ...(attempt.complete ? {correct:gradeQuiz(attempt, attempt.answers).correct} : {})
   };
 }
+export function validatePracticeDraft(value) {
+  if (!value || !Array.isArray(value.questions) || !value.questions.length || value.questions.length > MAX_QUESTIONS) throw new Error('draft');
+  const text = (v, limit) => { if (typeof v !== 'string' || v.length > limit) throw new Error('draft'); return v; };
+  return {questions:value.questions.map(q => {
+    if (!q || !Array.isArray(q.options) || q.options.length !== 4 || !Number.isInteger(q.answer) || q.answer < 0 || q.answer > 3) throw new Error('draft');
+    return {prompt:text(q.prompt,1000), options:q.options.map(x=>text(x,400)), answer:q.answer, explanation:text(q.explanation,1500)};
+  })};
+}
+const draftKey = code => practiceKey(code) + ':draft';
+export function loadPracticeDraft(storage, code) {
+  const raw=storage.getItem(draftKey(code));
+  if(!raw)return null;
+  const value=JSON.parse(raw);
+  if(value.version!==1)throw new Error('draft-version');
+  return validatePracticeDraft(value);
+}
+export function savePracticeDraft(storage, code, value) {
+  const draft=validatePracticeDraft(value);
+  storage.setItem(draftKey(code),JSON.stringify({version:1,...draft}));
+  return draft;
+}
+export function clearPracticeDraft(storage, code) { storage.removeItem(draftKey(code)); }
