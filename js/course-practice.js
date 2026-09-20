@@ -14,7 +14,7 @@ export function mountCoursePractice(root, code, english = false) {
   function home() {
     say('');
     body.innerHTML = saved ? `<p>${saved.questions.length} ${t('أسئلة جاهزة للتدريب','questions ready')}</p><div class="practice-actions">${saved.attempt?button('resume',saved.attempt.complete?t('آخر نتيجة','Last result'):t('تابع من حيث توقفت','Resume practice'),true):''}${button('start',t('ابدأ تدريبًا جديدًا','Start new practice'),!saved.attempt)}${button('export',t('نسخة احتياطية للأسئلة','Back up questions'))}${button('edit',t('تعديل أسئلتي','Edit my questions'))}</div>` : `<p>${t('ابدأ بسؤال واحد، وأضف حتى ٢٠ سؤالًا لكل مادة.','Start with one question and add up to 20 per course.')}</p>${button('edit',t('إنشاء أسئلتي','Create my questions'),true)}`;
-    body.insertAdjacentHTML('beforeend', `<div class="practice-actions"><label class="btn">${t('استيراد نسخة أسئلة','Import question backup')}<input type="file" id="practiceImport-${escape(code)}" name="practice-backup" class="practice-import-file" accept=".json,application/json" aria-label="${t('استيراد نسخة أسئلة','Import question backup')}"></label></div><p>${t('ملف النسخة يتضمن الأسئلة والإجابات الصحيحة. الاستيراد يضيف الأسئلة الجديدة ولا يحذف أسئلتك الحالية.','Backups include questions and the answer key. Import adds new questions without deleting your existing questions.')}</p>`);
+    body.insertAdjacentHTML('beforeend', `<div class="practice-actions">${button('paste',t('لصق نسخة الأسئلة','Paste question backup'))}<label class="btn">${t('استيراد نسخة أسئلة','Import question backup')}<input type="file" id="practiceImport-${escape(code)}" name="practice-backup" class="practice-import-file" accept=".json,application/json" aria-label="${t('استيراد نسخة أسئلة','Import question backup')}"></label></div><p>${t('ملف النسخة يتضمن الأسئلة والإجابات الصحيحة. الاستيراد يضيف الأسئلة الجديدة ولا يحذف أسئلتك الحالية.','Backups include questions and the answer key. Import adds new questions without deleting your existing questions.')}</p>`);
   }
   const blank = () => ({prompt:'',options:['','','',''],answer:0,explanation:''});
   function questionFields(q, i) {
@@ -44,6 +44,11 @@ export function mountCoursePractice(root, code, english = false) {
     focusHeading();
   }
   body.addEventListener('change', event => { if(event.target.name==='practice-answer') { answers[index]=Number(event.target.value); say(''); persist(); body.querySelector('progress').value=answers.filter(a=>a!==null).length; } });
+  function reviewImport(imported) {
+      const merged=mergePractice(saved,imported); pendingImport=imported;
+      body.innerHTML=`<h3 tabindex="-1">${t('مراجعة الاستيراد','Review import')}</h3><p>${escape(code)} · ${imported.questions.length} ${t('أسئلة في الملف','questions in file')} · ${merged.questions.length} ${t('أسئلة بعد الدمج','questions after merge')}</p><p>${t('راجع الأسئلة ومفتاح الإجابة بعد الاستيراد. إضافة أسئلة جديدة تبدأ سجل تدريب جديدًا.','Review the questions and answer key after importing. Adding new questions resets the saved attempt.')}</p><ul>${imported.questions.map(q=>`<li>${escape(q.prompt)}</li>`).join('')}</ul><div class="practice-actions">${button('import-confirm',t('تأكيد إضافة الأسئلة','Confirm adding questions'),true)}${button('import-cancel',t('إلغاء','Cancel'))}</div>`;
+      say(''); focusHeading();
+  }
   body.addEventListener('change', async event => {
     if (!event.target.matches('.practice-import-file')) return;
     const file=event.target.files?.[0]; if(!file) return;
@@ -52,9 +57,7 @@ export function mountCoursePractice(root, code, english = false) {
       if(file.size>400000) throw new Error('size');
       const imported=parsePracticeBackup(await file.text(),code);
       if(!input.isConnected) return;
-      const merged=mergePractice(saved,imported); pendingImport=imported;
-      body.innerHTML=`<h3 tabindex="-1">${t('مراجعة الاستيراد','Review import')}</h3><p>${escape(code)} · ${imported.questions.length} ${t('أسئلة في الملف','questions in file')} · ${merged.questions.length} ${t('أسئلة بعد الدمج','questions after merge')}</p><p>${t('راجع الأسئلة ومفتاح الإجابة بعد الاستيراد. إضافة أسئلة جديدة تبدأ سجل تدريب جديدًا.','Review the questions and answer key after importing. Adding new questions resets the saved attempt.')}</p><ul>${imported.questions.map(q=>`<li>${escape(q.prompt)}</li>`).join('')}</ul><div class="practice-actions">${button('import-confirm',t('تأكيد إضافة الأسئلة','Confirm adding questions'),true)}${button('import-cancel',t('إلغاء','Cancel'))}</div>`;
-      say(''); focusHeading();
+      reviewImport(imported);
     } catch(error) {
       say(error.message==='course'?t('هذه النسخة لمادة أخرى. افتح صفحة مادتها لاستيرادها.','This backup belongs to another course. Open that course to import it.'):t('تعذر قراءة النسخة. استخدم ملف UON Hub صالحًا، وبحد أقصى ٢٠ سؤالًا بعد الدمج و٤٠٠ كيلوبايت. أسئلتك لم تتغير.','Could not read the backup. Use a valid UON Hub file, no larger than 400 KB and no more than 20 merged questions. Your questions are unchanged.'));
     } finally { if(input.isConnected){input.disabled=false;input.value='';} }
@@ -79,15 +82,24 @@ export function mountCoursePractice(root, code, english = false) {
       return start();
     }
     if(action==='resume') { const a=saved.attempt; quiz=validateQuiz(a); answers=a.answers.slice(); index=a.index; graded=null; say(''); return a.complete?result():showQuestion(); }
+    if(action==='paste') {
+      body.innerHTML=`<h3 tabindex="-1">${t('لصق نسخة الأسئلة','Paste question backup')}</h3><p>${t('الصق النص الذي نسخته من «نسخة احتياطية للأسئلة». سنراجع النسخة قبل إضافتها لهذه المادة.','Paste the text copied from Back up questions. You can review it before adding it to this course.')}</p><label>${t('نص النسخة للاستيراد','Backup text to import')}<textarea class="practice-backup-text" rows="10" maxlength="400000" spellcheck="false"></textarea></label><div class="practice-actions">${button('paste-review',t('مراجعة النسخة','Review backup'),true)}${button('import-cancel',t('إلغاء','Cancel'))}</div>`;
+      say(''); body.querySelector('textarea').focus(); return;
+    }
+    if(action==='paste-review') {
+      try { reviewImport(parsePracticeBackup(body.querySelector('textarea').value,code)); }
+      catch(error) { say(error.message==='course'?t('هذه النسخة لمادة أخرى. افتح صفحة مادتها لاستيرادها.','This backup belongs to another course. Open that course to import it.'):t('النسخة غير صالحة أو تتجاوز حد ٢٠ سؤالًا بعد الدمج. الصق النص كاملًا؛ أسئلتك الحالية لم تتغير.','Invalid backup or more than 20 merged questions. Paste the complete text; your current questions are unchanged.')); }
+      return;
+    }
     if(action==='export') {
-      body.innerHTML=`<h3 tabindex="-1">${t('نسخة أسئلتك','Your question backup')}</h3><p>${t('نزّل النسخة، أو انسخ النص واحفظه في ملف بامتداد .json لاستيراده على جهاز آخر. يتضمن النص الإجابات الصحيحة.','Download the backup, or copy this text into a .json file to import on another device. The text includes the answer key.')}</p><label>${t('نص النسخة','Backup text')}<textarea class="practice-backup-text" readonly rows="10">${escape(exportPractice(code,saved))}</textarea></label><div class="practice-actions">${button('copy',t('نسخ النسخة','Copy backup'),true)}${button('download',t('تنزيل ملف','Download file'))}${button('home',t('العودة','Back'))}</div>`; say(''); focusHeading(); return;
+      body.innerHTML=`<h3 tabindex="-1">${t('نسخة أسئلتك','Your question backup')}</h3><p>${t('انسخ النص ثم افتح نفس المادة على جهازك الآخر واختر «لصق نسخة الأسئلة». يمكنك أيضًا تنزيل ملف. النسخة تتضمن الإجابات الصحيحة.','Copy this text, open the same course on another device and choose Paste question backup. You can also download a file. The backup includes the answer key.')}</p><label>${t('نص النسخة','Backup text')}<textarea class="practice-backup-text" readonly rows="10">${escape(exportPractice(code,saved))}</textarea></label><div class="practice-actions">${button('copy',t('نسخ النسخة','Copy backup'),true)}${button('download',t('تنزيل ملف','Download file'))}${button('home',t('العودة','Back'))}</div>`; say(''); focusHeading(); return;
     }
     if(action==='copy') {
       navigator.clipboard.writeText(exportPractice(code,saved)).then(()=>say(t('تم نسخ النسخة.','Backup copied.'))).catch(()=>say(t('تعذر النسخ التلقائي؛ حدّد النص وانسخه يدويًا.','Automatic copy failed; select and copy the text manually.'))); return;
     }
     if(action==='download') {
       const url=URL.createObjectURL(new Blob([exportPractice(code,saved)],{type:'application/json'}));
-      const link=document.createElement('a'); link.href=url; link.download=`uon-${code}-questions.json`; document.body.append(link); link.click(); link.remove(); setTimeout(()=>URL.revokeObjectURL(url),30000); return;
+      const link=document.createElement('a'); link.href=url; link.download=`uon-${code}-questions.json`; document.body.append(link); link.click(); link.remove(); say(t('إذا لم يبدأ التنزيل، استخدم «نسخ النسخة» ثم «لصق نسخة الأسئلة» على الجهاز الآخر.','If the download does not start, use Copy backup then Paste question backup on the other device.')); setTimeout(()=>URL.revokeObjectURL(url),30000); return;
     }
     if(action==='import-cancel') { pendingImport=null; return home(); }
     if(action==='import-confirm') {

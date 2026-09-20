@@ -1,4 +1,4 @@
-import{mountCoursePractice}from'./course-practice.js?v=71.0.0';
+import{mountCoursePractice}from'./course-practice.js?v=71.1.0';
 import{whatsappShare,reportBrokenLink,installErrorCapture,$,$$,esc,toast,rpc,uid,enforceUonMaintenance,watchUonMaintenance,trackEvent,safeHref,applyFeatureStates}from'./core.js?v=42.0.0';
 import{normalizeCourseCode,rememberCourse,courseClasses,mountStudentDock}from'./student-workspace.js?v=68.0.0';
 import{readSchedule,formatClassTime}from'./student-pulse.js?v=61.2.0';
