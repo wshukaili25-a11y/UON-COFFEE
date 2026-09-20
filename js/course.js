@@ -1,4 +1,5 @@
-import{mountCoursePractice}from'./course-practice.js?v=71.1.0';
+import{loadPractice,practiceSummary}from'./course-practice-data.js?v=72.0.0';
+import{mountCoursePractice}from'./course-practice.js?v=72.0.0';
 import{whatsappShare,reportBrokenLink,installErrorCapture,$,$$,esc,toast,rpc,uid,enforceUonMaintenance,watchUonMaintenance,trackEvent,safeHref,applyFeatureStates}from'./core.js?v=42.0.0';
 import{normalizeCourseCode,rememberCourse,courseClasses,mountStudentDock}from'./student-workspace.js?v=68.0.0';
 import{readSchedule,formatClassTime}from'./student-pulse.js?v=61.2.0';
@@ -8,7 +9,8 @@ const code=normalizeCourseCode(new URLSearchParams(location.search).get('code'))
 if(!code)location.replace('courses.html');
 const lang=()=>localStorage.getItem('uon_language')==='en'?'en':'ar';
 const t=(ar,en)=>lang()==='en'?en:ar;
-let hub=null;
+let hub=null, practiceController=null;
+
 const empty=(ar,en)=>`<div class="course-empty"><strong>${esc(t(ar,en))}</strong><span>${esc(t('يُعرض المحتوى بعد اعتماده من المشرف.','Content appears after supervisor approval.'))}</span></div>`;
 
 function itemUrl(x){const value=x.url||x.link||x.pdf_url||x.file_url||'';return value?safeHref(value,''):''}
@@ -50,6 +52,19 @@ function renderCourseWeek(){
  rows.sort((a,b)=>days.indexOf(a.day)-days.indexOf(b.day)||a.start.localeCompare(b.start));
  root.innerHTML=`<h2>${t('المادة في جدولك','This course in your schedule')}</h2>${rows.length?`<div class="course-week">${rows.map(row=>`<div class="course-week-row"><div><strong>${esc(lang()==='en'?(englishDays[days.indexOf(row.day)]||row.day):row.day)}</strong><small>${esc([row.room?`${t('القاعة','Room')} ${row.room}`:'',row.teacher||''].filter(Boolean).join(' · '))}</small></div><span dir="ltr">${esc(lang()==='en'?`${row.start} – ${row.end}`:`${formatClassTime(row.start)} – ${formatClassTime(row.end)}`)}</span></div>`).join('')}</div><p>${t('من جدولك المحفوظ على هذا الجهاز.','From your schedule saved on this device.')}</p>`:`<p>${t('ما عندك محاضرات محفوظة لهذه المادة على هذا الجهاز. أضفها من صفحة الجدول لتظهر هنا.','No classes for this course are saved on this device. Add them to your schedule to see them here.')}</p>`}<a class="btn" href="schedule.html">${t('افتح جدولي','Open my schedule')} ←</a>`;
 }
+function renderPracticeSummary(){
+ const root=$('#coursePracticeSummary');if(!root)return;
+ let summary;
+ try{summary=practiceSummary(loadPractice(localStorage,code))}catch{summary={state:'unavailable',count:0}}
+ let detail=t('أنشئ أسئلتك أو استورد نسخة، وراجع إجاباتك بعد التدريب.','Create questions or import a backup, then review your answers.');
+ let action=t('افتح التدريب الشخصي','Open personal practice');
+ if(summary.state==='ready')detail=t('أسئلتك جاهزة. ابدأ تدريبًا جديدًا متى ما أردت.','Your questions are ready. Start a new practice session anytime.');
+ if(summary.state==='in_progress'){detail=t(`أجبت عن ${summary.answered} من ${summary.total}. تابع من السؤال ${summary.question}.`,`Answered ${summary.answered} of ${summary.total}. Continue at question ${summary.question}.`);action=t('تابع محاولتك','Resume your attempt')}
+ if(summary.state==='complete'){detail=t(`نتيجة آخر محاولة: ${summary.correct} من ${summary.total}.`,`Last attempt: ${summary.correct} of ${summary.total}.`);action=t('راجع آخر نتيجة','Review last result')}
+ if(summary.state==='unavailable')detail=t('تعذر قراءة التقدم المحفوظ في هذا المتصفح.','Could not read progress saved in this browser.');
+ root.innerHTML=`<span class="student-label">${t('تدريب شخصي','Personal practice')}</span><h2>${t('تدرّب على مادتك','Practise your course')}</h2>${summary.count?`<p>${t('عدد أسئلتك','Your question count')}: <strong>${summary.count}</strong></p>`:''}<p>${esc(detail)}</p><button class="btn primary" type="button">${action} ←</button><p class="muted">${t('التقدم محفوظ في هذا المتصفح. التصحيح حسب إجاباتك المُدخلة.','Progress is saved in this browser. Grading uses your own answer key.')}</p>`;
+ root.querySelector('button').onclick=()=>{openTab('exams');practiceController?.open();$('#coursePractice')?.scrollIntoView({block:'start'})};
+}
 async function requestContent(){
  const types={summary:t('ملخص','Summary'),exam:t('اختبار سابق','Past exam'),group:t('مجموعة واتساب','WhatsApp group'),resource:t('مصدر رسمي','Official resource'),description:t('وصف المقرر','Course description')};
  const choice=prompt(`${t('اكتب نوع المحتوى المطلوب:','Enter requested content type:')}\nsummary / exam / group / resource / description`,'summary');
@@ -72,10 +87,10 @@ function render(){
  $('#tabSummaryCount').textContent=summaries.length?`(${summaries.length})`:'';$('#tabExamCount').textContent=exams.length?`(${exams.length})`:'';
  $('#courseStats').innerHTML=[[t('الملخصات','Summaries'),stats.summaries??summaries.length],[t('الاختبارات','Exams'),stats.exams??exams.length],[t('المجموعات','Groups'),stats.groups??groups.length],[t('التقييمات','Ratings'),stats.ratings??ratings.length],[t('المصادر','Resources'),stats.resources??resources.length]].map(([label,value])=>`<div><strong>${Number(value).toLocaleString(lang()==='en'?'en':'ar')}</strong><span>${label}</span></div>`).join('');
  $('#coursePrerequisites').innerHTML=prerequisites.length?prerequisites.map(x=>`<a href="course.html?code=${encodeURIComponent(x.prerequisite_code||x.code)}">${esc(x.prerequisite_code||x.code)}</a>`).join(''):`<span>${t('لا توجد متطلبات مسجلة','No prerequisites recorded')}</span>`;
- $('#courseOverview').innerHTML=`<div class="course-hub-shortcuts">${[["summaries",t('الملخصات','Summaries'),summaries.length],["exams",t('الاختبارات','Exams'),exams.length],["groups",t('المجموعات','Groups'),groups.length]].map(([tab,label,count])=>`<button type="button" data-open-tab="${tab}"><strong>${count}</strong>${label} ←</button>`).join('')}</div><article id="courseWeek" class="course-panel-card" data-feature="schedule"></article><a class="course-panel-card course-ai-link" data-feature="assistant" href="assistant.html?prompt=${encodeURIComponent(t('أريد معلومات ومصادر معتمدة عن مادة ','I need verified information and resources for ')+code)}"><div><span class="student-label">✦ UON AI</span><strong>${t('اسأل عن مادتك','Ask about your course')}</strong><p>${t('ابدأ سؤالك برمز المادة للوصول إلى المعلومات المرتبطة بها.','Start with your course code to find related information.')}</p></div><span aria-hidden="true">←</span></a><article class="course-panel-card"><h2>${t('عن المقرر','About the course')}</h2><p>${esc(course.description||t('لم تتم إضافة وصف لهذا المقرر بعد.','No description has been added yet.'))}</p>${course.learning_outcomes?`<h3>${t('مخرجات التعلم','Learning outcomes')}</h3><p>${esc(course.learning_outcomes)}</p>`:''}</article>${programs.length?`<article class="course-panel-card"><h3>${t('البرامج المرتبطة','Linked programs')}</h3><div class="course-prereq-list">${programs.map(p=>`<span>${esc(lang()==='en'?(p.name_en||p.name_ar):(p.name_ar||p.name_en))}</span>`).join('')}</div></article>`:''}<article class="course-panel-card"><h3>${t('الوصول السريع','Quick access')}</h3><div class="course-prereq-list"><button class="btn" data-open-tab="summaries">📚 ${t('الملخصات','Summaries')}</button><button class="btn" data-open-tab="exams">📝 ${t('الاختبارات','Exams')}</button><button class="btn" data-open-tab="groups">💬 ${t('المجموعات','Groups')}</button><button class="btn" data-open-tab="ratings">⭐ ${t('التقييمات','Ratings')}</button><a class="btn" href="search.html?q=${encodeURIComponent(code)}">🔎 ${t('البحث الشامل','Global search')}</a></div></article>`;
+ $('#courseOverview').innerHTML=`<div class="course-hub-shortcuts">${[["summaries",t('الملخصات','Summaries'),summaries.length],["exams",t('الاختبارات','Exams'),exams.length],["groups",t('المجموعات','Groups'),groups.length]].map(([tab,label,count])=>`<button type="button" data-open-tab="${tab}"><strong>${count}</strong>${label} ←</button>`).join('')}</div><article id="coursePracticeSummary" class="course-panel-card"></article><article id="courseWeek" class="course-panel-card" data-feature="schedule"></article><a class="course-panel-card course-ai-link" data-feature="assistant" href="assistant.html?prompt=${encodeURIComponent(t('أريد معلومات ومصادر معتمدة عن مادة ','I need verified information and resources for ')+code)}"><div><span class="student-label">✦ UON AI</span><strong>${t('اسأل عن مادتك','Ask about your course')}</strong><p>${t('ابدأ سؤالك برمز المادة للوصول إلى المعلومات المرتبطة بها.','Start with your course code to find related information.')}</p></div><span aria-hidden="true">←</span></a><article class="course-panel-card"><h2>${t('عن المقرر','About the course')}</h2><p>${esc(course.description||t('لم تتم إضافة وصف لهذا المقرر بعد.','No description has been added yet.'))}</p>${course.learning_outcomes?`<h3>${t('مخرجات التعلم','Learning outcomes')}</h3><p>${esc(course.learning_outcomes)}</p>`:''}</article>${programs.length?`<article class="course-panel-card"><h3>${t('البرامج المرتبطة','Linked programs')}</h3><div class="course-prereq-list">${programs.map(p=>`<span>${esc(lang()==='en'?(p.name_en||p.name_ar):(p.name_ar||p.name_en))}</span>`).join('')}</div></article>`:''}<article class="course-panel-card"><h3>${t('الوصول السريع','Quick access')}</h3><div class="course-prereq-list"><button class="btn" data-open-tab="summaries">📚 ${t('الملخصات','Summaries')}</button><button class="btn" data-open-tab="exams">📝 ${t('الاختبارات','Exams')}</button><button class="btn" data-open-tab="groups">💬 ${t('المجموعات','Groups')}</button><button class="btn" data-open-tab="ratings">⭐ ${t('التقييمات','Ratings')}</button><a class="btn" href="search.html?q=${encodeURIComponent(code)}">🔎 ${t('البحث الشامل','Global search')}</a></div></article>`;
  $('#courseSummaries').innerHTML=summaries.length?summaries.map(x=>resourceCard(x,t('ملخص','Summary'),'summaries')).join(''):empty('لا توجد ملخصات معتمدة بعد','No approved summaries yet');
  $('#courseExams').innerHTML='<section id="coursePractice" class="course-practice"></section><h2>'+t('ملفات الاختبارات السابقة','Past exam files')+'</h2>'+(exams.length?exams.map(x=>resourceCard(x,t('اختبار سابق','Past exam'),'summaries')).join(''):empty('لا توجد اختبارات معتمدة بعد','No approved exams yet'));
- mountCoursePractice($('#coursePractice'),code,lang()==='en');
+ practiceController=mountCoursePractice($('#coursePractice'),code,lang()==='en',{onChange:renderPracticeSummary});
  $('#courseGroups').innerHTML=groups.length?groups.map(x=>resourceCard(x,t('مجموعة واتساب','WhatsApp group'),'whatsapp_groups')).join(''):empty('لا توجد مجموعات معتمدة بعد','No approved groups yet');
  $('#courseRatings').innerHTML=ratings.length?ratings.map(x=>`<article class="course-panel-card"><div class="course-rating-stars">${stars(x.overall||x.overall_rating)}</div><h3>${esc(x.target_name||title)}</h3><p>${esc(x.comment||t('بدون تعليق','No comment'))}</p></article>`).join(''):empty('لا توجد تقييمات معتمدة بعد','No approved ratings yet');
  $('#courseResources').innerHTML=resources.length?resources.map(x=>resourceCard(x,x.resource_type||t('مصدر','Resource'),'course_resources')).join(''):empty('لا توجد مصادر مضافة بعد','No resources added yet');
@@ -88,6 +103,8 @@ async function load(){
 mountStudentDock('courses',lang()==='en');
 window.addEventListener('focus',renderCourseWeek);
 window.addEventListener('storage',renderCourseWeek);
+window.addEventListener('storage',renderPracticeSummary);
+window.addEventListener('focus',renderPracticeSummary);
 window.addEventListener('hashchange',()=>openTab(location.hash.slice(1),{updateHash:false}));
 $('#copyCourseLink').addEventListener('click',async()=>{try{await navigator.clipboard.writeText(location.href);toast(t('تم نسخ رابط المقرر','Course link copied'))}catch{toast(t('تعذر نسخ الرابط','Could not copy link'),true)}});
 load();

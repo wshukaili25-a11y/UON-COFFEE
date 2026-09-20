@@ -79,3 +79,12 @@ test('a damaged attempt does not hide valid saved questions',()=>{
  const restored=loadPractice({getItem:()=>JSON.stringify(value)},'COMP101');
  assert.equal(restored.questions.length,1);assert.equal(restored.attempt,undefined);
 });
+
+import {practiceSummary} from '../js/course-practice-data.js';
+test('course overview distinguishes ready questions, an unanswered choice zero, and retry scores',()=>{
+ assert.deepEqual(practiceSummary(null),{state:'empty',count:0});
+ const bank={questions:[question,{...question,prompt:'Other'}]};
+ assert.deepEqual(practiceSummary(bank),{state:'ready',count:2});
+ assert.deepEqual(practiceSummary({...bank,attempt:{questions:bank.questions,answers:[0,null],index:1}}),{state:'in_progress',count:2,total:2,answered:1,question:2});
+ assert.deepEqual(practiceSummary({...bank,attempt:{questions:[question],answers:[2],index:0,complete:true}}),{state:'complete',count:2,total:1,answered:1,question:1,correct:1});
+});

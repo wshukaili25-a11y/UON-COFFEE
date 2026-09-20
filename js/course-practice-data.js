@@ -73,3 +73,17 @@ export function mergePractice(current, incoming) {
   }
   return validateQuiz({questions});
 }
+export function practiceSummary(value) {
+  if (!value) return {state:'empty', count:0};
+  const bank = validateQuiz(value);
+  if (!value.attempt) return {state:'ready', count:bank.questions.length};
+  const attempt = validateAttempt(bank, value.attempt);
+  return {
+    state:attempt.complete ? 'complete' : 'in_progress',
+    count:bank.questions.length,
+    total:attempt.questions.length,
+    answered:attempt.answers.filter(answer => answer !== null).length,
+    question:attempt.index + 1,
+    ...(attempt.complete ? {correct:gradeQuiz(attempt, attempt.answers).correct} : {})
+  };
+}
