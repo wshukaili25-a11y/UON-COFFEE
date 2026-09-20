@@ -9,3 +9,5 @@ html[data-theme="light"] .course-practice,body.light .course-practice{background
 @media(max-width:600px){.practice-options-editor{grid-template-columns:1fr}.practice-actions>.btn{flex:1 1 140px}.practice-editor-question,.practice-question{padding:12px}}
 
 .practice-import-file{display:block;max-width:100%;min-width:0;margin-top:8px;font:inherit}.practice-actions label.btn{display:block;max-width:100%;box-sizing:border-box}
+
+.practice-backup-text{display:block;width:100%;box-sizing:border-box;margin-top:10px;resize:vertical;background:var(--bg,#07130f);color:inherit;border:1px solid #577567;border-radius:10px;padding:12px;direction:ltr;text-align:left}
