@@ -14,7 +14,7 @@ export function mountCoursePractice(root, code, english = false) {
   function home() {
     say('');
     body.innerHTML = saved ? `<p>${saved.questions.length} ${t('أسئلة جاهزة للتدريب','questions ready')}</p><div class="practice-actions">${saved.attempt?button('resume',saved.attempt.complete?t('آخر نتيجة','Last result'):t('تابع من حيث توقفت','Resume practice'),true):''}${button('start',t('ابدأ تدريبًا جديدًا','Start new practice'),!saved.attempt)}${button('export',t('تنزيل نسخة من الأسئلة','Download question backup'))}${button('edit',t('تعديل أسئلتي','Edit my questions'))}</div>` : `<p>${t('ابدأ بسؤال واحد، وأضف حتى ٢٠ سؤالًا لكل مادة.','Start with one question and add up to 20 per course.')}</p>${button('edit',t('إنشاء أسئلتي','Create my questions'),true)}`;
-    body.insertAdjacentHTML('beforeend', `<div class="practice-actions"><label class="btn">${t('استيراد نسخة أسئلة','Import question backup')}<input type="file" class="practice-import-file" accept=".json,application/json" aria-label="${t('استيراد نسخة أسئلة','Import question backup')}"></label></div><p>${t('ملف النسخة يتضمن الأسئلة والإجابات الصحيحة. الاستيراد يضيف الأسئلة الجديدة ولا يحذف أسئلتك الحالية.','Backups include questions and the answer key. Import adds new questions without deleting your existing questions.')}</p>`);
+    body.insertAdjacentHTML('beforeend', `<div class="practice-actions"><label class="btn">${t('استيراد نسخة أسئلة','Import question backup')}<input type="file" id="practiceImport-${escape(code)}" name="practice-backup" class="practice-import-file" accept=".json,application/json" aria-label="${t('استيراد نسخة أسئلة','Import question backup')}"></label></div><p>${t('ملف النسخة يتضمن الأسئلة والإجابات الصحيحة. الاستيراد يضيف الأسئلة الجديدة ولا يحذف أسئلتك الحالية.','Backups include questions and the answer key. Import adds new questions without deleting your existing questions.')}</p>`);
   }
   const blank = () => ({prompt:'',options:['','','',''],answer:0,explanation:''});
   function questionFields(q, i) {
@@ -47,7 +47,7 @@ export function mountCoursePractice(root, code, english = false) {
   body.addEventListener('change', async event => {
     if (!event.target.matches('.practice-import-file')) return;
     const file=event.target.files?.[0]; if(!file) return;
-    const input=event.target; input.disabled=true;
+    const input=event.target; input.disabled=true; say(t('جاري قراءة النسخة…','Reading backup…')); 
     try {
       if(file.size>400000) throw new Error('size');
       const imported=parsePracticeBackup(await file.text(),code);
