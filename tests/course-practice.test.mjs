@@ -30,3 +30,43 @@ test('stored malformed quiz is rejected, never silently graded',()=>{
  assert.throws(()=>loadPractice({getItem:()=>'{broken'},'COMP101'));
  assert.throws(()=>loadPractice({getItem:()=>JSON.stringify({version:1,questions:[{...question,answer:null}]})},'COMP101'));
 });
+
+import {saveAttempt,exportPractice,parsePracticeBackup,mergePractice} from '../js/course-practice-data.js';
+test('attempts resume answers and index, including a missed-question subset and completed result',()=>{
+ const data=new Map(),storage={getItem:k=>data.get(k),setItem:(k,v)=>data.set(k,v)};
+ const bank=savePractice(storage,'COMP101',{questions:[question,{...question,prompt:'Second'}]});
+ saveAttempt(storage,'COMP101',bank,{questions:bank.questions,answers:[2,null],index:1,complete:false});
+ assert.deepEqual(loadPractice(storage,'COMP101').attempt.answers,[2,null]);
+ assert.equal(loadPractice(storage,'COMP101').attempt.index,1);
+ saveAttempt(storage,'COMP101',bank,{questions:[bank.questions[1]],answers:[0],index:0,complete:true});
+ const attempt=loadPractice(storage,'COMP101').attempt;
+ assert.deepEqual(gradeQuiz(attempt,attempt.answers),{correct:0,total:1,wrong:[0]});
+ assert.throws(()=>saveAttempt(storage,'COMP101',bank,{questions:bank.questions,answers:[2,null],index:1,complete:true}));
+});
+test('stale attempts cannot overwrite questions edited in another tab',()=>{
+ const data=new Map(),storage={getItem:k=>data.get(k),setItem:(k,v)=>data.set(k,v)};
+ const old=savePractice(storage,'COMP101',{questions:[question]});
+ savePractice(storage,'COMP101',{questions:[{...question,prompt:'Updated'}]});
+ const snapshot=new Map(data);
+ assert.throws(()=>saveAttempt(storage,'COMP101',old,{questions:[question],answers:[0],index:0}),/changed/);
+ assert.deepEqual(data,snapshot);
+});
+test('backup round trip excludes attempts, preserves text, merges without duplicates, rejects foreign and oversized files',()=>{
+ const quiz={questions:[{...question,prompt:'<script>literal</script> سؤال'}],attempt:{answers:[2]}};
+ const backup=exportPractice('COMP101',quiz);
+ assert.ok(!backup.includes('attempt'));
+ const restored=parsePracticeBackup(backup,'COMP101');
+ assert.deepEqual(restored,validateQuiz(quiz));
+ assert.equal(mergePractice(restored,restored).questions.length,1);
+ assert.equal(mergePractice(restored,{questions:[question]}).questions.length,2);
+ assert.throws(()=>parsePracticeBackup(backup,'MATH101'),/course/);
+ assert.throws(()=>parsePracticeBackup('x'.repeat(400001),'COMP101'),/size/);
+ assert.throws(()=>parsePracticeBackup('{broken','COMP101'));
+ assert.throws(()=>parsePracticeBackup(JSON.stringify({version:9,format:'uon-personal-practice'}),'COMP101'),/format/);
+ assert.throws(()=>mergePractice({questions:Array.from({length:20},(_,i)=>({...question,prompt:String(i)}))},{questions:[question]}));
+});
+test('a damaged attempt does not hide valid saved questions',()=>{
+ const value={version:1,questions:[question],attempt:{questions:[question],index:99,answers:[null]}};
+ const restored=loadPractice({getItem:()=>JSON.stringify(value)},'COMP101');
+ assert.equal(restored.questions.length,1);assert.equal(restored.attempt,undefined);
+});

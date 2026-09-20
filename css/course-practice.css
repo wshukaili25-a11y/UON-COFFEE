@@ -7,3 +7,5 @@
 .course-practice progress{width:100%;height:8px;accent-color:#41b980}.practice-review article{border-top:1px solid #577567;padding:16px 0;overflow-wrap:anywhere}.practice-review p,.practice-review h4{white-space:pre-wrap}.course-practice :focus-visible{outline:3px solid #55cd94;outline-offset:3px}
 html[data-theme="light"] .course-practice,body.light .course-practice{background:#f4fbf7;color:#173f2c}html[data-theme="light"] .practice-editor-question input,html[data-theme="light"] .practice-editor-question textarea,html[data-theme="light"] .practice-editor-question select{background:#fff}
 @media(max-width:600px){.practice-options-editor{grid-template-columns:1fr}.practice-actions>.btn{flex:1 1 140px}.practice-editor-question,.practice-question{padding:12px}}
+
+.practice-import-file{display:block;max-width:100%;min-width:0;margin-top:8px;font:inherit}.practice-actions label.btn{display:block;max-width:100%;box-sizing:border-box}

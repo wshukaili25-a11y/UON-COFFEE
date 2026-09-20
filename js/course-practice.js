@@ -1,10 +1,10 @@
-import {validateQuiz, gradeQuiz, loadPractice, savePractice, MAX_QUESTIONS} from './course-practice-data.js?v=70.0.0';
+import {validateQuiz, gradeQuiz, loadPractice, savePractice, saveAttempt, exportPractice, parsePracticeBackup, mergePractice, MAX_QUESTIONS} from './course-practice-data.js?v=71.0.0';
 
 const escape = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 export function mountCoursePractice(root, code, english = false) {
   if (!root) return;
   const t = (ar,en) => english ? en : ar;
-  let saved = null, quiz = null, answers = [], index = 0, graded = null, storage;
+  let saved = null, quiz = null, answers = [], index = 0, graded = null, storage, pendingImport = null;
   try { storage = localStorage; saved = loadPractice(storage, code); } catch { /* Show a recoverable storage warning below. */ }
   root.innerHTML = `<header><span class="student-label">${t('تدريب شخصي','Personal practice')}</span><h2>${t('اختبر نفسك في','Practise')} ${escape(code)}</h2><p>${t('أنشئ أسئلة من ملاحظاتك مع الإجابة الصحيحة. أسئلتك محفوظة في هذا المتصفح فقط، وليست بنك أسئلة معتمدًا من الجامعة.','Create questions from your notes and provide the correct answers. Questions are saved only in this browser and are not an official university question bank.')}</p></header><div class="practice-body"></div><p class="practice-status" role="status" aria-live="polite"></p>`;
   const body = root.querySelector('.practice-body'), status = root.querySelector('.practice-status');
@@ -13,7 +13,8 @@ export function mountCoursePractice(root, code, english = false) {
   const button = (action, label, primary = false) => `<button type="button" class="btn${primary?' primary':''}" data-practice="${action}">${label}</button>`;
   function home() {
     say('');
-    body.innerHTML = saved ? `<p>${saved.questions.length} ${t('أسئلة جاهزة للتدريب','questions ready')}</p><div class="practice-actions">${button('start',t('ابدأ التدريب','Start practice'),true)}${button('edit',t('تعديل أسئلتي','Edit my questions'))}</div>` : `<p>${t('ابدأ بسؤال واحد، وأضف حتى ٢٠ سؤالًا لكل مادة.','Start with one question and add up to 20 per course.')}</p>${button('edit',t('إنشاء أسئلتي','Create my questions'),true)}`;
+    body.innerHTML = saved ? `<p>${saved.questions.length} ${t('أسئلة جاهزة للتدريب','questions ready')}</p><div class="practice-actions">${saved.attempt?button('resume',saved.attempt.complete?t('آخر نتيجة','Last result'):t('تابع من حيث توقفت','Resume practice'),true):''}${button('start',t('ابدأ تدريبًا جديدًا','Start new practice'),!saved.attempt)}${button('export',t('تنزيل نسخة من الأسئلة','Download question backup'))}${button('edit',t('تعديل أسئلتي','Edit my questions'))}</div>` : `<p>${t('ابدأ بسؤال واحد، وأضف حتى ٢٠ سؤالًا لكل مادة.','Start with one question and add up to 20 per course.')}</p>${button('edit',t('إنشاء أسئلتي','Create my questions'),true)}`;
+    body.insertAdjacentHTML('beforeend', `<div class="practice-actions"><label class="btn">${t('استيراد نسخة أسئلة','Import question backup')}<input type="file" class="practice-import-file" accept=".json,application/json" aria-label="${t('استيراد نسخة أسئلة','Import question backup')}"></label></div><p>${t('ملف النسخة يتضمن الأسئلة والإجابات الصحيحة. الاستيراد يضيف الأسئلة الجديدة ولا يحذف أسئلتك الحالية.','Backups include questions and the answer key. Import adds new questions without deleting your existing questions.')}</p>`);
   }
   const blank = () => ({prompt:'',options:['','','',''],answer:0,explanation:''});
   function questionFields(q, i) {
@@ -21,11 +22,15 @@ export function mountCoursePractice(root, code, english = false) {
   }
   function editor() {
     say('');
-    body.innerHTML = `<h3 tabindex="-1">${t('أسئلتي','My questions')}</h3><form class="practice-editor"><div class="practice-fields">${(saved?.questions || [blank()]).map(questionFields).join('')}</div><div class="practice-actions">${button('add',t('إضافة سؤال','Add question'))}<button class="btn primary" type="submit">${t('حفظ الأسئلة','Save questions')}</button>${button('home',t('إلغاء التعديل','Cancel editing'))}</div></form>`;
+    body.innerHTML = `<h3 tabindex="-1">${t('أسئلتي','My questions')}</h3><p>${t('حفظ التعديلات يبدأ سجل تدريب جديدًا لهذه الأسئلة.','Saving edits resets the saved attempt for these questions.')}</p><form class="practice-editor"><div class="practice-fields">${(saved?.questions || [blank()]).map(questionFields).join('')}</div><div class="practice-actions">${button('add',t('إضافة سؤال','Add question'))}<button class="btn primary" type="submit">${t('حفظ الأسئلة','Save questions')}</button>${button('home',t('إلغاء التعديل','Cancel editing'))}</div></form>`;
     focusHeading();
   }
   function start(selected = saved.questions) {
-    quiz = validateQuiz({questions:selected}); answers = Array(quiz.questions.length).fill(null); index = 0; graded = null; say(''); showQuestion();
+    quiz = validateQuiz({questions:selected}); answers = Array(quiz.questions.length).fill(null); index = 0; graded = null; say(''); showQuestion(); persist();
+  }
+  function persist(complete = false) {
+    try { saved = saveAttempt(storage,code,saved,{...quiz,answers,index,complete}); }
+    catch { say(t('تعذر حفظ التقدم. يمكنك إكمال التدريب، لكن قد تفقد هذه المحاولة عند المغادرة.','Progress could not be saved. You can continue, but this attempt may be lost when leaving.')); }
   }
   function showQuestion() {
     const q = quiz.questions[index];
@@ -34,10 +39,26 @@ export function mountCoursePractice(root, code, english = false) {
   }
   function result() {
     graded = gradeQuiz(quiz, answers);
+    persist(true);
     body.innerHTML = `<h3 tabindex="-1">${t('نتيجتك','Your result')}: ${graded.correct} / ${graded.total}</h3><p>${t('التصحيح حسب مفتاح الإجابة الذي أدخلته.','Graded against the answer key you provided.')}</p><div class="practice-actions">${graded.wrong.length?button('wrong',t('أعد الأسئلة الخاطئة','Retry missed questions'),true):''}${button('start',t('أعد الاختبار كاملًا','Retry full quiz'))}${button('home',t('العودة','Back'))}</div><div class="practice-review">${quiz.questions.map((q,i)=>`<article><h4>${i+1}. ${escape(q.prompt)}</h4><strong>${q.answer===answers[i]?t('✓ إجابة صحيحة','✓ Correct'):t('✕ تحتاج مراجعة','✕ Review needed')}</strong><p>${t('إجابتك:','Your answer:')} ${escape(q.options[answers[i]])}</p>${q.answer!==answers[i]?`<p>${t('الصحيح:','Correct:')} ${escape(q.options[q.answer])}</p>`:''}${q.explanation?`<p class="practice-explanation">${escape(q.explanation)}</p>`:''}</article>`).join('')}</div>`;
     focusHeading();
   }
-  body.addEventListener('change', event => { if(event.target.name==='practice-answer') { answers[index]=Number(event.target.value); say(''); } });
+  body.addEventListener('change', event => { if(event.target.name==='practice-answer') { answers[index]=Number(event.target.value); say(''); persist(); body.querySelector('progress').value=answers.filter(a=>a!==null).length; } });
+  body.addEventListener('change', async event => {
+    if (!event.target.matches('.practice-import-file')) return;
+    const file=event.target.files?.[0]; if(!file) return;
+    const input=event.target; input.disabled=true;
+    try {
+      if(file.size>400000) throw new Error('size');
+      const imported=parsePracticeBackup(await file.text(),code);
+      if(!input.isConnected) return;
+      const merged=mergePractice(saved,imported); pendingImport=imported;
+      body.innerHTML=`<h3 tabindex="-1">${t('مراجعة الاستيراد','Review import')}</h3><p>${escape(code)} · ${imported.questions.length} ${t('أسئلة في الملف','questions in file')} · ${merged.questions.length} ${t('أسئلة بعد الدمج','questions after merge')}</p><p>${t('راجع الأسئلة ومفتاح الإجابة بعد الاستيراد. إضافة أسئلة جديدة تبدأ سجل تدريب جديدًا.','Review the questions and answer key after importing. Adding new questions resets the saved attempt.')}</p><ul>${imported.questions.map(q=>`<li>${escape(q.prompt)}</li>`).join('')}</ul><div class="practice-actions">${button('import-confirm',t('تأكيد إضافة الأسئلة','Confirm adding questions'),true)}${button('import-cancel',t('إلغاء','Cancel'))}</div>`;
+      say(''); focusHeading();
+    } catch(error) {
+      say(error.message==='course'?t('هذه النسخة لمادة أخرى. افتح صفحة مادتها لاستيرادها.','This backup belongs to another course. Open that course to import it.'):t('تعذر قراءة النسخة. استخدم ملف UON Hub صالحًا، وبحد أقصى ٢٠ سؤالًا بعد الدمج و٤٠٠ كيلوبايت. أسئلتك لم تتغير.','Could not read the backup. Use a valid UON Hub file, no larger than 400 KB and no more than 20 merged questions. Your questions are unchanged.'));
+    } finally { if(input.isConnected){input.disabled=false;input.value='';} }
+  });
   body.addEventListener('submit', event => {
     event.preventDefault();
     const questions = [...body.querySelectorAll('.practice-editor-question')].map(field => ({prompt:field.querySelector('[data-field="prompt"]').value,options:[...field.querySelectorAll('[data-option]')].map(x=>x.value),answer:Number(field.querySelector('[data-field="answer"]').value),explanation:field.querySelector('[data-field="explanation"]').value}));
@@ -50,10 +71,27 @@ export function mountCoursePractice(root, code, english = false) {
     if (!action) return;
     if(action==='edit') return editor();
     if(action==='home') {
-      if((body.querySelector('form') || (quiz && !graded && body.querySelector('.practice-question'))) && !confirm(t('مغادرة هذه المحاولة؟ التعديلات غير المحفوظة والإجابات الحالية لن تُحفظ.','Leave this attempt? Unsaved edits and current answers will not be saved.'))) return;
+      if(body.querySelector('form') && !confirm(t('مغادرة هذه المحاولة؟ التعديلات غير المحفوظة والإجابات الحالية لن تُحفظ.','Leave this attempt? Unsaved edits and current answers will not be saved.'))) return;
       quiz=null; return home();
     }
-    if(action==='start') return start();
+    if(action==='start') {
+      if(saved.attempt && !saved.attempt.complete && !graded && !confirm(t('بدء محاولة جديدة بدل المحاولة المحفوظة؟','Start a new attempt instead of the saved attempt?'))) return;
+      return start();
+    }
+    if(action==='resume') { const a=saved.attempt; quiz=validateQuiz(a); answers=a.answers.slice(); index=a.index; graded=null; say(''); return a.complete?result():showQuestion(); }
+    if(action==='export') {
+      const url=URL.createObjectURL(new Blob([exportPractice(code,saved)],{type:'application/json'}));
+      const link=document.createElement('a'); link.href=url; link.download=`uon-${code}-questions.json`; link.click(); setTimeout(()=>URL.revokeObjectURL(url),30000); return;
+    }
+    if(action==='import-cancel') { pendingImport=null; return home(); }
+    if(action==='import-confirm') {
+      try {
+        const current=loadPractice(storage,code), merged=mergePractice(current,pendingImport);
+        saved=JSON.stringify(validateQuiz(current||merged))===JSON.stringify(merged)&&current?current:savePractice(storage,code,merged);
+        pendingImport=null; home(); say(t('تم استيراد الأسئلة مع الحفاظ على أسئلتك السابقة.','Questions imported; your previous questions are preserved.'));
+      } catch { say(t('تعذر الاستيراد. لم تتغير أسئلتك؛ تحقق من مساحة التخزين وحدّ ٢٠ سؤالًا.','Import failed. Your questions are unchanged; check storage and the 20-question limit.')); }
+      return;
+    }
     if(action==='wrong') return start(graded.wrong.map(i=>quiz.questions[i]));
     if(action==='add') {
       const fields=body.querySelector('.practice-fields');
@@ -67,9 +105,9 @@ export function mountCoursePractice(root, code, english = false) {
       event.target.closest('fieldset').remove();
       [...fields.children].forEach((field,i)=>field.querySelector('legend').textContent=`${t('السؤال','Question')} ${i+1}`); return;
     }
-    if(action==='prev') { index--; say(''); return showQuestion(); }
+    if(action==='prev') { index--; say(''); showQuestion(); persist(); return; }
     if(answers[index]===null) return say(t('اختر إجابة أولًا.','Choose an answer first.'));
-    if(action==='next') { index++; say(''); return showQuestion(); }
+    if(action==='next') { index++; say(''); showQuestion(); persist(); return; }
     if(action==='finish') { say(''); return result(); }
   });
   home();
