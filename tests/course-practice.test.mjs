@@ -113,3 +113,26 @@ test('draft storage failures and invalid drafts preserve prior data',()=>{
  assert.throws(()=>savePracticeDraft(storage,'COMP101',{questions:[{...question,prompt:'a'.repeat(1001)}]}));
  assert.deepEqual(data,before);
 });
+
+import {selectPracticeQuestions} from '../js/course-practice-data.js';
+test('session selection preserves answer keys and source order, sampling without replacement',()=>{
+ const bank={questions:Array.from({length:5},(_,i)=>({...question,prompt:`Question ${i}`,answer:i%4}))};
+ const original=structuredClone(bank);
+ assert.deepEqual(selectPracticeQuestions(bank,{count:2}),bank.questions.slice(0,2));
+ const sample=selectPracticeQuestions(bank,{count:3,shuffle:true,random:()=>0});
+ assert.equal(sample.length,3);assert.equal(new Set(sample.map(q=>q.prompt)).size,3);
+ assert.deepEqual(sample.map(q=>q.prompt),['Question 1','Question 2','Question 3']);
+ assert.deepEqual(gradeQuiz({questions:sample},sample.map(q=>q.answer)),{correct:3,total:3,wrong:[]});
+ assert.deepEqual(bank,original);
+ for(const count of [0,6,1.5,'2'])assert.throws(()=>selectPracticeQuestions(bank,{count}),/count/);
+});
+test('a shuffled short attempt resumes the exact selected questions and order',()=>{
+ const data=new Map(),storage={getItem:k=>data.get(k),setItem:(k,v)=>data.set(k,v)};
+ const bank=savePractice(storage,'COMP101',{questions:Array.from({length:5},(_,i)=>({...question,prompt:`Item ${i}`}))});
+ const selected=selectPracticeQuestions(bank,{count:2,shuffle:true,random:()=>0});
+ saveAttempt(storage,'COMP101',bank,{questions:selected,answers:[0,null],index:1});
+ const restored=loadPractice(storage,'COMP101');
+ assert.deepEqual(restored.attempt.questions,selected);
+ assert.deepEqual(restored.attempt.answers,[0,null]);
+ assert.equal(restored.questions.length,5);
+});

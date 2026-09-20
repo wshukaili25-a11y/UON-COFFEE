@@ -109,3 +109,17 @@ export function savePracticeDraft(storage, code, value) {
   return draft;
 }
 export function clearPracticeDraft(storage, code) { storage.removeItem(draftKey(code)); }
+export function selectPracticeQuestions(value, {count, shuffle = false, random = Math.random} = {}) {
+  const {questions} = validateQuiz(value);
+  const size = count ?? questions.length;
+  if (!Number.isInteger(size) || size < 1 || size > questions.length) throw new Error('count');
+  if (shuffle) {
+    for (let i = questions.length - 1; i > 0; i--) {
+      const sample = random();
+      if (!Number.isFinite(sample) || sample < 0 || sample >= 1) throw new Error('random');
+      const j = Math.floor(sample * (i + 1));
+      [questions[i], questions[j]] = [questions[j], questions[i]];
+    }
+  }
+  return questions.slice(0, size);
+}

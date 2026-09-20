@@ -1,4 +1,4 @@
-import {validateQuiz, gradeQuiz, loadPractice, savePractice, saveAttempt, exportPractice, parsePracticeBackup, mergePractice, loadPracticeDraft, savePracticeDraft, clearPracticeDraft, MAX_QUESTIONS} from './course-practice-data.js?v=73.0.0';
+import {validateQuiz, gradeQuiz, loadPractice, savePractice, saveAttempt, exportPractice, parsePracticeBackup, mergePractice, loadPracticeDraft, savePracticeDraft, clearPracticeDraft, selectPracticeQuestions, MAX_QUESTIONS} from './course-practice-data.js?v=74.0.0';
 
 const escape = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 export function mountCoursePractice(root, code, english = false, {onChange = () => {}} = {}) {
@@ -15,7 +15,7 @@ export function mountCoursePractice(root, code, english = false, {onChange = () 
   function home() {
     onChange();
     say('');
-    body.innerHTML = saved ? `<p>${saved.questions.length} ${t('أسئلة جاهزة للتدريب','questions ready')}</p><div class="practice-actions">${saved.attempt?button('resume',saved.attempt.complete?t('آخر نتيجة','Last result'):t('تابع من حيث توقفت','Resume practice'),true):''}${button('start',t('ابدأ تدريبًا جديدًا','Start new practice'),!saved.attempt)}${button('export',t('نسخة احتياطية للأسئلة','Back up questions'))}${button('edit',draft?t('أكمل المسودة','Continue draft'):t('تعديل أسئلتي','Edit my questions'))}</div>` : `<p>${t('ابدأ بسؤال واحد، وأضف حتى ٢٠ سؤالًا لكل مادة.','Start with one question and add up to 20 per course.')}</p>${button('edit',draft?t('أكمل المسودة','Continue draft'):t('إنشاء أسئلتي','Create my questions'),true)}`;
+    body.innerHTML = saved ? `<p>${saved.questions.length} ${t('أسئلة جاهزة للتدريب','questions ready')}</p><fieldset class="practice-session-settings"><legend>${t('خيارات المحاولة الجديدة','New attempt options')}</legend><label>${t('عدد أسئلة المحاولة','Questions per attempt')}<select data-session-count>${saved.questions.map((_,i)=>`<option value="${i+1}" ${i===saved.questions.length-1?'selected':''}>${i===saved.questions.length-1?t('كل الأسئلة','All questions')+' ('+(i+1)+')':i+1}</option>`).join('')}</select></label><label class="practice-shuffle-label"><input type="checkbox" data-session-shuffle> ${t('خلط ترتيب الأسئلة','Shuffle question order')}</label><small>${t('عند الخلط نختار العدد عشوائيًا. متابعة محاولة محفوظة تُبقي أسئلتها وترتيبها.','With shuffle, questions are sampled randomly. Resuming keeps the saved questions and order.')}</small></fieldset><div class="practice-actions">${saved.attempt?button('resume',saved.attempt.complete?t('آخر نتيجة','Last result'):t('تابع من حيث توقفت','Resume practice'),true):''}${button('start',t('ابدأ تدريبًا جديدًا','Start new practice'),!saved.attempt)}${button('export',t('نسخة احتياطية للأسئلة','Back up questions'))}${button('edit',draft?t('أكمل المسودة','Continue draft'):t('تعديل أسئلتي','Edit my questions'))}</div>` : `<p>${t('ابدأ بسؤال واحد، وأضف حتى ٢٠ سؤالًا لكل مادة.','Start with one question and add up to 20 per course.')}</p>${button('edit',draft?t('أكمل المسودة','Continue draft'):t('إنشاء أسئلتي','Create my questions'),true)}`;
     body.insertAdjacentHTML('beforeend', `<div class="practice-actions">${button('paste',t('لصق نسخة الأسئلة','Paste question backup'))}<label class="btn">${t('استيراد نسخة أسئلة','Import question backup')}<input type="file" id="practiceImport-${escape(code)}" name="practice-backup" class="practice-import-file" accept=".json,application/json" aria-label="${t('استيراد نسخة أسئلة','Import question backup')}"></label></div><p>${t('ملف النسخة يتضمن الأسئلة والإجابات الصحيحة. الاستيراد يضيف الأسئلة الجديدة ولا يحذف أسئلتك الحالية.','Backups include questions and the answer key. Import adds new questions without deleting your existing questions.')}</p>`);
   }
   function editorQuestions() {
@@ -92,7 +92,9 @@ export function mountCoursePractice(root, code, english = false, {onChange = () 
     }
     if(action==='start') {
       if(saved.attempt && !saved.attempt.complete && !graded && !confirm(t('بدء محاولة جديدة بدل المحاولة المحفوظة؟','Start a new attempt instead of the saved attempt?'))) return;
-      return start();
+      const count=Number(body.querySelector('[data-session-count]')?.value||saved.questions.length);
+      const shuffle=body.querySelector('[data-session-shuffle]')?.checked||false;
+      return start(selectPracticeQuestions(saved,{count,shuffle}));
     }
     if(action==='resume') { const a=saved.attempt; quiz=validateQuiz(a); answers=a.answers.slice(); index=a.index; graded=null; say(''); return a.complete?result():showQuestion(); }
     if(action==='paste') {
