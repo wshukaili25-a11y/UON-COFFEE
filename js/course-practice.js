@@ -47,7 +47,7 @@ export function mountCoursePractice(root, code, english = false) {
   body.addEventListener('change', async event => {
     if (!event.target.matches('.practice-import-file')) return;
     const file=event.target.files?.[0]; if(!file) return;
-    const input=event.target; input.disabled=true; say(t('جاري قراءة النسخة…','Reading backup…')); 
+    const input=event.target; input.disabled=true; say(t('جاري قراءة النسخة…','Reading backup…'));
     try {
       if(file.size>400000) throw new Error('size');
       const imported=parsePracticeBackup(await file.text(),code);
@@ -81,7 +81,7 @@ export function mountCoursePractice(root, code, english = false) {
     if(action==='resume') { const a=saved.attempt; quiz=validateQuiz(a); answers=a.answers.slice(); index=a.index; graded=null; say(''); return a.complete?result():showQuestion(); }
     if(action==='export') {
       const url=URL.createObjectURL(new Blob([exportPractice(code,saved)],{type:'application/json'}));
-      const link=document.createElement('a'); link.href=url; link.download=`uon-${code}-questions.json`; link.click(); setTimeout(()=>URL.revokeObjectURL(url),30000); return;
+      const link=document.createElement('a'); link.href=url; link.download=`uon-${code}-questions.json`; document.body.append(link); link.click(); link.remove(); setTimeout(()=>URL.revokeObjectURL(url),30000); return;
     }
     if(action==='import-cancel') { pendingImport=null; return home(); }
     if(action==='import-confirm') {

@@ -32,6 +32,15 @@ test('stored malformed quiz is rejected, never silently graded',()=>{
 });
 
 import {saveAttempt,exportPractice,parsePracticeBackup,mergePractice} from '../js/course-practice-data.js';
+import {inspectFile} from '../js/security-guard-v48.js';
+test('file guard admits only schema-valid course backups in the dedicated import context',async()=>{
+ const file=new File([exportPractice('COMP101',{questions:[question]})],'backup.json',{type:'application/json'});
+ assert.equal((await inspectFile(file)).safe,false);
+ assert.equal((await inspectFile(file,{practiceCourse:'COMP101'})).safe,true);
+ assert.equal((await inspectFile(file,{practiceCourse:'MATH101'})).safe,false);
+ assert.equal((await inspectFile(new File(['{"unexpected":true}'],'bad.json',{type:'application/json'}),{practiceCourse:'COMP101'})).safe,false);
+ assert.equal((await inspectFile(new File(['x'.repeat(400001)],'big.json',{type:'application/json'}),{practiceCourse:'COMP101'})).safe,false);
+});
 test('attempts resume answers and index, including a missed-question subset and completed result',()=>{
  const data=new Map(),storage={getItem:k=>data.get(k),setItem:(k,v)=>data.set(k,v)};
  const bank=savePractice(storage,'COMP101',{questions:[question,{...question,prompt:'Second'}]});
