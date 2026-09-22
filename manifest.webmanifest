@@ -8,23 +8,23 @@
   "display":"standalone",
   "display_override":["window-controls-overlay","standalone","minimal-ui"],
   "orientation":"any",
-  "background_color":"#060b1b",
-  "theme_color":"#060b1b",
+  "background_color":"#06100c",
+  "theme_color":"#06100c",
   "lang":"ar",
   "dir":"rtl",
   "categories":["education","productivity","utilities"],
   "icons":[
-    {"src":"/assets/icons/icon-192.png","sizes":"192x192","type":"image/png","purpose":"any"},
-    {"src":"/assets/icons/icon-192-maskable.png","sizes":"192x192","type":"image/png","purpose":"maskable"},
-    {"src":"/assets/icons/icon-512.png","sizes":"512x512","type":"image/png","purpose":"any"},
-    {"src":"/assets/icons/icon-512-maskable.png","sizes":"512x512","type":"image/png","purpose":"maskable"}
+    {"src":"/assets/icons/uonhub-192-v75.png","sizes":"192x192","type":"image/png","purpose":"any"},
+    {"src":"/assets/icons/uonhub-192-maskable-v75.png","sizes":"192x192","type":"image/png","purpose":"maskable"},
+    {"src":"/assets/icons/uonhub-512-v75.png","sizes":"512x512","type":"image/png","purpose":"any"},
+    {"src":"/assets/icons/uonhub-512-maskable-v75.png","sizes":"512x512","type":"image/png","purpose":"maskable"}
   ],
   "shortcuts":[
-    {"name":"مركز المقررات","short_name":"المقررات","url":"/courses.html?source=pwa","icons":[{"src":"/assets/icons/icon-192.png","sizes":"192x192","type":"image/png"}]},
-    {"name":"البحث في المنصة","short_name":"البحث","url":"/search.html?source=pwa","icons":[{"src":"/assets/icons/icon-192.png","sizes":"192x192","type":"image/png"}]},
-    {"name":"الملخصات والاختبارات","short_name":"الملخصات","url":"/summaries.html?source=pwa","icons":[{"src":"/assets/icons/icon-192.png","sizes":"192x192","type":"image/png"}]},
-    {"name":"مساعد UON AI","short_name":"UON AI","url":"/assistant.html?source=pwa","icons":[{"src":"/assets/icons/icon-192.png","sizes":"192x192","type":"image/png"}]},
-    {"name":"رفع ملف دراسي","short_name":"رفع ملف","url":"/upload-summary.html?source=pwa","icons":[{"src":"/assets/icons/icon-192.png","sizes":"192x192","type":"image/png"}]}
+    {"name":"مركز المقررات","short_name":"المقررات","url":"/courses.html?source=pwa","icons":[{"src":"/assets/icons/uonhub-192-v75.png","sizes":"192x192","type":"image/png"}]},
+    {"name":"البحث في المنصة","short_name":"البحث","url":"/search.html?source=pwa","icons":[{"src":"/assets/icons/uonhub-192-v75.png","sizes":"192x192","type":"image/png"}]},
+    {"name":"الملخصات والاختبارات","short_name":"الملخصات","url":"/summaries.html?source=pwa","icons":[{"src":"/assets/icons/uonhub-192-v75.png","sizes":"192x192","type":"image/png"}]},
+    {"name":"مساعد UON AI","short_name":"UON AI","url":"/assistant.html?source=pwa","icons":[{"src":"/assets/icons/uonhub-192-v75.png","sizes":"192x192","type":"image/png"}]},
+    {"name":"رفع ملف دراسي","short_name":"رفع ملف","url":"/upload-summary.html?source=pwa","icons":[{"src":"/assets/icons/uonhub-192-v75.png","sizes":"192x192","type":"image/png"}]}
   ],
   "share_target":{"action":"/search.html","method":"GET","params":{"title":"title","text":"q","url":"url"}}
 }
