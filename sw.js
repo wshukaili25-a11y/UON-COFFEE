@@ -1,4 +1,4 @@
-const VERSION = '74.0.0';
+const VERSION = '75.0.0';
 const STATIC_CACHE = `uonhub-static-${VERSION}`;
 const PAGE_CACHE = `uonhub-pages-${VERSION}`;
 const DATA_CACHE = `uonhub-data-${VERSION}`;
@@ -23,7 +23,7 @@ const PRECACHE = [
   '/js/groups.js','/js/summaries.js','/js/gpa.js','/js/university-guide.js','/js/guide-redesign-v1.js','/js/contact-directory.js','/js/maintenance.js',
   '/js/google-connect-v641.js','/js/google-auth-session-v641.js','/js/google-auth-status-v641.js','/js/student-tasks-data.js','/js/tasks.js','/js/study-focus-data.js','/js/study-focus.js','/js/search.js','/js/go.js','/js/pwa-init.js','/js/tool-registry-v44.js','/js/platform-experience-v44.js',
   '/js/app-capabilities-v48.js','/js/support-centers.js','/js/academic-calendar-data.js','/js/academic-calendar-page.js','/js/student-pulse.js','/js/user-dashboard.js','/js/notifications.js','/js/v20-experience.js','/js/security-guard-v48.js','/js/runtime-guard.js','/js/status.js','/js/courses.js',
-  '/assets/uonhub-instagram-logo.svg','/assets/uonhub-logo-header-v1.svg','/assets/uonhub-logo-original-20260904.jpeg','/assets/whatsapp-official.svg','/assets/whatsapp-outline-white.svg','/assets/icons/icon-192.png','/assets/icons/icon-512.png'
+  '/assets/uonhub-instagram-logo.svg','/assets/uonhub-logo-header-v1.svg','/assets/uonhub-logo-original-20260904.jpeg','/assets/whatsapp-official.svg','/assets/whatsapp-outline-white.svg','/assets/icons/uonhub-192-v75.png','/assets/icons/uonhub-512-v75.png','/assets/icons/uonhub-192-maskable-v75.png','/assets/icons/uonhub-512-maskable-v75.png'
 ];
 
 self.addEventListener('install',event=>{event.waitUntil(caches.open(STATIC_CACHE).then(cache=>Promise.allSettled(PRECACHE.map(url=>cache.add(new Request(url,{cache:'reload'}))))).then(()=>self.skipWaiting()))});
