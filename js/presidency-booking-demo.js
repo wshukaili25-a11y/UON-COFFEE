@@ -17,6 +17,7 @@ const STATUS={
   pending:"بانتظار التأكيد",
   confirmed:"مؤكد",
   called:"تم الاستدعاء",
+  transferred:"محوّل لجهة مختصة",
   completed:"مكتمل",
   rejected:"مرفوض",
   no_show:"لم يحضر",
@@ -116,6 +117,7 @@ function appointmentCard(a,opts={}){
     '<div><b>'+arDate(a.date)+' — '+escapeHtml(a.time)+'</b></div>'+
     '<div class="muted">'+escapeHtml(getReason(a.reason).label)+' · '+escapeHtml(a.college)+'</div>'+
     (a.urgent?'<div class="urgent-note">⚠️ الطالب صنّف الطلب كحالة عاجلة ويحتاج مراجعة المكتب.</div>':'')+
+    (a.transferredTo?'<div class="route-box show"><strong>تم تحويل الطلب</strong><p style="margin:6px 0 0">الجهة: <b>'+escapeHtml(a.transferredTo)+'</b></p></div>':'')+
     (a.notes?'<div class="note-text">'+escapeHtml(a.notes)+'</div>':'')+
     (a.attachmentName?'<div class="file-chip">📎 '+escapeHtml(a.attachmentName)+' <small>(اسم ملف Demo فقط)</small></div>':'')+
     (allowCancel&&["pending","confirmed"].includes(a.status)?'<div><button type="button" class="btn small danger" data-cancel>إلغاء الموعد</button></div>':'')+
@@ -124,9 +126,24 @@ function appointmentCard(a,opts={}){
 }
 function adminActions(a){
   let out="";
-  if(a.status==="pending")out+='<button class="btn small primary" data-act="confirm">تأكيد</button><button class="btn small danger" data-act="reject">رفض</button>';
-  if(a.status==="confirmed")out+='<button class="btn small primary" data-act="call">استدعاء</button><button class="btn small danger" data-act="no_show">لم يحضر</button>';
-  if(a.status==="called")out+='<button class="btn small primary" data-act="complete">تمت المقابلة</button><button class="btn small danger" data-act="no_show">لم يحضر</button>';
+  if(a.status==="pending"){
+    out+='<button class="btn small primary" data-act="confirm">تأكيد</button>';
+    out+='<button class="btn small" data-act="transfer">تحويل لجهة</button>';
+    out+='<button class="btn small danger" data-act="cancel">إلغاء</button>';
+    out+='<button class="btn small ghost" data-act="reject">رفض</button>';
+  }
+  if(a.status==="confirmed"){
+    out+='<button class="btn small primary" data-act="call">استدعاء</button>';
+    out+='<button class="btn small" data-act="transfer">تحويل لجهة</button>';
+    out+='<button class="btn small danger" data-act="cancel">إلغاء</button>';
+    out+='<button class="btn small ghost" data-act="no_show">لم يحضر</button>';
+  }
+  if(a.status==="called"){
+    out+='<button class="btn small primary" data-act="complete">تمت المقابلة</button>';
+    out+='<button class="btn small" data-act="transfer">تحويل لجهة</button>';
+    out+='<button class="btn small danger" data-act="cancel">إلغاء</button>';
+    out+='<button class="btn small ghost" data-act="no_show">لم يحضر</button>';
+  }
   out+='<button class="btn small ghost" data-act="copy">نسخ الرقم</button>';
   return out;
 }
@@ -298,7 +315,20 @@ function initAdmin(){
       state=loadState();const id=btn.closest("[data-id]")?.dataset.id,a=state.appointments.find(x=>x.id===id);if(!a)return;
       const act=btn.dataset.act;
       if(act==="copy"){copyText(a.ref);return}
-      if(act==="call"){
+      if(act==="transfer"){
+        const suggested=getReason(a.reason).route;
+        const destination=prompt("حوّل الطلب إلى أي جهة؟",a.transferredTo||suggested);
+        if(!destination||!destination.trim())return;
+        a.status="transferred";
+        a.transferredTo=destination.trim();
+        a.transferredAt=nowIso();
+        if(state.queue?.calledId===a.id)state.queue={calledId:null,calledAt:null};
+      }else if(act==="cancel"){
+        if(!confirm("إلغاء هذا الموعد؟"))return;
+        a.status="cancelled";
+        a.cancelledAt=nowIso();
+        if(state.queue?.calledId===a.id)state.queue={calledId:null,calledAt:null};
+      }else if(act==="call"){
         state.appointments.forEach(x=>{if(x.status==="called"&&x.id!==a.id)x.status="confirmed"});
         a.status="called";state.queue={calledId:a.id,calledAt:nowIso()};
       }else{
@@ -331,7 +361,8 @@ function initAdmin(){
     const box=$("#upcomingList");if(!box)return;
     const list=state.appointments.filter(a=>isFutureAppointment(a)&&["pending","confirmed","called"].includes(a.status))
       .sort((a,b)=>appointmentStamp(a)-appointmentStamp(b)).slice(0,5);
-    box.innerHTML=list.length?list.map(a=>appointmentCard(a,{showStudent:true})).join(""):'<div class="empty">لا توجد مواعيد قادمة.</div>';
+    box.innerHTML=list.length?list.map(a=>appointmentCard(a,{showStudent:true,showActions:true})).join(""):'<div class="empty">لا توجد مواعيد قادمة.</div>';
+    bindAdminActions(box);
   }
   function renderQueue(){
     const today=localDate(new Date());
