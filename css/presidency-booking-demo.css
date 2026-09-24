@@ -51,7 +51,7 @@ input::placeholder,textarea::placeholder{color:#719080}textarea{min-height:110px
 .file-chip small{color:var(--muted)}.urgent-note{color:#ffd7d7;background:rgba(255,122,122,.07);border:1px solid rgba(255,122,122,.15);padding:8px 10px;border-radius:10px;font-size:13px}
 .row{display:flex;align-items:center;gap:9px;flex-wrap:wrap}.between{justify-content:space-between}.status{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:6px 10px;font-size:12px;font-weight:900;white-space:nowrap}
 .status.pending{background:rgba(243,201,105,.1);color:#ffe8a7}.status.confirmed{background:rgba(22,167,101,.13);color:#baf0cf}
-.status.called{background:rgba(121,184,255,.13);color:#d7e9ff}.status.completed{background:rgba(121,184,255,.11);color:#d7e9ff}
+.status.called{background:rgba(121,184,255,.13);color:#d7e9ff}.status.transferred{background:rgba(183,140,255,.12);color:#eadcff}.status.completed{background:rgba(121,184,255,.11);color:#d7e9ff}
 .status.rejected,.status.no_show{background:rgba(255,122,122,.1);color:#ffd3d3}.status.cancelled{background:rgba(169,193,180,.09);color:#d0ddd6}
 .footer{border-top:1px solid var(--line);padding:28px 0 38px;color:var(--muted);text-align:center;font-size:13px}
 .login-shell{min-height:100vh;display:grid;place-items:center;padding:24px}.login-card{width:min(470px,100%);padding:28px}.cred{background:#071811;border:1px dashed rgba(111,211,156,.36);border-radius:15px;padding:14px;margin:16px 0}
