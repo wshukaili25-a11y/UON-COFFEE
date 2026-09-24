@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="robots" content="noindex,nofollow">
+  <title>لوحة مكتب الرئاسة Demo | UON Hub</title>
+  <meta name="theme-color" content="#06110d">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/presidency-booking-demo.css?v=1.0.0">
+</head>
+<body data-demo-page="admin">
+  <section id="adminLogin" class="login-shell">
+    <div class="card login-card">
+      <a class="brand" href="/presidency-booking-demo.html"><img src="/assets/icons/uonhub-192-v75.png" alt="UON Hub"><div><strong>UON Hub</strong><small>Presidency Booking Demo</small></div></a>
+      <span class="eyebrow" style="margin-top:24px">حساب إداري تجريبي</span>
+      <h1 style="font-size:34px">دخول مكتب الرئاسة</h1>
+      <p style="color:var(--muted)">هذه لوحة Demo فقط. بيانات الدخول معلنة عمدًا لأنها لا تصل لأي نظام حقيقي.</p>
+      <div class="cred"><b>بيانات Demo</b><code>username: ayman.demo</code><code>password: uon2026</code></div>
+      <form id="adminLoginForm" class="form-grid">
+        <div class="field wide"><label>اسم المستخدم</label><input name="username" autocomplete="username" required></div>
+        <div class="field wide"><label>كلمة المرور</label><input name="password" type="password" autocomplete="current-password" required></div>
+        <div class="field wide"><button class="btn primary" type="submit">دخول</button></div>
+      </form>
+      <button id="demoAutoLogin" class="btn ghost" style="width:100%;margin-top:8px">دخول سريع للحساب التجريبي</button>
+      <a class="btn ghost" style="width:100%;margin-top:8px" href="/presidency-booking-demo.html">فتح صفحة الطالب</a>
+    </div>
+  </section>
+
+  <div id="adminApp" class="admin-wrap" hidden>
+    <aside id="sidebar" class="sidebar">
+      <a class="brand" href="/presidency-booking-demo.html"><img src="/assets/icons/uonhub-192-v75.png" alt=""><div><strong>مكتب الرئاسة</strong><small>لوحة Demo</small></div></a>
+      <div class="side-nav">
+        <button class="btn active" data-section="overview">نظرة عامة</button>
+        <button class="btn" data-section="appointments">المواعيد</button>
+        <button class="btn" data-section="walkin">استقبال مباشر</button>
+        <button class="btn" data-section="availability">أوقات الاستقبال</button>
+      </div>
+      <div class="demo-notice" style="margin-top:18px">كل البيانات محلية داخل متصفحك ولا تستخدم قاعدة البيانات الحقيقية.</div>
+    </aside>
+
+    <main class="admin-main">
+      <div class="admin-head">
+        <div class="row"><button id="menuBtn" class="btn small mobile-menu">☰</button><div><span class="eyebrow">UON Executive Service Demo</span><h1>إدارة مواعيد مكتب الرئاسة</h1></div></div>
+        <div class="row"><button id="exportCsv" class="btn small">تصدير CSV</button><button id="resetDemo" class="btn small danger">إعادة Demo</button><button id="logoutAdmin" class="btn small ghost">خروج</button></div>
+      </div>
+
+      <section id="sec-overview" class="section active">
+        <div id="stats" class="stats"></div>
+        <div class="admin-grid">
+          <div class="card table-card"><div class="between row"><div><h2>المواعيد القادمة</h2><p style="color:var(--muted);margin:0">عرض سريع لأقرب الطلبات.</p></div><a class="btn small" href="/presidency-booking-demo.html" target="_blank">فتح صفحة الطالب</a></div><div id="upcomingList" class="appointments-list" style="margin-top:14px"></div></div>
+          <aside>
+            <div class="card side-card"><h3>أسباب الزيارة</h3><div id="categoryStats"></div></div>
+            <div class="card side-card"><h3>ماذا يثبت هذا النموذج؟</h3><p style="color:var(--muted)">تنظيم المواعيد، تقليل الانتظار، توجيه الطلبات، وإتاحة مؤشرات للإدارة بدون تعقيد النظام الرسمي.</p></div>
+          </aside>
+        </div>
+      </section>
+
+      <section id="sec-appointments" class="section">
+        <div class="card table-card">
+          <div class="between row"><div><h2>جميع المواعيد</h2><p style="color:var(--muted);margin:0">إدارة الحالات ومراجعة تفاصيل الطلبة التجريبيين.</p></div></div>
+          <div class="filters">
+            <input id="adminSearch" type="search" placeholder="بحث بالاسم أو الرقم أو الكلية">
+            <select id="statusFilter">
+              <option value="all">كل الحالات</option>
+              <option value="pending">بانتظار التأكيد</option>
+              <option value="confirmed">مؤكد</option>
+              <option value="completed">مكتمل</option>
+              <option value="rejected">مرفوض</option>
+              <option value="no_show">لم يحضر</option>
+              <option value="cancelled">ملغي</option>
+            </select>
+          </div>
+          <div id="appointmentsList" class="appointments-list"></div>
+        </div>
+      </section>
+
+      <section id="sec-walkin" class="section">
+        <div class="card panel" style="max-width:760px">
+          <span class="eyebrow">استقبال بدون موعد</span><h2 style="margin-top:10px">إضافة طالب حضر مباشرة</h2>
+          <form id="walkinForm" class="form-grid">
+            <div class="field"><label>اسم الطالب</label><input name="studentName" required placeholder="بيانات تجريبية"></div>
+            <div class="field"><label>الرقم الجامعي</label><input name="studentId" required></div>
+            <div class="field"><label>الكلية</label><select name="college" required>
+              <option>كلية الاقتصاد والإدارة ونظم المعلومات</option><option>كلية العلوم والآداب</option><option>كلية الهندسة والعمارة</option><option>كلية العلوم الصحية</option><option>البرنامج التأسيسي</option><option>أخرى</option>
+            </select></div>
+            <div class="field"><label>سبب الزيارة</label><select name="reason" required>
+              <option value="proposal">مقترح تطوير</option><option value="complaint">ملاحظة أو شكوى عامة</option><option value="academic">موضوع أكاديمي</option><option value="financial">الشؤون المالية</option><option value="registration">التسجيل</option><option value="other">موضوع آخر</option>
+            </select></div>
+            <div class="field wide"><label class="checkbox"><input name="urgent" type="checkbox"> <span>حالة عاجلة</span></label></div>
+            <div class="field wide"><button class="btn primary" type="submit">إضافة للاستقبال الآن</button></div>
+          </form>
+        </div>
+      </section>
+
+      <section id="sec-availability" class="section">
+        <div class="card panel" style="max-width:760px">
+          <span class="eyebrow">إدارة التوفر</span><h2 style="margin-top:10px">فترات الاستقبال الافتراضية</h2>
+          <p style="color:var(--muted)">اضغط على الوقت لتفعيله أو إيقافه في صفحة الحجز التجريبية.</p>
+          <div id="slotSettings" class="slot-toggle"></div>
+          <div class="notice" style="margin-top:18px">النسخة النهائية يمكن ربطها بتقويم المكتب الرسمي، تحديد أيام معينة، إجازات، مدة المقابلة، والحد الأقصى للحجوزات.</div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div class="toast"></div>
+  <script type="module" src="/js/presidency-booking-demo.js?v=1.0.0"></script>
+</body>
+</html>
