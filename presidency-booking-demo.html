@@ -4,12 +4,12 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="robots" content="noindex,nofollow">
-  <title>حجز موعد مكتب الرئاسة | UON Hub Demo</title>
+  <title>حجز موعد مكتب رئاسة الجامعة | UON Hub Demo</title>
   <meta name="theme-color" content="#06110d">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/css/presidency-booking-demo.css?v=1.0.0">
+  <link rel="stylesheet" href="/css/presidency-booking-demo.css?v=2.0.0">
 </head>
 <body data-demo-page="student">
   <header class="topbar">
@@ -17,7 +17,7 @@
       <a class="brand" href="/"><img src="/assets/icons/uonhub-192-v75.png" alt="UON Hub"><div><strong>UON Hub</strong><small>Presidency Booking Demo</small></div></a>
       <div class="nav-actions">
         <a class="btn ghost hide-mobile" href="#track">متابعة حجز</a>
-        <a class="btn" href="/presidency-booking-admin-demo.html">لوحة Demo</a>
+        <a class="btn" href="/presidency-booking-admin-demo.html">لوحة المكتب</a>
       </div>
     </div>
   </header>
@@ -26,45 +26,47 @@
     <section class="hero">
       <div class="shell hero-grid">
         <div class="card hero-copy">
-          <span class="eyebrow">نسخة تجريبية مستقلة · UON Hub Labs</span>
-          <h1>احجز موعدك مع مكتب الرئاسة بدون انتظار طويل.</h1>
-          <p class="lead">تجربة أولية لتنظيم استقبال الطلبة، توجيه الطلب للجهة المناسبة، ثم حجز وقت واضح ومتابعة حالة الموعد.</p>
+          <span class="eyebrow">UON Hub Labs · نسخة تجريبية مستقلة</span>
+          <h1>حجز مواعيد مكتب رئاسة الجامعة بطريقة أوضح وأسرع.</h1>
+          <p class="lead">نموذج مقترح لتنظيم استقبال الطلبة، تقليل الانتظار، توجيه الطلب للجهة الصحيحة، ومتابعة الموعد من نفس الصفحة.</p>
           <div class="hero-points">
-            <div class="mini"><strong>حجز سريع</strong><span>اختر السبب والوقت المتاح</span></div>
-            <div class="mini"><strong>توجيه ذكي</strong><span>يقلل المواعيد التي لا تحتاج تصعيدًا</span></div>
-            <div class="mini"><strong>متابعة واضحة</strong><span>رقم حجز وحالة محدثة</span></div>
+            <div class="mini"><strong>حجز منظم</strong><span>الأوقات الممتلئة تختفي تلقائيًا</span></div>
+            <div class="mini"><strong>توجيه قبل التصعيد</strong><span>يقلل الطلبات التي يمكن حلها لدى جهة أخرى</span></div>
+            <div class="mini"><strong>متابعة برقم حجز</strong><span>تأكيد أو إلغاء أو استدعاء</span></div>
           </div>
         </div>
         <aside class="card hero-side">
-          <div>
-            <div class="office-badge"><div class="office-icon">🏛️</div><div><strong>مكتب رئاسة الجامعة</strong><p style="margin:2px 0;color:var(--muted)">نموذج حجز تجريبي لطلاب جامعة نزوى</p></div></div>
-          </div>
-          <div class="demo-notice"><b>تنبيه Demo:</b> هذه الصفحة للتجربة فقط وليست نظام حجز رسميًا، ولا ينبغي إدخال بيانات شخصية حقيقية.</div>
-          <button class="btn primary" id="fillDemoStudent" type="button">تعبئة طالب تجريبي</button>
+          <div class="office-badge"><div class="office-icon">🏛️</div><div><strong>مكتب رئاسة الجامعة</strong><p class="muted" style="margin:2px 0">تصور تجريبي لتنظيم استقبال الطلبة</p></div></div>
+          <div class="demo-notice"><b>مهم:</b> هذه نسخة Demo وليست خدمة رسمية. لا تدخل اسمك الحقيقي أو رقمك الجامعي أو أي مستند شخصي.</div>
+          <button class="btn primary" id="fillDemoStudent" type="button">تعبئة بيانات تجريبية</button>
         </aside>
       </div>
     </section>
 
     <section class="shell main-grid">
       <aside class="card panel">
-        <h2>كيف يعمل؟</h2>
-        <p style="color:var(--muted)">الفكرة تقلل الزحام على المكتب وتوصل كل طالب للمسار الصحيح.</p>
+        <h2>قبل الحجز</h2>
+        <p class="muted">الهدف أن تصل الحالات التي تحتاج مكتب الرئاسة فعلًا، بدون إضاعة وقت الطالب أو المكتب.</p>
         <div class="step-list">
-          <div class="step"><b>1</b><div><strong>حدد سبب الزيارة</strong><span>النظام يحدد هل تحتاج جهة مختصة أولًا.</span></div></div>
-          <div class="step"><b>2</b><div><strong>اختر موعدًا</strong><span>تظهر فقط الفترات المتاحة وغير المحجوزة.</span></div></div>
-          <div class="step"><b>3</b><div><strong>استلم رقم الحجز</strong><span>تقدر تتابع التأكيد أو الإلغاء بنفس الرقم.</span></div></div>
-          <div class="step"><b>4</b><div><strong>المكتب يدير الطلب</strong><span>تأكيد، رفض، إكمال، أو تسجيل عدم الحضور.</span></div></div>
+          <div class="step"><b>1</b><div><strong>حدد نوع الموضوع</strong><span>النظام يقترح الجهة الأولى المناسبة.</span></div></div>
+          <div class="step"><b>2</b><div><strong>أكد التصعيد عند الحاجة</strong><span>للمالية والتسجيل والموضوع الأكاديمي يجب مراجعة الجهة المختصة أولًا.</span></div></div>
+          <div class="step"><b>3</b><div><strong>اختر الموعد</strong><span>تظهر لك الفترات المتاحة فقط.</span></div></div>
+          <div class="step"><b>4</b><div><strong>تابع الطلب</strong><span>باستخدام رقم الحجز مع الرقم الجامعي التجريبي.</span></div></div>
         </div>
-        <div class="notice" style="margin-top:16px">الفئات التي لها جهة مختصة مثل المالية أو التسجيل تتطلب تأكيد أن الطالب راجع الجهة أولًا قبل إكمال الحجز.</div>
+        <div class="notice" style="margin-top:16px">الأوقات الحالية تجريبية فقط وليست أوقات استقبال رسمية لمكتب الرئاسة.</div>
       </aside>
 
       <div>
         <section class="card panel">
-          <div class="between row"><div><span class="eyebrow">حجز جديد</span><h2 style="margin-top:10px">بيانات الطالب والطلب</h2></div></div>
-          <form id="bookingForm">
+          <div class="between row">
+            <div><span class="eyebrow">حجز جديد</span><h2 style="margin-top:10px">بيانات الطلب</h2></div>
+            <span class="status confirmed">Demo</span>
+          </div>
+
+          <form id="bookingForm" novalidate>
             <div class="form-grid">
-              <div class="field"><label>اسم الطالب</label><input name="studentName" required placeholder="استخدم بيانات تجريبية"></div>
-              <div class="field"><label>الرقم الجامعي</label><input name="studentId" required inputmode="numeric" placeholder="2026XXXX"></div>
+              <div class="field"><label>اسم الطالب التجريبي</label><input name="studentName" required minlength="2" placeholder="مثال: طالب تجريبي"></div>
+              <div class="field"><label>الرقم الجامعي التجريبي</label><input name="studentId" required inputmode="numeric" pattern="[0-9]{6,12}" placeholder="2026XXXX"></div>
               <div class="field"><label>الكلية</label><select name="college" required>
                 <option value="">اختر الكلية</option>
                 <option>كلية الاقتصاد والإدارة ونظم المعلومات</option>
@@ -74,27 +76,40 @@
                 <option>البرنامج التأسيسي</option>
                 <option>أخرى</option>
               </select></div>
-              <div class="field"><label>رقم الهاتف</label><input name="phone" required inputmode="tel" placeholder="968XXXXXXXX"></div>
-              <div class="field wide"><label>سبب الزيارة</label><select id="reason" name="reason" required>
-                <option value="">اختر السبب</option>
-                <option value="financial">الشؤون المالية</option>
-                <option value="registration">التسجيل والسجل الأكاديمي</option>
-                <option value="academic">موضوع أكاديمي</option>
-                <option value="technical">مشكلة تقنية</option>
-                <option value="student_service">خدمة طلابية</option>
-                <option value="proposal">مقترح تطوير</option>
-                <option value="complaint">ملاحظة أو شكوى عامة</option>
-                <option value="other">موضوع آخر</option>
-              </select><div id="routeBox" class="route-box"></div></div>
-              <div class="field wide" id="priorWrap" hidden><label class="checkbox"><input id="priorReviewed" type="checkbox"> <span>أؤكد أنني راجعت الجهة المختصة ولم تُحل المشكلة، وأحتاج مقابلة مكتب الرئاسة.</span></label></div>
-              <div class="field wide"><label>وصف مختصر</label><textarea name="notes" required placeholder="اشرح الموضوع بشكل مختصر وواضح"></textarea></div>
-              <div class="field"><label>مرفق اختياري (Demo)</label><input name="attachment" type="file" accept=".pdf,.jpg,.jpeg,.png"></div>
-              <div class="field"><label class="checkbox" style="margin-top:31px"><input name="urgent" type="checkbox"> <span>الحالة عاجلة</span></label></div>
+              <div class="field"><label>رقم هاتف تجريبي</label><input name="phone" required inputmode="tel" pattern="[0-9]{8,12}" placeholder="968XXXXXXXX"></div>
+
+              <div class="field wide">
+                <label>سبب الزيارة</label>
+                <select id="reason" name="reason" required>
+                  <option value="">اختر السبب</option>
+                  <option value="financial">الشؤون المالية</option>
+                  <option value="registration">التسجيل والسجل الأكاديمي</option>
+                  <option value="academic">موضوع أكاديمي</option>
+                  <option value="technical">مشكلة تقنية</option>
+                  <option value="student_service">خدمة طلابية</option>
+                  <option value="proposal">مقترح تطوير</option>
+                  <option value="complaint">ملاحظة أو شكوى عامة</option>
+                  <option value="other">موضوع آخر</option>
+                </select>
+                <div id="routeBox" class="route-box"></div>
+              </div>
+
+              <div class="field wide" id="priorWrap" hidden>
+                <label class="checkbox"><input id="priorReviewed" type="checkbox"> <span>أؤكد أنني راجعت الجهة المختصة ولم تُحل المشكلة، وأحتاج مقابلة مكتب رئاسة الجامعة.</span></label>
+              </div>
+
+              <div class="field wide"><label>وصف مختصر</label><textarea name="notes" required minlength="5" placeholder="اشرح الموضوع باختصار حتى يكون المكتب مستعدًا قبل الموعد"></textarea></div>
+
+              <div class="field"><label>اختيار مرفق للتجربة</label><input name="attachment" type="file" accept=".pdf,.jpg,.jpeg,.png"><small class="muted">لن يتم رفع الملف في نسخة Demo؛ يظهر اسمه فقط.</small></div>
+              <div class="field"><label class="checkbox" style="margin-top:31px"><input name="urgent" type="checkbox"> <span>أعتقد أن الموضوع عاجل ويحتاج مراجعة سريعة من المكتب</span></label></div>
             </div>
+
             <div style="margin-top:22px">
-              <h3>اختر الموعد المتاح</h3>
+              <div class="between row"><div><h3>اختر الموعد التجريبي</h3><span class="muted">الأحد – الخميس</span></div></div>
               <div id="slots" class="slot-days"></div>
+              <div id="selectedSlotBox" class="selected-slot" hidden>الموعد المحدد: <strong id="selectedSlotText"></strong></div>
             </div>
+
             <button class="btn primary" style="width:100%;margin-top:18px" type="submit">إرسال طلب الحجز التجريبي</button>
           </form>
           <div id="bookingSummary" class="summary"></div>
@@ -102,10 +117,11 @@
 
         <section id="track" class="card panel track-box">
           <span class="eyebrow">متابعة الموعد</span>
-          <h2 style="margin-top:10px">تحقق من حالة حجزك</h2>
+          <h2 style="margin-top:10px">تحقق من حالة الحجز</h2>
+          <p class="muted">أدخل رقم الحجز والرقم الجامعي التجريبي المستخدم عند إنشاء الطلب.</p>
           <form id="trackForm" class="form-grid">
-            <div class="field"><label>رقم الحجز</label><input name="trackRef" required placeholder="PR-DEMO-XXXXXX"></div>
-            <div class="field"><label>الرقم الجامعي</label><input name="trackStudentId" required></div>
+            <div class="field"><label>رقم الحجز</label><input name="trackRef" required placeholder="PR-DEMO-XXXXXX" dir="ltr"></div>
+            <div class="field"><label>الرقم الجامعي</label><input name="trackStudentId" required inputmode="numeric"></div>
             <div class="field wide"><button class="btn" type="submit">عرض الحالة</button></div>
           </form>
           <div id="trackResult" class="track-result"></div>
@@ -114,7 +130,8 @@
     </section>
   </main>
 
-  <footer class="footer"><div class="shell">UON Hub مشروع طلابي مستقل وغير تابع رسميًا لجامعة نزوى · هذه نسخة Demo للاختبار فقط.</div></footer>
-  <script type="module" src="/js/presidency-booking-demo.js?v=1.0.0"></script>
+  <footer class="footer"><div class="shell">UON Hub مشروع طلابي مستقل وغير تابع رسميًا لجامعة نزوى · هذا نموذج تجريبي فقط.</div></footer>
+  <div class="toast"></div>
+  <script type="module" src="/js/presidency-booking-demo.js?v=2.0.0"></script>
 </body>
 </html>
