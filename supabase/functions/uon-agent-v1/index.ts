@@ -159,8 +159,8 @@ function route(question:string){
 
   if(/انجز|انجاز|مسالك|مركز.*(?:دعم|تعلم)|anjiz|support center|learning pathways/.test(q))return 'support';
 
-  if(/^(?:من|مين|منو|من هو|من هي|who is)\s+(?:رئيس|مدير|عميد|نائب رئيس|president|vice president|dean|director)/i.test(q)
-    || /(?:رئيس|مدير|عميد|نائب رئيس).*(?:جامعه نزوى|جامعة نزوى|university of nizwa)/i.test(q))return 'search';
+  if(/(?:رئيس|مدير|عميد|نائب رئيس|president|vice president|dean|director).*(?:جامع|university)/i.test(q)
+    || /^(?:من|مين|منو|من هو|من هي|who is).*?(?:رئيس|مدير|عميد|نائب رئيس|president|vice president|dean|director)/i.test(q))return 'search';
 
   const staffWords=/(?:دكتور|دكتوره|استاذ|استاذه|موظف|عميد|مدير|رئيس|مرشد|doctor|professor|staff|dean|director|advisor)/;
   const staffLookup=(
@@ -320,7 +320,7 @@ async function generateWithGemini(system:string,prompt:string,temperature=.3,max
   for(const model of GENERAL_MODELS){
     try{
       const generationConfig:any={temperature,maxOutputTokens};
-      if(/^gemini-3\.(7|8)-flash$/.test(model))generationConfig.thinkingConfig={thinkingLevel:'low'};
+      if(!googleSearch && /^gemini-3\.(7|8)-flash$/.test(model))generationConfig.thinkingConfig={thinkingLevel:'low'};
       const payload:any={
         system_instruction:{parts:[{text:system}]},
         contents:[{role:'user',parts:[{text:prompt}]}],
@@ -336,7 +336,10 @@ async function generateWithGemini(system:string,prompt:string,temperature=.3,max
         signal:AbortSignal.timeout(18000)
       });
       const d=await r.json().catch(()=>({}));
-      if(!r.ok)continue;
+      if(!r.ok){
+        if(googleSearch)console.error('uon-agent-google-search',model,r.status,clean(JSON.stringify(d),900));
+        continue;
+      }
       const answer=String(d?.candidates?.[0]?.content?.parts?.filter((x:any)=>!x?.thought).map((x:any)=>x?.text||'').join('')||'').trim().slice(0,6500);
       if(answer)return {
         answer,
