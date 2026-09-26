@@ -127,10 +127,10 @@ function casualReply(question:string,language:string){
   const rows:[RegExp,string,string][]=[
     [/^(?:السلام عليكم|سلام عليكم|السلام عليكم ورحمة الله|السلام عليكم ورحمه الله)$/i,'وعليكم السلام ورحمة الله وبركاته 👋 كيف أقدر أساعدك؟','Wa alaikum assalam 👋 How can I help?'],
     [/^(?:وعليكم السلام|وعليكم السلام ورحمة الله|وعليكم السلام ورحمه الله)$/i,'وعليكم السلام ورحمة الله وبركاته 🌿','Wa alaikum assalam 🌿'],
-    [/^(?:هلا|هلا والله|هلا بك|هلو|يا هلا|يا مرحبا|مرحبا|مرحبتين|مرحبا الساع|حياك|حيك|حياك الله|حي الله|الله يحييك)$/i,'هلا وغلا 👋 وش تحتاج؟','Hi 👋 What can I help you with?'],
+    [/^(?:هلا|هلا والله|هلا بك|هلو|يا هلا|يا مرحبا|مرحبا|مرحبتين|مرحبا الساع|حياك|حيك|حياك الله|حي الله|الله يحييك)$/i,'هلا والله 👋 ويش تحتاج؟','Hi 👋 What can I help you with?'],
     [/^(?:صباح الخير|صباح النور)$/i,'صباح النور ☀️ وش أقدر أساعدك فيه؟','Good morning ☀️ How can I help?'],
     [/^(?:مساء الخير|مساء النور)$/i,'مساء النور 🌙 وش أقدر أساعدك فيه؟','Good evening 🌙 How can I help?'],
-    [/^(?:كيفك|كيف حالك|هلا كيفك|شخبارك|وش اخبارك|ويش اخبارك|كيف امورك|شلونك|علومك|how are you)$/i,'بخير دامك بخير 😄 أنا جاهز، وش تحتاج؟','Doing well 😄 I’m ready. What do you need?'],
+    [/^(?:كيفك|كيف حالك|هلا كيفك|شخبارك|وش اخبارك|ويش اخبارك|كيف امورك|شلونك|علومك|how are you)$/i,'بخير دامك بخير 😄 حاضر، ويش عندك؟','Doing well 😄 I’m ready. What do you need?'],
     [/^(?:شكرا|شكرا لك|مشكور|تسلم|يعطيك العافيه|يعطيك العافية|thanks|thank you)$/i,'العفو وحاضرين 🙌','You’re welcome 🙌'],
     [/^(?:تمام|زين|اوكي|اوك|ok|okay)$/i,'تمام 🙌 كمل، أنا معك.','Sounds good 🙌 Go ahead.'],
     [/^(?:مع السلامه|مع السلامة|باي|bye)$/i,'في أمان الله 👋','Goodbye 👋'],
@@ -141,15 +141,38 @@ function casualReply(question:string,language:string){
   return '';
 }
 
+function universitySignal(question:string){
+  const q=norm(question);
+  return /جامعه نزوى|جامعة نزوى|university of nizwa|\buon\b|uonhub|eduwave|مودل|moodle|البوابه|البوابة|portal|الرقم الجامعي|البريد الجامعي|تحديد المستوى|linguaskill|فاونديشن|تاسيسي|تأسيسي|سكشن|سكاشن|شعبه|شعبة|الشعب|القبول|التسجيل|حذف واضاف|حذف وإضاف|الانسحاب|الخطة الدراسيه|الخطة الدراسية|المعدل التراكمي|gpa|الساعات المعتمده|الساعات المعتمدة|الحرم|الكليه|الكلية|القسم|انجز|انجاز|مسالك|رسوم الجامعه|رسوم الجامعة|السكن الجامعي|المكتبه|المكتبة|واي فاي|wifi|الجدول الدراسي|جدولي|محاضراتي|قاعة|قاعه|مبنى|موظف|دكتور|دكتوره|استاذ|استاذه|عميد|مرشد/.test(q);
+}
+
 function route(question:string){
   const q=norm(question);
+  const writing=/اكتب|اكتبلي|صيغ|صياغ|اعد صياغ|عدّل|عدل لي|ترجم|لخص|لخّص|اشرح|فهمني|حل لي|حللي|ساعدني|سوي لي|سو لي|write|rewrite|translate|summari[sz]e|explain|solve|help me|code|برمج|كود/.test(q);
+  const conversational=/رايك|رأيك|وش رايك|ويش رايك|ايش رايك|سالف|امزح|نكت|طفشان|متضايق|مبسوط|احب|اكره|what do you think|joke|chat/.test(q);
+
   if(/جدولي|محاضراتي|محاضرتي|وش عندي اليوم|ويش عندي اليوم|ايش عندي اليوم|my schedule|my classes|next class/.test(q))return 'schedule';
-  if(/دكتور|دكتوره|استاذ|استاذه|موظف|عميد|مدير|رئيس|مرشد|ايميل|بريد|تحويله|مكتب.*(?:دكتور|استاذ)|doctor|professor|staff|dean|director|advisor|email/.test(q))return 'staff';
+
   if(/انجز|انجاز|مسالك|مركز.*(?:دعم|تعلم)|anjiz|support center|learning pathways/.test(q))return 'support';
-  if(/تقويم|موعد|تاريخ|اختبار|امتحان|تسجيل|حذف.*اضاف|اجازه|دوام|calendar|exam|registration|add.?drop|holiday|semester/.test(q))return 'calendar';
-  if(/\b[A-Z]{2,10}[ -]*\d{2,4}[A-Z]?\b/i.test(question)||/ماده|مادة|مساق|مقرر|متطلب|ساعات.*معتمد|course|prerequisite|credit/.test(q))return 'course';
-  if(/مبنى|المبنى|قاعه|قاعة|مختبر|خريط|مكان|موقع|building|room|lab|campus|location/.test(q))return 'campus';
-  return 'search';
+
+  const staffWords=/(?:دكتور|دكتوره|استاذ|استاذه|موظف|عميد|مدير|رئيس|مرشد|doctor|professor|staff|dean|director|advisor)/;
+  const staffLookup=(
+    /(?:وين|اين|أين|من هو|من هي|عطني|اعطني|ابي|ابا|اريد|ابغى|ابغي|دور|ابحث|find|where|who).*(?:دكتور|دكتوره|استاذ|استاذه|موظف|عميد|مدير|رئيس|مرشد|doctor|professor|staff|dean|director|advisor)/.test(q)
+    || /(?:ايميل|بريد|رقم|هاتف|تحويله|تحويلة|مكتب|مكان|email|phone|extension|office).*(?:دكتور|دكتوره|استاذ|استاذه|موظف|عميد|مدير|رئيس|مرشد|doctor|professor|staff|dean|director|advisor)/.test(q)
+    || (!writing&&!conversational&&new RegExp('^'+staffWords.source).test(q))
+  );
+  if(staffLookup)return 'staff';
+
+  const calendarSpecific=/التقويم الاكاديمي|التقويم الأكاديمي|حذف واضاف|حذف وإضاف|موعد التسجيل|متى التسجيل|فتره التسجيل|فترة التسجيل|موعد الاختبار|متى الاختبار|موعد الامتحان|متى الامتحان|بدايه الفصل|بداية الفصل|نهايه الفصل|نهاية الفصل|academic calendar|registration date|add.?drop|exam date|semester date/.test(q);
+  if(calendarSpecific || ((/موعد|متى|تاريخ|يوم|اسبوع|أسبوع|calendar|when/.test(q))&&(/تسجيل|اختبار|امتحان|دوام|اجازه|إجازة|semester|registration|exam|holiday/.test(q))))return 'calendar';
+
+  if(/\b[A-Z]{2,10}[ -]*\d{2,4}[A-Z]?\b/i.test(question))return 'course';
+  if(!writing && (/كم.*ساع.*معتمد|متطلب.*(?:ماده|مادة|مساق|مقرر)|prerequisite|credit hours/.test(q)))return 'course';
+
+  if(/مبنى|المبنى|قاعه|قاعة|مختبر|خريط|مكان.*(?:جامعه|جامعة|حرم)|موقع.*(?:جامعه|جامعة|حرم)|building|room|lab|campus|campus location/.test(q))return 'campus';
+
+  if(writing||conversational)return 'chat';
+  return universitySignal(question)?'search':'chat';
 }
 
 async function staffTool(question:string){
@@ -311,10 +334,17 @@ Deno.serve(async (req:Request)=>{
     const casual=casualReply(question,language);
     if(casual){
       const request_id=await persistDirect(body,question,casual).catch(()=>null);
-      return reply(req,{answer:casual,links:[],actions:[],request_id:request_id||undefined,agent:true,agent_version:'1.2.0',intent:'chat',tool_trace:[],grounded:false,confidence:0.99});
+      return reply(req,{answer:casual,links:[],actions:[],request_id:request_id||undefined,agent:true,agent_version:'1.3.0',intent:'chat',tool_trace:[],grounded:false,confidence:0.99});
     }
     const effectiveQuestion=contextualQuestion(body,question);
     const selected=route(effectiveQuestion);
+
+    if(selected==='chat'){
+      const fb=await fallback(req,{...body,question});
+      if(fb.ok&&fb.data?.answer)return reply(req,{...fb.data,agent:true,agent_version:'1.3.0',intent:'chat',tool_trace:[fb.trace],fallback:false});
+      return reply(req,{answer:language==='en'?'I could not reply just now. Try again in a moment.':'ما قدرت أرد عليك الحين، جرّب مرة ثانية بعد شوي 🙏',links:[],actions:[],agent:true,agent_version:'1.3.0',intent:'chat',tool_trace:[fb.trace],grounded:false,confidence:0.3});
+    }
+
     let result:any;
     if(selected==='staff')result=await staffTool(effectiveQuestion);
     else if(selected==='course')result=await courseTool(effectiveQuestion);
@@ -327,11 +357,11 @@ Deno.serve(async (req:Request)=>{
     const formatted=formatResult(result,question,language);
     if(formatted.answer){
       const request_id=await persistDirect(body,question,formatted.answer).catch(()=>null);
-      return reply(req,{...formatted,request_id:request_id||undefined,agent:true,agent_version:'1.2.0',intent:selected,resolved_question:effectiveQuestion!==question?effectiveQuestion:undefined,tool_trace:[result.trace],grounded:true,confidence:result.rows?.length?0.94:0.72});
+      return reply(req,{...formatted,request_id:request_id||undefined,agent:true,agent_version:'1.3.0',intent:selected,resolved_question:effectiveQuestion!==question?effectiveQuestion:undefined,tool_trace:[result.trace],grounded:true,confidence:result.rows?.length?0.94:0.72});
     }
     const fb=await fallback(req,body);
-    if(fb.ok&&fb.data?.answer)return reply(req,{...fb.data,agent:true,agent_version:'1.2.0',intent:selected,tool_trace:[result.trace,fb.trace],fallback:true});
-    return reply(req,{answer:language==='en'?'I could not verify an answer right now. Try a more specific question.':'ما قدرت أتحقق من إجابة دقيقة حاليًا. جرّب سؤال أكثر تحديدًا.',links:[],actions:[],agent:true,agent_version:'1.2.0',intent:selected,tool_trace:[result.trace,fb.trace],grounded:false,confidence:0.35});
+    if(fb.ok&&fb.data?.answer)return reply(req,{...fb.data,agent:true,agent_version:'1.3.0',intent:selected,tool_trace:[result.trace,fb.trace],fallback:true});
+    return reply(req,{answer:language==='en'?'I could not verify an answer right now. Try a more specific question.':'ما قدرت أتحقق من إجابة دقيقة حاليًا. جرّب سؤال أكثر تحديدًا.',links:[],actions:[],agent:true,agent_version:'1.3.0',intent:selected,tool_trace:[result.trace,fb.trace],grounded:false,confidence:0.35});
   }catch(e){
     console.error('uon-agent-v1',e);
     return reply(req,{error:'agent_unavailable'},500);
