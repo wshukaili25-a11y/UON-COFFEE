@@ -60,7 +60,8 @@ async function rateHit(key:string,limit:number){
 async function enforceRate(req:Request,body:any){
   const checks:{key:string,limit:number}[]=[];
   if(isUuid(body?.client_token))checks.push({key:`agent-client:${body.client_token}`,limit:RATE_CLIENT_LIMIT});
-  const ip=clientIp(req); if(ip)checks.push({key:`agent-ip:${await digest(ip)}`,limit:RATE_IP_LIMIT});
+  const internal=req.headers.get('authorization')===`Bearer ${SERVICE_ROLE_KEY}`;
+  const ip=internal?'':clientIp(req); if(ip)checks.push({key:`agent-ip:${await digest(ip)}`,limit:RATE_IP_LIMIT});
   if(!checks.length)checks.push({key:`agent-anon:${await digest(req.headers.get('user-agent')||'unknown')}`,limit:RATE_CLIENT_LIMIT});
   for(const c of checks){const hit=await rateHit(c.key,c.limit);if(!hit.allowed)return hit;}
   return {allowed:true,retry_after:0};
