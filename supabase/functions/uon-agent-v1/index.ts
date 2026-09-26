@@ -151,6 +151,7 @@ function universitySignal(question:string){
 }
 
 function route(question:string){
+  const raw=clean(question,1200).toLowerCase();
   const q=norm(question);
   const writing=/اكتب|اكتبلي|صيغ|صياغ|اعد صياغ|عدّل|عدل لي|ترجم|لخص|لخّص|اشرح|فهمني|حل لي|حللي|ساعدني|سوي لي|سو لي|write|rewrite|translate|summari[sz]e|explain|solve|help me|code|برمج|كود/.test(q);
   const conversational=/رايك|رأيك|وش رايك|ويش رايك|ايش رايك|سالف|امزح|نكت|طفشان|متضايق|مبسوط|احب|اكره|what do you think|joke|chat/.test(q);
@@ -159,8 +160,8 @@ function route(question:string){
 
   if(/انجز|انجاز|مسالك|مركز.*(?:دعم|تعلم)|anjiz|support center|learning pathways/.test(q))return 'support';
 
-  if(/(?:رئيس|مدير|عميد|نائب رئيس|president|vice president|dean|director).*(?:جامع|university)/i.test(q)
-    || /^(?:من|مين|منو|من هو|من هي|who is).*?(?:رئيس|مدير|عميد|نائب رئيس|president|vice president|dean|director)/i.test(q))return 'search';
+  if(/(?:رئيس|مدير|عميد|نائب رئيس|president|vice president|dean|director).*(?:جامع|university)/i.test(raw)
+    || /^(?:من|مين|منو|من هو|من هي|who is).*?(?:رئيس|مدير|عميد|نائب رئيس|president|vice president|dean|director)/i.test(raw))return 'search';
 
   const staffWords=/(?:دكتور|دكتوره|استاذ|استاذه|موظف|عميد|مدير|رئيس|مرشد|doctor|professor|staff|dean|director|advisor)/;
   const staffLookup=(
@@ -464,7 +465,7 @@ Deno.serve(async (req:Request)=>{
     }
     const effectiveQuestion=contextualQuestion(body,question);
     const selected=route(effectiveQuestion);
-    console.log('uon-agent-route',JSON.stringify({question,effectiveQuestion,normalized:norm(effectiveQuestion),selected}));
+    console.log('uon-agent-route',JSON.stringify({question,effectiveQuestion,selected}));
 
     if(selected==='chat'){
       const g=await generalChat(body,question,language);
