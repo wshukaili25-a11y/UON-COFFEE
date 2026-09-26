@@ -457,6 +457,66 @@ function officialUonUrl(value:any){
   }catch{return false}
 }
 
+async function officialSiteSearch(question:string){
+  const started=Date.now();
+  try{
+    const expanded=expandStaffQuery(question);
+    const queryTerms=tokens(expanded).slice(0,10).join(' ') || clean(question,300);
+    const url='https://www.unizwa.edu.om/search.php?kw='+encodeURIComponent(queryTerms);
+    const r=await fetch(url,{headers:{'user-agent':'UONHub-Agent/1.6 (+https://uonhub.space)'},signal:AbortSignal.timeout(7000),redirect:'follow'});
+    if(!r.ok)return {rows:[],trace:tool('uon_official_site_search',started,0,'http_'+r.status)};
+    const type=(r.headers.get('content-type')||'').toLowerCase();
+    const bytes=new Uint8Array(await r.arrayBuffer());
+    const declared=(type.match(/charset=([^;\s]+)/i)?.[1]||'').replace(/["']/g,'');
+    let html='';
+    try{if(declared)html=new TextDecoder(declared).decode(bytes)}catch{}
+    if(!html){
+      const utf=new TextDecoder('utf-8').decode(bytes);
+      let win=''; try{win=new TextDecoder('windows-1256').decode(bytes)}catch{}
+      const arScore=(s:string)=>(s.match(/[\u0600-\u06ff]/g)||[]).length*3-(s.match(/\uFFFD/g)||[]).length*12;
+      html=win&&arScore(win)>arScore(utf)?win:utf;
+    }
+    html=html.slice(0,700000);
+    const rows:any[]=[];
+    const re=/<a\b[^>]*href\s*=\s*["']([^"']+)["'][^>]*>([\s\S]*?)<\/a>/gi;
+    let m:any,seen=0;
+    while((m=re.exec(html))&&seen<700){
+      seen++;
+      const rawHref=decodeHtml(m[1]||'');
+      if(!rawHref||/^(?:#|javascript:|mailto:|tel:)/i.test(rawHref))continue;
+      let href='';
+      try{href=new URL(rawHref,'https://www.unizwa.edu.om/').toString()}catch{continue}
+      if(!officialUonUrl(href))continue;
+      if(/\.(?:css|js|png|jpe?g|gif|svg|ico|woff2?|ttf)(?:\?|$)/i.test(href))continue;
+      const title=decodeHtml(String(m[2]||'').replace(/<[^>]+>/g,' '));
+      const around=decodeHtml(
+        html.slice(Math.max(0,m.index-420),Math.min(html.length,re.lastIndex+900))
+          .replace(/<script[\s\S]*?<\/script>/gi,' ')
+          .replace(/<style[\s\S]*?<\/style>/gi,' ')
+          .replace(/<[^>]+>/g,' ')
+      );
+      if(!title && !around)continue;
+      let score=scoreText(expanded,title+' '+around);
+      if(/profile_details\.php/i.test(href) && /دكتور|دكتوره|استاذ|استاذه|موظف|مدير|رئيس|عميد|مرشد|doctor|professor|staff|director|chancellor|dean|advisor/i.test(expanded))score+=8;
+      if(/search\.php/i.test(href)||/index\.php\?contentid=1(?:$|&)/i.test(href))score-=8;
+      if(score<=0)continue;
+      rows.push({type:'بحث موقع الجامعة',title:title||'نتيجة من موقع جامعة نزوى',description:clean(around,850),url:href,official:true,_score:score});
+    }
+    const unique:any[]=[];
+    const seenUrl=new Set<string>();
+    for(const row of rows.sort((a:any,b:any)=>b._score-a._score)){
+      const key=row.url.replace(/&amp;/g,'&');
+      if(seenUrl.has(key))continue;
+      seenUrl.add(key); unique.push(row);
+      if(unique.length>=8)break;
+    }
+    return {rows:unique,trace:tool('uon_official_site_search',started,unique.length,unique.length?'ok':'no_match')};
+  }catch(e){
+    console.error('uon-official-site-search',clean(String(e),500));
+    return {rows:[],trace:tool('uon_official_site_search',started,0,'error')};
+  }
+}
+
 async function fetchOfficialContext(rows:any[]){
   const started=Date.now();
   const urls=[...new Set(rows.map((r:any)=>clean(r.url||r.source_url,1600)).filter(officialUonUrl))].slice(0,3);
@@ -575,7 +635,7 @@ Deno.serve(async (req:Request)=>{
     const casual=casualReply(question,language);
     if(casual){
       const request_id=await persistDirect(body,question,casual).catch(()=>null);
-      return reply(req,{answer:casual,links:[],actions:[],request_id:request_id||undefined,agent:true,agent_version:'1.6.3',intent:'chat',tool_trace:[],grounded:false,confidence:0.99});
+      return reply(req,{answer:casual,links:[],actions:[],request_id:request_id||undefined,agent:true,agent_version:'1.7.0',intent:'chat',tool_trace:[],grounded:false,confidence:0.99});
     }
     const effectiveQuestion=contextualQuestion(body,question);
     const selected=route(effectiveQuestion);
@@ -585,11 +645,11 @@ Deno.serve(async (req:Request)=>{
       const g=await generalChat(body,question,language);
       if(g?.answer){
         const request_id=await persistDirect(body,question,g.answer).catch(()=>null);
-        return reply(req,{...g,request_id:request_id||undefined,agent:true,agent_version:'1.6.3',intent:'chat',tool_trace:[{name:'general_chat',status:'ok',count:1,ms:0}]});
+        return reply(req,{...g,request_id:request_id||undefined,agent:true,agent_version:'1.7.0',intent:'chat',tool_trace:[{name:'general_chat',status:'ok',count:1,ms:0}]});
       }
       const fb=await fallback(req,{...body,question});
-      if(fb.ok&&fb.data?.answer)return reply(req,{...fb.data,agent:true,agent_version:'1.6.3',intent:'chat',tool_trace:[fb.trace],fallback:true});
-      return reply(req,{answer:language==='en'?'I could not reply just now. Try again in a moment.':'ما قدرت أرد عليك الحين، جرّب مرة ثانية بعد شوي 🙏',links:[],actions:[],agent:true,agent_version:'1.6.3',intent:'chat',tool_trace:[fb.trace],grounded:false,confidence:0.3});
+      if(fb.ok&&fb.data?.answer)return reply(req,{...fb.data,agent:true,agent_version:'1.7.0',intent:'chat',tool_trace:[fb.trace],fallback:true});
+      return reply(req,{answer:language==='en'?'I could not reply just now. Try again in a moment.':'ما قدرت أرد عليك الحين، جرّب مرة ثانية بعد شوي 🙏',links:[],actions:[],agent:true,agent_version:'1.7.0',intent:'chat',tool_trace:[fb.trace],grounded:false,confidence:0.3});
     }
 
     let result:any;
@@ -604,39 +664,50 @@ Deno.serve(async (req:Request)=>{
     const hasRows=Array.isArray(result?.rows)&&result.rows.length>0;
     const hasContext=Array.isArray(result?.context)&&result.context.length>0;
     if(!hasRows&&!hasContext&&['staff','course','calendar','campus','search'].includes(selected)){
+      const site=universitySignal(effectiveQuestion)?await officialSiteSearch(effectiveQuestion):{rows:[],trace:tool('uon_official_site_search',Date.now(),0,'skipped')};
+      if(site.rows.length){
+        const official=await fetchOfficialContext(site.rows.slice(0,3));
+        const synthesis=await groundedUniversityAnswer(question,[...official.rows,...site.rows],language);
+        if(synthesis?.answer){
+          const links=uniqueLinks([...official.rows,...site.rows].map((r:any)=>link(r.title,r.url,true,r.type||'official')));
+          const request_id=await persistDirect(body,question,synthesis.answer).catch(()=>null);
+          return reply(req,{answer:synthesis.answer,links,actions:[],request_id:request_id||undefined,agent:true,agent_version:'1.7.0',intent:selected,resolved_question:effectiveQuestion!==question?effectiveQuestion:undefined,tool_trace:[result.trace,site.trace,official.trace,{name:'grounded_synthesis',status:'ok',count:official.rows.length+site.rows.length,ms:0}],grounded:true,confidence:.95,sources_count:links.length,used_model:true,ai_provider:'google_gemini',ai_model:synthesis.model,ai_model_version:synthesis.modelVersion});
+        }
+      }
       const web=await liveWebAnswer(effectiveQuestion,language,[],universitySignal(effectiveQuestion)?'university':'general');
       if(web?.answer){
         const request_id=await persistDirect(body,question,web.answer).catch(()=>null);
-        return reply(req,{answer:web.answer,links:web.links||[],actions:[],request_id:request_id||undefined,agent:true,agent_version:'1.6.3',intent:selected,resolved_question:effectiveQuestion!==question?effectiveQuestion:undefined,tool_trace:[result.trace,{name:'google_search',status:web.used_search?'ok':'no_results',count:(web.links||[]).length,ms:web.ms||0}],grounded:Boolean(web.used_search),confidence:web.used_search?.93:.68,sources_count:(web.links||[]).length,used_model:true,ai_provider:'google_gemini',ai_model:web.model,ai_model_version:web.modelVersion,web_search_queries:web.search_queries||[]});
+        return reply(req,{answer:web.answer,links:web.links||[],actions:[],request_id:request_id||undefined,agent:true,agent_version:'1.7.0',intent:selected,resolved_question:effectiveQuestion!==question?effectiveQuestion:undefined,tool_trace:[result.trace,site.trace,{name:'google_search',status:web.used_search?'ok':'no_results',count:(web.links||[]).length,ms:web.ms||0}],grounded:Boolean(web.used_search),confidence:web.used_search?.93:.68,sources_count:(web.links||[]).length,used_model:true,ai_provider:'google_gemini',ai_model:web.model,ai_model_version:web.modelVersion,web_search_queries:web.search_queries||[]});
       }
       const fb=await fallback(req,{...body,question:effectiveQuestion});
-      if(fb.ok&&fb.data?.answer)return reply(req,{...fb.data,agent:true,agent_version:'1.6.3',intent:selected,resolved_question:effectiveQuestion!==question?effectiveQuestion:undefined,tool_trace:[result.trace,fb.trace],fallback:true});
+      if(fb.ok&&fb.data?.answer)return reply(req,{...fb.data,agent:true,agent_version:'1.7.0',intent:selected,resolved_question:effectiveQuestion!==question?effectiveQuestion:undefined,tool_trace:[result.trace,site.trace,fb.trace],fallback:true});
     }
 
     if(selected==='search'&&hasRows){
-      const official=await fetchOfficialContext(result.rows);
+      const site=await officialSiteSearch(effectiveQuestion);
+      const official=await fetchOfficialContext([...site.rows.slice(0,3),...result.rows.slice(0,3)]);
       if(official.rows.length){
-        const liveSynthesis=await groundedUniversityAnswer(question,[...official.rows,...result.rows],language);
+        const liveSynthesis=await groundedUniversityAnswer(question,[...official.rows,...site.rows,...result.rows],language);
         if(liveSynthesis?.answer && !/ما قدرت|لم أتمكن|غير متوفر|غير متوفرة|could not verify|couldn't verify/i.test(liveSynthesis.answer)){
-          const links=uniqueLinks([...official.rows,...result.rows].map((r:any)=>link(r.title,r.url||r.source_url,Boolean(r.official),r.type||'source')));
+          const links=uniqueLinks([...official.rows,...site.rows,...result.rows].map((r:any)=>link(r.title,r.url||r.source_url,Boolean(r.official),r.type||'source')));
           const request_id=await persistDirect(body,question,liveSynthesis.answer).catch(()=>null);
-          return reply(req,{answer:liveSynthesis.answer,links,actions:[],request_id:request_id||undefined,agent:true,agent_version:'1.6.3',intent:'search',tool_trace:[result.trace,official.trace,{name:'grounded_synthesis',status:'ok',count:official.rows.length+result.rows.length,ms:0}],grounded:true,confidence:.97,sources_count:links.length,used_model:true,ai_provider:'google_gemini',ai_model:liveSynthesis.model,ai_model_version:liveSynthesis.modelVersion});
+          return reply(req,{answer:liveSynthesis.answer,links,actions:[],request_id:request_id||undefined,agent:true,agent_version:'1.7.0',intent:'search',tool_trace:[result.trace,site.trace,official.trace,{name:'grounded_synthesis',status:'ok',count:official.rows.length+site.rows.length+result.rows.length,ms:0}],grounded:true,confidence:.97,sources_count:links.length,used_model:true,ai_provider:'google_gemini',ai_model:liveSynthesis.model,ai_model_version:liveSynthesis.modelVersion});
         }
       }
 
-      const web=await liveWebAnswer(effectiveQuestion,language,[...official.rows,...result.rows],'university');
+      const web=await liveWebAnswer(effectiveQuestion,language,[...official.rows,...site.rows,...result.rows],'university');
       if(web?.answer){
-        const internalLinks=[...official.rows,...result.rows].map((r:any)=>link(r.title,r.url||r.source_url,Boolean(r.official),r.type||'UON Hub'));
+        const internalLinks=[...official.rows,...site.rows,...result.rows].map((r:any)=>link(r.title,r.url||r.source_url,Boolean(r.official),r.type||'UON Hub'));
         const links=uniqueLinks([...(web.links||[]),...internalLinks]).sort((a:any,b:any)=>Number(Boolean(b.official))-Number(Boolean(a.official))).slice(0,5);
         const request_id=await persistDirect(body,question,web.answer).catch(()=>null);
-        return reply(req,{answer:web.answer,links,actions:[],request_id:request_id||undefined,agent:true,agent_version:'1.6.3',intent:'search',tool_trace:[result.trace,official.trace,{name:'google_search',status:web.used_search?'ok':'no_results',count:(web.links||[]).length,ms:web.ms||0}],grounded:Boolean(web.used_search||result.rows.length),confidence:web.used_search?.96:.88,sources_count:links.length,used_model:true,ai_provider:'google_gemini',ai_model:web.model,ai_model_version:web.modelVersion,web_search_queries:web.search_queries||[]});
+        return reply(req,{answer:web.answer,links,actions:[],request_id:request_id||undefined,agent:true,agent_version:'1.7.0',intent:'search',tool_trace:[result.trace,site.trace,official.trace,{name:'google_search',status:web.used_search?'ok':'no_results',count:(web.links||[]).length,ms:web.ms||0}],grounded:Boolean(web.used_search||result.rows.length),confidence:web.used_search?.96:.88,sources_count:links.length,used_model:true,ai_provider:'google_gemini',ai_model:web.model,ai_model_version:web.modelVersion,web_search_queries:web.search_queries||[]});
       }
 
-      const synthesis=await groundedUniversityAnswer(question,[...official.rows,...result.rows],language);
+      const synthesis=await groundedUniversityAnswer(question,[...official.rows,...site.rows,...result.rows],language);
       if(synthesis?.answer){
         const links=uniqueLinks([...official.rows,...result.rows].map((r:any)=>link(r.title,r.url||r.source_url,Boolean(r.official),r.type||'source')));
         const request_id=await persistDirect(body,question,synthesis.answer).catch(()=>null);
-        return reply(req,{answer:synthesis.answer,links,actions:[],request_id:request_id||undefined,agent:true,agent_version:'1.6.3',intent:'search',tool_trace:[result.trace,official.trace,{name:'grounded_synthesis',status:'ok',count:result.rows.length,ms:0}],grounded:true,confidence:.9,sources_count:links.length,used_model:true,ai_provider:'google_gemini',ai_model:synthesis.model,ai_model_version:synthesis.modelVersion});
+        return reply(req,{answer:synthesis.answer,links,actions:[],request_id:request_id||undefined,agent:true,agent_version:'1.7.0',intent:'search',tool_trace:[result.trace,official.trace,{name:'grounded_synthesis',status:'ok',count:result.rows.length,ms:0}],grounded:true,confidence:.9,sources_count:links.length,used_model:true,ai_provider:'google_gemini',ai_model:synthesis.model,ai_model_version:synthesis.modelVersion});
       }
     }
 
@@ -658,25 +729,25 @@ Deno.serve(async (req:Request)=>{
         const answer=prefix+exact.answer;
         const links=uniqueLinks([...(official.rows||[]).map((r:any)=>link(r.title,r.url,true,'صفحة رسمية حية')),...(exact.links||[])]);
         const request_id=await persistDirect(body,question,answer).catch(()=>null);
-        return reply(req,{answer,links,actions:exact.actions||[],request_id:request_id||undefined,agent:true,agent_version:'1.6.3',intent:'staff',tool_trace:[result.trace,official.trace,{name:'official_match',status:'ok',count:1,ms:0}],grounded:true,confidence:.995,sources_count:links.length,verified_live:true});
+        return reply(req,{answer,links,actions:exact.actions||[],request_id:request_id||undefined,agent:true,agent_version:'1.7.0',intent:'staff',tool_trace:[result.trace,official.trace,{name:'official_match',status:'ok',count:1,ms:0}],grounded:true,confidence:.995,sources_count:links.length,verified_live:true});
       }
 
       const synthesis=await groundedUniversityAnswer(question,[...official.rows,{...top,title:top.full_name,description:[top.job_title,top.department,top.college,top.email,top.phone,top.extension,top.office_location].filter(Boolean).join(' • '),url:top.source_url,official:true}],language);
       if(synthesis?.answer){
         const links=uniqueLinks([...official.rows].map((r:any)=>link(r.title,r.url,true,r.type||'staff')).concat([link(top.full_name,top.source_url,true,'staff')]));
         const request_id=await persistDirect(body,question,synthesis.answer).catch(()=>null);
-        return reply(req,{answer:synthesis.answer,links,actions:[],request_id:request_id||undefined,agent:true,agent_version:'1.6.3',intent:'staff',tool_trace:[result.trace,official.trace,{name:'grounded_synthesis',status:'ok',count:official.rows.length+1,ms:0}],grounded:true,confidence:.96,sources_count:links.length,used_model:true,ai_provider:'google_gemini',ai_model:synthesis.model,ai_model_version:synthesis.modelVersion});
+        return reply(req,{answer:synthesis.answer,links,actions:[],request_id:request_id||undefined,agent:true,agent_version:'1.7.0',intent:'staff',tool_trace:[result.trace,official.trace,{name:'grounded_synthesis',status:'ok',count:official.rows.length+1,ms:0}],grounded:true,confidence:.96,sources_count:links.length,used_model:true,ai_provider:'google_gemini',ai_model:synthesis.model,ai_model_version:synthesis.modelVersion});
       }
     }
 
     const formatted=formatResult(result,question,language);
     if(formatted.answer){
       const request_id=await persistDirect(body,question,formatted.answer).catch(()=>null);
-      return reply(req,{...formatted,request_id:request_id||undefined,agent:true,agent_version:'1.6.3',intent:selected,resolved_question:effectiveQuestion!==question?effectiveQuestion:undefined,tool_trace:[result.trace],grounded:true,confidence:result.rows?.length?0.94:0.72});
+      return reply(req,{...formatted,request_id:request_id||undefined,agent:true,agent_version:'1.7.0',intent:selected,resolved_question:effectiveQuestion!==question?effectiveQuestion:undefined,tool_trace:[result.trace],grounded:true,confidence:result.rows?.length?0.94:0.72});
     }
     const fb=await fallback(req,body);
-    if(fb.ok&&fb.data?.answer)return reply(req,{...fb.data,agent:true,agent_version:'1.6.3',intent:selected,tool_trace:[result.trace,fb.trace],fallback:true});
-    return reply(req,{answer:language==='en'?'I could not verify an answer right now. Try a more specific question.':'ما قدرت أتحقق من إجابة دقيقة حاليًا. جرّب سؤال أكثر تحديدًا.',links:[],actions:[],agent:true,agent_version:'1.6.3',intent:selected,tool_trace:[result.trace,fb.trace],grounded:false,confidence:0.35});
+    if(fb.ok&&fb.data?.answer)return reply(req,{...fb.data,agent:true,agent_version:'1.7.0',intent:selected,tool_trace:[result.trace,fb.trace],fallback:true});
+    return reply(req,{answer:language==='en'?'I could not verify an answer right now. Try a more specific question.':'ما قدرت أتحقق من إجابة دقيقة حاليًا. جرّب سؤال أكثر تحديدًا.',links:[],actions:[],agent:true,agent_version:'1.7.0',intent:selected,tool_trace:[result.trace,fb.trace],grounded:false,confidence:0.35});
   }catch(e){
     console.error('uon-agent-v1',e);
     return reply(req,{error:'agent_unavailable'},500);
