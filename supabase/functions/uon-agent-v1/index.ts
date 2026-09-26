@@ -159,6 +159,9 @@ function route(question:string){
 
   if(/انجز|انجاز|مسالك|مركز.*(?:دعم|تعلم)|anjiz|support center|learning pathways/.test(q))return 'support';
 
+  if(/^(?:من|مين|منو|من هو|من هي|who is)\s+(?:رئيس|مدير|عميد|نائب رئيس|president|vice president|dean|director)/i.test(q)
+    || /(?:رئيس|مدير|عميد|نائب رئيس).*(?:جامعه نزوى|جامعة نزوى|university of nizwa)/i.test(q))return 'search';
+
   const staffWords=/(?:دكتور|دكتوره|استاذ|استاذه|موظف|عميد|مدير|رئيس|مرشد|doctor|professor|staff|dean|director|advisor)/;
   const staffLookup=(
     /(?:وين|اين|أين|من هو|من هي|عطني|اعطني|ابي|ابا|اريد|ابغى|ابغي|دور|ابحث|find|where|who).*(?:دكتور|دكتوره|استاذ|استاذه|موظف|عميد|مدير|رئيس|مرشد|doctor|professor|staff|dean|director|advisor)/.test(q)
@@ -284,29 +287,88 @@ async function searchTool(question:string){
   return {kind:'search',rows:ranked,trace:tool('uon_knowledge_search',started,ranked.length)};
 }
 
-async function generateWithGemini(system:string,prompt:string,temperature=.3,maxOutputTokens=1400){
+function groundingLinks(data:any){
+  const candidate=data?.candidates?.[0]||{};
+  const meta=candidate?.groundingMetadata||candidate?.grounding_metadata||{};
+  const chunks=meta?.groundingChunks||meta?.grounding_chunks||[];
+  const links:any[]=[];
+  for(const chunk of chunks){
+    const web=chunk?.web||chunk?.grounding_chunk?.web;
+    const url=clean(web?.uri||web?.url,1600);
+    if(!/^https?:\/\//i.test(url))continue;
+    let host='';
+    try{host=new URL(url).hostname.replace(/^www\./,'')}catch{}
+    links.push({
+      title:clean(web?.title||host||'Web source',180),
+      url,
+      official:host==='unizwa.edu.om'||host.endsWith('.unizwa.edu.om'),
+      type:host==='unizwa.edu.om'||host.endsWith('.unizwa.edu.om')?'University of Nizwa':'Web'
+    });
+  }
+  return uniqueLinks(links);
+}
+
+function searchQueriesFrom(data:any){
+  const candidate=data?.candidates?.[0]||{};
+  const meta=candidate?.groundingMetadata||candidate?.grounding_metadata||{};
+  const values=meta?.webSearchQueries||meta?.web_search_queries||[];
+  return Array.isArray(values)?values.map((x:any)=>clean(x,300)).filter(Boolean).slice(0,6):[];
+}
+
+async function generateWithGemini(system:string,prompt:string,temperature=.3,maxOutputTokens=1400,googleSearch=false){
   if(!GEMINI_API_KEY)return null;
   for(const model of GENERAL_MODELS){
     try{
       const generationConfig:any={temperature,maxOutputTokens};
       if(/^gemini-3\.(7|8)-flash$/.test(model))generationConfig.thinkingConfig={thinkingLevel:'low'};
-      const r=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`,{
+      const payload:any={
+        system_instruction:{parts:[{text:system}]},
+        contents:[{role:'user',parts:[{text:prompt}]}],
+        generationConfig
+      };
+      if(googleSearch)payload.tools=[{google_search:{}}];
+      const started=Date.now();
+      const endpoint='https://generativelanguage.googleapis.com/v1beta/models/'+encodeURIComponent(model)+':generateContent';
+      const r=await fetch(endpoint,{
         method:'POST',
         headers:{'content-type':'application/json','x-goog-api-key':GEMINI_API_KEY},
-        body:JSON.stringify({
-          system_instruction:{parts:[{text:system}]},
-          contents:[{role:'user',parts:[{text:prompt}]}],
-          generationConfig
-        }),
-        signal:AbortSignal.timeout(14000)
+        body:JSON.stringify(payload),
+        signal:AbortSignal.timeout(18000)
       });
       const d=await r.json().catch(()=>({}));
       if(!r.ok)continue;
       const answer=String(d?.candidates?.[0]?.content?.parts?.filter((x:any)=>!x?.thought).map((x:any)=>x?.text||'').join('')||'').trim().slice(0,6500);
-      if(answer)return {answer,model,modelVersion:clean(d?.modelVersion,120)||model};
+      if(answer)return {
+        answer,
+        model,
+        modelVersion:clean(d?.modelVersion,120)||model,
+        links:googleSearch?groundingLinks(d):[],
+        search_queries:googleSearch?searchQueriesFrom(d):[],
+        used_search:googleSearch&&groundingLinks(d).length>0,
+        ms:Date.now()-started
+      };
     }catch{}
   }
   return null;
+}
+
+async function liveWebAnswer(question:string,language:string,internalRows:any[]=[],kind='university'){
+  const internal=internalRows.slice(0,6).map((r:any,i:number)=>{
+    const title=clean(r.title||r.full_name||r.code,220);
+    const desc=clean(r.description||[r.job_title,r.department,r.college,r.email,r.phone,r.office_location].filter(Boolean).join(' • '),1200);
+    const url=clean(r.url||r.source_url,900);
+    return '[UON-HUB '+(i+1)+'] '+title+'\n'+desc+'\nURL: '+url;
+  }).join('\n\n');
+  const university=kind==='university';
+  const system=language==='en'
+    ? (university
+      ? 'You are UON Agent. Answer University of Nizwa questions using live Google Search plus any supplied UON Hub context. Search the official University of Nizwa website (unizwa.edu.om) first and prefer it over third-party sources. Use other credible web sources only when the official site is insufficient. For current leadership, dates, fees, contacts, policies, and services, verify with live sources before answering. Never invent a missing fact. Do not print raw URLs in the answer because source cards are shown separately.'
+      : 'You are UON Agent, a capable general assistant. Use live Google Search when it helps answer factual or current questions. Prefer primary and authoritative sources. Answer naturally and do not invent facts. Do not print raw URLs because source cards are shown separately.')
+    : (university
+      ? 'أنت UON Agent. جاوب أسئلة جامعة نزوى باستخدام بحث Google الحي مع سياق UON Hub المتاح. ابحث أولًا في الموقع الرسمي لجامعة نزوى unizwa.edu.om وفضّله على أي مصدر خارجي، واستخدم مصادر ويب موثوقة أخرى فقط إذا الموقع الرسمي ما كفى. المعلومات المتغيرة مثل رئيس الجامعة والإدارة والمواعيد والرسوم والتواصل والسياسات والخدمات لازم تتحقق منها من مصدر حي قبل الجواب. لا تخمن أي معلومة ناقصة. رد بعربي عماني طبيعي وخفيف، ولا تطبع الروابط داخل نص الرد لأن بطاقات المصادر تظهر بشكل منفصل.'
+      : 'أنت UON Agent، مساعد ذكي عام. استخدم بحث Google الحي إذا كان يفيد في سؤال واقعي أو حديث، وفضّل المصادر الأصلية والموثوقة. رد بعربي عماني طبيعي إذا المستخدم عامي، ولا تخمن معلومات غير مؤكدة. لا تطبع الروابط داخل نص الرد لأن المصادر تظهر بشكل منفصل.');
+  const prompt=(internal?'UON HUB CONTEXT (may help, but live official sources take priority for changing facts):\n'+internal+'\n\n':'')+'USER QUESTION:\n'+question;
+  return generateWithGemini(system,prompt,.16,1200,true);
 }
 
 async function generalChat(body:any,question:string,language:string){
@@ -317,9 +379,12 @@ async function generalChat(body:any,question:string,language:string){
     ? 'You are UON Agent, a capable general-purpose assistant for UON Hub students. Answer naturally and directly. You can help with study, coding, writing, translation, brainstorming, explanations, and normal conversation. Do not invent current University of Nizwa facts; those are handled by verified tools. If something needs live/current data you do not have, say so plainly. Follow the user language and tone.'
     : 'أنت UON Agent، مساعد ذكي عام لطلبة UON Hub. رد بعربي عماني طبيعي وخفيف إذا المستخدم يتكلم عامي عماني، بدون تصنع أو مبالغة في اللهجة. افهم كلمات مثل: ويش، أبا، واجد، زين، تو، حيك، من صوب. فضّل تعابير عمانية طبيعية مثل «ويش»، «زين»، «حاضرين»، «ما حصلت»، «ما قدرت» عند مناسبتها، وتجنب التعابير السعودية المصطنعة مثل «أبشر» و«يا الغالي». في الواجبات والرسائل والشرح الأكاديمي استخدم أسلوبًا واضحًا ومناسبًا للمهمة، والفصحى إذا كانت أنسب. تقدر تساعد في الدراسة والبرمجة والكتابة والترجمة والأفكار والأسئلة العامة والسوالف العادية. لا تخترع معلومات حالية خاصة بجامعة نزوى؛ المعلومات الجامعية الدقيقة لها أدوات موثوقة منفصلة. إذا السؤال يحتاج معلومة حية أو حديثة وما عندك مصدر مباشر، وضّح هذا باختصار.';
   const prompt=`CONVERSATION (for continuity only):\n${JSON.stringify(history)}\n\nUSER:\n${question}`;
-  const g=await generateWithGemini(system,prompt,.35,1500);
+  const q=norm(question);
+  const likelyWriting=/اكتب|اكتبلي|صيغ|صياغ|ترجم|لخص|لخّص|rewrite|write|translate|summari[sz]e/.test(q);
+  const likelyStudy=/اشرح|فهمني|حل لي|حللي|كود|برمج|sql|ram|ssd|رياضيات|فيزياء|كيمياء|explain|solve|code/.test(q);
+  const g=await generateWithGemini(system,prompt,.35,1500,!likelyWriting&&!likelyStudy);
   if(!g)return null;
-  return {answer:g.answer,links:[],actions:[],grounded:false,confidence:.72,sources_count:0,used_model:true,ai_provider:'google_gemini',ai_model:g.model,ai_model_version:g.modelVersion};
+  return {answer:g.answer,links:g.links||[],actions:[],grounded:Boolean(g.used_search),confidence:g.used_search?.9:.72,sources_count:(g.links||[]).length,used_model:true,ai_provider:'google_gemini',ai_model:g.model,ai_model_version:g.modelVersion,web_search_queries:g.search_queries||[]};
 }
 
 async function groundedUniversityAnswer(question:string,rows:any[],language:string){
@@ -392,7 +457,7 @@ Deno.serve(async (req:Request)=>{
     const casual=casualReply(question,language);
     if(casual){
       const request_id=await persistDirect(body,question,casual).catch(()=>null);
-      return reply(req,{answer:casual,links:[],actions:[],request_id:request_id||undefined,agent:true,agent_version:'1.4.1',intent:'chat',tool_trace:[],grounded:false,confidence:0.99});
+      return reply(req,{answer:casual,links:[],actions:[],request_id:request_id||undefined,agent:true,agent_version:'1.5.0',intent:'chat',tool_trace:[],grounded:false,confidence:0.99});
     }
     const effectiveQuestion=contextualQuestion(body,question);
     const selected=route(effectiveQuestion);
@@ -401,11 +466,11 @@ Deno.serve(async (req:Request)=>{
       const g=await generalChat(body,question,language);
       if(g?.answer){
         const request_id=await persistDirect(body,question,g.answer).catch(()=>null);
-        return reply(req,{...g,request_id:request_id||undefined,agent:true,agent_version:'1.4.1',intent:'chat',tool_trace:[{name:'general_chat',status:'ok',count:1,ms:0}]});
+        return reply(req,{...g,request_id:request_id||undefined,agent:true,agent_version:'1.5.0',intent:'chat',tool_trace:[{name:'general_chat',status:'ok',count:1,ms:0}]});
       }
       const fb=await fallback(req,{...body,question});
-      if(fb.ok&&fb.data?.answer)return reply(req,{...fb.data,agent:true,agent_version:'1.4.1',intent:'chat',tool_trace:[fb.trace],fallback:true});
-      return reply(req,{answer:language==='en'?'I could not reply just now. Try again in a moment.':'ما قدرت أرد عليك الحين، جرّب مرة ثانية بعد شوي 🙏',links:[],actions:[],agent:true,agent_version:'1.4.1',intent:'chat',tool_trace:[fb.trace],grounded:false,confidence:0.3});
+      if(fb.ok&&fb.data?.answer)return reply(req,{...fb.data,agent:true,agent_version:'1.5.0',intent:'chat',tool_trace:[fb.trace],fallback:true});
+      return reply(req,{answer:language==='en'?'I could not reply just now. Try again in a moment.':'ما قدرت أرد عليك الحين، جرّب مرة ثانية بعد شوي 🙏',links:[],actions:[],agent:true,agent_version:'1.5.0',intent:'chat',tool_trace:[fb.trace],grounded:false,confidence:0.3});
     }
 
     let result:any;
@@ -420,27 +485,39 @@ Deno.serve(async (req:Request)=>{
     const hasRows=Array.isArray(result?.rows)&&result.rows.length>0;
     const hasContext=Array.isArray(result?.context)&&result.context.length>0;
     if(!hasRows&&!hasContext&&['staff','course','calendar','campus','search'].includes(selected)){
+      const web=await liveWebAnswer(effectiveQuestion,language,[],universitySignal(effectiveQuestion)?'university':'general');
+      if(web?.answer){
+        const request_id=await persistDirect(body,question,web.answer).catch(()=>null);
+        return reply(req,{answer:web.answer,links:web.links||[],actions:[],request_id:request_id||undefined,agent:true,agent_version:'1.5.0',intent:selected,resolved_question:effectiveQuestion!==question?effectiveQuestion:undefined,tool_trace:[result.trace,{name:'google_search',status:web.used_search?'ok':'no_results',count:(web.links||[]).length,ms:web.ms||0}],grounded:Boolean(web.used_search),confidence:web.used_search?.93:.68,sources_count:(web.links||[]).length,used_model:true,ai_provider:'google_gemini',ai_model:web.model,ai_model_version:web.modelVersion,web_search_queries:web.search_queries||[]});
+      }
       const fb=await fallback(req,{...body,question:effectiveQuestion});
-      if(fb.ok&&fb.data?.answer)return reply(req,{...fb.data,agent:true,agent_version:'1.4.1',intent:selected,resolved_question:effectiveQuestion!==question?effectiveQuestion:undefined,tool_trace:[result.trace,fb.trace],fallback:true});
+      if(fb.ok&&fb.data?.answer)return reply(req,{...fb.data,agent:true,agent_version:'1.5.0',intent:selected,resolved_question:effectiveQuestion!==question?effectiveQuestion:undefined,tool_trace:[result.trace,fb.trace],fallback:true});
     }
 
     if(selected==='search'&&hasRows){
+      const web=await liveWebAnswer(effectiveQuestion,language,result.rows,'university');
+      if(web?.answer){
+        const internalLinks=result.rows.map((r:any)=>link(r.title,r.url,Boolean(r.official),r.type||'UON Hub'));
+        const links=uniqueLinks([...(web.links||[]),...internalLinks]).sort((a:any,b:any)=>Number(Boolean(b.official))-Number(Boolean(a.official))).slice(0,5);
+        const request_id=await persistDirect(body,question,web.answer).catch(()=>null);
+        return reply(req,{answer:web.answer,links,actions:[],request_id:request_id||undefined,agent:true,agent_version:'1.5.0',intent:'search',tool_trace:[result.trace,{name:'google_search',status:web.used_search?'ok':'no_results',count:(web.links||[]).length,ms:web.ms||0}],grounded:Boolean(web.used_search||result.rows.length),confidence:web.used_search?.96:.88,sources_count:links.length,used_model:true,ai_provider:'google_gemini',ai_model:web.model,ai_model_version:web.modelVersion,web_search_queries:web.search_queries||[]});
+      }
       const synthesis=await groundedUniversityAnswer(question,result.rows,language);
       if(synthesis?.answer){
         const links=uniqueLinks(result.rows.map((r:any)=>link(r.title,r.url,Boolean(r.official),r.type||'source')));
         const request_id=await persistDirect(body,question,synthesis.answer).catch(()=>null);
-        return reply(req,{answer:synthesis.answer,links,actions:[],request_id:request_id||undefined,agent:true,agent_version:'1.4.1',intent:'search',tool_trace:[result.trace,{name:'grounded_synthesis',status:'ok',count:result.rows.length,ms:0}],grounded:true,confidence:.9,sources_count:result.rows.length,used_model:true,ai_provider:'google_gemini',ai_model:synthesis.model,ai_model_version:synthesis.modelVersion});
+        return reply(req,{answer:synthesis.answer,links,actions:[],request_id:request_id||undefined,agent:true,agent_version:'1.5.0',intent:'search',tool_trace:[result.trace,{name:'grounded_synthesis',status:'ok',count:result.rows.length,ms:0}],grounded:true,confidence:.9,sources_count:result.rows.length,used_model:true,ai_provider:'google_gemini',ai_model:synthesis.model,ai_model_version:synthesis.modelVersion});
       }
     }
 
     const formatted=formatResult(result,question,language);
     if(formatted.answer){
       const request_id=await persistDirect(body,question,formatted.answer).catch(()=>null);
-      return reply(req,{...formatted,request_id:request_id||undefined,agent:true,agent_version:'1.4.1',intent:selected,resolved_question:effectiveQuestion!==question?effectiveQuestion:undefined,tool_trace:[result.trace],grounded:true,confidence:result.rows?.length?0.94:0.72});
+      return reply(req,{...formatted,request_id:request_id||undefined,agent:true,agent_version:'1.5.0',intent:selected,resolved_question:effectiveQuestion!==question?effectiveQuestion:undefined,tool_trace:[result.trace],grounded:true,confidence:result.rows?.length?0.94:0.72});
     }
     const fb=await fallback(req,body);
-    if(fb.ok&&fb.data?.answer)return reply(req,{...fb.data,agent:true,agent_version:'1.4.1',intent:selected,tool_trace:[result.trace,fb.trace],fallback:true});
-    return reply(req,{answer:language==='en'?'I could not verify an answer right now. Try a more specific question.':'ما قدرت أتحقق من إجابة دقيقة حاليًا. جرّب سؤال أكثر تحديدًا.',links:[],actions:[],agent:true,agent_version:'1.4.1',intent:selected,tool_trace:[result.trace,fb.trace],grounded:false,confidence:0.35});
+    if(fb.ok&&fb.data?.answer)return reply(req,{...fb.data,agent:true,agent_version:'1.5.0',intent:selected,tool_trace:[result.trace,fb.trace],fallback:true});
+    return reply(req,{answer:language==='en'?'I could not verify an answer right now. Try a more specific question.':'ما قدرت أتحقق من إجابة دقيقة حاليًا. جرّب سؤال أكثر تحديدًا.',links:[],actions:[],agent:true,agent_version:'1.5.0',intent:selected,tool_trace:[result.trace,fb.trace],grounded:false,confidence:0.35});
   }catch(e){
     console.error('uon-agent-v1',e);
     return reply(req,{error:'agent_unavailable'},500);
