@@ -424,8 +424,23 @@ async function fetchOfficialContext(rows:any[]){
       if(!r.ok)return null;
       const type=(r.headers.get('content-type')||'').toLowerCase();
       if(!type.includes('text/html')&&!type.includes('text/plain'))return null;
-      const html=(await r.text()).slice(0,450000);
-      const title=decodeHtml((html.match(/<title[^>]*>([\s\S]*?)<\/title>/i)?.[1]||'جامعة نزوى').replace(/<[^>]+>/g,' '));
+      const bytes=new Uint8Array(await r.arrayBuffer());
+      const declared=(type.match(/charset=([^;\s]+)/i)?.[1]||'').replace(/["']/g,'');
+      let html='';
+      try{
+        if(declared)html=new TextDecoder(declared).decode(bytes);
+      }catch{}
+      if(!html){
+        const utf=new TextDecoder('utf-8').decode(bytes);
+        let win='';
+        try{win=new TextDecoder('windows-1256').decode(bytes)}catch{}
+        const score=(s:string)=>(s.match(/[\u0600-\u06ff]/g)||[]).length*3-(s.match(/\uFFFD/g)||[]).length*12;
+        html=win&&score(win)>score(utf)?win:utf;
+      }
+      html=html.slice(0,450000);
+      const sourceRow=rows.find((x:any)=>clean(x.url||x.source_url,1600)===url);
+      const pageTitle=decodeHtml((html.match(/<title[^>]*>([\s\S]*?)<\/title>/i)?.[1]||'').replace(/<[^>]+>/g,' '));
+      const title=clean(sourceRow?.title||pageTitle||'جامعة نزوى',220);
       const body=decodeHtml(
         html
           .replace(/<script[\s\S]*?<\/script>/gi,' ')
@@ -512,7 +527,7 @@ Deno.serve(async (req:Request)=>{
     const casual=casualReply(question,language);
     if(casual){
       const request_id=await persistDirect(body,question,casual).catch(()=>null);
-      return reply(req,{answer:casual,links:[],actions:[],request_id:request_id||undefined,agent:true,agent_version:'1.5.1',intent:'chat',tool_trace:[],grounded:false,confidence:0.99});
+      return reply(req,{answer:casual,links:[],actions:[],request_id:request_id||undefined,agent:true,agent_version:'1.5.2',intent:'chat',tool_trace:[],grounded:false,confidence:0.99});
     }
     const effectiveQuestion=contextualQuestion(body,question);
     const selected=route(effectiveQuestion);
@@ -522,11 +537,11 @@ Deno.serve(async (req:Request)=>{
       const g=await generalChat(body,question,language);
       if(g?.answer){
         const request_id=await persistDirect(body,question,g.answer).catch(()=>null);
-        return reply(req,{...g,request_id:request_id||undefined,agent:true,agent_version:'1.5.1',intent:'chat',tool_trace:[{name:'general_chat',status:'ok',count:1,ms:0}]});
+        return reply(req,{...g,request_id:request_id||undefined,agent:true,agent_version:'1.5.2',intent:'chat',tool_trace:[{name:'general_chat',status:'ok',count:1,ms:0}]});
       }
       const fb=await fallback(req,{...body,question});
-      if(fb.ok&&fb.data?.answer)return reply(req,{...fb.data,agent:true,agent_version:'1.5.1',intent:'chat',tool_trace:[fb.trace],fallback:true});
-      return reply(req,{answer:language==='en'?'I could not reply just now. Try again in a moment.':'ما قدرت أرد عليك الحين، جرّب مرة ثانية بعد شوي 🙏',links:[],actions:[],agent:true,agent_version:'1.5.1',intent:'chat',tool_trace:[fb.trace],grounded:false,confidence:0.3});
+      if(fb.ok&&fb.data?.answer)return reply(req,{...fb.data,agent:true,agent_version:'1.5.2',intent:'chat',tool_trace:[fb.trace],fallback:true});
+      return reply(req,{answer:language==='en'?'I could not reply just now. Try again in a moment.':'ما قدرت أرد عليك الحين، جرّب مرة ثانية بعد شوي 🙏',links:[],actions:[],agent:true,agent_version:'1.5.2',intent:'chat',tool_trace:[fb.trace],grounded:false,confidence:0.3});
     }
 
     let result:any;
@@ -544,10 +559,10 @@ Deno.serve(async (req:Request)=>{
       const web=await liveWebAnswer(effectiveQuestion,language,[],universitySignal(effectiveQuestion)?'university':'general');
       if(web?.answer){
         const request_id=await persistDirect(body,question,web.answer).catch(()=>null);
-        return reply(req,{answer:web.answer,links:web.links||[],actions:[],request_id:request_id||undefined,agent:true,agent_version:'1.5.1',intent:selected,resolved_question:effectiveQuestion!==question?effectiveQuestion:undefined,tool_trace:[result.trace,{name:'google_search',status:web.used_search?'ok':'no_results',count:(web.links||[]).length,ms:web.ms||0}],grounded:Boolean(web.used_search),confidence:web.used_search?.93:.68,sources_count:(web.links||[]).length,used_model:true,ai_provider:'google_gemini',ai_model:web.model,ai_model_version:web.modelVersion,web_search_queries:web.search_queries||[]});
+        return reply(req,{answer:web.answer,links:web.links||[],actions:[],request_id:request_id||undefined,agent:true,agent_version:'1.5.2',intent:selected,resolved_question:effectiveQuestion!==question?effectiveQuestion:undefined,tool_trace:[result.trace,{name:'google_search',status:web.used_search?'ok':'no_results',count:(web.links||[]).length,ms:web.ms||0}],grounded:Boolean(web.used_search),confidence:web.used_search?.93:.68,sources_count:(web.links||[]).length,used_model:true,ai_provider:'google_gemini',ai_model:web.model,ai_model_version:web.modelVersion,web_search_queries:web.search_queries||[]});
       }
       const fb=await fallback(req,{...body,question:effectiveQuestion});
-      if(fb.ok&&fb.data?.answer)return reply(req,{...fb.data,agent:true,agent_version:'1.5.1',intent:selected,resolved_question:effectiveQuestion!==question?effectiveQuestion:undefined,tool_trace:[result.trace,fb.trace],fallback:true});
+      if(fb.ok&&fb.data?.answer)return reply(req,{...fb.data,agent:true,agent_version:'1.5.2',intent:selected,resolved_question:effectiveQuestion!==question?effectiveQuestion:undefined,tool_trace:[result.trace,fb.trace],fallback:true});
     }
 
     if(selected==='search'&&hasRows){
@@ -557,7 +572,7 @@ Deno.serve(async (req:Request)=>{
         if(liveSynthesis?.answer && !/ما قدرت|لم أتمكن|غير متوفر|غير متوفرة|could not verify|couldn't verify/i.test(liveSynthesis.answer)){
           const links=uniqueLinks([...official.rows,...result.rows].map((r:any)=>link(r.title,r.url||r.source_url,Boolean(r.official),r.type||'source')));
           const request_id=await persistDirect(body,question,liveSynthesis.answer).catch(()=>null);
-          return reply(req,{answer:liveSynthesis.answer,links,actions:[],request_id:request_id||undefined,agent:true,agent_version:'1.5.1',intent:'search',tool_trace:[result.trace,official.trace,{name:'grounded_synthesis',status:'ok',count:official.rows.length+result.rows.length,ms:0}],grounded:true,confidence:.97,sources_count:links.length,used_model:true,ai_provider:'google_gemini',ai_model:liveSynthesis.model,ai_model_version:liveSynthesis.modelVersion});
+          return reply(req,{answer:liveSynthesis.answer,links,actions:[],request_id:request_id||undefined,agent:true,agent_version:'1.5.2',intent:'search',tool_trace:[result.trace,official.trace,{name:'grounded_synthesis',status:'ok',count:official.rows.length+result.rows.length,ms:0}],grounded:true,confidence:.97,sources_count:links.length,used_model:true,ai_provider:'google_gemini',ai_model:liveSynthesis.model,ai_model_version:liveSynthesis.modelVersion});
         }
       }
 
@@ -566,25 +581,25 @@ Deno.serve(async (req:Request)=>{
         const internalLinks=[...official.rows,...result.rows].map((r:any)=>link(r.title,r.url||r.source_url,Boolean(r.official),r.type||'UON Hub'));
         const links=uniqueLinks([...(web.links||[]),...internalLinks]).sort((a:any,b:any)=>Number(Boolean(b.official))-Number(Boolean(a.official))).slice(0,5);
         const request_id=await persistDirect(body,question,web.answer).catch(()=>null);
-        return reply(req,{answer:web.answer,links,actions:[],request_id:request_id||undefined,agent:true,agent_version:'1.5.1',intent:'search',tool_trace:[result.trace,official.trace,{name:'google_search',status:web.used_search?'ok':'no_results',count:(web.links||[]).length,ms:web.ms||0}],grounded:Boolean(web.used_search||result.rows.length),confidence:web.used_search?.96:.88,sources_count:links.length,used_model:true,ai_provider:'google_gemini',ai_model:web.model,ai_model_version:web.modelVersion,web_search_queries:web.search_queries||[]});
+        return reply(req,{answer:web.answer,links,actions:[],request_id:request_id||undefined,agent:true,agent_version:'1.5.2',intent:'search',tool_trace:[result.trace,official.trace,{name:'google_search',status:web.used_search?'ok':'no_results',count:(web.links||[]).length,ms:web.ms||0}],grounded:Boolean(web.used_search||result.rows.length),confidence:web.used_search?.96:.88,sources_count:links.length,used_model:true,ai_provider:'google_gemini',ai_model:web.model,ai_model_version:web.modelVersion,web_search_queries:web.search_queries||[]});
       }
 
       const synthesis=await groundedUniversityAnswer(question,[...official.rows,...result.rows],language);
       if(synthesis?.answer){
         const links=uniqueLinks([...official.rows,...result.rows].map((r:any)=>link(r.title,r.url||r.source_url,Boolean(r.official),r.type||'source')));
         const request_id=await persistDirect(body,question,synthesis.answer).catch(()=>null);
-        return reply(req,{answer:synthesis.answer,links,actions:[],request_id:request_id||undefined,agent:true,agent_version:'1.5.1',intent:'search',tool_trace:[result.trace,official.trace,{name:'grounded_synthesis',status:'ok',count:result.rows.length,ms:0}],grounded:true,confidence:.9,sources_count:links.length,used_model:true,ai_provider:'google_gemini',ai_model:synthesis.model,ai_model_version:synthesis.modelVersion});
+        return reply(req,{answer:synthesis.answer,links,actions:[],request_id:request_id||undefined,agent:true,agent_version:'1.5.2',intent:'search',tool_trace:[result.trace,official.trace,{name:'grounded_synthesis',status:'ok',count:result.rows.length,ms:0}],grounded:true,confidence:.9,sources_count:links.length,used_model:true,ai_provider:'google_gemini',ai_model:synthesis.model,ai_model_version:synthesis.modelVersion});
       }
     }
 
     const formatted=formatResult(result,question,language);
     if(formatted.answer){
       const request_id=await persistDirect(body,question,formatted.answer).catch(()=>null);
-      return reply(req,{...formatted,request_id:request_id||undefined,agent:true,agent_version:'1.5.1',intent:selected,resolved_question:effectiveQuestion!==question?effectiveQuestion:undefined,tool_trace:[result.trace],grounded:true,confidence:result.rows?.length?0.94:0.72});
+      return reply(req,{...formatted,request_id:request_id||undefined,agent:true,agent_version:'1.5.2',intent:selected,resolved_question:effectiveQuestion!==question?effectiveQuestion:undefined,tool_trace:[result.trace],grounded:true,confidence:result.rows?.length?0.94:0.72});
     }
     const fb=await fallback(req,body);
-    if(fb.ok&&fb.data?.answer)return reply(req,{...fb.data,agent:true,agent_version:'1.5.1',intent:selected,tool_trace:[result.trace,fb.trace],fallback:true});
-    return reply(req,{answer:language==='en'?'I could not verify an answer right now. Try a more specific question.':'ما قدرت أتحقق من إجابة دقيقة حاليًا. جرّب سؤال أكثر تحديدًا.',links:[],actions:[],agent:true,agent_version:'1.5.1',intent:selected,tool_trace:[result.trace,fb.trace],grounded:false,confidence:0.35});
+    if(fb.ok&&fb.data?.answer)return reply(req,{...fb.data,agent:true,agent_version:'1.5.2',intent:selected,tool_trace:[result.trace,fb.trace],fallback:true});
+    return reply(req,{answer:language==='en'?'I could not verify an answer right now. Try a more specific question.':'ما قدرت أتحقق من إجابة دقيقة حاليًا. جرّب سؤال أكثر تحديدًا.',links:[],actions:[],agent:true,agent_version:'1.5.2',intent:selected,tool_trace:[result.trace,fb.trace],grounded:false,confidence:0.35});
   }catch(e){
     console.error('uon-agent-v1',e);
     return reply(req,{error:'agent_unavailable'},500);
