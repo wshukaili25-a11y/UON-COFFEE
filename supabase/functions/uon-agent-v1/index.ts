@@ -5,6 +5,8 @@ declare const Deno: any;
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL') || '';
 const SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || '';
 const BASE_AI = `${SUPABASE_URL}/functions/v1/uon-ai-chat-v64`;
+const GEMINI_API_KEY = Deno.env.get('GEMINI_API_KEY') || '';
+const GENERAL_MODELS = [...new Set(['gemini-3.8-flash', Deno.env.get('GEMINI_PRIMARY_MODEL') || '', 'gemini-3.5-flash-lite', 'gemini-2.5-flash'].filter(Boolean))];
 const db = createClient(SUPABASE_URL, SERVICE_ROLE_KEY, { auth: { persistSession: false, autoRefreshToken: false } });
 
 const RATE_CLIENT_LIMIT = 18;
@@ -268,10 +270,64 @@ async function scheduleTool(body:any){
 }
 async function searchTool(question:string){
   const started=Date.now();
-  const {data,error}=await db.rpc('uon_ai_search_fast',{p_question:question,p_limit:12});
+  const {data,error}=await db.rpc('uon_ai_search_fast',{p_question:question,p_limit:20});
   if(error)throw error;
-  const rows=(data||[]).slice(0,8);
-  return {kind:'search',rows,trace:tool('uon_knowledge_search',started,rows.length)};
+  const ranked=(data||[]).map((r:any)=>({
+    ...r,
+    _local:scoreText(question,[r.title,r.description,r.type].join(' ')),
+    _backend:Number(r.score||0)
+  })).filter((r:any)=>r._local>0)
+    .sort((a:any,b:any)=>b._local-a._local||b._backend-a._backend)
+    .slice(0,6);
+  return {kind:'search',rows:ranked,trace:tool('uon_knowledge_search',started,ranked.length)};
+}
+
+async function generateWithGemini(system:string,prompt:string,temperature=.3,maxOutputTokens=1400){
+  if(!GEMINI_API_KEY)return null;
+  for(const model of GENERAL_MODELS){
+    try{
+      const generationConfig:any={temperature,maxOutputTokens};
+      if(/^gemini-3\.(7|8)-flash$/.test(model))generationConfig.thinkingConfig={thinkingLevel:'low'};
+      const r=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`,{
+        method:'POST',
+        headers:{'content-type':'application/json','x-goog-api-key':GEMINI_API_KEY},
+        body:JSON.stringify({
+          system_instruction:{parts:[{text:system}]},
+          contents:[{role:'user',parts:[{text:prompt}]}],
+          generationConfig
+        }),
+        signal:AbortSignal.timeout(14000)
+      });
+      const d=await r.json().catch(()=>({}));
+      if(!r.ok)continue;
+      const answer=String(d?.candidates?.[0]?.content?.parts?.filter((x:any)=>!x?.thought).map((x:any)=>x?.text||'').join('')||'').trim().slice(0,6500);
+      if(answer)return {answer,model,modelVersion:clean(d?.modelVersion,120)||model};
+    }catch{}
+  }
+  return null;
+}
+
+async function generalChat(body:any,question:string,language:string){
+  const history=(Array.isArray(body?.history)?body.history:[]).slice(-10)
+    .filter((x:any)=>['user','assistant'].includes(x?.role)&&clean(x?.content,1800))
+    .map((x:any)=>({role:x.role,content:clean(x.content,1800)}));
+  const system=language==='en'
+    ? 'You are UON Agent, a capable general-purpose assistant for UON Hub students. Answer naturally and directly. You can help with study, coding, writing, translation, brainstorming, explanations, and normal conversation. Do not invent current University of Nizwa facts; those are handled by verified tools. If something needs live/current data you do not have, say so plainly. Follow the user language and tone.'
+    : 'أنت UON Agent، مساعد ذكي عام لطلبة UON Hub. رد بعربي عماني طبيعي وخفيف إذا المستخدم يتكلم عامي عماني، بدون تصنع أو مبالغة في اللهجة. افهم كلمات مثل: ويش، أبا، واجد، زين، تو، حيك، من صوب. فضّل تعابير عمانية طبيعية مثل «ويش»، «زين»، «حاضرين»، «ما حصلت»، «ما قدرت» عند مناسبتها، وتجنب التعابير السعودية المصطنعة مثل «أبشر» و«يا الغالي». في الواجبات والرسائل والشرح الأكاديمي استخدم أسلوبًا واضحًا ومناسبًا للمهمة، والفصحى إذا كانت أنسب. تقدر تساعد في الدراسة والبرمجة والكتابة والترجمة والأفكار والأسئلة العامة والسوالف العادية. لا تخترع معلومات حالية خاصة بجامعة نزوى؛ المعلومات الجامعية الدقيقة لها أدوات موثوقة منفصلة. إذا السؤال يحتاج معلومة حية أو حديثة وما عندك مصدر مباشر، وضّح هذا باختصار.';
+  const prompt=`CONVERSATION (for continuity only):\n${JSON.stringify(history)}\n\nUSER:\n${question}`;
+  const g=await generateWithGemini(system,prompt,.35,1500);
+  if(!g)return null;
+  return {answer:g.answer,links:[],actions:[],grounded:false,confidence:.72,sources_count:0,used_model:true,ai_provider:'google_gemini',ai_model:g.model,ai_model_version:g.modelVersion};
+}
+
+async function groundedUniversityAnswer(question:string,rows:any[],language:string){
+  if(!rows.length)return null;
+  const context=rows.slice(0,6).map((r:any,i:number)=>`[${i+1}] ${clean(r.title,220)}\n${clean(r.description,1200)}\nOfficial: ${r.official?'yes':'no'}\nURL: ${clean(r.url,900)}`).join('\n\n');
+  const system=language==='en'
+    ? 'Answer the University of Nizwa question using ONLY the verified context provided. If the exact requested fact is not present, say you could not verify the exact answer instead of guessing. Be concise and useful.'
+    : 'جاوب سؤال الطالب عن جامعة نزوى اعتمادًا فقط على السياق الموثوق المرفق. لا تخمن ولا تكمل معلومة ناقصة من عندك. إذا المطلوب الدقيق غير موجود في السياق، قل بشكل واضح وبلهجة عمانية طبيعية إنك ما قدرت تتأكد من المعلومة الدقيقة، ووجّه للمصدر المتاح. لا تسرد نتائج البحث كقائمة إلا إذا السؤال يطلب قائمة.';
+  const g=await generateWithGemini(system,`VERIFIED CONTEXT:\n${context}\n\nQUESTION:\n${question}`,.12,900);
+  return g?{answer:g.answer,model:g.model,modelVersion:g.modelVersion}:null;
 }
 
 function formatResult(result:any,question:string,language:string){
@@ -334,15 +390,20 @@ Deno.serve(async (req:Request)=>{
     const casual=casualReply(question,language);
     if(casual){
       const request_id=await persistDirect(body,question,casual).catch(()=>null);
-      return reply(req,{answer:casual,links:[],actions:[],request_id:request_id||undefined,agent:true,agent_version:'1.3.0',intent:'chat',tool_trace:[],grounded:false,confidence:0.99});
+      return reply(req,{answer:casual,links:[],actions:[],request_id:request_id||undefined,agent:true,agent_version:'1.4.0',intent:'chat',tool_trace:[],grounded:false,confidence:0.99});
     }
     const effectiveQuestion=contextualQuestion(body,question);
     const selected=route(effectiveQuestion);
 
     if(selected==='chat'){
+      const g=await generalChat(body,question,language);
+      if(g?.answer){
+        const request_id=await persistDirect(body,question,g.answer).catch(()=>null);
+        return reply(req,{...g,request_id:request_id||undefined,agent:true,agent_version:'1.4.0',intent:'chat',tool_trace:[{name:'general_chat',status:'ok',count:1,ms:0}]});
+      }
       const fb=await fallback(req,{...body,question});
-      if(fb.ok&&fb.data?.answer)return reply(req,{...fb.data,agent:true,agent_version:'1.3.0',intent:'chat',tool_trace:[fb.trace],fallback:false});
-      return reply(req,{answer:language==='en'?'I could not reply just now. Try again in a moment.':'ما قدرت أرد عليك الحين، جرّب مرة ثانية بعد شوي 🙏',links:[],actions:[],agent:true,agent_version:'1.3.0',intent:'chat',tool_trace:[fb.trace],grounded:false,confidence:0.3});
+      if(fb.ok&&fb.data?.answer)return reply(req,{...fb.data,agent:true,agent_version:'1.4.0',intent:'chat',tool_trace:[fb.trace],fallback:true});
+      return reply(req,{answer:language==='en'?'I could not reply just now. Try again in a moment.':'ما قدرت أرد عليك الحين، جرّب مرة ثانية بعد شوي 🙏',links:[],actions:[],agent:true,agent_version:'1.4.0',intent:'chat',tool_trace:[fb.trace],grounded:false,confidence:0.3});
     }
 
     let result:any;
@@ -354,14 +415,30 @@ Deno.serve(async (req:Request)=>{
     else if(selected==='schedule')result=await scheduleTool(body);
     else result=await searchTool(effectiveQuestion);
 
+    const hasRows=Array.isArray(result?.rows)&&result.rows.length>0;
+    const hasContext=Array.isArray(result?.context)&&result.context.length>0;
+    if(!hasRows&&!hasContext&&['staff','course','calendar','campus','search'].includes(selected)){
+      const fb=await fallback(req,{...body,question:effectiveQuestion});
+      if(fb.ok&&fb.data?.answer)return reply(req,{...fb.data,agent:true,agent_version:'1.4.0',intent:selected,resolved_question:effectiveQuestion!==question?effectiveQuestion:undefined,tool_trace:[result.trace,fb.trace],fallback:true});
+    }
+
+    if(selected==='search'&&hasRows){
+      const synthesis=await groundedUniversityAnswer(question,result.rows,language);
+      if(synthesis?.answer){
+        const links=uniqueLinks(result.rows.map((r:any)=>link(r.title,r.url,Boolean(r.official),r.type||'source')));
+        const request_id=await persistDirect(body,question,synthesis.answer).catch(()=>null);
+        return reply(req,{answer:synthesis.answer,links,actions:[],request_id:request_id||undefined,agent:true,agent_version:'1.4.0',intent:'search',tool_trace:[result.trace,{name:'grounded_synthesis',status:'ok',count:result.rows.length,ms:0}],grounded:true,confidence:.9,sources_count:result.rows.length,used_model:true,ai_provider:'google_gemini',ai_model:synthesis.model,ai_model_version:synthesis.modelVersion});
+      }
+    }
+
     const formatted=formatResult(result,question,language);
     if(formatted.answer){
       const request_id=await persistDirect(body,question,formatted.answer).catch(()=>null);
-      return reply(req,{...formatted,request_id:request_id||undefined,agent:true,agent_version:'1.3.0',intent:selected,resolved_question:effectiveQuestion!==question?effectiveQuestion:undefined,tool_trace:[result.trace],grounded:true,confidence:result.rows?.length?0.94:0.72});
+      return reply(req,{...formatted,request_id:request_id||undefined,agent:true,agent_version:'1.4.0',intent:selected,resolved_question:effectiveQuestion!==question?effectiveQuestion:undefined,tool_trace:[result.trace],grounded:true,confidence:result.rows?.length?0.94:0.72});
     }
     const fb=await fallback(req,body);
-    if(fb.ok&&fb.data?.answer)return reply(req,{...fb.data,agent:true,agent_version:'1.3.0',intent:selected,tool_trace:[result.trace,fb.trace],fallback:true});
-    return reply(req,{answer:language==='en'?'I could not verify an answer right now. Try a more specific question.':'ما قدرت أتحقق من إجابة دقيقة حاليًا. جرّب سؤال أكثر تحديدًا.',links:[],actions:[],agent:true,agent_version:'1.3.0',intent:selected,tool_trace:[result.trace,fb.trace],grounded:false,confidence:0.35});
+    if(fb.ok&&fb.data?.answer)return reply(req,{...fb.data,agent:true,agent_version:'1.4.0',intent:selected,tool_trace:[result.trace,fb.trace],fallback:true});
+    return reply(req,{answer:language==='en'?'I could not verify an answer right now. Try a more specific question.':'ما قدرت أتحقق من إجابة دقيقة حاليًا. جرّب سؤال أكثر تحديدًا.',links:[],actions:[],agent:true,agent_version:'1.4.0',intent:selected,tool_trace:[result.trace,fb.trace],grounded:false,confidence:0.35});
   }catch(e){
     console.error('uon-agent-v1',e);
     return reply(req,{error:'agent_unavailable'},500);
