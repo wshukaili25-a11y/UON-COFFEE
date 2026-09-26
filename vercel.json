@@ -25,7 +25,8 @@
   ],
   "rewrites": [
     {"source":"/go/:slug","destination":"/go.html?slug=:slug"},
-    {"source":"/agent","destination":"/agent.html"},\n    {"source":"/schedule","destination":"/schedule.html"},
+    {"source":"/agent","destination":"/agent.html"},
+    {"source":"/schedule","destination":"/schedule.html"},
     {"source":"/tools","destination":"/tools.html"},
     {"source":"/search","destination":"/search.html"},
     {"source":"/gpa","destination":"/gpa.html"},
