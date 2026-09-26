@@ -71,11 +71,13 @@ async function enforceRate(req:Request,body:any){
 
 function contextualQuestion(body:any,question:string){
   const q=norm(question).replace(/[؟?!.،,]+$/g,'').trim();
-  const followup=/^(?:و?ايميله|و?ايميلها|و?بريده|و?بريدها|و?رقمه|و?رقمها|و?مكتبه|و?مكتبها|وين مكتبه|وين مكتبها|وين مكانه|وين مكانها|طيب ايميله|طيب رقمها|طيب رقمه|his email|her email|his phone|her phone|his office|her office|where is his office|where is her office)$/i.test(q);
-  if(!followup)return question;
   const history=Array.isArray(body?.history)?body.history:[];
   const previous=[...history].reverse().find((x:any)=>x?.role==='user'&&clean(x?.content,800)&&norm(x.content)!==norm(question));
-  return previous?`${clean(previous.content,600)} — ${question}`:question;
+  if(!previous)return question;
+  const directFollowup=/^(?:و?ايميله|و?ايميلها|و?بريده|و?بريدها|و?رقمه|و?رقمها|و?مكتبه|و?مكتبها|وين مكتبه|وين مكتبها|وين مكانه|وين مكانها|طيب ايميله|طيب رقمها|طيب رقمه|his email|her email|his phone|her phone|his office|her office|where is his office|where is her office)$/i.test(q);
+  const shortFollowup=q.length<=90&&/^(?:و|طيب|زين|تمام بس|كم|وين|اين|متى|كيف|وش|ويش|ايش|وعن|وبعدين|بعدها|نفس|هذا|هذي|هاذا|هل)/i.test(q);
+  if(directFollowup || (shortFollowup&&universitySignal(previous.content)))return `${clean(previous.content,600)} — ${question}`;
+  return question;
 }
 
 async function persistDirect(body:any,question:string,answer:string){
@@ -127,7 +129,7 @@ function casualReply(question:string,language:string){
   const q=norm(question).replace(/[!؟?.,،\s]+$/g,'').trim();
   const en=language==='en';
   const rows:[RegExp,string,string][]=[
-    [/^(?:السلام عليكم|سلام عليكم|السلام عليكم ورحمة الله|السلام عليكم ورحمه الله)$/i,'وعليكم السلام ورحمة الله وبركاته 👋 كيف أقدر أساعدك؟','Wa alaikum assalam 👋 How can I help?'],
+    [/^(?:السلام عليكم|سلام عليكم|السلام عليكم ورحمة الله|السلام عليكم ورحمه الله)$/i,'وعليكم السلام ورحمة الله وبركاته 👋 ويش أقدر أساعدك فيه؟','Wa alaikum assalam 👋 How can I help?'],
     [/^(?:وعليكم السلام|وعليكم السلام ورحمة الله|وعليكم السلام ورحمه الله)$/i,'وعليكم السلام ورحمة الله وبركاته 🌿','Wa alaikum assalam 🌿'],
     [/^(?:هلا|هلا والله|هلا بك|هلو|يا هلا|يا مرحبا|مرحبا|مرحبتين|مرحبا الساع|حياك|حيك|حياك الله|حي الله|الله يحييك)$/i,'هلا والله 👋 ويش تحتاج؟','Hi 👋 What can I help you with?'],
     [/^(?:صباح الخير|صباح النور)$/i,'صباح النور ☀️ وش أقدر أساعدك فيه؟','Good morning ☀️ How can I help?'],
@@ -325,7 +327,7 @@ async function groundedUniversityAnswer(question:string,rows:any[],language:stri
   const context=rows.slice(0,6).map((r:any,i:number)=>`[${i+1}] ${clean(r.title,220)}\n${clean(r.description,1200)}\nOfficial: ${r.official?'yes':'no'}\nURL: ${clean(r.url,900)}`).join('\n\n');
   const system=language==='en'
     ? 'Answer the University of Nizwa question using ONLY the verified context provided. If the exact requested fact is not present, say you could not verify the exact answer instead of guessing. Be concise and useful.'
-    : 'جاوب سؤال الطالب عن جامعة نزوى اعتمادًا فقط على السياق الموثوق المرفق. لا تخمن ولا تكمل معلومة ناقصة من عندك. إذا المطلوب الدقيق غير موجود في السياق، قل بشكل واضح وبلهجة عمانية طبيعية إنك ما قدرت تتأكد من المعلومة الدقيقة، ووجّه للمصدر المتاح. لا تسرد نتائج البحث كقائمة إلا إذا السؤال يطلب قائمة.';
+    : 'جاوب سؤال الطالب عن جامعة نزوى اعتمادًا فقط على السياق الموثوق المرفق. لا تخمن ولا تكمل معلومة ناقصة من عندك. إذا المطلوب الدقيق غير موجود في السياق، قل بشكل واضح وبلهجة عمانية طبيعية إنك ما قدرت تتأكد من المعلومة الدقيقة، ووجّه للمصدر المتاح. لا تطبع الروابط داخل نص الإجابة لأن الروابط تُعرض للمستخدم بشكل منفصل. لا تسرد نتائج البحث كقائمة إلا إذا السؤال يطلب قائمة.';
   const g=await generateWithGemini(system,`VERIFIED CONTEXT:\n${context}\n\nQUESTION:\n${question}`,.12,900);
   return g?{answer:g.answer,model:g.model,modelVersion:g.modelVersion}:null;
 }
