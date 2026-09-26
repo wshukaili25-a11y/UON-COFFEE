@@ -121,6 +121,26 @@ function link(title:string,url:any,official=true,type='source'){
 }
 function uniqueLinks(items:any[]){const seen=new Set();return items.filter(Boolean).filter((x:any)=>{if(seen.has(x.url))return false;seen.add(x.url);return true}).slice(0,5)}
 
+function casualReply(question:string,language:string){
+  const q=norm(question).replace(/[!؟?.,،\s]+$/g,'').trim();
+  const en=language==='en';
+  const rows:[RegExp,string,string][]=[
+    [/^(?:السلام عليكم|سلام عليكم|السلام عليكم ورحمة الله|السلام عليكم ورحمه الله)$/i,'وعليكم السلام ورحمة الله وبركاته 👋 كيف أقدر أساعدك؟','Wa alaikum assalam 👋 How can I help?'],
+    [/^(?:وعليكم السلام|وعليكم السلام ورحمة الله|وعليكم السلام ورحمه الله)$/i,'وعليكم السلام ورحمة الله وبركاته 🌿','Wa alaikum assalam 🌿'],
+    [/^(?:هلا|هلا والله|هلا بك|هلو|يا هلا|يا مرحبا|مرحبا|مرحبتين|مرحبا الساع|حياك|حيك|حياك الله|حي الله|الله يحييك)$/i,'هلا وغلا 👋 وش تحتاج؟','Hi 👋 What can I help you with?'],
+    [/^(?:صباح الخير|صباح النور)$/i,'صباح النور ☀️ وش أقدر أساعدك فيه؟','Good morning ☀️ How can I help?'],
+    [/^(?:مساء الخير|مساء النور)$/i,'مساء النور 🌙 وش أقدر أساعدك فيه؟','Good evening 🌙 How can I help?'],
+    [/^(?:كيفك|كيف حالك|هلا كيفك|شخبارك|وش اخبارك|ويش اخبارك|كيف امورك|شلونك|علومك|how are you)$/i,'بخير دامك بخير 😄 أنا جاهز، وش تحتاج؟','Doing well 😄 I’m ready. What do you need?'],
+    [/^(?:شكرا|شكرا لك|مشكور|تسلم|يعطيك العافيه|يعطيك العافية|thanks|thank you)$/i,'العفو وحاضرين 🙌','You’re welcome 🙌'],
+    [/^(?:تمام|زين|اوكي|اوك|ok|okay)$/i,'تمام 🙌 كمل، أنا معك.','Sounds good 🙌 Go ahead.'],
+    [/^(?:مع السلامه|مع السلامة|باي|bye)$/i,'في أمان الله 👋','Goodbye 👋'],
+    [/^(?:من انت|منو انت|وش اسمك|ويش اسمك|ايش اسمك|who are you)$/i,'أنا UON Agent 🤖 مساعد UON Hub الذكي لطلبة جامعة نزوى. أبحث في بيانات المنصة والمصادر المتاحة قبل ما أعطيك معلومة جامعية.','I’m UON Agent 🤖, UON Hub’s assistant for University of Nizwa students.'],
+    [/^(?:وش تقدر تسوي|ويش تقدر تسوي|ايش تقدر تسوي|كيف تساعدني|what can you do)$/i,'أقدر أبحث عن الدكاترة والمواد والمواعيد والخدمات والمباني، وأستخدم جدولك المحفوظ، وأساعدك في الأسئلة الدراسية والمحادثة العادية.','I can search staff, courses, dates, services and campus information, use your saved schedule, and help with study questions and normal conversation.']
+  ];
+  for(const [re,ar,enText] of rows)if(re.test(q))return en?enText:ar;
+  return '';
+}
+
 function route(question:string){
   const q=norm(question);
   if(/جدولي|محاضراتي|محاضرتي|وش عندي اليوم|ويش عندي اليوم|ايش عندي اليوم|my schedule|my classes|next class/.test(q))return 'schedule';
@@ -288,6 +308,11 @@ Deno.serve(async (req:Request)=>{
     if(!question)return reply(req,{error:'question_required'},400);
     const rate=await enforceRate(req,body); if(!rate.allowed)return reply(req,{error:'rate_limited',retry_after:rate.retry_after},429);
     const language=body?.language==='en'?'en':'ar';
+    const casual=casualReply(question,language);
+    if(casual){
+      const request_id=await persistDirect(body,question,casual).catch(()=>null);
+      return reply(req,{answer:casual,links:[],actions:[],request_id:request_id||undefined,agent:true,agent_version:'1.2.0',intent:'chat',tool_trace:[],grounded:false,confidence:0.99});
+    }
     const effectiveQuestion=contextualQuestion(body,question);
     const selected=route(effectiveQuestion);
     let result:any;
@@ -302,11 +327,11 @@ Deno.serve(async (req:Request)=>{
     const formatted=formatResult(result,question,language);
     if(formatted.answer){
       const request_id=await persistDirect(body,question,formatted.answer).catch(()=>null);
-      return reply(req,{...formatted,request_id:request_id||undefined,agent:true,agent_version:'1.1.0',intent:selected,resolved_question:effectiveQuestion!==question?effectiveQuestion:undefined,tool_trace:[result.trace],grounded:true,confidence:result.rows?.length?0.94:0.72});
+      return reply(req,{...formatted,request_id:request_id||undefined,agent:true,agent_version:'1.2.0',intent:selected,resolved_question:effectiveQuestion!==question?effectiveQuestion:undefined,tool_trace:[result.trace],grounded:true,confidence:result.rows?.length?0.94:0.72});
     }
     const fb=await fallback(req,body);
-    if(fb.ok&&fb.data?.answer)return reply(req,{...fb.data,agent:true,agent_version:'1.1.0',intent:selected,tool_trace:[result.trace,fb.trace],fallback:true});
-    return reply(req,{answer:language==='en'?'I could not verify an answer right now. Try a more specific question.':'ما قدرت أتحقق من إجابة دقيقة حاليًا. جرّب سؤال أكثر تحديدًا.',links:[],actions:[],agent:true,agent_version:'1.1.0',intent:selected,tool_trace:[result.trace,fb.trace],grounded:false,confidence:0.35});
+    if(fb.ok&&fb.data?.answer)return reply(req,{...fb.data,agent:true,agent_version:'1.2.0',intent:selected,tool_trace:[result.trace,fb.trace],fallback:true});
+    return reply(req,{answer:language==='en'?'I could not verify an answer right now. Try a more specific question.':'ما قدرت أتحقق من إجابة دقيقة حاليًا. جرّب سؤال أكثر تحديدًا.',links:[],actions:[],agent:true,agent_version:'1.2.0',intent:selected,tool_trace:[result.trace,fb.trace],grounded:false,confidence:0.35});
   }catch(e){
     console.error('uon-agent-v1',e);
     return reply(req,{error:'agent_unavailable'},500);
