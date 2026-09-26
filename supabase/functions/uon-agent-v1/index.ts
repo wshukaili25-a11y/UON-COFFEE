@@ -464,6 +464,7 @@ Deno.serve(async (req:Request)=>{
     }
     const effectiveQuestion=contextualQuestion(body,question);
     const selected=route(effectiveQuestion);
+    console.log('uon-agent-route',JSON.stringify({question,effectiveQuestion,normalized:norm(effectiveQuestion),selected}));
 
     if(selected==='chat'){
       const g=await generalChat(body,question,language);
