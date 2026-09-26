@@ -66,6 +66,44 @@ async function enforceRate(req:Request,body:any){
   return {allowed:true,retry_after:0};
 }
 
+function contextualQuestion(body:any,question:string){
+  const q=norm(question).replace(/[؟?!.،,]+$/g,'').trim();
+  const followup=/^(?:و?ايميله|و?ايميلها|و?بريده|و?بريدها|و?رقمه|و?رقمها|و?مكتبه|و?مكتبها|وين مكتبه|وين مكتبها|وين مكانه|وين مكانها|طيب ايميله|طيب رقمها|طيب رقمه|his email|her email|his phone|her phone|his office|her office|where is his office|where is her office)$/i.test(q);
+  if(!followup)return question;
+  const history=Array.isArray(body?.history)?body.history:[];
+  const previous=[...history].reverse().find((x:any)=>x?.role==='user'&&clean(x?.content,800)&&norm(x.content)!==norm(question));
+  return previous?`${clean(previous.content,600)} — ${question}`:question;
+}
+
+async function persistDirect(body:any,question:string,answer:string){
+  if(!isUuid(body?.session_id)||!isUuid(body?.client_token))return null;
+  const {data:binding,error}=await db.rpc('uon_ai_bind_conversation_client',{p_session_id:body.session_id,p_client_token:body.client_token});
+  const bound=Array.isArray(binding)?binding[0]:binding;
+  if(error||!bound?.allowed)return null;
+  let cid=bound.conversation_id||null;
+  if(!cid){
+    const channel=['web','instagram','whatsapp','telegram'].includes(body?.channel)?body.channel:'web';
+    const {data:created,error:insertError}=await db.from('uon_ai_conversations').insert({
+      session_id:body.session_id,
+      client_token_hash:await digest(body.client_token),
+      channel,
+      status:'ai',
+      page_context:clean(body?.page_context,240)||null,
+      last_message_at:new Date().toISOString()
+    }).select('id').single();
+    if(insertError)return null;
+    cid=created?.id||null;
+  }
+  if(!cid)return null;
+  const requestId=crypto.randomUUID();
+  await db.from('uon_ai_messages').insert([
+    {conversation_id:cid,role:'user',content:question},
+    {conversation_id:cid,role:'assistant',content:answer,request_id:requestId}
+  ]);
+  await db.from('uon_ai_conversations').update({last_message_at:new Date().toISOString(),updated_at:new Date().toISOString()}).eq('id',cid);
+  return requestId;
+}
+
 const stop = new Set(norm('دكتور دكتوره الدكتور الدكتوره استاذ استاذه موظف جامعه الجامعه نزوى اريد ابا ابغى ابغي عطني عطيني اعطني وين اين كيف وش ويش ايش هل في من عن على الى لي عندك عندي اسم اسمه ايميل بريده رقم مكتبه مكتب تخصص مادة مساق مقرر رابط the a an of to in for at university nizwa doctor professor staff course where what how email office').split(/\s+/));
 function tokens(v:any){
   return [...new Set(norm(v).replace(/[^\p{L}\p{N}\s]/gu,' ').split(/\s+/).filter(x=>x.length>1&&!stop.has(x)))];
@@ -234,7 +272,7 @@ function formatResult(result:any,question:string,language:string){
 }
 async function fallback(req:Request,body:any){
   const started=Date.now();
-  const r=await fetch(BASE_AI,{method:'POST',headers:{'content-type':'application/json',Origin:requestOrigin(req)||'https://uonhub.space',Authorization:`Bearer ${SERVICE_ROLE_KEY}`,apikey:SERVICE_ROLE_KEY},body:JSON.stringify({...body,channel:'web'}),signal:AbortSignal.timeout(18000)});
+  const r=await fetch(BASE_AI,{method:'POST',headers:{'content-type':'application/json',Origin:requestOrigin(req)||'https://uonhub.space',Authorization:`Bearer ${SERVICE_ROLE_KEY}`,apikey:SERVICE_ROLE_KEY},body:JSON.stringify({...body,channel:['web','instagram','whatsapp','telegram'].includes(body?.channel)?body.channel:'web'}),signal:AbortSignal.timeout(18000)});
   const data=await r.json().catch(()=>({}));
   return {data,trace:tool('uon_ai_fallback',started,data?.answer?1:0,r.ok?'ok':'error'),ok:r.ok};
 }
@@ -249,23 +287,25 @@ Deno.serve(async (req:Request)=>{
     if(!question)return reply(req,{error:'question_required'},400);
     const rate=await enforceRate(req,body); if(!rate.allowed)return reply(req,{error:'rate_limited',retry_after:rate.retry_after},429);
     const language=body?.language==='en'?'en':'ar';
-    const selected=route(question);
+    const effectiveQuestion=contextualQuestion(body,question);
+    const selected=route(effectiveQuestion);
     let result:any;
-    if(selected==='staff')result=await staffTool(question);
-    else if(selected==='course')result=await courseTool(question);
-    else if(selected==='calendar')result=await calendarTool(question);
-    else if(selected==='support')result=await supportTool(question);
-    else if(selected==='campus')result=await campusTool(question);
+    if(selected==='staff')result=await staffTool(effectiveQuestion);
+    else if(selected==='course')result=await courseTool(effectiveQuestion);
+    else if(selected==='calendar')result=await calendarTool(effectiveQuestion);
+    else if(selected==='support')result=await supportTool(effectiveQuestion);
+    else if(selected==='campus')result=await campusTool(effectiveQuestion);
     else if(selected==='schedule')result=await scheduleTool(body);
-    else result=await searchTool(question);
+    else result=await searchTool(effectiveQuestion);
 
     const formatted=formatResult(result,question,language);
     if(formatted.answer){
-      return reply(req,{...formatted,agent:true,agent_version:'1.0.0',intent:selected,tool_trace:[result.trace],grounded:true,confidence:result.rows?.length?0.94:0.72});
+      const request_id=await persistDirect(body,question,formatted.answer).catch(()=>null);
+      return reply(req,{...formatted,request_id:request_id||undefined,agent:true,agent_version:'1.1.0',intent:selected,resolved_question:effectiveQuestion!==question?effectiveQuestion:undefined,tool_trace:[result.trace],grounded:true,confidence:result.rows?.length?0.94:0.72});
     }
     const fb=await fallback(req,body);
-    if(fb.ok&&fb.data?.answer)return reply(req,{...fb.data,agent:true,agent_version:'1.0.0',intent:selected,tool_trace:[result.trace,fb.trace],fallback:true});
-    return reply(req,{answer:language==='en'?'I could not verify an answer right now. Try a more specific question.':'ما قدرت أتحقق من إجابة دقيقة حاليًا. جرّب سؤال أكثر تحديدًا.',links:[],actions:[],agent:true,agent_version:'1.0.0',intent:selected,tool_trace:[result.trace,fb.trace],grounded:false,confidence:0.35});
+    if(fb.ok&&fb.data?.answer)return reply(req,{...fb.data,agent:true,agent_version:'1.1.0',intent:selected,tool_trace:[result.trace,fb.trace],fallback:true});
+    return reply(req,{answer:language==='en'?'I could not verify an answer right now. Try a more specific question.':'ما قدرت أتحقق من إجابة دقيقة حاليًا. جرّب سؤال أكثر تحديدًا.',links:[],actions:[],agent:true,agent_version:'1.1.0',intent:selected,tool_trace:[result.trace,fb.trace],grounded:false,confidence:0.35});
   }catch(e){
     console.error('uon-agent-v1',e);
     return reply(req,{error:'agent_unavailable'},500);
