@@ -1,0 +1,40 @@
+name: Build ANJIZ V30 pack
+on:
+  push:
+    branches: [anjiz-system-v7]
+    paths:
+      - 'anjiz-v7/anjiz-v30-static.html'
+      - '.github/workflows/anjiz-pack-v30.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  pack:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: anjiz-system-v7
+      - name: Pack V30 static HTML
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import gzip, base64
+          src = Path('anjiz-v7/anjiz-v30-static.html').read_bytes()
+          packed = base64.b64encode(gzip.compress(src, compresslevel=9, mtime=0)).decode()
+          Path('anjiz-v7/v16-full-loader.pack.b64').write_text(packed)
+          print('source', len(src), 'packed', len(packed))
+          PY
+      - name: Commit generated pack
+        run: |
+          if git diff --quiet -- anjiz-v7/v16-full-loader.pack.b64; then
+            echo "Pack already current"
+            exit 0
+          fi
+          git config user.name "ANJIZ Build Bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add anjiz-v7/v16-full-loader.pack.b64
+          git commit -m "Build V30 self-contained loader pack"
+          git push origin HEAD:anjiz-system-v7
