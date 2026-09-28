@@ -1,10 +1,5 @@
-name: Build ANJIZ V30 pack
+name: Build ANJIZ V30 pack (manual only)
 on:
-  push:
-    branches: [anjiz-system-v7]
-    paths:
-      - 'anjiz-v7/anjiz-v30-static.html'
-      - '.github/workflows/anjiz-pack-v30.yml'
   workflow_dispatch:
 
 permissions:
