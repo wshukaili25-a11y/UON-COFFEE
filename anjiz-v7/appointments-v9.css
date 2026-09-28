@@ -17,6 +17,28 @@ const scanFnV24=async function(fieldId){const target=fieldId||'loginId';const d=
 function cleanLoginV24(){const l=document.getElementById('login');if(!l)return;l.querySelectorAll('.demo,.build').forEach(x=>x.remove());[...l.querySelectorAll('button')].filter(b=>/\bdemo\b/i.test(b.textContent||'')).forEach(x=>x.remove());const id=document.getElementById('loginId'),pw=document.getElementById('loginPw')||document.getElementById('loginPass');if(id&&/@anjiz\\.demo/i.test(id.value||''))id.value='';if(pw&&pw.value==='anjiz')pw.value=''}
 function installV24(){window.scanBarcodeToField=scanFnV24;window.scanLoginId=()=>scanFnV24('loginId');cleanLoginV24()}
 async function addon(js,css,id,patch){try{const [codeText,cssText]=await Promise.all([fetch(root+js+'?v=20260928final',{cache:'no-store'}).then(r=>{if(!r.ok)throw new Error(js+' '+r.status);return r.text()}),fetch(root+css+'?v=20260928final',{cache:'no-store'}).then(r=>{if(!r.ok)throw new Error(css+' '+r.status);return r.text()})]);const style=document.createElement('style');style.id=id+'-css';style.textContent=cssText;document.head.appendChild(style);let code=patch?patch(codeText):codeText;const blob=new Blob([code],{type:'text/javascript'}),url=URL.createObjectURL(blob);await new Promise((resolve,reject)=>{const s=document.createElement('script');s.src=url;s.onload=resolve;s.onerror=reject;document.head.appendChild(s)});URL.revokeObjectURL(url);window['__'+id+'Loaded']=1}catch(e){console.warn('ANJIZ '+id+' add-on unavailable',e)}}
-installV24();let qrGuardN=0,qrGuardT=setInterval(()=>{installV24();if(++qrGuardN>300)clearInterval(qrGuardT)},100);const load=()=>{addon('booking-v10.js','booking-v10.css','bookingV10',c=>c.replace("let choose=me.role!=='student'","let choose=['admin','peer','trainee'].includes(me.role)"));addon('attendance-v11.js','attendance-v11.css','attendanceV11');addon('reports-v12.js','reports-v12.css','reportsV12')};
+installV24();let qrGuardN=0,qrGuardT=setInterval(()=>{installV24();if(++qrGuardN>300)clearInterval(qrGuardT)},100);
+function installLoginQrScanner(){
+  if(window.__anjizLoginQrBootstrapV24)return;window.__anjizLoginQrBootstrapV24=1;
+  let qr=null;
+  const libUrl='https://cdn.jsdelivr.net/npm/html5-qrcode@2.3.8/html5-qrcode.min.js';
+  function loadLib(){return new Promise((resolve,reject)=>{if(window.Html5Qrcode)return resolve();let s=document.getElementById('anjiz-html5-qrcode-v24');if(s){s.addEventListener('load',resolve,{once:true});s.addEventListener('error',reject,{once:true});return}s=document.createElement('script');s.id='anjiz-html5-qrcode-v24';s.src=libUrl;s.async=true;s.onload=resolve;s.onerror=reject;document.head.appendChild(s)})}
+  function parsed(raw){let v=String(raw||'').trim();try{let u=new URL(v,location.href);for(const k of ['uid','id','user','verify']){let x=u.searchParams.get(k);if(x&&/^[A-Za-z0-9._-]{2,40}$/.test(x))return x.toUpperCase()}let h=u.hash.match(/(?:uid|id|user|verify)=([A-Za-z0-9._-]{2,40})/i);if(h)return h[1].toUpperCase()}catch(e){}let m=v.match(/(?:ANJIZ\s*[:#\-|]\s*)?([A-Z]{1,4}\d{2,12})/i);return (m?m[1]:v).toUpperCase()}
+  async function stop(){const x=qr;qr=null;if(!x)return;try{if(x.isScanning)await x.stop()}catch(e){}try{await x.clear()}catch(e){}}
+  window.stopAnjizLoginQr=async function(){await stop();try{closeModal()}catch(e){}};
+  window.scanBarcodeToField=async function(fieldId){
+    try{
+      if(typeof showModal!=='function')throw new Error('UI not ready');
+      showModal('<div><span class="section-label">ANJIZ ID SCANNER</span><h3>Scan Student ID / QR</h3><p class="muted">Allow camera access, or choose a saved QR image.</p><div id="anjizQrReaderV24" style="width:100%;min-height:280px;border-radius:14px;overflow:hidden;background:#071f17"></div><div class="row" style="margin-top:12px"><label class="btn secondary" style="cursor:pointer">Choose QR Image<input id="anjizQrFileV24" type="file" accept="image/*" style="display:none"></label><button class="btn outline" onclick="stopAnjizLoginQr()">Close</button></div><div id="anjizQrStatusV24" class="muted" style="margin-top:8px"></div></div>');
+      try{await loadLib()}catch(e){let s=document.getElementById('anjizQrStatusV24');if(s)s.textContent='Scanner library could not load. Check the connection and try again.';return}
+      const finish=async(raw)=>{const value=parsed(raw);await stop();try{closeModal()}catch(e){}const target=document.getElementById(fieldId);if(target){target.value=value;target.dispatchEvent(new Event('input',{bubbles:true}));target.dispatchEvent(new Event('change',{bubbles:true}));target.focus()}if(fieldId==='loginId'){const p=document.getElementById('loginPass');if(p)p.focus()}};
+      try{qr=new Html5Qrcode('anjizQrReaderV24');await qr.start({facingMode:'environment'},{fps:10,qrbox:{width:230,height:230},aspectRatio:1},finish,()=>{})}catch(e){let s=document.getElementById('anjizQrStatusV24');if(s)s.textContent='Camera unavailable here. Use Choose QR Image below.'}
+      const file=document.getElementById('anjizQrFileV24');
+      if(file)file.onchange=async()=>{if(!file.files||!file.files[0])return;try{if(qr&&qr.isScanning)await qr.stop()}catch(e){}try{if(!qr)qr=new Html5Qrcode('anjizQrReaderV24');const raw=await qr.scanFile(file.files[0],true);await finish(raw)}catch(e){let s=document.getElementById('anjizQrStatusV24');if(s)s.textContent='Could not read this image. Try a clearer QR image.'}};
+    }catch(e){alert('QR scanner could not start. Please try again.')}
+  };
+}
+
+const load=()=>{installLoginQrScanner();addon('booking-v10.js','booking-v10.css','bookingV10',c=>c.replace("let choose=me.role!=='student'","let choose=['admin','peer','trainee'].includes(me.role)"));addon('attendance-v11.js','attendance-v11.css','attendanceV11');addon('reports-v12.js','reports-v12.css','reportsV12')};
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',load,{once:true});else setTimeout(load,0)
 })();</script><style>
