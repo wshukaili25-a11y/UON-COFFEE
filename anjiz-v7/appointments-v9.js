@@ -121,3 +121,58 @@
 
   fetch(STABLE_APPOINTMENTS,{cache:'no-store'}).then(r=>{if(!r.ok)throw new Error('appointments '+r.status);return r.text()}).then(code=>{const blob=new Blob([code],{type:'text/javascript'}),url=URL.createObjectURL(blob),s=document.createElement('script');s.src=url;s.onload=()=>URL.revokeObjectURL(url);s.onerror=()=>URL.revokeObjectURL(url);document.head.appendChild(s)}).catch(e=>console.warn('ANJIZ appointments enhancement unavailable',e));
 })();
+
+
+/* ANJIZ V31 — iOS native-camera QR fallback */
+;(()=>{
+  if(window.__anjizQrNativeV31)return;
+  window.__anjizQrNativeV31=1;
+  const LIB='https://cdn.jsdelivr.net/npm/html5-qrcode@2.3.8/html5-qrcode.min.js';
+  let live=null;
+  function loadLib(){
+    return new Promise((resolve,reject)=>{
+      if(window.Html5Qrcode)return resolve();
+      let s=document.getElementById('anjiz-html5-qrcode-v31');
+      if(s){s.addEventListener('load',resolve,{once:true});s.addEventListener('error',reject,{once:true});return;}
+      s=document.createElement('script');s.id='anjiz-html5-qrcode-v31';s.src=LIB;s.async=true;s.onload=resolve;s.onerror=reject;document.head.appendChild(s);
+    });
+  }
+  function normalize(raw){
+    const v=String(raw||'').trim();
+    try{const u=new URL(v,location.href);for(const k of ['verifyUid','uid','id','user','verify']){const x=u.searchParams.get(k);if(x)return x.toUpperCase();}}catch(e){}
+    const m=v.match(/(?:ANJIZ\\s*[:#|\\-]\\s*)?([A-Z]{1,5}\\d{2,14})/i);return (m?m[1]:v).toUpperCase();
+  }
+  function apply(raw,fieldId){
+    const t=document.getElementById(fieldId||'loginId'),v=normalize(raw);
+    if(t){t.value=v;t.dispatchEvent(new Event('input',{bubbles:true}));t.dispatchEvent(new Event('change',{bubbles:true}));t.focus();}
+    if((fieldId||'loginId')==='loginId'){const p=document.getElementById('loginPass');if(p)p.focus();}
+  }
+  async function stop(){const x=live;live=null;if(x){try{if(x.isScanning)await x.stop()}catch(e){}try{await x.clear()}catch(e){}}const o=document.getElementById('anjizQrOverlayV31');if(o)o.remove();}
+  window.stopAnjizQrV31=stop;
+  async function decodeFile(file,fieldId){
+    if(!file)return;
+    try{
+      await loadLib();
+      let box=document.getElementById('anjizQrFileDecodeV31');if(!box){box=document.createElement('div');box.id='anjizQrFileDecodeV31';box.style.display='none';document.body.appendChild(box);}
+      const r=new Html5Qrcode('anjizQrFileDecodeV31');const raw=await r.scanFile(file,true);try{await r.clear()}catch(e){}apply(raw,fieldId);
+    }catch(e){alert('QR could not be read. Take a clearer photo or try again.');}
+  }
+  function nativeCamera(fieldId){
+    const i=document.createElement('input');i.type='file';i.accept='image/*';i.setAttribute('capture','environment');i.style.position='fixed';i.style.left='-9999px';
+    i.onchange=()=>{const f=i.files&&i.files[0];i.remove();decodeFile(f,fieldId);};document.body.appendChild(i);i.click();
+  }
+  async function liveCamera(fieldId){
+    const old=document.getElementById('anjizQrOverlayV31');if(old)old.remove();
+    const o=document.createElement('div');o.id='anjizQrOverlayV31';o.style.cssText='position:fixed;inset:0;z-index:999999;background:rgba(4,28,20,.96);display:flex;align-items:center;justify-content:center;padding:18px';
+    o.innerHTML='<div style="width:min(94vw,480px);background:#fff;color:#173b2e;border-radius:20px;padding:18px"><h3 style="margin:0 0 6px">ANJIZ QR Scanner</h3><p style="margin:0 0 14px;color:#667a70;font-size:13px">Point the rear camera at the ANJIZ QR code.</p><div id="anjizQrReaderV31" style="min-height:300px;background:#071f17;border-radius:14px;overflow:hidden"></div><div style="display:flex;gap:8px;margin-top:12px"><button type="button" id="anjizQrPhotoV31" style="flex:1;padding:12px;border:0;border-radius:12px;background:#0b6b49;color:white;font-weight:800">Take QR Photo</button><button type="button" id="anjizQrCloseV31" style="padding:12px;border:1px solid #ccd8d2;border-radius:12px;background:white;font-weight:800">Close</button></div></div>';
+    document.body.appendChild(o);document.getElementById('anjizQrCloseV31').onclick=stop;document.getElementById('anjizQrPhotoV31').onclick=()=>nativeCamera(fieldId);
+    try{await loadLib();live=new Html5Qrcode('anjizQrReaderV31');await live.start({facingMode:'environment'},{fps:10,qrbox:{width:230,height:230}},raw=>{apply(raw,fieldId);stop();},()=>{});}catch(e){const box=document.getElementById('anjizQrReaderV31');if(box)box.innerHTML='<div style="color:white;padding:24px;text-align:center">Live camera is unavailable here.<br><b>Tap Take QR Photo below.</b></div>';}
+  }
+  function scanner(fieldId='loginId'){
+    const ios=/iPad|iPhone|iPod/i.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+    if(ios){nativeCamera(fieldId);return;}
+    liveCamera(fieldId);
+  }
+  function install(){try{scanBarcodeToField=scanner}catch(e){}window.scanBarcodeToField=scanner;try{scanLoginId=()=>scanner('loginId')}catch(e){}window.scanLoginId=()=>scanner('loginId');}
+  install();document.addEventListener('DOMContentLoaded',install,{once:true});let n=0,t=setInterval(()=>{install();if(++n>100)clearInterval(t)},100);
+})();
