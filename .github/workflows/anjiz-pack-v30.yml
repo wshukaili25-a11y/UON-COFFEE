@@ -1,4 +1,4 @@
-name: Build ANJIZ V30 pack (manual only)
+name: Build validated ANJIZ runtime (manual only)
 on:
   workflow_dispatch:
 
@@ -12,24 +12,19 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: anjiz-system-v7
-      - name: Pack V30 static HTML
-        run: |
-          python - <<'PY'
-          from pathlib import Path
-          import gzip, base64
-          src = Path('anjiz-v7/anjiz-v30-static.html').read_bytes()
-          packed = base64.b64encode(gzip.compress(src, compresslevel=9, mtime=0)).decode()
-          Path('anjiz-v7/v16-full-loader.pack.b64').write_text(packed)
-          print('source', len(src), 'packed', len(packed))
-          PY
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Build and validate runtime
+        run: node anjiz-v7/build-runtime.mjs
       - name: Commit generated pack
         run: |
-          if git diff --quiet -- anjiz-v7/v16-full-loader.pack.b64; then
+          if git diff --quiet -- anjiz-v7/index.html anjiz-v7/v16-full-loader.pack.b64; then
             echo "Pack already current"
             exit 0
           fi
           git config user.name "ANJIZ Build Bot"
           git config user.email "actions@users.noreply.github.com"
-          git add anjiz-v7/v16-full-loader.pack.b64
-          git commit -m "Build V30 self-contained loader pack"
+          git add anjiz-v7/index.html anjiz-v7/v16-full-loader.pack.b64
+          git commit -m "Build validated ANJIZ runtime"
           git push origin HEAD:anjiz-system-v7
