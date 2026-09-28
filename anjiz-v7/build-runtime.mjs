@@ -29,7 +29,7 @@ if (!html.includes('function bookingPage()')) throw new Error('Missing base appl
 
 // The previous QR patch duplicated async and prevented the entire app parsing.
 html = html.replace('async async function scanBarcodeToField', 'async function scanBarcodeToField');
-html = html.replace('<html>', '<html lang="en" data-anjiz-build="20260928-v32">');
+html = html.replace('<html>', '<html lang="en" data-anjiz-build="20260928-v33">');
 // Keep the base script separate from add-ons, and preserve replacement tokens
 // such as $& literally by always using replacement callbacks.
 for (const [index, match] of [...html.matchAll(scriptPattern)].entries()) {
@@ -85,8 +85,9 @@ addScript('qr-login', await read('qr-login-v31.js'));
 addScript('ready', `
 scanBarcodeToField = window.anjizQrScanV31;
 window.scanLoginId = () => scanBarcodeToField('loginId');
-window.__anjizBuild = '20260928-v32';
+window.__anjizBuild = '20260928-v33';
 window.__anjizLoadedModulesV27 = { reports:true, timetable:true, communications:true, registration:true, instructor:true, student:true, demo:true, qr:true, final:true };
+document.documentElement.dataset.anjizBuild = '20260928-v33';
 document.documentElement.dataset.anjizReady = 'true';
 `);
 html = html.replace('</head>', () => styles.join('\n') + '\n</head>');
@@ -102,4 +103,4 @@ await writeFile(new URL('index.html', root), html);
 // publishing the entire assembled app atomically in a single payload.
 const packed = gzipSync(Buffer.from(html), { level: 9, mtime: 0 }).toString('base64');
 await writeFile(new URL('v16-full-loader.pack.b64', root), packed);
-console.log(`ANJIZ V32: ${parsedScripts.length} validated scripts; ${Buffer.byteLength(html)} HTML bytes; ${packed.length} packed bytes.`);
+console.log(`ANJIZ V33: ${parsedScripts.length} validated scripts; ${Buffer.byteLength(html)} HTML bytes; ${packed.length} packed bytes.`);
