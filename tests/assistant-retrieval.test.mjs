@@ -40,3 +40,13 @@ test('a link follow-up retains the service and new service questions replace it'
   assert.equal(serviceTopic(retrievalQuestion('عطني الرابط',h)),'anjiz');
   assert.equal(serviceTopic(retrievalQuestion('وين اختبار تحديد المستوى؟',h)),'placement');
 });
+
+test('successive short follow-ups preserve the topic, even with an intervening thanks',()=>{
+ const h=[{role:'user',content:'خدمات مركز أنجز'},{role:'assistant',content:'خدمات الدعم'},
+ {role:'user',content:'كيف أحجز؟'},{role:'assistant',content:'من البوابة'},
+ {role:'user',content:'عطني الرابط'},{role:'assistant',content:'رابط الحجز'},
+ {role:'user',content:'شكرا 👋'},{role:'assistant',content:'العفو'}];
+ for(const q of ['كيف احجز؟','وضح أكثر','الرابط الرسمي'])assert.match(retrievalQuestion(q,h),/خدمات مركز أنجز/);
+ assert.equal(retrievalQuestion('وين مسالك التعلم؟',h),'وين مسالك التعلم؟');
+ assert.equal(retrievalQuestion('عطني الرابط',[]),'عطني الرابط');
+});

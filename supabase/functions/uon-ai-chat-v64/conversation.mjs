@@ -7,16 +7,17 @@ export function conversationHistory(input, question) {
   if (rows.at(-1)?.role === 'user' && rows.at(-1).content.trim() === question.trim()) rows.pop();
   return rows;
 }
+// Keep the original topic across chains of short follow-ups.
+function isFollowup(question) {
+  const q = normalize(question).replace(/[؟?!.،,]+$/g, '').trim();
+  return /^(?:و?الرابط|عطني الرابط|عطيني الرابط|اريد الرابط|الرابط الرسمي|وين احصله|كيف احجز|و?ايميله|و?بريده|و?رقمه|و?تخصصه|و?مكتبه|وين مكتبه|وين مكانه|وش اسمه|ما اسمه|ومتي|متي يبدا|وضح اكثر|اشرح اكثر|كم مدته|وش شروطه|ويش شروطه|و?ايميلها|و?رقمها|وين مكتبها|عطني رقمه|عطني ايميله|عطيني رقمه|عطيني ايميله|the link|booking link|send (?:me )?the link|his email|her email|his phone|her phone|his office|her office|where is his office|tell me more)$/.test(q);
+}
 export function retrievalQuestion(question, history) {
-  const q = normalize(question);
-  if (/^(?:و?الرابط|عطني الرابط|عطيني الرابط|اريد الرابط|الرابط الرسمي|وين احصله|كيف احجز|the link|booking link|send (?:me )?the link)[؟?!.\s]*$/.test(q.trim())) {
-    const previous = [...history].reverse().find(x => x.role === 'user' && !/^(?:و?الرابط|عطني الرابط|عطيني الرابط|the link)[؟?!.\s]*$/.test(normalize(x.content).trim()));
-    return previous ? `${previous.content.slice(0, 500)} — ${question}` : question;
-  }
-  if (!/^(?:و?ايميله|و?بريده|و?رقمه|و?تخصصه|و?مكتبه|وين مكتبه|وين مكانه|وش اسمه|ما اسمه|ومتي|متي يبدا|وضح اكثر|اشرح اكثر|كم مدته|وش شروطه|و?ايميلها|وين مكتبها|his email|her email|his office|her office|where is his office|tell me more)[؟?!.\s]*$/.test(q.trim())) return question;
-  const previous = [...history].reverse().find(x => x.role === 'user' && !/^(?:و?ايميله|و?رقمه|وين مكتبه|وضح اكثر)[؟?!.\s]*$/.test(normalize(x.content)));
+  if (!isFollowup(question)) return question;
+  const previous = [...history].reverse().find(x => x.role === 'user' && !isFollowup(x.content) && !greetingReply(x.content) && selectionIndex(x.content) < 0);
   return previous ? `${previous.content.slice(0, 500)} — ${question}` : question;
 }
+
 const stop = new Set(normalize('دكتور الدكتور دكتوره الدكتوره دكاتره استاذ الاستاذ استاذه الاستاذه بروفيسور dr doctor professor prof mr mrs ms اسم اسمه من هو هي عن معلومات عطني اعطني عطيني اريد ابي ابغي لو سمحت ممكن تعرف تعرفني عندك هل في جامعه الجامعه نزوي ايميل ايميله ايميلها بريده بريده الالكتروني بريد البريد الالكتروني رقم رقمه رقمها هاتف الهاتف تواصل التواصل كيف اتواصل مع وين اين مكتب مكتبه مكتبها مكانه مكانها موقع موقعه موقعها تفاصيل تخصصه تخصصها و ايميله بريده رقمه تخصصه مكتبه وش ويش ما يقول تعرفه please give me the of a an what is who tell about email phone contact office number university nizwa his her').split(/\s+/));
 export function nameTokens(value) {
   return normalize(value).replace(/عبد\s+الله/g, 'عبدالله').replace(/\bal[\s-]+/g, 'al').replace(/[^\p{L}\p{N}\s]/gu, ' ').split(/\s+/).filter(x => x.length > 1 && !stop.has(x));
@@ -45,7 +46,7 @@ export function rankStaff(question, rows, fuzzy = true) {
 }
 
 export function greetingReply(question, lang = 'ar') {
-  const q = normalize(question).replace(/[!؟?.,،\s]+$/g,'').trim();
+  const q = normalize(question).replace(/[\p{Extended_Pictographic}\p{Emoji_Modifier}\uFE0F\u200D]/gu, '').replace(/[!؟?.,،\s]+$/g,'').trim();
   const groups = [
     [/^(?:حياك|حيك|حياك الله|الله يحييك|حيالله|حي الله|يا هلا|يا مرحبا|هلا|هلا والله|هلا بك|هلو|مرحبا|مرحبتين|مرحبا الساع|hi|hello|hey)$/, 'الله يحييك! كيف أقدر أساعدك؟', 'Hello! How can I help?'],
     [/^(?:السلام عليكم|وعليكم السلام)$/, 'وعليكم السلام ورحمة الله! كيف أقدر أساعدك؟', 'Peace be upon you! How can I help?'],
@@ -53,6 +54,8 @@ export function greetingReply(question, lang = 'ar') {
     [/^(?:مساء الخير|مساء النور)$/, 'مساء النور! كيف أقدر أساعدك؟', 'Good evening! How can I help?'],
     [/^(?:هلا كيفك|كيفك|كيف حالك|شخبارك|وش اخبارك|كيف امورك|شلونك|علومك|how are you)$/, 'هلا فيك! جاهز أساعدك، شخبارك أنت؟', 'Hello! Ready to help. How are you?'],
     [/^(?:شكرا|شكرا لك|مشكور|تسلم|يعطيك العافيه|thanks|thank you)$/, 'العفو، حاضرين!', 'You’re welcome!'],
+    [/^(?:تمام|زين|اوكي|ok|okay)$/, 'تمام، كمل أنا معك.', 'Okay, I’m with you.'],
+    [/^(?:من انت|منو انت|وش اسمك|ويش اسمك|ايش اسمك|who are you)$/, 'أنا UON AI، مساعد UON Hub الطلابي المستقل. أساعدك في معلومات الجامعة والخدمات والدراسة.', 'I’m UON AI, the independent UON Hub student assistant. I can help with university information, services and studying.'],
     [/^(?:مع السلامه|باي|bye)$/, 'في أمان الله!', 'Goodbye!']
   ];
   const match = groups.find(([pattern]) => pattern.test(q));
@@ -60,6 +63,7 @@ export function greetingReply(question, lang = 'ar') {
 }
 export function isCasual(question) {
   const q = normalize(question).trim();
+  if (greetingReply(question)) return true;
   return /^(?:حياك|حيك|حياك الله|الله يحييك|حيالله|حي الله|يا هلا|يا مرحبا|هلا|هلا والله|هلا بك|هلو|هلا كيفك|مرحبا|مرحبتين|مرحبا الساع|صباح الخير|صباح النور|مساء الخير|مساء النور|شخبارك|وش اخبارك|كيف امورك|شلونك|علومك|تمام|زين|اوكي|مع السلامه|باي|العفو|يعطيك العافيه|الله يعافيك|السلام عليكم|وعليكم السلام|كيفك|كيف حالك|شكرا|شكرا لك|مشكور|تسلم|من انت|منو انت|وش اسمك|ايش اسمك|وش تقدر تسوي|ايش تقدر تسوي|كيف تساعدني|hi|hello|hey|thanks|thank you|how are you)[!؟?.\s]*$/.test(q) || /(?:متوتر|متوتره|قلقان|قلقانه|مضغوط|مضغوطه|طفشان|تعبان|نصيحه|تنصحني|نظم وقتي|انظم وقتي|نكتة|نكته|stressed|anxious|study tips|motivat)/.test(q);
 }
 
@@ -86,6 +90,7 @@ export function selectionIndex(question) {
 }
 export function staffLookupMode(question, history = []) {
   const route = intent(question);
+  if (serviceTopic(question) && route !== 'people') return null;
   if (['chat','gpa','plan','calendar','course','policy'].includes(route)) return null;
   const last = [...history].reverse().find(x => x.role === 'assistant');
   const hasStaff = Array.isArray(last?.staff_ids) && last.staff_ids.length > 0;
@@ -103,8 +108,9 @@ export function resolveStaff(question, history, rows) {
     const last=[...history].reverse().find(x=>x.role==='assistant');
     const ids=Array.isArray(last?.staff_ids)?last.staff_ids:[];
     // Client-supplied IDs select only from the current public, active directory.
-    const candidates=ids.map(id=>rows.find(r=>String(r.id)===String(id))).filter(Boolean);
-    if(index>=0)return {rows:candidates[index]?[candidates[index]]:[],selected:Boolean(candidates[index]),needsSelection:!candidates[index]};
+    const ordered=ids.map(id=>rows.find(r=>String(r.id)===String(id)));
+    if(index>=0)return {rows:ordered[index]?[ordered[index]]:[],selected:Boolean(ordered[index]),needsSelection:!ordered[index]};
+    const candidates=ordered.filter(Boolean);
     if(candidates.length)return {rows:candidates,selected:candidates.length===1,needsSelection:candidates.length>1};
   }
   const q=question.replace(/^\s*(?:هلا(?: والله)?|مرحبا|حياك(?: الله)?|السلام عليكم|hi|hello)[،,!\s]+/i,'').replace(/^\s*(?:لا[،,]?\s*)?(?:أقصد|اقصد|قصدي)\s*/,'');

@@ -85,3 +85,21 @@ test('simple greetings respond without model availability, mixed requests still 
  for(const q of ['هلا عطني ايميل الدكتور عبدالله','مرحبا متى التسجيل؟','أنا متوتر']) assert.equal(greetingReply(q),null,q);
  assert.match(greetingReply('hello','en'),/Hello/);
 });
+
+test('emoji greetings are instant but greetings containing a real question are not swallowed',()=>{
+ for(const q of ['حيك 🏃🏻','هلا 👋🔥','السلام عليكم 😊','من أنت؟','تمام 👍']) {
+  assert.ok(greetingReply(q),q);
+  assert.equal(staffLookupMode(q,choices),null,q);
+ }
+ assert.equal(greetingReply('هلا 👋 متى التسجيل؟'),null);
+ assert.equal(greetingReply('حيك اريد ايميل الدكتور عبدالله'),null);
+});
+test('missing directory IDs do not shift the visible selection order',()=>{
+ const h=[{role:'assistant',content:'choices',staff_ids:['999','2','3']}];
+ assert.equal(resolveStaff('الثاني',h,directory).rows[0].id,2);
+ assert.equal(resolveStaff('الأول',h,directory).needsSelection,true);
+});
+test('service questions bypass staff enumeration but named service contacts still use it',()=>{
+ assert.equal(staffLookupMode('خدمات مركز أنجز'),null);
+ assert.equal(staffLookupMode('ايميل مدير مركز أنجز'),'explicit');
+});
