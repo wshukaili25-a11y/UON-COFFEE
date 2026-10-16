@@ -70,7 +70,7 @@ export function isCasual(question) {
 export function intent(question) {
   const q=normalize(question);
   if (/معدل|\bgpa\b|تراكمي|فصلي/.test(q)) return 'gpa';
-  if (/خطتي|وش اسجل|ويش اسجل|الفصل القادم|الفصل الجاي|رتب.*جدول|مواد.*متبقي/.test(q)) return 'plan';
+  if (/خطتي|وش اسجل|ويش اسجل|رتب.*جدول|مواد.*متبقي/.test(q)) return 'plan';
   if (/دكتور|دكاتر|استاذ|موظف|ايميل|بريد|مكتبه|رقمه|عميد|رئيس|\bdr\b|professor|staff|email|his office|her office/.test(q)) return 'people';
   if (/موعد|تقويم|متي|تاريخ|اختبار|اجازه|calendar|exam|semester/.test(q)) return 'calendar';
   if (/ماده|مساق|مقرر|متطلب|\b[a-z]{2,10}\s*\d{2,4}[a-z]?\b|course|prerequisite/.test(q)) return 'course';
@@ -141,6 +141,12 @@ export function relevantContext(question, rows) {
   if(!tokens.length&&!topic)return [];
   return verified.map(row=>{
     const title=normalize(row.title),body=normalize(row.description),text=`${title} ${body}`;
+    if (intent(q)!=='people' && /موظف|staff directory/.test(normalize(row.type))) return null;
+    if (intent(q)==='calendar' && /مبني|تقويم اكاديمي/.test(normalize(row.type))) return null;
+    const calendarSource=intent(q)==='calendar' && /تقويم|calendar/.test(title);
+    const datedEvent=row.type==='تقويم UON Hub';
+    if (/رسوم|تكلفه|سعر|tuition|fees|cost/.test(q) && !/رسوم|تكلفه|سعر|tuition|fees|cost/.test(text)) return null;
+    if (row.expires_at && new Date(row.expires_at).getTime()<=Date.now()) return null;
     if(topic && serviceTopic(text)!==topic)return null;
     // Shared course data must never become the student's schedule or crowd out
     // a booking, placement, contact or policy answer.
@@ -149,8 +155,8 @@ export function relevantContext(question, rows) {
     const match=(term,list)=>list.some(word=>word===term || (term.length>=4 && (word.startsWith(term)||term.startsWith(word))));
     const titleHits=tokens.filter(term=>match(term,titleTerms)).length;
     const bodyHits=tokens.filter(term=>match(term,bodyTerms)).length;
-    if(!topic&&!titleHits&&bodyHits<Math.min(2,tokens.length))return null;
-    return {...row,relevance:(topic?30:0)+titleHits*6+bodyHits+(row.official?2:0)};
+    if(!topic&&!calendarSource&&!datedEvent&&!titleHits&&bodyHits<Math.min(2,tokens.length))return null;
+    return {...row,relevance:(topic?30:0)+(datedEvent?30:calendarSource?12:0)+titleHits*6+bodyHits+(row.official?2:0)};
   }).filter(Boolean).sort((a,b)=>b.relevance-a.relevance);
 }
 
@@ -170,4 +176,15 @@ export function serviceTopic(value){
 // display empty Markdown links if the model omits a destination.
 export function cleanAnswerLinks(value){
   return String(value||'').replace(/\[([^\]\n]+)\]\(\s*\)/g,'$1');
+}
+
+export function calendarContext(question, events, today) {
+  const q=normalize(question);
+  if(intent(q)!=='calendar' || serviceTopic(q))return [];
+  const historical=/20[0-9]{2}|٢٠[٠-٩]{2}|الماضي|السابق|past|previous/.test(q);
+  const kind=/تسجيل|registration/.test(q)?'registration':/اختبار|امتحان|exam/.test(q)?'exam':null;
+  return events.filter(e=>(historical || (e.end_date||e.start_date)>=today) && (!kind||e.event_type===kind)).map(e=>({
+    type:'تقويم UON Hub',title:e.title,description:`${e.description||''} — البداية: ${e.start_date} — النهاية: ${e.end_date||e.start_date}. هذه بيانات تقويم UON Hub؛ راجع التقويم الرسمي للتأكيد.`,
+    url:'https://uonhub.space/academic-calendar.html',official:false,score:0
+  }));
 }
