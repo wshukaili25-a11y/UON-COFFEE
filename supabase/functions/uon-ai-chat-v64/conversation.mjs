@@ -145,7 +145,7 @@ export function relevantContext(question, rows) {
     if (intent(q)==='calendar' && /مبني|تقويم اكاديمي/.test(normalize(row.type))) return null;
     const calendarSource=intent(q)==='calendar' && /تقويم|calendar/.test(title);
     const datedEvent=row.type==='تقويم UON Hub';
-    if (/رسوم|تكلفه|سعر|tuition|fees|cost/.test(q) && !/رسوم|تكلفه|سعر|tuition|fees|cost/.test(text)) return null;
+    if (/رسوم|تكلفه|سعر|tuition|fees|cost/.test(q) && !/رسوم|تكلفه|سعر|قيمه الساعه|tuition|fees|cost/.test(text)) return null;
     if (row.expires_at && new Date(row.expires_at).getTime()<=Date.now()) return null;
     if(topic && serviceTopic(text)!==topic)return null;
     // Shared course data must never become the student's schedule or crowd out

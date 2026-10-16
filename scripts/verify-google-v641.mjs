@@ -19,7 +19,7 @@ const checks=[
   {
     file:'supabase/functions/uon-ai-chat-v64/index.ts',
     must:['privateIntent(q)','calendar-upcoming','drive-files','google_calendar_private','google_drive_private','private:true','gemini-3.8-flash','models?pageSize=100','uon_ai_model_health','thinkingLevel:\'low\'','gemini-health'],
-    mustNot:['uon_ai_knowledge', 'provider_token']
+    mustNot:['provider_token']
   },
   {
     file:'supabase/functions/uon-google-account-v64/index.ts',
@@ -45,6 +45,10 @@ for(const check of checks){
   for(const forbidden of check.mustNot||[])if(source.includes(forbidden))failures.push(`${check.file}: forbidden pattern ${JSON.stringify(forbidden)}`);
 }
 
+const gateway=await readFile('supabase/functions/uon-ai-chat-v64/index.ts','utf8');
+for(const statement of gateway.split(';')){
+ if(statement.includes("from('uon_ai_knowledge')") && (!statement.includes(".select(") || !statement.includes(".eq('active',true)") || !statement.includes(".eq('official',true)") || !statement.includes(".eq('verification_status','approved')") || /\.(insert|upsert|update|delete)\(/.test(statement)))failures.push('Knowledge access must be read-only, active, official and approved');
+}
 if(failures.length){
   console.error(`Google V64.4 verification failed:\n${failures.join('\n')}`);
   process.exit(1);

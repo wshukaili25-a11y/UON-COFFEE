@@ -170,8 +170,8 @@ return response};
   controller=new AbortController();
   const timer=setTimeout(()=>controller?.abort(),30000);
   try{
-   const response=await window.fetch(DIRECT_API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({question:raw,history:[...document.querySelectorAll('#chat .message:not(.typing-message)')].slice(-12).map(el=>({role:el.classList.contains('user')?'user':'assistant',content:el.querySelector('.message-content')?.textContent||'',staff_ids:el.uonMeta?.staff_ids||[]})).filter(x=>x.content),language:lang(),page_context:location.pathname,session_id:SESSION_TOKEN,client_token:CLIENT_TOKEN,channel:'web'}),cache:'no-store',signal:controller.signal});
-   const data=await response.json().catch(()=>({}));
+   const response=await window.fetch(DIRECT_API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({stream:true,question:raw,history:[...document.querySelectorAll('#chat .message:not(.typing-message)')].slice(-12).map(el=>({role:el.classList.contains('user')?'user':'assistant',content:el.querySelector('.message-content')?.textContent||'',staff_ids:el.uonMeta?.staff_ids||[]})).filter(x=>x.content),language:lang(),page_context:location.pathname,session_id:SESSION_TOKEN,client_token:CLIENT_TOKEN,channel:'web'}),cache:'no-store',signal:controller.signal});
+   const data=await window.readUonAIResponse(response,text=>{if(!typing)return;typing.replaceChildren();const content=document.createElement('div');content.className='message-content';content.textContent=text;typing.appendChild(content);const chat=document.querySelector('#chat');if(chat)chat.scrollTop=chat.scrollHeight;});
    if(!response.ok||!data.answer)throw new Error(data.error||('AI HTTP '+response.status));
    if((!Array.isArray(data.google_places)||!data.google_places.length)&&isPlaceQuestion(raw)){
     const fallback=await fetchPlaceFallback(raw);
