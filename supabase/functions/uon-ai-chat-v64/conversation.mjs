@@ -7,15 +7,24 @@ export function conversationHistory(input, question) {
   if (rows.at(-1)?.role === 'user' && rows.at(-1).content.trim() === question.trim()) rows.pop();
   return rows;
 }
+// Exact short forms inherit a topic; a question naming another programme does not.
+function programmeFollowup(question) {
+  const q = normalize(question).trim().replace(/[؟?!.،,]+$/g, '').trim();
+  return /^(?:و?\s*(?:(?:كم|و?كم) (?:عدد )?(?:الساعات|ساعاته|ساعه|الرسوم|رسومه|مده الدراسه|مدته)|(?:وش|ويش|ما) (?:هي )?شروط (?:القبول|قبوله)|شروط القبول|مده الدراسه)|(?:and )?(?:how many credits|how long does it take|what are the admission requirements|how much does it cost))$/.test(q);
+}
 // Keep the original topic across chains of short follow-ups.
 function isFollowup(question) {
   const q = normalize(question).replace(/[؟?!.،,]+$/g, '').trim();
-  return /^(?:و?الرابط|عطني الرابط|عطيني الرابط|اريد الرابط|الرابط الرسمي|وين احصله|كيف احجز|و?ايميله|و?بريده|و?رقمه|و?تخصصه|و?مكتبه|وين مكتبه|وين مكانه|وش اسمه|ما اسمه|ومتي|متي يبدا|وضح اكثر|اشرح اكثر|كم مدته|وش شروطه|ويش شروطه|و?ايميلها|و?رقمها|وين مكتبها|عطني رقمه|عطني ايميله|عطيني رقمه|عطيني ايميله|the link|booking link|send (?:me )?the link|his email|her email|his phone|her phone|his office|her office|where is his office|tell me more)$/.test(q);
+  return programmeFollowup(question) || /^(?:و?الرابط|عطني الرابط|عطيني الرابط|اريد الرابط|الرابط الرسمي|وين احصله|كيف احجز|و?ايميله|و?بريده|و?رقمه|و?تخصصه|و?مكتبه|وين مكتبه|وين مكانه|وش اسمه|ما اسمه|ومتي|متي يبدا|وضح اكثر|اشرح اكثر|كم مدته|وش شروطه|ويش شروطه|و?ايميلها|و?رقمها|وين مكتبها|عطني رقمه|عطني ايميله|عطيني رقمه|عطيني ايميله|the link|booking link|send (?:me )?the link|his email|her email|his phone|her phone|his office|her office|where is his office|tell me more)$/.test(q);
 }
 export function retrievalQuestion(question, history) {
   if (!isFollowup(question)) return question;
   const previous = [...history].reverse().find(x => x.role === 'user' && !isFollowup(x.content) && !greetingReply(x.content) && selectionIndex(x.content) < 0);
-  return previous ? `${previous.content.slice(0, 500)} — ${question}` : question;
+  if (!previous) return question;
+  // Old tuition wording must not exclude sources that answer the new facet.
+  let topic = previous.content.slice(0, 500);
+  if (programmeFollowup(question)) topic = topic.replace(/رسوم|تكلفة|تكلفه|سعر|\b(?:tuition|fees|cost)\b/gi, ' ');
+  return `${topic.trim()} — ${question}`;
 }
 
 const stop = new Set(normalize('دكتور الدكتور دكتوره الدكتوره دكاتره استاذ الاستاذ استاذه الاستاذه بروفيسور dr doctor professor prof mr mrs ms اسم اسمه من هو هي عن معلومات عطني اعطني عطيني اريد ابي ابغي لو سمحت ممكن تعرف تعرفني عندك هل في جامعه الجامعه نزوي ايميل ايميله ايميلها بريده بريده الالكتروني بريد البريد الالكتروني رقم رقمه رقمها هاتف الهاتف تواصل التواصل كيف اتواصل مع وين اين مكتب مكتبه مكتبها مكانه مكانها موقع موقعه موقعها تفاصيل تخصصه تخصصها و ايميله بريده رقمه تخصصه مكتبه وش ويش ما يقول تعرفه please give me the of a an what is who tell about email phone contact office number university nizwa his her').split(/\s+/));

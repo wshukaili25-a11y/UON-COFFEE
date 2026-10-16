@@ -78,3 +78,18 @@ test('calendar retrieval uses date-filtered events rather than unfiltered legacy
  const rows=[{type:'تقويم أكاديمي',title:'فترة التسجيل الثانية',description:'التسجيل 2026-08-30 2026-09-03'}, {type:'مبنى',title:'مبنى التسجيل',description:'التسجيل للفصل القادم'}, {type:'معلومة رسمية',title:'التقويم الأكاديمي الرسمي',description:'روابط التقويم الرسمي',official:true}];
  const result=relevantContext('متى التسجيل للفصل القادم؟',rows);assert.equal(result.length,1);assert.equal(result[0].title,'التقويم الأكاديمي الرسمي');
 });
+test('programme follow-ups keep the named programme across turns without stale tuition filtering',()=>{
+ const h=[{role:'user',content:'كم رسوم تخصص تربية الرياضيات؟'},{role:'assistant',content:'رسوم البرنامج'}, {role:'user',content:'وكم الساعات؟'},{role:'assistant',content:'الساعات من المصدر'}];
+ const row={type:'معلومة رسمية',title:'تربية الرياضيات',description:'شروط القبول ومدة الدراسة وعدد الساعات',official:true};
+ for(const q of ['وكم الساعات؟','وش شروط القبول؟','وكم مدة الدراسة؟','كم عدد الساعات؟','and how many credits?']) {
+  const resolved=retrievalQuestion(q,h);
+  assert.match(resolved,/تربية الرياضيات/);
+  assert.ok(resolved.endsWith(q));
+  assert.equal(relevantContext(resolved,[row]).length,1,q);
+ }
+ assert.equal(relevantContext(retrievalQuestion('وكم الرسوم؟',h),[row]).length,0);
+ for(const q of ['كم رسوم تخصص التمريض؟','وش شروط قبول الصيدلة؟','كيف أحسب معدلي؟']) assert.equal(retrievalQuestion(q,h),q);
+ assert.equal(retrievalQuestion('وكم الساعات؟',[]),'وكم الساعات؟');
+ const switched=[...h,{role:'user',content:'تخصص التمريض'}];
+ assert.match(retrievalQuestion('وش شروط القبول؟',switched),/^تخصص التمريض/);
+});
