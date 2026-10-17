@@ -21,6 +21,22 @@ export function searchLinks(html,question){
  const best=Math.max(0,...out.map(x=>x.score));
  return [...new Map(out.filter(x=>x.score===best).map(x=>[x.url,x])).values()].slice(0,2);
 }
+// Only public official HTML is cached. Keep original fetch time and never use
+// an expired entry after a fetch failure. Bound memory per edge isolate.
+const pageCache=new Map();
+const PAGE_TTL=5*60*1000;
+const PAGE_CACHE_LIMIT=16;
+async function cachedHTML(url,signal){
+ if(signal?.aborted)throw Error('request_cancelled');
+ const now=Date.now(),entry=pageCache.get(url);
+ if(entry&&now-entry.at<PAGE_TTL)return {...entry,cached:true};
+ pageCache.delete(url);
+ const html=await fetchHTML(url,signal);
+ const result={html,at:Date.now()};
+ if(pageCache.size>=PAGE_CACHE_LIMIT)pageCache.delete(pageCache.keys().next().value);
+ pageCache.set(url,result);
+ return {...result,cached:false};
+}
 async function fetchHTML(url,signal){
  const r=await fetch(url,{signal,redirect:'error',headers:{'accept':'text/html'}});if(!r.ok||!r.headers.get('content-type')?.includes('text/html'))throw Error('source_unavailable');
  const reader=r.body.getReader();const chunks=[];let size=0;try{for(;;){const {value,done}=await reader.read();if(done)break;size+=value.byteLength;if(size>800000){await reader.cancel();throw Error('source_too_large');}chunks.push(value);}}finally{reader.releaseLock();}
@@ -31,13 +47,14 @@ export async function liveUniversitySearch(question,signal){
  const term=searchTerm(question);if(!term)return [];
  const timeout=AbortSignal.timeout(6500),combined=signal?AbortSignal.any([timeout,signal]):timeout;
  try{
-  const html=await fetchHTML(ROOT+'search.php?kw='+encodeSearch(term),combined);
+  const {html}=await cachedHTML(ROOT+'search.php?kw='+encodeSearch(term),combined);
   const candidates=searchLinks(html,question);
   const results=await Promise.allSettled(candidates.map(async x=>{
-   let page=await fetchHTML(x.url,combined);
+   const fetched=await cachedHTML(x.url,combined);
+   let page=fetched.html;
    page=page.split(/<!--\s*End of header\s*-->/i).at(-1).split(/<footer\b|<div[^>]*class=['"](?:footer|sitemap)/i)[0];
    const description=textFromHTML(page).slice(0,6000);if(description.length<50)return null;
-   return {type:'بحث مباشر في موقع الجامعة',title:x.title,description,programme_fields:programmeFields(page,textFromHTML),url:x.url,official:true,live:true,checked_at:new Date().toISOString(),score:0};
+   return {type:'بحث مباشر في موقع الجامعة',title:x.title,description,programme_fields:programmeFields(page,textFromHTML),url:x.url,official:true,live:true,cached:fetched.cached,checked_at:new Date(fetched.at).toISOString(),score:0};
   }));return results.flatMap(r=>r.status==='fulfilled'&&r.value?[r.value]:[]);
  }catch{return [];}
 }

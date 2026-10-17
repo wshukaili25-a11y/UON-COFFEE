@@ -30,3 +30,19 @@ test('live search only publishes fetched official pages, not snippets',async()=>
  globalThis.fetch=async(url,opts)=>{calls.push([url,opts.redirect]);return new Response(url.includes('search.php')?'<li class="searchli"><a href=program_details.php?programid=22>تربية الرياضيات</a>':'<!-- End of header --><h1>تربية الرياضيات</h1><p>قيمة الساعة المعتمدة 84 ريال عماني، إجمالي الساعات 135، إجمالي تكلفة البرنامج 13580 ريال عماني.</p>',{headers:{'content-type':'text/html; charset=utf-8'}});};
  try{const rows=await liveUniversitySearch('رسوم تربية الرياضيات');assert.equal(rows.length,1);assert.equal(rows[0].live,true);assert.match(rows[0].description,/84/);assert.equal(calls.length,2);assert.ok(calls.every(x=>x[1]==='error'));}finally{globalThis.fetch=original;}
 });
+test('official page cache reuses follow-up fetches, preserves check time and refuses expired data on failure',async()=>{
+ // Fresh module instance isolates the cache from the other fixture.
+ const {liveUniversitySearch:search}=await import('../supabase/functions/uon-ai-chat-v64/live-search.mjs?cache-test');
+ const original=globalThis.fetch,originalNow=Date.now;let now=1000000,calls=0,offline=false;
+ Date.now=()=>now;
+ globalThis.fetch=async url=>{calls++;if(offline)throw Error('offline');return new Response(url.includes('search.php')?'<li class="searchli"><a href=program_details.php?programid=22>تربية الرياضيات</a>':'<!-- End of header --><h1>تربية الرياضيات</h1><p>معلومات رسمية عن البرنامج وعدد الساعات المعتمدة وخطة الدراسة ورسوم البرنامج من صفحة الجامعة.</p>',{headers:{'content-type':'text/html; charset=utf-8'}});};
+ try{
+  const first=await search('رسوم تربية الرياضيات');assert.equal(first.length,1);assert.equal(calls,2);assert.equal(first[0].cached,false);
+  now+=1000;const follow=await search('تخصص تربية الرياضيات — وكم الساعات؟');assert.equal(calls,2);assert.equal(follow[0].cached,true);assert.equal(follow[0].checked_at,first[0].checked_at);
+  // Returned metadata must not let one request modify the cached HTML.
+  follow[0].description='changed';assert.notEqual((await search('تربية الرياضيات'))[0].description,'changed');
+  const aborted=new AbortController();aborted.abort();assert.deepEqual(await search('تربية الرياضيات',aborted.signal),[]);assert.equal(calls,2);
+  now+=300001;offline=true;assert.deepEqual(await search('تربية الرياضيات'),[]);assert.equal(calls,3);
+  offline=false;const refreshed=await search('تربية الرياضيات');assert.equal(calls,5);assert.notEqual(refreshed[0].checked_at,first[0].checked_at);
+ }finally{globalThis.fetch=original;Date.now=originalNow;}
+});
