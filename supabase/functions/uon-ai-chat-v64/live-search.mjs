@@ -26,15 +26,26 @@ export function searchLinks(html,question){
 const pageCache=new Map();
 const PAGE_TTL=5*60*1000;
 const PAGE_CACHE_LIMIT=16;
-async function cachedHTML(url,signal){
+async function cachedHTML(url,signal,shared){
  if(signal?.aborted)throw Error('request_cancelled');
  const now=Date.now(),entry=pageCache.get(url);
  if(entry&&now-entry.at<PAGE_TTL)return {...entry,cached:true};
  pageCache.delete(url);
+ if(shared){
+  try{
+   const saved=await shared.get(url,signal),age=Date.now()-saved?.at;
+   if(saved&&typeof saved.html==='string'&&saved.html.length<=800000&&age>=0&&age<PAGE_TTL){
+    if(signal?.aborted)throw Error('request_cancelled');
+    return {...saved,cached:true};
+   }
+  }catch{/* Cache is optional; fetch the official source on a miss or outage. */}
+ }
+ if(signal?.aborted)throw Error('request_cancelled');
  const html=await fetchHTML(url,signal);
  const result={html,at:Date.now()};
  if(pageCache.size>=PAGE_CACHE_LIMIT)pageCache.delete(pageCache.keys().next().value);
  pageCache.set(url,result);
+ if(shared)try{await shared.set(url,result);}catch{/* Keep successful source fetches usable. */}
  return {...result,cached:false};
 }
 async function fetchHTML(url,signal){
@@ -43,14 +54,14 @@ async function fetchHTML(url,signal){
  const data=new Uint8Array(size);let offset=0;for(const c of chunks){data.set(c,offset);offset+=c.length;}
  const charset=/charset=([\w-]+)/i.exec(r.headers.get('content-type')||'')?.[1]||'utf-8';return new TextDecoder(charset).decode(data);
 }
-export async function liveUniversitySearch(question,signal){
+export async function liveUniversitySearch(question,signal,shared){
  const term=searchTerm(question);if(!term)return [];
  const timeout=AbortSignal.timeout(6500),combined=signal?AbortSignal.any([timeout,signal]):timeout;
  try{
-  const {html}=await cachedHTML(ROOT+'search.php?kw='+encodeSearch(term),combined);
+  const {html}=await cachedHTML(ROOT+'search.php?kw='+encodeSearch(term),combined,shared);
   const candidates=searchLinks(html,question);
   const results=await Promise.allSettled(candidates.map(async x=>{
-   const fetched=await cachedHTML(x.url,combined);
+   const fetched=await cachedHTML(x.url,combined,shared);
    let page=fetched.html;
    page=page.split(/<!--\s*End of header\s*-->/i).at(-1).split(/<footer\b|<div[^>]*class=['"](?:footer|sitemap)/i)[0];
    const description=textFromHTML(page).slice(0,6000);if(description.length<50)return null;

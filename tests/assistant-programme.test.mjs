@@ -26,7 +26,7 @@ test('gateway answers a retrieved programme fact even when the model is unavaila
  const code=readFileSync(new URL('../supabase/functions/uon-ai-chat-v64/index.ts',import.meta.url),'utf8');
  const fn=code.slice(code.indexOf('async function gemini('),code.indexOf('\nasync function conversation('));
  let searches=0;
- const sandbox={programmeFacet,directProgrammeAnswer,greetingReply:()=>null,intent:()=> 'general',staffLookupMode:()=>null,context:async()=>[{title:'generic programme introduction'}],relevantContext:(_,rows)=>rows,liveUniversitySearch:async()=>{searches++;return [source]},directServiceAnswer:()=>null,plainAnswer:(answer,mode,links)=>({answer,mode,links}),GEMINI_API_KEY:'',modelState:()=>{throw Error('must not call the model')}};
+ const sandbox={officialPageCache:undefined,programmeFacet,directProgrammeAnswer,greetingReply:()=>null,intent:()=> 'general',staffLookupMode:()=>null,context:async()=>[{title:'generic programme introduction'}],relevantContext:(_,rows)=>rows,liveUniversitySearch:async()=>{searches++;return [source]},directServiceAnswer:()=>null,plainAnswer:(answer,mode,links)=>({answer,mode,links}),GEMINI_API_KEY:'',modelState:()=>{throw Error('must not call the model')}};
  vm.createContext(sandbox);vm.runInContext(stripTypeScriptTypes(fn),sandbox);
  const result=await sandbox.gemini('وكم الساعات؟','ar',[],'تخصص تربية الرياضيات — وكم الساعات؟');
  assert.match(result.answer,/135/);assert.equal(result.source_cards[0].url,source.url);assert.equal(searches,1);
@@ -35,7 +35,7 @@ test('provider outages retain retrieved source cards and ask for retry, not a di
  const code=readFileSync(new URL('../supabase/functions/uon-ai-chat-v64/index.ts',import.meta.url),'utf8');
  const fn=code.slice(code.indexOf('async function gemini('),code.indexOf('\nasync function conversation('));
  const row={...source,programme_fields:[],description:'تفاصيل البرنامج'};
- const sandbox={programmeFacet,directProgrammeAnswer,greetingReply:()=>null,intent:()=> 'general',staffLookupMode:()=>null,context:async()=>[row],directServiceAnswer:()=>null,plainAnswer:(answer,mode,links)=>({answer,mode,links}),GEMINI_API_KEY:''};
+ const sandbox={officialPageCache:undefined,programmeFacet,directProgrammeAnswer,greetingReply:()=>null,intent:()=> 'general',staffLookupMode:()=>null,context:async()=>[row],directServiceAnswer:()=>null,plainAnswer:(answer,mode,links)=>({answer,mode,links}),GEMINI_API_KEY:''};
  vm.createContext(sandbox);vm.runInContext(stripTypeScriptTypes(fn),sandbox);
  const result=await sandbox.gemini('اشرح البرنامج','ar',[],'اشرح البرنامج');
  assert.equal(result.retryable,true);assert.equal(result.source_cards[0].url,source.url);assert.match(result.answer,/مؤقتًا/);assert.doesNotMatch(result.answer,/الاسم الكامل/);

@@ -46,3 +46,19 @@ test('official page cache reuses follow-up fetches, preserves check time and ref
   offline=false;const refreshed=await search('تربية الرياضيات');assert.equal(calls,5);assert.notEqual(refreshed[0].checked_at,first[0].checked_at);
  }finally{globalThis.fetch=original;Date.now=originalNow;}
 });
+test('shared official cache survives fresh isolates without refetching or hiding source age',async()=>{
+ const first=await import('../supabase/functions/uon-ai-chat-v64/live-search.mjs?shared-one');
+ const second=await import('../supabase/functions/uon-ai-chat-v64/live-search.mjs?shared-two');
+ const pages=new Map(),shared={get:async url=>pages.get(url),set:async(url,row)=>pages.set(url,row)};
+ const original=globalThis.fetch;let calls=0;
+ globalThis.fetch=async url=>{calls++;return new Response(url.includes('search.php')?'<li class="searchli"><a href=program_details.php?programid=22>تربية الرياضيات</a>':'<h1>تربية الرياضيات</h1><p>معلومات رسمية عن برنامج تربية الرياضيات والساعات المعتمدة والتكلفة وخطة الدراسة.</p>',{headers:{'content-type':'text/html'}})};
+ try{
+  const a=await first.liveUniversitySearch('رسوم تربية الرياضيات',undefined,shared);
+  assert.equal(calls,2);assert.equal(pages.size,2);
+  const b=await second.liveUniversitySearch('تربية الرياضيات — وكم الساعات؟',undefined,shared);
+  assert.equal(calls,2);assert.equal(b[0].cached,true);assert.equal(b[0].checked_at,a[0].checked_at);
+  const third=await import('../supabase/functions/uon-ai-chat-v64/live-search.mjs?shared-three');
+  const broken={get:async()=>{throw Error('db unavailable')},set:async()=>{throw Error('write failed')}};
+  assert.equal((await third.liveUniversitySearch('تربية الرياضيات',undefined,broken)).length,1);assert.equal(calls,4);
+ }finally{globalThis.fetch=original;}
+});
