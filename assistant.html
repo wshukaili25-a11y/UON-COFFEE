@@ -3,88 +3,67 @@
 <head>
  <meta charset="utf-8">
  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
- <meta name="theme-color" content="#06100c">
+ <meta name="theme-color" content="#f7f9f6">
  <title>مساعد UON AI | UON Hub</title>
  <meta name="description" content="UON AI مساعد طلاب جامعة نزوى للمقررات والمواعيد والخدمات والمواقع والمصادر الرسمية المتاحة.">
- <meta name="robots" content="index,follow,max-image-preview:large">
+ <meta name="robots" content="noindex,nofollow">
  <link rel="canonical" href="https://uonhub.space/assistant.html">
  <meta property="og:type" content="website"><meta property="og:site_name" content="UON Hub"><meta property="og:title" content="مساعد UON AI | UON Hub"><meta property="og:description" content="اسأل UON AI عن الجامعة، المصادر الرسمية، والمواقع والخدمات القريبة عبر Google Maps عند توفرها."><meta property="og:url" content="https://uonhub.space/assistant.html"><meta property="og:image" content="https://uonhub.space/assets/unizwa-new-gate-v52.jpg">
  <meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="مساعد UON AI | UON Hub"><meta name="twitter:description" content="مساعد طلاب جامعة نزوى للمقررات والمواعيد والخدمات والمصادر الرسمية والمواقع القريبة."><meta name="twitter:image" content="https://uonhub.space/assets/unizwa-new-gate-v52.jpg">
  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
- <link rel="stylesheet" href="css/app.css?v=66.7.1">
- <link rel="stylesheet" href="css/ui-refresh-v24.css?v=66.7.1">
- <link rel="stylesheet" href="css/assistant-smart-v63.css?v=66.7.1">
- <link rel="stylesheet" href="css/assistant-redesign-v1.css?v=1.0.1">
- <link rel="manifest" href="/manifest.webmanifest"><link rel="apple-touch-icon" href="/assets/icons/uonhub-192-v75.png">
- <meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="UON Hub">
- <link rel="stylesheet" href="/css/pwa.css?v=66.7.1">
- <style>
-  html,body{max-width:100%;overflow-x:hidden}.v175-ai-page,.v175-section,.v175-ai-layout,.v175-ai-chat,.chat-list,.message{min-width:0;max-width:100%}.v175-ai-chat{overflow:hidden}.chat-list{overflow-x:hidden!important}.message{overflow-wrap:anywhere;word-break:break-word}.typing-dots{display:flex;gap:5px}.typing-dots span{width:7px;height:7px;border-radius:50%;background:currentColor;opacity:.32;animation:uonTyping 1.15s infinite}.typing-dots span:nth-child(2){animation-delay:.14s}.typing-dots span:nth-child(3){animation-delay:.28s}@keyframes uonTyping{35%{transform:translateY(-5px);opacity:.8}}.assistant-feedback{display:flex;align-items:center;gap:7px;margin-top:10px;font-size:.78rem;min-width:0}.assistant-feedback span{margin-inline-end:auto}.assistant-feedback-btn{width:34px;height:34px;border-radius:11px}.assistant-response-tools{display:flex;gap:6px;margin-top:8px;max-width:100%}.assistant-response-tool{border:0;background:transparent;font:inherit;font-size:.78rem;padding:6px 8px;border-radius:9px;cursor:pointer;white-space:nowrap}.assistant-chat-tools{display:flex;gap:8px;max-width:100%}.assistant-history-drawer{position:fixed;inset:0 0 0 auto;width:min(360px,92vw);z-index:9999;transform:translateX(105%);transition:.22s ease;padding:18px;overflow:auto}.assistant-history-drawer.open{transform:none}.assistant-history-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px}.assistant-history-head button{border:0;background:transparent;color:inherit;font-size:1.3rem;cursor:pointer}.assistant-history-items{display:grid;gap:8px}.assistant-history-item{width:100%;border-radius:14px;padding:10px;text-align:start;display:flex;align-items:center;gap:8px;cursor:pointer}.assistant-history-item span{display:grid;gap:3px;min-width:0;flex:1}.assistant-history-item strong{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.assistant-history-item i{font-style:normal;font-size:1.1rem;opacity:.55}
- </style>
-<link rel="stylesheet" href="css/assistant-cards.css?v=64.7.0">
+ <link rel="stylesheet" href="css/assistant-studio.css?v=1.0.0">
+ <link rel="stylesheet" href="css/assistant-cards.css?v=64.7.0">
 </head>
-<body data-uon-page="assistant">
- <header class="site-header"></header>
- <main class="v175-ai-page" data-feature="assistant">
-  <section class="v175-page-hero ai">
-   <div class="container">
-    <span data-ar="UON AI · مساعدك الطلابي" data-en="UON AI · Your student assistant">UON AI · مساعدك الطلابي</span>
-    <h1 data-ar="اسأل، خطط، ووصل للمعلومة أسرع" data-en="Ask, plan, and get to the answer faster">اسأل، خطط، ووصل للمعلومة أسرع</h1>
-    <p data-ar="UON AI يجمع خدمات UON Hub ومصادر جامعة نزوى الموثوقة في محادثة واحدة، ويستفيد من جدولك وبيانات المنصة لتقديم مساعدة أذكى." data-en="UON AI brings UON Hub services and trusted University of Nizwa sources into one conversation, using your schedule and platform data to give smarter help.">UON AI يجمع خدمات UON Hub ومصادر جامعة نزوى الموثوقة في محادثة واحدة، ويستفيد من جدولك وبيانات المنصة لتقديم مساعدة أذكى.</p>
-   </div>
-  </section>
-  <section class="v175-section">
-   <div class="container">
-    <div class="v175-ai-layout">
-     <aside class="v175-ai-info">
-      <div class="assistant-side-head">
-       <span class="assistant-status-dot" aria-hidden="true"></span>
-       <div>
-        <h2 data-ar="UON AI جاهز لك" data-en="UON AI is ready">UON AI جاهز لك</h2>
-        <p data-ar="اسأل عن الجامعة والمقررات والمواعيد والخدمات، واستفد من جدولك وبيانات UON Hub للحصول على مساعدة أذكى." data-en="Ask about the university, courses, dates, and services, using your UON Hub schedule and platform data for smarter help.">اسأل عن الجامعة والمقررات والمواعيد والخدمات، واستفد من جدولك وبيانات UON Hub للحصول على مساعدة أذكى.</p>
-        <div class="assistant-smart-actions" hidden></div>
-       </div>
-      </div>
-     </aside>
-     <section class="v175-ai-chat" aria-label="UON AI chat">
-      <div class="assistant-chat-tools">
-       <button type="button" id="assistantNewChat"><span data-ar="＋ محادثة جديدة" data-en="＋ New chat">＋ محادثة جديدة</span></button>
-       <button type="button" id="assistantHistoryOpen"><span data-ar="☰ السجل" data-en="☰ History">☰ السجل</span></button>
-       <button type="button" id="assistantStop" class="assistant-stop" hidden><span data-ar="■ إيقاف الرد" data-en="■ Stop response">■ إيقاف الرد</span></button>
-      </div>
-      <div id="chat" class="chat-list" role="log" aria-live="polite">
-       <div class="message bot"><div class="message-content" data-ar="هلا 👋 اسألني عن جامعة نزوى، موادك، جدولك، الخدمات، أو مكان قريب." data-en="Hi 👋 Ask me about the University of Nizwa, your courses, schedule, services, or a nearby place.">هلا 👋 اسألني عن جامعة نزوى، موادك، جدولك، الخدمات، أو مكان قريب.</div></div>
-      </div>
-      <form id="chatForm" class="chat-form" novalidate>
-       <textarea id="question" maxlength="800" required placeholder="اكتب سؤالك هنا..." data-placeholder-ar="اكتب سؤالك هنا..." data-placeholder-en="Type your question here..." aria-label="اكتب سؤالك لـ UON AI" data-label-ar="اكتب سؤالك لـ UON AI" data-label-en="Ask UON AI"></textarea>
-       <button type="submit" id="assistantSend" data-assistant-send="1" class="btn primary"><span data-ar="إرسال" data-en="Send">إرسال</span></button>
-      </form>
-     </section>
-    </div>
-   </div>
-  </section>
- </main>
- <aside class="assistant-history-drawer" id="assistantHistoryDrawer" aria-label="سجل محادثات UON AI" data-label-ar="سجل محادثات UON AI" data-label-en="UON AI conversation history">
-  <div class="assistant-history-head"><div><strong data-ar="محادثاتك" data-en="Your chats">محادثاتك</strong><br><small data-ar="محفوظة في هذا المتصفح ويمكنك الرجوع لها." data-en="Saved in this browser so you can return to them.">محفوظة في هذا المتصفح ويمكنك الرجوع لها.</small></div><button type="button" id="assistantHistoryClose" aria-label="إغلاق" data-label-ar="إغلاق" data-label-en="Close">✕</button></div>
-  <div class="assistant-history-items" id="assistantHistoryItems"></div>
+<body data-uon-page="assistant" class="studio">
+<a class="skip-link" href="#question">انتقل إلى كتابة السؤال</a>
+<div class="studio-layout">
+ <aside class="studio-rail" aria-label="التنقل">
+  <a class="studio-brand" href="index.html"><span class="brand-mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12 3 2.5 6.5L21 12l-6.5 2.5L12 21l-2.5-6.5L3 12l6.5-2.5Z"/></svg></span><span dir="ltr">UON <b>AI</b><small>YOUR CAMPUS COMPANION</small></span></a>
+  <div class="rail-actions"><button id="assistantNewChat" type="button" class="new-chat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg><span data-ar="محادثة جديدة" data-en="New chat">محادثة جديدة</span></button>
+  <button id="assistantHistoryOpen" type="button" class="history-open"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10a9 9 0 1 1 1 7M3 4v6h6m3-3v5l3 2"/></svg><span data-ar="سجل المحادثات" data-en="Chat history">سجل المحادثات</span></button></div>
+  <div class="rail-explore"><p class="rail-label" data-ar="مساحتك الجامعية" data-en="YOUR CAMPUS">مساحتك الجامعية</p>
+   <a href="university-guide.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 6c-3-2-6-2-9-1v14c3-1 6-1 9 1 3-2 6-2 9-1V5c-3-1-6-1-9 1Zm0 0v14"/></svg><span data-ar="دليل الجامعة" data-en="University guide">دليل الجامعة</span><span class="nav-chevron">↖</span></a>
+   <a href="academic-calendar.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M7 3v4m10-4v4M3 11h18m-13 5h2m4 0h2"/></svg><span data-ar="التقويم الأكاديمي" data-en="Academic calendar">التقويم الأكاديمي</span><span class="nav-chevron">↖</span></a>
+   <a href="gpa.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="m16 8-2 6-6 2 2-6Z"/></svg><span data-ar="حاسبة المعدل" data-en="GPA calculator">حاسبة المعدل</span><span class="nav-chevron">↖</span></a>
+  </div>
+  <div class="rail-note"><div class="mini-orbit" aria-hidden="true">✦</div><strong data-ar="خطوة أقرب للمعلومة." data-en="Closer to your answer.">خطوة أقرب للمعلومة.</strong><p data-ar="اسأل بطريقتك، وخلي البحث علينا." data-en="Ask your way. We’ll help you find it.">اسأل بطريقتك، وخلي البحث علينا.</p></div>
+  <a class="rail-home" href="index.html"><span>UON HUB</span><span data-ar="العودة للرئيسية ↗" data-en="Back to home ↗">العودة للرئيسية ↗</span></a>
  </aside>
- <div class="uon-ai-legal">
-  <div class="uon-ai-notice" role="note"><strong data-ar="تنبيه:" data-en="Notice:">تنبيه:</strong> <span data-ar="UON Hub مشروع طلابي مستقل وغير تابع رسميًا لجامعة نزوى. جميع الشعارات والأسماء المستخدمة تعود لمالكيها، ويهدف الموقع إلى تسهيل وصول الطلبة إلى الخدمات والمعلومات." data-en="UON Hub is an independent student project and is not officially affiliated with the University of Nizwa. All logos and names belong to their respective owners, and the website aims to make student services and information easier to access.">UON Hub مشروع طلابي مستقل وغير تابع رسميًا لجامعة نزوى. جميع الشعارات والأسماء المستخدمة تعود لمالكيها، ويهدف الموقع إلى تسهيل وصول الطلبة إلى الخدمات والمعلومات.</span></div>
- </div>
- <footer class="uon-ai-footer"><div class="container uon-ai-footer-main"><p class="uon-ai-footer-prayer" data-ar="رَبِّ زِدْنِي عِلْمًا" data-en="My Lord, increase me in knowledge">رَبِّ زِدْنِي عِلْمًا</p><p class="uon-ai-footer-credit" data-ar="صمم بحب من طلاب جامعة نزوى❤️." data-en="Designed with ❤️ by University of Nizwa students.">صمم بحب من طلاب جامعة نزوى❤️.</p><a class="uon-ai-footer-handle" dir="ltr" href="https://www.instagram.com/uonhub" target="_blank" rel="noopener noreferrer">@uonhub</a><p class="uon-ai-footer-rights" data-ar="جميع الحقوق محفوظة © 2026 UON Hub" data-en="All rights reserved © 2026 UON Hub">جميع الحقوق محفوظة © 2026 UON Hub</p></div></footer>
- <div id="toast" class="toast" aria-live="polite"></div>
- <script src="js/assistant-places-proxy-v1.js?v=1.0.0"></script>
- <script src="js/assistant-cards.js?v=64.7.0"></script>
- <script src="js/assistant-stream.js?v=64.13.0"></script>
- <script src="js/assistant-client-token.js?v=64.13.0"></script>
- <script type="module" src="js/assistant-history.js?v=64.7.0"></script>
- <script type="module" src="js/assistant-smart-v63.js?v=66.7.1"></script>
- <script type="module" src="js/assistant.js?v=64.13.0"></script>
- <script type="module">import {setupV14Shell} from "./js/v14-ui.js?v=67.0.2";setupV14Shell();</script>
- <script type="module" src="js/assistant-redesign-v1.js?v=1.0.1"></script>
- <script type="module" src="js/runtime-guard.js?v=66.7.1"></script>
- <script type="module" src="js/v20-experience.js?v=66.7.1"></script>
- <script type="module" src="/js/pwa-init.js?v=67.0.2"></script>
-</body>
-</html>
+ <main class="studio-main" data-feature="assistant">
+  <header class="studio-topbar"><div class="workspace-name"><span class="status-light" aria-hidden="true"></span><span data-ar="مساعدك الجامعي" data-en="Your campus assistant">مساعدك الجامعي</span><span class="preview-tag" data-ar="تجريبي" data-en="PREVIEW">تجريبي</span></div><div class="topbar-actions"><button id="studioMotion" type="button" aria-pressed="false" aria-label="تقليل الحركة" title="تقليل الحركة">◌</button><button id="studioLanguage" type="button" aria-label="Switch to English">EN</button></div></header>
+  <div class="studio-workspace">
+   <section class="studio-welcome" id="studioWelcome" aria-labelledby="welcomeTitle">
+    <div class="orbital-art" aria-hidden="true"><div class="orbit orbit-one"><i></i></div><div class="orbit orbit-two"><i></i></div><div class="orbit-grid"></div><div class="orbit-core"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12 3 2.5 6.5L21 12l-6.5 2.5L12 21l-2.5-6.5L3 12l6.5-2.5Z"/></svg></div><span class="orbit-label label-one">ASK</span><span class="orbit-label label-two">EXPLORE</span></div>
+    <div class="welcome-eyebrow"><span></span><span data-ar="مساحة صغيرة. احتمالات كبيرة." data-en="A little space. A world of possibilities.">مساحة صغيرة. احتمالات كبيرة.</span></div>
+    <h1 id="welcomeTitle"><span data-ar="هلا، وش بخاطرك" data-en="Hello. What’s on">هلا، وش بخاطرك</span><br><em data-ar="تعرف اليوم؟" data-en="your mind today?">تعرف اليوم؟</em></h1>
+    <p class="welcome-copy" data-ar="من أول سؤال إلى خطوتك الجاية. معك في تفاصيل يومك الجامعي." data-en="From your first question to your next step. Here for your campus day.">من أول سؤال إلى خطوتك الجاية. معك في تفاصيل يومك الجامعي.</p>
+    <div class="starter-grid">
+<button type="button" class="starter" data-starter-ar="كم رسوم تخصص تربية الرياضيات؟" data-starter-en="What are the fees for the Mathematics Education programme?"><span class="starter-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 6c-3-2-6-2-9-1v14c3-1 6-1 9 1 3-2 6-2 9-1V5c-3-1-6-1-9 1Zm0 0v14"/></svg></span><span class="starter-copy"><strong data-ar="تخصصك، عن قرب" data-en="Explore your programme">تخصصك، عن قرب</strong><small data-ar="الرسوم والساعات والخطط" data-en="Fees, credits and study plans">الرسوم والساعات والخطط</small></span><span class="starter-arrow" aria-hidden="true">↖</span></button>
+<button type="button" class="starter" data-starter-ar="عطني إيميل الدكتور عبدالله الغافري" data-starter-en="Find Dr Abdullah Al-Ghafri’s email"><span class="starter-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3"/><path d="M3 21v-3a6 6 0 0 1 12 0v3m1-16a3 3 0 0 1 0 6m3 10v-3a6 6 0 0 0-2-4"/></svg></span><span class="starter-copy"><strong data-ar="وصل للشخص الصح" data-en="Find the right person">وصل للشخص الصح</strong><small data-ar="دليل أعضاء هيئة التدريس" data-en="Faculty and staff directory">دليل أعضاء هيئة التدريس</small></span><span class="starter-arrow" aria-hidden="true">↖</span></button>
+<button type="button" class="starter" data-starter-ar="كيف أحجز في مركز أنجز؟" data-starter-en="How do I book at Anjiz Center?"><span class="starter-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="m16 8-2 6-6 2 2-6Z"/></svg></span><span class="starter-copy"><strong data-ar="خدمات تسهّل يومك" data-en="Make campus life easier">خدمات تسهّل يومك</strong><small data-ar="أنجز ومراكز الدعم" data-en="Anjiz and support centres">أنجز ومراكز الدعم</small></span><span class="starter-arrow" aria-hidden="true">↖</span></button>
+<button type="button" class="starter" data-starter-ar="متى التسجيل للفصل القادم؟" data-starter-en="When is registration for next semester?"><span class="starter-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M7 3v4m10-4v4M3 11h18m-13 5h2m4 0h2"/></svg></span><span class="starter-copy"><strong data-ar="خطوتك الجاية" data-en="Plan your next step">خطوتك الجاية</strong><small data-ar="التسجيل والتقويم الأكاديمي" data-en="Registration and calendar">التسجيل والتقويم الأكاديمي</small></span><span class="starter-arrow" aria-hidden="true">↖</span></button>
+    </div>
+   </section>
+   <section id="chat" class="chat-list" role="log" aria-live="polite" aria-label="المحادثة"></section>
+   <div class="composer-area"><div class="composer-status"><span id="studioStatus" role="status" aria-live="polite"></span><button type="button" id="assistantStop" hidden>■ <span data-ar="إيقاف الرد" data-en="Stop response">إيقاف الرد</span></button></div>
+    <form id="chatForm" class="chat-form" novalidate><label class="sr-only" for="question" data-ar="اكتب سؤالك" data-en="Your question">اكتب سؤالك</label><textarea id="question" maxlength="800" required rows="1" placeholder="اسأل عن اللي بخاطرك…" data-placeholder-ar="اسأل عن اللي بخاطرك…" data-placeholder-en="What would you like to know?"></textarea><button type="submit" id="assistantSend" data-assistant-send="1" aria-label="إرسال السؤال"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5m-6 6 6-6 6 6"/></svg></button><div class="composer-meta"><span><span class="composer-spark">✦</span> UON AI</span><span data-ar="Enter للإرسال · Shift + Enter لسطر جديد" data-en="Enter to send · Shift + Enter for a new line">Enter للإرسال · Shift + Enter لسطر جديد</span></div></form>
+    <p class="composer-note" data-ar="قد يخطئ المساعد. راجع المصادر الرسمية للمعلومات المهمة." data-en="AI can make mistakes. Check official sources for important information.">قد يخطئ المساعد. راجع المصادر الرسمية للمعلومات المهمة.</p>
+   </div>
+  </div>
+  <footer class="studio-footer"><span data-ar="مشروع طلابي مستقل، غير تابع رسميًا لجامعة نزوى." data-en="An independent student project, not officially affiliated with the University of Nizwa.">مشروع طلابي مستقل، غير تابع رسميًا لجامعة نزوى.</span><a href="https://www.instagram.com/uonhub" target="_blank" rel="noopener noreferrer" dir="ltr">@uonhub ↗</a></footer>
+ </main>
+</div>
+<div id="studioBackdrop" class="history-backdrop" hidden></div>
+<aside class="assistant-history-drawer" id="assistantHistoryDrawer" role="dialog" aria-modal="true" aria-labelledby="historyTitle" inert>
+ <div class="assistant-history-head"><div><strong id="historyTitle" data-ar="محادثاتك" data-en="Your conversations">محادثاتك</strong><p data-ar="ارجع للفكرة من وين وقفت." data-en="Pick up where you left off.">ارجع للفكرة من وين وقفت.</p></div><button type="button" id="assistantHistoryClose" aria-label="إغلاق السجل">×</button></div><div class="assistant-history-items" id="assistantHistoryItems"></div>
+</aside>
+<div id="toast" class="toast" role="status"></div>
+<script src="js/assistant-places-proxy-v1.js?v=1.0.0"></script>
+<script src="js/assistant-cards.js?v=64.7.0"></script>
+<script src="js/assistant-stream.js?v=64.13.0"></script>
+<script src="js/assistant-client-token.js?v=64.13.0"></script>
+<script type="module" src="js/assistant-history.js?v=64.7.0"></script>
+<script type="module" src="js/assistant.js?v=64.13.0"></script>
+<script type="module" src="js/assistant-studio.js?v=1.0.0"></script>
+</body></html>
