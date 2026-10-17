@@ -1,3 +1,4 @@
+import { programmeFields } from './programme.mjs';
 import { normalize, searchTokens } from './conversation.mjs';
 const ROOT='https://www.unizwa.edu.om/';
 export function officialURL(value){try{const u=new URL(value,ROOT);return u.protocol==='https:'&&u.hostname==='www.unizwa.edu.om'&&!u.port&&!u.username&&!u.password&&/^\/(?:index|program_details|profile_details|search)\.php$/.test(u.pathname)?u.href:null;}catch{return null;}}
@@ -36,7 +37,7 @@ export async function liveUniversitySearch(question,signal){
    let page=await fetchHTML(x.url,combined);
    page=page.split(/<!--\s*End of header\s*-->/i).at(-1).split(/<footer\b|<div[^>]*class=['"](?:footer|sitemap)/i)[0];
    const description=textFromHTML(page).slice(0,6000);if(description.length<50)return null;
-   return {type:'بحث مباشر في موقع الجامعة',title:x.title,description,url:x.url,official:true,live:true,checked_at:new Date().toISOString(),score:0};
+   return {type:'بحث مباشر في موقع الجامعة',title:x.title,description,programme_fields:programmeFields(page,textFromHTML),url:x.url,official:true,live:true,checked_at:new Date().toISOString(),score:0};
   }));return results.flatMap(r=>r.status==='fulfilled'&&r.value?[r.value]:[]);
  }catch{return [];}
 }
