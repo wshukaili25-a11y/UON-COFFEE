@@ -1,0 +1,1 @@
+document.querySelectorAll('[data-size]').forEach(button=>button.addEventListener('click',()=>{document.body.dataset.size=button.dataset.size;document.querySelectorAll('[data-size]').forEach(other=>other.setAttribute('aria-pressed',String(other===button)))}));
