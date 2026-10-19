@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>UON Hub Intelligence — Preview</title>
+<style>
+:root{color-scheme:dark;font-family:system-ui,Tahoma,sans-serif;background:#07130e;color:#e8f7ee}
+*{box-sizing:border-box}body{margin:0;padding:24px}main{max-width:1150px;margin:auto}
+header{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+h1{font-size:clamp(25px,4vw,40px);margin:10px 0}p{color:#afc9b8;line-height:1.8}
+.tag{background:#194c34;border:1px solid #3b855c;padding:8px 12px;border-radius:20px;color:#d3ffe5}
+.warning{padding:15px 18px;background:#2b2814;border:1px solid #827034;border-radius:14px;color:#fff0b6;margin:22px 0}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:15px}
+article{background:linear-gradient(145deg,#12251b,#0a1b13);border:1px solid #28523b;border-radius:20px;padding:20px;min-height:150px}
+article h2{font-size:17px;margin:0 0 20px}article strong{font-size:32px;color:#80efaa}
+article small{display:block;color:#abc9b7;margin-top:12px;line-height:1.6}
+section{margin-top:35px}table{width:100%;border-collapse:collapse;background:#102118;border-radius:12px;overflow:hidden}
+th,td{text-align:right;padding:13px;border-bottom:1px solid #294836}th{color:#a4d6b8}
+footer{padding:25px 0;color:#93bba2}a{color:#a6f3c1}
+</style>
+</head>
+<body><main>
+<header><div><span class="tag">UON Hub • Intelligence</span><h1>مركز قيادة الأرصاد</h1><p>لوحة تجريبية لعرض شكل نظام المراقبة قبل ربطه بالبيانات الحقيقية.</p></div><span class="tag">وضع المعاينة فقط</span></header>
+<div class="warning" role="status">بيانات العرض أدناه مثال توضيحي وليست قياسات مباشرة. هذه الصفحة لا تتصل بقاعدة البيانات ولا تعرض معلومات الطلاب. يجب تقييد الوصول إليها قبل استخدامها مع بيانات حقيقية.</div>
+<section><h2>الأرصاد السبعة</h2><div class="grid">
+<article><h2>🏛️ رقيب الجامعة</h2><strong>مجدول</strong><small>متابعة الإعلانات الرسمية والتغييرات المؤكدة</small></article>
+<article><h2>🤖 رقيب UON AI</h2><strong>تجهيز</strong><small>جودة الإجابات وفجوات المعرفة وزمن الاستجابة</small></article>
+<article><h2>🌐 رقيب صحة الموقع</h2><strong>مجدول</strong><small>الوصول إلى الصفحات والخدمات العامة</small></article>
+<article><h2>🔎 رقيب المنافسين</h2><strong>مجدول</strong><small>مراقبة التحديثات الجديدة للمنافسين</small></article>
+<article><h2>🎓 رقيب احتياجات الطلاب</h2><strong>تجهيز</strong><small>اتجاهات الملاحظات والطلبات المجمعة</small></article>
+<article><h2>📣 رقيب المحتوى</h2><strong>مجدول</strong><small>فرص النشر الأكاديمية الموثقة</small></article>
+<article><h2>🛡️ رقيب الأمان</h2><strong>تجهيز</strong><small>تصنيف أحداث الأمان ومراجعة الأخطاء</small></article>
+</div></section>
+<section><h2>المؤشرات المطلوبة عند الربط</h2><table><thead><tr><th>المؤشر</th><th>مصدر البيانات</th><th>طريقة العرض</th></tr></thead><tbody>
+<tr><td>فجوات معرفة UON AI</td><td>uon_ai_knowledge_gaps</td><td>مفتوحة / قيد التحسين</td></tr>
+<tr><td>أخطاء النظام</td><td>system_errors</td><td>حسب الحالة والشدة</td></tr>
+<tr><td>الأحداث الأمنية</td><td>security_events</td><td>حسب الشدة خلال 24 ساعة</td></tr>
+<tr><td>صحة الأدوات</td><td>tool_health_checks</td><td>حسب حالة الفحص</td></tr>
+<tr><td>ملاحظات الطلاب</td><td>platform_feedback</td><td>إحصاءات فقط دون محتوى شخصي</td></tr>
+</tbody></table></section>
+<footer>UON Hub Intelligence • Preview — لا تستخدم هذه الصفحة لإدارة الصلاحيات أو الوصول للبيانات الحساسة.</footer>
+</main></body></html>
