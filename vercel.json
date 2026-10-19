@@ -103,23 +103,6 @@
           "value": "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https:; connect-src 'self' https://irkhvydgxpseflggbeqq.supabase.co wss://irkhvydgxpseflggbeqq.supabase.co; manifest-src 'self'; worker-src 'self' blob:; upgrade-insecure-requests"
         }
       ]
-    },
-    {
-      "source": "/:page(index|assistant|courses|summaries|groups|schedule|gpa|academic-calendar|university-guide|support-centers|tools|search|tasks|study-focus|useful-sites|ratings|projects|questions|marketplace|confessions|notifications|user-dashboard|about|feedback|status).html",
-      "headers": [
-        {
-          "key": "X-Frame-Options",
-          "value": "SAMEORIGIN"
-        },
-        {
-          "key": "Content-Security-Policy",
-          "value": "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'self'; form-action 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https:; connect-src 'self' https://irkhvydgxpseflggbeqq.supabase.co wss://irkhvydgxpseflggbeqq.supabase.co; manifest-src 'self'; worker-src 'self' blob:; upgrade-insecure-requests"
-        },
-        {
-          "key": "X-Robots-Tag",
-          "value": "noindex, nofollow"
-        }
-      ]
     }
   ],
   "cleanUrls": false,
@@ -129,6 +112,11 @@
       "source": "/home",
       "destination": "/index.html",
       "permanent": true
+    },
+    {
+      "source": "/studio-review.html",
+      "destination": "/index.html",
+      "permanent": false
     }
   ],
   "rewrites": [

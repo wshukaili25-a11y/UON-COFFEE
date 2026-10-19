@@ -32,28 +32,8 @@ export function courseClasses(rows, course) {
     return codes.length ? codes.some(value => normalizeCourseCode(value) === code) : names.includes(normalizeName(row.course));
   });
 }
-export function mountStudentDock(active, en = false) {
-  if (document.querySelector('.uon-student-dock')) return;
-  const links = [
-    ['home', 'index.html', '⌂', en ? 'Home' : 'الرئيسية', ''],
-    ['courses', 'courses.html', '▤', en ? 'Courses' : 'المواد', 'courses'],
-    ['schedule', 'schedule.html', '▦', en ? 'Schedule' : 'جدولي', 'schedule'],
-    ['assistant', 'assistant.html', '✦', 'UON AI', 'assistant']
-  ];
-  const nav = document.createElement('nav');
-  nav.className = 'uon-student-dock';
-  nav.setAttribute('aria-label', en ? 'Student navigation' : 'تنقل الطالب');
-  for (const [key, href, icon, label, feature] of links) {
-    const a = document.createElement('a');
-    a.href = href;
-    if (key === active) a.setAttribute('aria-current', 'page');
-    if (feature) a.dataset.feature = feature;
-    const mark = document.createElement('span');
-    mark.textContent = icon;
-    mark.setAttribute('aria-hidden', 'true');
-    a.append(mark, document.createTextNode(label));
-    nav.append(a);
-  }
-  document.body.append(nav);
-  document.body.classList.add('has-student-dock');
+// The Studio preview uses page-level Home links instead of a fixed bottom bar.
+export function mountStudentDock() {
+  document.querySelectorAll('.uon-student-dock').forEach(node => node.remove());
+  document.body.classList.remove('has-student-dock');
 }

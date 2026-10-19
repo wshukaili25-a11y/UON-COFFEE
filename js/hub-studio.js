@@ -5,6 +5,14 @@
  const en=()=>root.lang==='en';
  function decorate(){
   const main=document.querySelector('main');
+  const isHome=['/','/index.html'].includes(location.pathname);
+  if(!isHome&&!document.querySelector('.hub-home-link')){
+   const back=document.createElement('a');back.className='hub-home-link';back.href='/index.html';
+   back.innerHTML='<span aria-hidden="true">⌂</span><span data-ar="الرجوع للرئيسية" data-en="Back to home">'+(en()?'Back to home':'الرجوع للرئيسية')+'</span>';
+   if(main)main.prepend(back);else document.body.prepend(back);
+  }
+  document.querySelectorAll('.uon-student-dock').forEach(node=>node.remove());
+  document.body.classList.remove('has-student-dock');
   if(main&&!document.querySelector('.hub-skip')){
    if(!main.id)main.id='hubMain';
    const skip=document.createElement('a');skip.className='hub-skip';skip.href=`#${main.id}`;
@@ -24,7 +32,7 @@
    button.addEventListener('click',()=>{root.dataset.hubMotion=root.dataset.hubMotion==='off'?'on':'off';try{localStorage.setItem('uon_hub_motion',root.dataset.hubMotion)}catch{}syncMotion()});
    actions.prepend(button);syncMotion();
   }
-  document.querySelectorAll('.uon-rd-card,.uon-rd-support-card').forEach(card=>{
+  document.querySelectorAll('.uon-rd-card,.uon-rd-support-card,.gpa-panel,.guide-hero,.groups-hero,.cal-hero,.support-hero,.course-center-hero').forEach(card=>{
    if(card.dataset.hubObserved)return;card.dataset.hubObserved='1';reveal.observe(card);
   });
  }
