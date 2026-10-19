@@ -85,3 +85,20 @@ html[data-hub-studio] .hub-motion{font:inherit;font-size:16px;cursor:pointer}
 @media(prefers-reduced-motion:reduce){html[data-hub-studio] *,html[data-hub-studio] *:before,html[data-hub-studio] *:after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
 html[data-hub-motion="off"] *,html[data-hub-motion="off"] *:before,html[data-hub-motion="off"] *:after{animation:none!important;transition:none!important;scroll-behavior:auto!important}
 @media print{html[data-hub-studio] body{background:white!important;color:#111!important}.hub-motion,.hub-orbit,.hub-skip{display:none!important}}
+/* Keep all four header actions reachable at 320px without shrinking touch targets. */
+@media(max-width:400px){
+ html[data-hub-studio] body :is(.uon-rd-logo,.site-header .v176-brand>span){display:none!important}
+ html[data-hub-studio] body :is(.uon-rd-brand,.site-header .v176-brand){gap:0;flex-shrink:0;white-space:nowrap;font-size:15px}
+ html[data-hub-studio] body :is(.uon-rd-brand strong,.site-header .v176-brand strong){font-size:15px;white-space:nowrap}
+ html[data-hub-studio] body :is(.uon-rd-actions,.v176-nav-actions){gap:4px}
+ html[data-hub-studio] body :is(.uon-rd-nav,.v176-nav){width:calc(100% - 20px);gap:6px}
+ html[data-hub-studio] body .v176-side-menu{max-width:calc(100vw - 20px)}
+}
+html[data-hub-studio] body :is(.schedule-modal,.schedule-modal-card){background:var(--studio-panel);color:var(--studio-ink)}
+html[data-hub-studio] body .schedule-days-field legend{color:var(--studio-ink)}
+html[data-hub-studio] body .schedule-day-choice span{background:var(--studio-wash);color:var(--studio-ink);border-color:var(--studio-line)}
+html[data-hub-studio] body .schedule-day-choice input:checked+span{background:#194d37;color:#fff;border-color:#194d37}
+html[data-hub-studio] body .schedule-modal-close{width:44px;height:44px;background:var(--studio-wash);color:var(--studio-ink)}
+html[data-hub-studio] body .schedule-redesign-tabs{grid-template-columns:repeat(5,minmax(0,1fr));min-width:0}
+html[data-hub-studio] body .schedule-redesign-tabs button{min-width:0;padding:7px 3px;white-space:normal}
+html[data-hub-studio] body .schedule-redesign-tabs button.active small{color:#fff;background:#ffffff18}
