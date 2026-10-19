@@ -1,0 +1,28 @@
+name: UON Hub 3 Preview Safety
+on:
+  push:
+    branches:
+      - feature/uonhub-3-university-platform
+    paths:
+      - 'uonhub-3-preview.html'
+      - 'tests/uonhub-3-preview-isolation.test.mjs'
+      - '.github/workflows/uonhub-3-preview.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'uonhub-3-preview.html'
+      - 'tests/uonhub-3-preview-isolation.test.mjs'
+      - '.github/workflows/uonhub-3-preview.yml'
+permissions:
+  contents: read
+jobs:
+  preview-isolation:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Verify preview remains disconnected from production
+        run: node --test tests/uonhub-3-preview-isolation.test.mjs
