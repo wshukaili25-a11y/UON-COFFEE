@@ -41,7 +41,8 @@
      <div class="gpa-field"><label for="previousHours" data-ar="إجمالي الساعات السابقة*" data-en="Previous attempted hours*">إجمالي الساعات السابقة*</label><input id="previousHours" type="number" min="0" value="0" inputmode="numeric"></div>
     </div>
     <div class="gpa-note" data-ar="* أدخل الساعات المكتملة + ساعات الرسوب قبل الفصل الحالي، ولا تكرر ساعات المادة المعادة مرتين." data-en="* Enter completed hours plus failed-course hours before the current semester. Do not count a repeated course twice.">* أدخل الساعات المكتملة + ساعات الرسوب قبل الفصل الحالي، ولا تكرر ساعات المادة المعادة مرتين.</div>
-    <div class="gpa-toolbar"><button class="btn primary" id="addCourse" type="button" data-ar="＋ إضافة مادة" data-en="＋ Add course">＋ إضافة مادة</button><button class="btn" id="clear" type="button" data-ar="مسح" data-en="Clear">مسح</button></div>
+    <div class="gpa-toolbar"><button class="btn primary" id="addCourse" type="button" data-ar="＋ إضافة مادة" data-en="＋ Add course">＋ إضافة مادة</button><button class="btn" id="clear" type="button" data-ar="مسح الكل" data-en="Clear all">مسح الكل</button></div>
+    <p id="gpaDraftStatus" class="gpa-draft-status" role="status" aria-live="polite" data-ar="تُحفظ مدخلاتك تلقائيًا على هذا الجهاز فقط." data-en="Your inputs are saved automatically on this device only.">تُحفظ مدخلاتك تلقائيًا على هذا الجهاز فقط.</p>
     <div class="gpa-table-wrap"><table class="gpa-table"><thead><tr><th data-ar="المادة" data-en="Course">المادة</th><th data-ar="الساعات" data-en="Credits">الساعات</th><th data-ar="التقدير الجديد" data-en="New grade">التقدير الجديد</th><th data-ar="معادة؟" data-en="Repeated?">معادة؟</th><th data-ar="التقدير السابق" data-en="Previous grade">التقدير السابق</th><th data-ar="صافي النقاط" data-en="Net points">صافي النقاط</th><th><span class="sr-only" data-ar="إجراء" data-en="Action">إجراء</span></th></tr></thead><tbody id="courses"></tbody></table></div>
    </section>
   </div>

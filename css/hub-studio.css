@@ -152,3 +152,5 @@ html[data-hub-studio] .sum-empty{grid-column:1/-1;text-align:center;padding:32px
 html[data-hub-studio] .sum-empty p{margin:0 0 18px;line-height:1.8}
 html[data-hub-studio] .sum-card h3{overflow-wrap:anywhere;line-height:1.6}
 html[data-hub-studio] .sum-actions{gap:8px;flex-wrap:wrap}
+
+html[data-hub-studio] .gpa-draft-status{font-size:13px;line-height:1.8;color:var(--studio-muted);margin:0 0 16px}
