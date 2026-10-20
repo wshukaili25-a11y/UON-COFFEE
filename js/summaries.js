@@ -41,6 +41,8 @@ const ratingPicker=$('#ratingPicker'),ratingForm=$('#ratingForm'),ratingModal=$(
 if(ratingPicker)ratingPicker.innerHTML=[1,2,3,4,5].map(n=>`<button type="button" data-value="${n}" aria-label="${n} ${t('نجوم','stars')}">★</button>`).join('');
 let loading=false,loadFailed=false;
 const resultStatus=document.querySelector('#summaryResultsStatus');
+const loadMore=$('#summaryLoadMore'),PAGE_SIZE=24;
+let matches=[],visibleCount=0;
 const normalizeSearch=value=>String(value||'').normalize('NFKC').toLowerCase().replace(/[\u064B-\u065F\u0670ـ]/g,'').replace(/[أإآٱ]/g,'ا').replace(/ى/g,'ي');
 let rows=[],stats=new Map(),activeItem=null,selectedRating=0,selectedRecommended=null;
 const SESSION_KEY='uon_anon_session';let sessionId=crypto.randomUUID();try{sessionId=localStorage.getItem(SESSION_KEY)||sessionId;localStorage.setItem(SESSION_KEY,sessionId)}catch{}
@@ -57,9 +59,9 @@ function searchableText(item){
 }
 let searchTimer;
 function renderNow(){clearTimeout(searchTimer);render()}
-function scheduleSearch(){clearTimeout(searchTimer);searchTimer=setTimeout(render,120)}
+function scheduleSearch(){clearTimeout(searchTimer);if(loadMore)loadMore.disabled=true;searchTimer=setTimeout(render,120)}
 
-async function load(){if(loading)return;loading=true;loadFailed=false;items.setAttribute('aria-busy','true');if(resultStatus)resultStatus.textContent='';items.innerHTML=`<div class="sum-loading">${t('جاري تحميل الملفات…','Loading files…')}</div>`;try{rows=await get('public_summaries','select=id,title,course_code,college,pdf_url,downloads,created_at,subject,tags,link,description,approved,url,views,rating,updated_at,resource_type,content_type,instructor_name,semester,academic_year,language,page_count&order=created_at.desc&limit=500');loading=false;items.setAttribute('aria-busy','false');render();if(ratingModal)void loadStats().then(refreshRatingLines);trackEvent('page_view',{page:'summaries',language:lang})}catch(error){loading=false;loadFailed=true;items.setAttribute('aria-busy','false');console.error('UON Hub summaries load failed:',error);items.innerHTML=`<div class="sum-empty"><p>${t('تعذر تحميل الملخصات حاليًا.','Could not load files right now.')}</p><button class="btn primary" type="button" data-retry>${t('إعادة المحاولة','Try again')}</button></div>`;toast(t('تعذر تحميل الملخصات حاليًا','Could not load files right now'),true)}}
+async function load(){if(loading)return;loading=true;loadFailed=false;if(loadMore)loadMore.hidden=true;items.setAttribute('aria-busy','true');if(resultStatus)resultStatus.textContent='';items.innerHTML=`<div class="sum-loading">${t('جاري تحميل الملفات…','Loading files…')}</div>`;try{rows=await get('public_summaries','select=id,title,course_code,college,pdf_url,downloads,created_at,subject,tags,link,description,approved,url,views,rating,updated_at,resource_type,content_type,instructor_name,semester,academic_year,language,page_count&order=created_at.desc&limit=500');loading=false;items.setAttribute('aria-busy','false');render();if(ratingModal)void loadStats().then(refreshRatingLines);trackEvent('page_view',{page:'summaries',language:lang})}catch(error){loading=false;loadFailed=true;items.setAttribute('aria-busy','false');console.error('UON Hub summaries load failed:',error);items.innerHTML=`<div class="sum-empty"><p>${t('تعذر تحميل الملخصات حاليًا.','Could not load files right now.')}</p><button class="btn primary" type="button" data-retry>${t('إعادة المحاولة','Try again')}</button></div>`;toast(t('تعذر تحميل الملخصات حاليًا','Could not load files right now'),true)}}
 async function loadStats(){stats.clear();const ids=rows.map(x=>String(x.id));if(!ids.length)return;try{const data=await rpc('uon_summary_rating_stats',{p_ids:ids});for(const s of data||[])stats.set(String(s.resource_id),s)}catch(error){console.warn('Rating stats unavailable',error)}}
 function refreshRatingLines(){
  // Update only rating text so a late response cannot replace focused file links.
@@ -80,9 +82,25 @@ function render(){
  const filtered=Boolean(terms.length||college||type||savedOnly);
  syncSavedFilter();
  const list=rows.filter(x=>(!savedOnly||savedIds.has(String(x.id)))&&(!college||x.college===college)&&(!type||normalizedType(x)===type)&&terms.every(term=>searchableText(x).includes(term)));
- if(resultStatus)resultStatus.textContent=t(`النتائج: ${list.length} من ${rows.length}`,`Results: ${list.length} of ${rows.length}`);
- items.innerHTML=list.length?list.map(card).join(''):`<div class="sum-empty"><p>${savedOnly&&!terms.length&&!college&&!type?t('ما عندك ملفات محفوظة متاحة بعد. افتح كل الملفات واضغط «حفظ الملف».','No available saved files yet. Browse all files and choose Save file.'):filtered?t('ما حصلنا ملفات تطابق بحثك. جرّب اسم المادة أو رمزها.','No matching files. Try the course name or code.'):t('ما فيه ملفات متاحة حاليًا.','No files are available yet.')}</p>${filtered?`<button class="btn primary" type="button" data-reset-filters>${t('عرض كل الملفات','Show all files')}</button>`:''}</div>`;
+ matches=list;visibleCount=Math.min(PAGE_SIZE,list.length);
+ syncResults();
+ items.innerHTML=list.length?list.slice(0,visibleCount).map(card).join(''):`<div class="sum-empty"><p>${savedOnly&&!terms.length&&!college&&!type?t('ما عندك ملفات محفوظة متاحة بعد. افتح كل الملفات واضغط «حفظ الملف».','No available saved files yet. Browse all files and choose Save file.'):filtered?t('ما حصلنا ملفات تطابق بحثك. جرّب اسم المادة أو رمزها.','No matching files. Try the course name or code.'):t('ما فيه ملفات متاحة حاليًا.','No files are available yet.')}</p>${filtered?`<button class="btn primary" type="button" data-reset-filters>${t('عرض كل الملفات','Show all files')}</button>`:''}</div>`;
 }
+
+function syncResults(){
+ if(resultStatus)resultStatus.textContent=t(`عرض ${visibleCount} من ${matches.length} نتيجة`,`Showing ${visibleCount} of ${matches.length} results`);
+ if(loadMore){loadMore.hidden=visibleCount>=matches.length;loadMore.disabled=false;loadMore.textContent=t(`عرض المزيد (${Math.min(PAGE_SIZE,matches.length-visibleCount)})`,`Show more (${Math.min(PAGE_SIZE,matches.length-visibleCount)})`)}
+}
+function showMore(){
+ if(loading||loadFailed||visibleCount>=matches.length)return;
+ const firstNew=visibleCount;
+ const batch=matches.slice(visibleCount,visibleCount+PAGE_SIZE);
+ items.insertAdjacentHTML('beforeend',batch.map(card).join(''));
+ visibleCount+=batch.length;syncResults();
+ // Continue keyboard navigation at the new cards, including when the button disappears.
+ items.querySelectorAll('.sum-card')[firstNew]?.querySelector('a,button')?.focus({preventScroll:true});
+}
+if(loadMore)loadMore.onclick=showMore;
 
 if(search)search.value=new URLSearchParams(location.search).get('q')||'';
 function clearAllFilters(){savedOnly=false;if(search)search.value='';if(collegeFilter)collegeFilter.value='';if(typeFilter)typeFilter.value='';renderNow()}

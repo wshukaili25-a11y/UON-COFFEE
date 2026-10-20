@@ -159,3 +159,7 @@ html[data-hub-studio] .sum-saved-bar{display:flex;align-items:center;flex-wrap:w
 html[data-hub-studio] .sum-saved-bar span{font-size:13px;color:var(--studio-muted);line-height:1.8}
 html[data-hub-studio] body :is(#savedSummariesFilter,.sum-save)[aria-pressed="true"]{background:var(--studio-wash)!important;color:var(--studio-accent)!important;border-color:var(--studio-accent)!important}
 html[data-hub-studio] .sum-save{transition:background .2s ease,border-color .2s ease}
+
+html[data-hub-studio] .sum-more-wrap{display:flex;justify-content:center;padding:0 0 30px}
+html[data-hub-studio] #summaryLoadMore{min-width:180px}
+html[data-hub-studio] #summaryLoadMore[hidden]{display:none!important}

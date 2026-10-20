@@ -12,10 +12,24 @@ test('saved filter combines with search and clears to all files',()=>{
  const s=fs.readFileSync(new URL('../js/summaries.js',import.meta.url),'utf8');
  const render=s.slice(s.indexOf('function render(){'),s.indexOf('\nif(search)search.value'));
  const clear=s.slice(s.indexOf('function clearAllFilters(){'),s.indexOf('\nif(search){search.oninput'));
- const ctx={loading:false,loadFailed:false,search:{value:''},collegeFilter:{value:''},typeFilter:{value:''},savedOnly:true,savedIds:new Set(['a','deleted-id']),rows:[{id:'a',title:'Math'},{id:'b',title:'English'}],normalizeSearch:v=>String(v||'').toLowerCase(),searchableText:x=>x.title.toLowerCase(),normalizedType:()=>'',syncSavedFilter(){},resultStatus:{},items:{},card:x=>x.id,t:a=>a};
+ const ctx={loadMore:null,PAGE_SIZE:24,matches:[],visibleCount:0,loading:false,loadFailed:false,search:{value:''},collegeFilter:{value:''},typeFilter:{value:''},savedOnly:true,savedIds:new Set(['a','deleted-id']),rows:[{id:'a',title:'Math'},{id:'b',title:'English'}],normalizeSearch:v=>String(v||'').toLowerCase(),searchableText:x=>x.title.toLowerCase(),normalizedType:()=>'',syncSavedFilter(){},resultStatus:{},items:{},card:x=>x.id,t:a=>a};
  vm.createContext(ctx);vm.runInContext(render+'\n'+clear+'\nfunction renderNow(){render()}',ctx);
  vm.runInContext('render()',ctx);assert.equal(ctx.items.innerHTML,'a');
  ctx.search.value='English';vm.runInContext('render()',ctx);assert.match(ctx.items.innerHTML,/data-reset-filters/);
  vm.runInContext('clearAllFilters()',ctx);assert.equal(ctx.items.innerHTML,'ab');assert.equal(ctx.savedOnly,false);
  assert.ok(!s.includes('class="sum-meta"'));
+});
+test('progressive results append without duplicates and search includes undisplayed files',()=>{
+ const source=fs.readFileSync(new URL('../js/summaries.js',import.meta.url),'utf8');
+ const rendering=source.slice(source.indexOf('function render(){'),source.indexOf('\nif(search)search.value'));
+ let focused=false;
+ const ctx={loadMore:{hidden:true},PAGE_SIZE:24,matches:[],visibleCount:0,loading:false,loadFailed:false,search:{value:''},collegeFilter:{value:''},typeFilter:{value:''},savedOnly:false,savedIds:new Set(),rows:Array.from({length:53},(_,i)=>({id:String(i),title:`course-${i}`})),normalizeSearch:v=>String(v||'').toLowerCase(),searchableText:x=>x.title,normalizedType:()=>'',syncSavedFilter(){},resultStatus:{},items:{innerHTML:'',insertAdjacentHTML(position,html){assert.equal(position,'beforeend');this.innerHTML+=html},querySelectorAll(){return Array.from({length:53},()=>({querySelector:()=>({focus:()=>{focused=true}})}))}},card:x=>`[${x.id}]`,t:a=>a};
+ vm.createContext(ctx);vm.runInContext(rendering,ctx);vm.runInContext('render()',ctx);
+ assert.equal(ctx.visibleCount,24);assert.equal(ctx.loadMore.hidden,false);
+ vm.runInContext('showMore();showMore();showMore()',ctx);
+ assert.equal(ctx.items.innerHTML,ctx.rows.map(ctx.card).join(''));assert.equal(ctx.visibleCount,53);assert.equal(ctx.loadMore.hidden,true);assert.equal(focused,true);
+ ctx.search.value='course-52';vm.runInContext('render()',ctx);assert.equal(ctx.items.innerHTML,'[52]');assert.equal(ctx.visibleCount,1);
+ ctx.search.value='';vm.runInContext('render()',ctx);assert.equal(ctx.visibleCount,24);assert.equal(ctx.loadMore.hidden,false);
+ ctx.savedOnly=true;ctx.savedIds=new Set(['52']);vm.runInContext('render()',ctx);assert.equal(ctx.items.innerHTML,'[52]');
+ ctx.search.value='no-match';vm.runInContext('render()',ctx);assert.equal(ctx.loadMore.hidden,true);assert.equal(ctx.visibleCount,0);
 });
