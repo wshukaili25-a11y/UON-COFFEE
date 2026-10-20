@@ -146,3 +146,9 @@ html[data-hub-studio] .gpa-remove{min-width:44px;min-height:44px;color:var(--stu
  html[data-hub-studio] .gpa-table .net{direction:inherit;font-size:22px;font-variant-numeric:tabular-nums}
  html[data-hub-studio] .gpa-table .net::before{font-size:12px}
 }
+
+html[data-hub-studio] .sum-results-status{color:var(--studio-muted);font-size:14px;margin:0 4px;min-height:22px}
+html[data-hub-studio] .sum-empty{grid-column:1/-1;text-align:center;padding:32px 20px;border:1px dashed var(--studio-line);border-radius:20px;background:var(--studio-panel);color:var(--studio-muted)}
+html[data-hub-studio] .sum-empty p{margin:0 0 18px;line-height:1.8}
+html[data-hub-studio] .sum-card h3{overflow-wrap:anywhere;line-height:1.6}
+html[data-hub-studio] .sum-actions{gap:8px;flex-wrap:wrap}
