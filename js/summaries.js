@@ -29,23 +29,43 @@ const formatDate=v=>v?new Date(v).toLocaleDateString(en?'en-GB':'ar-OM'):'—';
 const starText=value=>{const n=Math.max(0,Math.min(5,Math.round(Number(value)||0)));return '★'.repeat(n)+'☆'.repeat(5-n)};
 const normalizedType=item=>{const raw=String(item?.resource_type||item?.content_type||'').trim().toLowerCase();if(['exam','اختبار'].includes(raw))return'exam';if(['notes','ملاحظات'].includes(raw))return'notes';if(['summary','ملخص'].includes(raw))return'summary';return raw};
 const typeLabel=value=>({summary:t('ملخص','Summary'),exam:t('اختبار','Exam'),notes:t('ملاحظات','Notes')}[normalizedType({resource_type:value})]||String(value||t('ملف','File')));
-const collegeLabel=value=>en?(collegeNames[String(value||'').trim()]||String(value||t('غير محدد','Not specified'))):String(value||'غير محدد');
+// Cache searchable text once per record instead of normalizing every keystroke.
+const searchIndex=new WeakMap();
+function searchableText(item){
+ if(!searchIndex.has(item))searchIndex.set(item,normalizeSearch(`${item.title||''} ${item.subject||''} ${item.course_code||''} ${item.description||''}`));
+ return searchIndex.get(item);
+}
+let searchTimer;
+function renderNow(){clearTimeout(searchTimer);render()}
+function scheduleSearch(){clearTimeout(searchTimer);searchTimer=setTimeout(render,120)}
 
-async function load(){if(loading)return;loading=true;loadFailed=false;items.setAttribute('aria-busy','true');if(resultStatus)resultStatus.textContent='';items.innerHTML=`<div class="sum-loading">${t('جاري تحميل الملفات…','Loading files…')}</div>`;try{rows=await get('public_summaries','select=id,title,course_code,college,pdf_url,downloads,created_at,subject,tags,link,description,approved,url,views,rating,updated_at,resource_type,content_type,instructor_name,semester,academic_year,language,page_count&order=created_at.desc&limit=500');await loadStats();loading=false;items.setAttribute('aria-busy','false');render();trackEvent('page_view',{page:'summaries',language:lang})}catch(error){loading=false;loadFailed=true;items.setAttribute('aria-busy','false');console.error('UON Hub summaries load failed:',error);items.innerHTML=`<div class="sum-empty"><p>${t('تعذر تحميل الملخصات حاليًا.','Could not load files right now.')}</p><button class="btn primary" type="button" data-retry>${t('إعادة المحاولة','Try again')}</button></div>`;toast(t('تعذر تحميل الملخصات حاليًا','Could not load files right now'),true)}}
+async function load(){if(loading)return;loading=true;loadFailed=false;items.setAttribute('aria-busy','true');if(resultStatus)resultStatus.textContent='';items.innerHTML=`<div class="sum-loading">${t('جاري تحميل الملفات…','Loading files…')}</div>`;try{rows=await get('public_summaries','select=id,title,course_code,college,pdf_url,downloads,created_at,subject,tags,link,description,approved,url,views,rating,updated_at,resource_type,content_type,instructor_name,semester,academic_year,language,page_count&order=created_at.desc&limit=500');loading=false;items.setAttribute('aria-busy','false');render();if(ratingModal)void loadStats().then(refreshRatingLines);trackEvent('page_view',{page:'summaries',language:lang})}catch(error){loading=false;loadFailed=true;items.setAttribute('aria-busy','false');console.error('UON Hub summaries load failed:',error);items.innerHTML=`<div class="sum-empty"><p>${t('تعذر تحميل الملخصات حاليًا.','Could not load files right now.')}</p><button class="btn primary" type="button" data-retry>${t('إعادة المحاولة','Try again')}</button></div>`;toast(t('تعذر تحميل الملخصات حاليًا','Could not load files right now'),true)}}
 async function loadStats(){stats.clear();const ids=rows.map(x=>String(x.id));if(!ids.length)return;try{const data=await rpc('uon_summary_rating_stats',{p_ids:ids});for(const s of data||[])stats.set(String(s.resource_id),s)}catch(error){console.warn('Rating stats unavailable',error)}}
+function refreshRatingLines(){
+ // Update only rating text so a late response cannot replace focused file links.
+ items.querySelectorAll('.sum-card').forEach(cardEl=>{
+  const line=cardEl.querySelector('.sum-rating-line');
+  const item=rows.find(row=>String(row.id)===cardEl.dataset.id);
+  if(!line||!item)return;
+  const data=stats.get(String(item.id))||{},avg=Number(data.average||item.rating||0),count=Number(data.total||0);
+  line.querySelector('.sum-stars').textContent=starText(avg);
+  line.querySelector('.sum-rating-num').textContent=avg?avg.toFixed(1):t('جديد','New');
+  line.querySelector('small').textContent=`(${count} ${t('تقييم','ratings')})`;
+ });
+}
 function card(item){const title=item.title||t('ملخص أو اختبار','Summary or exam'),url=safeUrl(item.url||item.link||item.pdf_url),type=normalizedType(item)||'file',code=item.course_code||item.subject||'',s=stats.get(String(item.id))||{},avg=Number(s.average||item.rating||0),count=Number(s.total||0);const ratingButton=ratingModal?`<button class="btn" data-rate>⭐ ${t('تقييم','Rate')}</button>`:'';return `<article class="sum-card" data-id="${esc(item.id)}"><div class="sum-card-head"><span class="sum-type">${esc(typeLabel(type))}</span>${courseHref(item.course_code)?`<a class="sum-code" href="${courseHref(item.course_code)}" aria-label="${t('صفحة المادة','Course hub')} ${esc(code)}">${esc(code)} ↗</a>`:`<span class="sum-code">${esc(code)}</span>`}</div><h3>${esc(title)}</h3><p class="sum-desc">${esc(item.description||t('ملف دراسي مرفوع لطلاب المقرر.','A study file shared for students in this course.'))}</p>${ratingModal?`<div class="sum-rating-line"><span class="sum-stars">${starText(avg)}</span><span class="sum-rating-num">${avg?avg.toFixed(1):t('جديد','New')}</span><small>(${count} ${t('تقييم','ratings')})</small></div>`:''}<div class="sum-actions">${url?`<a class="btn primary" data-open="view" target="_blank" rel="noopener" href="${esc(url)}">${t('فتح الملف','Open file')}</a>`:''}${ratingButton}${url?`<a class="btn" target="_blank" rel="noopener" href="${whatsappShare(title,url)}">${t('مشاركة','Share')}</a><button class="btn danger" data-report>${t('بلاغ','Report')}</button>`:''}</div></article>`}
 function render(){
  if(loading||loadFailed)return;
  const terms=normalizeSearch(search?.value).trim().split(/\s+/).filter(Boolean),college=collegeFilter?.value||'',type=typeFilter?.value||'';
  const filtered=Boolean(terms.length||college||type);
- const list=rows.filter(x=>(!college||x.college===college)&&(!type||normalizedType(x)===type)&&terms.every(term=>normalizeSearch(`${x.title||''} ${x.subject||''} ${x.course_code||''} ${x.description||''}`).includes(term)));
+ const list=rows.filter(x=>(!college||x.college===college)&&(!type||normalizedType(x)===type)&&terms.every(term=>searchableText(x).includes(term)));
  if(resultStatus)resultStatus.textContent=t(`النتائج: ${list.length} من ${rows.length}`,`Results: ${list.length} of ${rows.length}`);
  items.innerHTML=list.length?list.map(card).join(''):`<div class="sum-empty"><p>${filtered?t('ما حصلنا ملفات تطابق بحثك. جرّب اسم المادة أو رمزها.','No matching files. Try the course name or code.'):t('ما فيه ملفات متاحة حاليًا.','No files are available yet.')}</p>${filtered?`<button class="btn primary" type="button" data-reset-filters>${t('عرض كل الملفات','Show all files')}</button>`:''}</div>`;
 }
 
 if(search)search.value=new URLSearchParams(location.search).get('q')||'';
-function clearAllFilters(){if(search)search.value='';if(collegeFilter)collegeFilter.value='';if(typeFilter)typeFilter.value='';render()}
-if(search)search.oninput=render;if(collegeFilter)collegeFilter.onchange=render;if(typeFilter)typeFilter.onchange=render;if(clearFilters)clearFilters.onclick=clearAllFilters;
+function clearAllFilters(){if(search)search.value='';if(collegeFilter)collegeFilter.value='';if(typeFilter)typeFilter.value='';renderNow()}
+if(search){search.oninput=scheduleSearch;search.addEventListener('search',renderNow)}if(collegeFilter)collegeFilter.onchange=renderNow;if(typeFilter)typeFilter.onchange=renderNow;if(clearFilters)clearFilters.onclick=clearAllFilters;
 
 const openForm=$('#openForm'),closeForm=$('#closeForm');if(openForm)openForm.onclick=()=>openModal('submitModal');if(closeForm)closeForm.onclick=()=>closeModal('submitModal');const closeRating=$('#closeRating');if(closeRating)closeRating.onclick=()=>closeModal('ratingModal');
 document.querySelectorAll('.modal').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)closeModal(m.id)}));
