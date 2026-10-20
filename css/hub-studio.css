@@ -154,3 +154,8 @@ html[data-hub-studio] .sum-card h3{overflow-wrap:anywhere;line-height:1.6}
 html[data-hub-studio] .sum-actions{gap:8px;flex-wrap:wrap}
 
 html[data-hub-studio] .gpa-draft-status{font-size:13px;line-height:1.8;color:var(--studio-muted);margin:0 0 16px}
+
+html[data-hub-studio] .sum-saved-bar{display:flex;align-items:center;flex-wrap:wrap;gap:12px;margin:0 0 18px}
+html[data-hub-studio] .sum-saved-bar span{font-size:13px;color:var(--studio-muted);line-height:1.8}
+html[data-hub-studio] body :is(#savedSummariesFilter,.sum-save)[aria-pressed="true"]{background:var(--studio-wash)!important;color:var(--studio-accent)!important;border-color:var(--studio-accent)!important}
+html[data-hub-studio] .sum-save{transition:background .2s ease,border-color .2s ease}
