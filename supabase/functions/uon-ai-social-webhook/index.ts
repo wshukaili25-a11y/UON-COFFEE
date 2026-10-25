@@ -14,7 +14,7 @@ const IG_ACCOUNT_ID = Deno.env.get('INSTAGRAM_ACCOUNT_ID') || '';
 const GRAPH_VERSION = Deno.env.get('META_GRAPH_VERSION') || 'v26.0';
 const IG_GRAPH_BASE = (Deno.env.get('INSTAGRAM_GRAPH_BASE') || 'https://graph.instagram.com').replace(/\/+$/,'');
 const HANDOFF_SECRET = Deno.env.get('UON_AI_HANDOFF_SECRET') || '';
-const AI_URL = SUPABASE_URL + '/functions/v1/uon-ai-chat-v64';
+const AI_URL = SUPABASE_URL + '/functions/v1/uon-agent-v1';
 const HANDOFF_URL = SUPABASE_URL + '/functions/v1/uon-ai-handoff';
 const db = createClient(SUPABASE_URL, SERVICE_ROLE_KEY, { auth: { persistSession:false, autoRefreshToken:false } });
 
@@ -49,7 +49,7 @@ function handoffIntent(text:string){
 }
 function resumeIntent(text:string){
   const q=text.toLowerCase().replace(/[أإآ]/g,'ا').replace(/\s+/g,' ').trim();
-  return /^(?:رجع|شغل|فعل)\s*(?:uon\s*ai|الذكاء|المساعد)|^(?:uon\s*ai|ai)\s*(?:ارجع|رد)$/i.test(q);
+  return /^(?:رجع|شغل|فعل)\s*(?:uon\s*(?:ai|agent)|الذكاء|المساعد)|^(?:uon\s*(?:ai|agent)|ai|agent)\s*(?:ارجع|رد)$/i.test(q);
 }
 async function claimEvent(channel:string,eventId:string,sender:string){
   const sender_hash=await sha256(channel+':'+sender);
@@ -96,7 +96,7 @@ async function askAi(channel:string,sender:string,text:string){
       await db.from('uon_ai_conversations').update({status:'ai',updated_at:new Date().toISOString()}).eq('id',t.conversation.id);
     }else{
       await db.from('uon_ai_messages').insert({conversation_id:t.conversation.id,role:'user',content:text});
-      return {answer:isArabic(text)?'محادثتك محوّلة للمشرف حاليًا. إذا تريد ترجع لـ UON AI اكتب: رجع UON AI 🤖':'Your conversation is with a supervisor. To return to UON AI, send: UON AI رجع 🤖',links:[]};
+      return {answer:isArabic(text)?'محادثتك محوّلة للمشرف حاليًا. إذا تريد ترجع لـ UON Agent اكتب: رجع UON Agent 🤖':'Your conversation is with a supervisor. To return to UON AI, send: UON AI رجع 🤖',links:[]};
     }
   }
   const r=await fetch(AI_URL,{
@@ -106,14 +106,16 @@ async function askAi(channel:string,sender:string,text:string){
     signal:AbortSignal.timeout(25000)
   });
   const data=await r.json().catch(()=>({}));
-  if(!r.ok || !data?.answer)throw new Error('uon_ai_'+r.status+':'+clean(data?.error||'empty_answer',160));
+  if(!r.ok || !data?.answer)throw new Error('uon_agent_'+r.status+':'+clean(data?.error||'empty_answer',160));
   return data;
 }
 function withSources(result:any){
   const answer=clean(result?.answer,5200);
-  const links=(Array.isArray(result?.links)?result.links:[]).filter((x:any)=>/^https?:\/\//i.test(String(x?.url||''))).filter((x:any,i:number,a:any[])=>a.findIndex(y=>y.url===x.url)===i).slice(0,2);
-  if(!links.length)return answer;
-  return answer+'\n\n'+links.map((x:any)=>'🔗 '+clean(x.title||'المصدر',80)+'\n'+x.url).join('\n');
+  const links=(Array.isArray(result?.links)?result.links:[]).map((x:any)=>({...x,url:String(x?.url||'')})).filter((x:any)=>/^https?:\/\//i.test(x.url));
+  const actions=(Array.isArray(result?.actions)?result.actions:[]).map((x:any)=>({title:x?.label||'فتح',url:String(x?.url||'')})).filter((x:any)=>x.url).map((x:any)=>({...x,url:/^https?:\/\//i.test(x.url)?x.url:'https://uonhub.space'+(x.url.startsWith('/')?x.url:'/'+x.url)}));
+  const merged=[...links,...actions].filter((x:any,i:number,a:any[])=>a.findIndex(y=>y.url===x.url)===i).slice(0,2);
+  if(!merged.length)return answer;
+  return answer+'\n\n'+merged.map((x:any)=>'🔗 '+clean(x.title||'المصدر',80)+'\n'+x.url).join('\n');
 }
 function splitText(text:string,max:number){
   const out:string[]=[]; let rest=clean(text,12000);
@@ -149,12 +151,12 @@ async function handleMessage(channel:'instagram'|'whatsapp',sender:string,eventI
     claimed=await claimEvent(channel,eventId,sender);
     if(!claimed)return;
     if(!text){
-      await send('أرسل سؤالك كنص حاليًا، وبرد عليك UON AI 🤖');
+      await send('أرسل سؤالك كنص حاليًا، وبرد عليك UON Agent 🤖');
       await finishEvent(channel,eventId,'ignored'); return;
     }
     if(handoffIntent(text)){
       await ensureHumanThread(channel,sender,text);
-      await send(isArabic(text)?'تم تحويل المحادثة للمشرف ✅\nإذا تريد ترجع للمساعد لاحقًا اكتب: رجع UON AI 🤖':'Your conversation was handed to a supervisor ✅\nTo return to the assistant later, send: UON AI رجع 🤖');
+      await send(isArabic(text)?'تم تحويل المحادثة للمشرف ✅\nإذا تريد ترجع للمساعد لاحقًا اكتب: رجع UON Agent 🤖':'Your conversation was handed to a supervisor ✅\nTo return to the assistant later, send: UON AI رجع 🤖');
       await finishEvent(channel,eventId,'processed'); return;
     }
     const result=await askAi(channel,sender,text);
@@ -197,7 +199,7 @@ async function processPayload(payload:any){
 Deno.serve(async (req:Request)=>{
   const url=new URL(req.url);
   if(req.method==='GET'){
-    if(url.searchParams.get('health')==='1')return json({ok:true,graph_version:GRAPH_VERSION,meta_app_secret_configured:Boolean(META_APP_SECRET),verify_token_configured:Boolean(VERIFY_TOKEN),instagram_token_configured:Boolean(IG_TOKEN),whatsapp_token_configured:Boolean(WA_TOKEN)});
+    if(url.searchParams.get('health')==='1')return json({ok:true,assistant_engine:'uon-agent-v1',graph_version:GRAPH_VERSION,meta_app_secret_configured:Boolean(META_APP_SECRET),verify_token_configured:Boolean(VERIFY_TOKEN),instagram_token_configured:Boolean(IG_TOKEN),whatsapp_token_configured:Boolean(WA_TOKEN)});
     const mode=url.searchParams.get('hub.mode')||'', token=url.searchParams.get('hub.verify_token')||'', challenge=url.searchParams.get('hub.challenge')||'';
     if(mode==='subscribe' && VERIFY_TOKEN && token===VERIFY_TOKEN)return new Response(challenge,{status:200,headers:{'content-type':'text/plain','cache-control':'no-store'}});
     return new Response('forbidden',{status:403});

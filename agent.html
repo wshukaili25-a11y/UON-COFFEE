@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+ <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+ <meta name="theme-color" content="#06100c">
+ <title>UON Agent | UON Hub</title>
+ <meta name="description" content="نسخة تجريبية من UON Agent، وكيل ذكي لطلبة جامعة نزوى يعتمد على أدوات وبيانات UON Hub الموثوقة.">
+ <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+ <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+ <link rel="stylesheet" href="css/app.css?v=66.7.1"><link rel="stylesheet" href="css/ui-refresh-v24.css?v=66.7.1"><link rel="stylesheet" href="css/assistant-smart-v63.css?v=66.7.1"><link rel="stylesheet" href="css/assistant-redesign-v1.css?v=1.0.1">
+ <link rel="manifest" href="/manifest.webmanifest"><link rel="apple-touch-icon" href="/assets/icons/uonhub-192-v75.png">
+ <style>
+ .agent-badge{display:inline-flex;align-items:center;gap:7px;padding:7px 12px;border:1px solid rgba(79,196,121,.35);border-radius:999px;background:rgba(35,120,74,.12);font-weight:800}.agent-badge i{width:8px;height:8px;border-radius:50%;background:#42d27a;box-shadow:0 0 0 5px rgba(66,210,122,.1)}
+ .agent-capabilities{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}.agent-capabilities button{border:1px solid rgba(120,190,145,.22);border-radius:999px;background:rgba(255,255,255,.035);padding:8px 11px;color:inherit;font:inherit;cursor:pointer}
+ .agent-tool-trace{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}.agent-tool-trace span{font-size:.74rem;padding:5px 8px;border-radius:999px;background:rgba(45,150,92,.11);border:1px solid rgba(79,196,121,.18);opacity:.9}
+ .agent-actions{display:flex;flex-wrap:wrap;gap:7px;margin-top:10px}.agent-action{display:inline-flex;align-items:center;text-decoration:none;padding:7px 10px;border-radius:10px;border:1px solid rgba(79,196,121,.22);font-size:.8rem}
+ .agent-note{margin-top:12px;font-size:.8rem;opacity:.72}.typing-dots{display:flex;gap:5px}.typing-dots span{width:7px;height:7px;border-radius:50%;background:currentColor;opacity:.32;animation:dot 1.1s infinite}.typing-dots span:nth-child(2){animation-delay:.14s}.typing-dots span:nth-child(3){animation-delay:.28s}@keyframes dot{35%{transform:translateY(-5px);opacity:.8}}
+ </style>
+</head>
+<body data-uon-page="assistant">
+<header class="site-header"></header>
+<main class="v175-ai-page" data-feature="assistant">
+ <section class="v175-page-hero ai"><div class="container">
+  <span class="agent-badge"><i></i><b>UON Agent V1 · تجريبي</b></span>
+  <h1>مو بس يجاوبك — يبحث وينفّذ الأدوات المناسبة</h1>
+  <p>نسخة مستقلة للتجربة. يبحث أولًا في بيانات UON Hub الموثوقة عن الموظفين، المواد، التقويم، المراكز، المباني، وجدولك المحفوظ ثم يكوّن الرد.</p>
+ </div></section>
+ <section class="v175-section"><div class="container"><div class="v175-ai-layout">
+  <aside class="v175-ai-info"><div class="assistant-side-head"><span class="assistant-status-dot"></span><div>
+   <h2>أدوات UON Agent</h2><p>كل أداة تقرأ المصدر المناسب بدل ما يعتمد الوكيل على التخمين.</p>
+   <div class="agent-capabilities">
+    <button data-prompt="وين مكتب الدكتور أيمن؟">👤 دليل الموظفين</button>
+    <button data-prompt="متى أقرب موعد تسجيل؟">📅 التقويم</button>
+    <button data-prompt="عطني معلومات عن COMP210">📚 المواد</button>
+    <button data-prompt="كيف أحجز في مركز أنجز؟">🗓️ مراكز الدعم</button>
+    <button data-prompt="وش عندي اليوم؟">🧭 جدولي اليوم</button>
+   </div>
+   <p class="agent-note">أي عملية تغيّر بيانات الطالب أو تنشئ حجزًا راح تتطلب تأكيد قبل التنفيذ في المراحل القادمة.</p>
+  </div></div></aside>
+  <section class="v175-ai-chat" aria-label="UON Agent chat">
+   <div class="assistant-chat-tools"><button type="button" id="agentNewChat">＋ محادثة جديدة</button><button type="button" id="assistantStop" class="assistant-stop" hidden>■ إيقاف</button></div>
+   <div id="chat" class="chat-list" role="log" aria-live="polite"><article class="message bot"><div class="message-content">هلا 👋 أنا UON Agent. اسألني، وبوضح لك تحت الرد أي أداة استخدمتها.</div></article></div>
+   <form id="chatForm" class="chat-form" novalidate><textarea id="question" maxlength="800" required placeholder="مثال: وين مكتب د. فلان؟"></textarea><button type="submit" id="assistantSend" class="btn primary">إرسال</button></form>
+  </section>
+ </div></div></section>
+</main>
+<div class="uon-ai-legal"><div class="uon-ai-notice" role="note"><strong>تنبيه:</strong> UON Hub مشروع طلابي مستقل وغير تابع رسميًا لجامعة نزوى. جميع الشعارات والأسماء المستخدمة تعود لمالكيها، ويهدف الموقع إلى تسهيل وصول الطلبة إلى الخدمات والمعلومات.</div></div>
+<footer class="uon-ai-footer"><div class="container uon-ai-footer-main"><p class="uon-ai-footer-prayer">رَبِّ زِدْنِي عِلْمًا</p><a class="uon-ai-footer-handle" dir="ltr" href="https://www.instagram.com/uonhub" target="_blank" rel="noopener noreferrer">@uonhub</a></div></footer>
+<script type="module" src="js/agent-v1.js?v=1.0.0"></script>
+<script type="module">import {setupV14Shell} from "./js/v14-ui.js?v=67.0.2";setupV14Shell();</script>
+<script type="module" src="./js/runtime-guard.js?v=66.7.1"></script><script type="module" src="/js/pwa-init.js?v=67.0.2"></script>
+</body></html>
