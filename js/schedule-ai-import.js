@@ -35,6 +35,14 @@ function apply(){
   rows.push({id:uid(),seriesId:grouped.get(key),course,day,start,end,room,teacher,type:'lecture'});
  }
  if(!rows.length)return;
+ // Reject any internally overlapping proposed classes before replacing the student's schedule.
+ for(let i=0;i<rows.length;i++)for(let j=i+1;j<rows.length;j++){
+  const a=rows[i],b=rows[j];
+  if(a.day===b.day&&a.start<b.end&&b.start<a.end){
+   alert(document.documentElement.lang?.startsWith('en')?'The proposed schedule contains a time conflict. Nothing was changed.':'الجدول المقترح فيه تعارض بالأوقات. ما غيرنا جدولك الحالي.');
+   return;
+  }
+ }
 
  try{
   const current=JSON.parse(localStorage.getItem(TARGET)||'[]');
