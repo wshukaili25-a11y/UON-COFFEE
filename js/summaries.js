@@ -1,8 +1,9 @@
+import {SAVED_SUMMARIES_KEY,readSavedSummaries,toggleSavedSummary} from './saved-summaries.js';
 import{whatsappShare,reportBrokenLink,installErrorCapture,setupNav,enforceUonMaintenance,watchUonMaintenance,$,get,notifyPending,toast,fillCollege,esc,openModal,closeModal,trackEvent,rpc}from'./core.js?v=67.0.0';
 import{courseHref}from'./student-workspace.js?v=68.0.0';
 setupNav();await enforceUonMaintenance();watchUonMaintenance();installErrorCapture();
 
-const LANG_KEY='uon_language',lang=localStorage.getItem(LANG_KEY)==='en'?'en':'ar',en=lang==='en';
+const lang=document.documentElement.lang==='en'?'en':'ar',en=lang==='en';
 const t=(ar,enText)=>en?enText:ar;
 const collegeNames={
  'كلية العلوم والآداب':'College of Arts and Sciences',
@@ -17,24 +18,101 @@ const search=$('#summarySearch')||$('#search'),collegeFilter=$('#collegeFilter')
 if(!items){console.error('UON Hub summaries: result container is missing');throw new Error('summaries_container_missing')}
 if(collegeFilter){fillCollege(collegeFilter);localizeCollegeSelect(collegeFilter)}if(collegeInput){fillCollege(collegeInput);localizeCollegeSelect(collegeInput)}
 
+let savedIds=new Set(),savedOnly=false;
+try{savedIds=readSavedSummaries(localStorage)}catch{}
+const savedFilter=$('#savedSummariesFilter');
+function syncSavedFilter(){
+ if(!savedFilter)return;
+ const count=rows.filter(item=>savedIds.has(String(item.id))).length;
+ savedFilter.setAttribute('aria-pressed',String(savedOnly));
+ savedFilter.textContent=t(`ملفاتي المحفوظة (${count})`,`Saved files (${count})`);
+}
+function toggleSaved(item,button){
+ try{savedIds=toggleSavedSummary(localStorage,item.id)}catch{toast(t('تعذّر الحفظ على هذا الجهاز. تحقق من إعدادات التخزين.','Could not save on this device. Check storage settings.'),true);return}
+ const saved=savedIds.has(String(item.id));
+ toast(saved?t('تم حفظ الملف على هذا الجهاز','File saved on this device'):t('أُزيل الملف من المحفوظات','File removed from saved files'));
+ if(savedOnly){renderNow();(items.querySelector('[data-save]')||savedFilter)?.focus()}else{
+  button.setAttribute('aria-pressed',String(saved));
+  button.textContent=saved?t('محفوظ ✓','Saved ✓'):t('حفظ الملف','Save file');
+  syncSavedFilter();
+ }
+}
 const ratingPicker=$('#ratingPicker'),ratingForm=$('#ratingForm'),ratingModal=$('#ratingModal');
 if(ratingPicker)ratingPicker.innerHTML=[1,2,3,4,5].map(n=>`<button type="button" data-value="${n}" aria-label="${n} ${t('نجوم','stars')}">★</button>`).join('');
+let loading=false,loadFailed=false;
+const resultStatus=document.querySelector('#summaryResultsStatus');
+const loadMore=$('#summaryLoadMore'),PAGE_SIZE=24;
+let matches=[],visibleCount=0;
+const normalizeSearch=value=>String(value||'').normalize('NFKC').toLowerCase().replace(/[\u064B-\u065F\u0670ـ]/g,'').replace(/[أإآٱ]/g,'ا').replace(/ى/g,'ي');
 let rows=[],stats=new Map(),activeItem=null,selectedRating=0,selectedRecommended=null;
-const SESSION_KEY='uon_anon_session';let sessionId=localStorage.getItem(SESSION_KEY);if(!sessionId){sessionId=crypto.randomUUID();localStorage.setItem(SESSION_KEY,sessionId)}
+const SESSION_KEY='uon_anon_session';let sessionId=crypto.randomUUID();try{sessionId=localStorage.getItem(SESSION_KEY)||sessionId;localStorage.setItem(SESSION_KEY,sessionId)}catch{}
 const safeUrl=value=>{try{const u=new URL(String(value||''),location.origin);return ['https:','http:'].includes(u.protocol)?u.href:''}catch{return''}};
 const formatDate=v=>v?new Date(v).toLocaleDateString(en?'en-GB':'ar-OM'):'—';
 const starText=value=>{const n=Math.max(0,Math.min(5,Math.round(Number(value)||0)));return '★'.repeat(n)+'☆'.repeat(5-n)};
 const normalizedType=item=>{const raw=String(item?.resource_type||item?.content_type||'').trim().toLowerCase();if(['exam','اختبار'].includes(raw))return'exam';if(['notes','ملاحظات'].includes(raw))return'notes';if(['summary','ملخص'].includes(raw))return'summary';return raw};
 const typeLabel=value=>({summary:t('ملخص','Summary'),exam:t('اختبار','Exam'),notes:t('ملاحظات','Notes')}[normalizedType({resource_type:value})]||String(value||t('ملف','File')));
-const collegeLabel=value=>en?(collegeNames[String(value||'').trim()]||String(value||t('غير محدد','Not specified'))):String(value||'غير محدد');
+// Cache searchable text once per record instead of normalizing every keystroke.
+const searchIndex=new WeakMap();
+function searchableText(item){
+ if(!searchIndex.has(item))searchIndex.set(item,normalizeSearch(`${item.title||''} ${item.subject||''} ${item.course_code||''} ${item.description||''}`));
+ return searchIndex.get(item);
+}
+let searchTimer;
+function renderNow(){clearTimeout(searchTimer);render()}
+function scheduleSearch(){clearTimeout(searchTimer);if(loadMore)loadMore.disabled=true;searchTimer=setTimeout(render,120)}
 
-async function load(){items.innerHTML=`<div class="sum-loading">${t('جاري تحميل الملفات…','Loading files…')}</div>`;try{rows=await get('public_summaries','select=id,title,course_code,college,pdf_url,downloads,created_at,subject,tags,link,description,approved,url,views,rating,updated_at,resource_type,content_type,instructor_name,semester,academic_year,language,page_count&order=created_at.desc&limit=500');await loadStats();render();trackEvent('page_view',{page:'summaries',language:lang})}catch(error){console.error('UON Hub summaries load failed:',error);items.innerHTML=`<div class="sum-empty">${t('تعذر تحميل الملخصات حاليًا. حاول تحديث الصفحة.','Could not load files right now. Please refresh the page.')}</div>`;toast(t('تعذر تحميل الملخصات حاليًا','Could not load files right now'),true)}}
+async function load(){if(loading)return;loading=true;loadFailed=false;if(loadMore)loadMore.hidden=true;items.setAttribute('aria-busy','true');if(resultStatus)resultStatus.textContent='';items.innerHTML=`<div class="sum-loading">${t('جاري تحميل الملفات…','Loading files…')}</div>`;try{rows=await get('public_summaries','select=id,title,course_code,college,pdf_url,downloads,created_at,subject,tags,link,description,approved,url,views,rating,updated_at,resource_type,content_type,instructor_name,semester,academic_year,language,page_count&order=created_at.desc&limit=500');loading=false;items.setAttribute('aria-busy','false');render();if(ratingModal)void loadStats().then(refreshRatingLines);trackEvent('page_view',{page:'summaries',language:lang})}catch(error){loading=false;loadFailed=true;items.setAttribute('aria-busy','false');console.error('UON Hub summaries load failed:',error);items.innerHTML=`<div class="sum-empty"><p>${t('تعذر تحميل الملخصات حاليًا.','Could not load files right now.')}</p><button class="btn primary" type="button" data-retry>${t('إعادة المحاولة','Try again')}</button></div>`;toast(t('تعذر تحميل الملخصات حاليًا','Could not load files right now'),true)}}
 async function loadStats(){stats.clear();const ids=rows.map(x=>String(x.id));if(!ids.length)return;try{const data=await rpc('uon_summary_rating_stats',{p_ids:ids});for(const s of data||[])stats.set(String(s.resource_id),s)}catch(error){console.warn('Rating stats unavailable',error)}}
-function card(item){const title=item.title||t('ملخص أو اختبار','Summary or exam'),url=safeUrl(item.url||item.link||item.pdf_url),type=normalizedType(item)||'file',code=item.course_code||item.subject||'',s=stats.get(String(item.id))||{},avg=Number(s.average||item.rating||0),count=Number(s.total||0);const viewUrl='summary-viewer.html?id='+encodeURIComponent(item.id);const description=String(item.description||'').includes('دفعة uoncafe-20261020')?t('نسخة دراسية متاحة للعرض. معلومات المصدر داخل صفحة الملف.','Study material available to view. Source details are on the file page.'):item.description;const ratingButton=ratingModal?`<button class="btn" data-rate>⭐ ${t('تقييم','Rate')}</button>`:'';return `<article class="sum-card" data-id="${esc(item.id)}"><div class="sum-card-head"><span class="sum-type">${esc(typeLabel(type))}</span>${courseHref(item.course_code)?`<a class="sum-code" href="${courseHref(item.course_code)}" aria-label="${t('صفحة المادة','Course hub')} ${esc(code)}">${esc(code)} ↗</a>`:`<span class="sum-code">${esc(code)}</span>`}</div><h3>${esc(title)}</h3><p class="sum-desc">${esc(description||t('ملف دراسي مرفوع لطلاب المقرر.','A study file shared for students in this course.'))}</p><div class="sum-meta"><span>🏫 ${esc(collegeLabel(item.college))}</span><span>👁 ${Number(item.views||0)}</span><span>📥 ${Number(item.downloads||0)}</span><span>🗓 ${formatDate(item.updated_at||item.created_at)}</span></div>${ratingModal?`<div class="sum-rating-line"><span class="sum-stars">${starText(avg)}</span><span class="sum-rating-num">${avg?avg.toFixed(1):t('جديد','New')}</span><small>(${count} ${t('تقييم','ratings')})</small></div>`:''}<div class="sum-actions">${url?`<a class="btn primary" data-open="view" href="${esc(viewUrl)}">${t('فتح الملف','Open file')}</a>`:''}${ratingButton}${url?`<a class="btn" target="_blank" rel="noopener" href="${whatsappShare(title,new URL(viewUrl,location.href).href)}">${t('مشاركة','Share')}</a><button class="btn danger" data-report>${t('بلاغ','Report')}</button>`:''}</div></article>`}
-function render(){const q=(search?.value||'').trim().toLowerCase(),college=collegeFilter?.value||'',type=typeFilter?.value||'';const list=rows.filter(x=>(!college||x.college===college)&&(!type||normalizedType(x)===type)&&`${x.title||''} ${x.subject||''} ${x.course_code||''} ${x.description||''}`.toLowerCase().includes(q));items.innerHTML=list.length?list.map(card).join(''):`<div class="sum-empty">${t('ما حصلنا ملفات تطابق بحثك.','No files match your search.')}</div>`}
+function refreshRatingLines(){
+ // Update only rating text so a late response cannot replace focused file links.
+ items.querySelectorAll('.sum-card').forEach(cardEl=>{
+  const line=cardEl.querySelector('.sum-rating-line');
+  const item=rows.find(row=>String(row.id)===cardEl.dataset.id);
+  if(!line||!item)return;
+  const data=stats.get(String(item.id))||{},avg=Number(data.average||item.rating||0),count=Number(data.total||0);
+  line.querySelector('.sum-stars').textContent=starText(avg);
+  line.querySelector('.sum-rating-num').textContent=avg?avg.toFixed(1):t('جديد','New');
+  line.querySelector('small').textContent=`(${count} ${t('تقييم','ratings')})`;
+ });
+}
+// Keep import bookkeeping out of student-facing descriptions; retain stored provenance.
+function visibleDescription(value){
+ return String(value||'').split(/\s*\|\s*/).filter(part=>!/^\s*(?:المصدر\s*:|(?:uoncafe\s*[-–—]?\s*)?دفعة\b|نسخة مستضافة على UON Hub|حقوق المحتوى لأصحابه)/iu.test(part)&&!/^\s*(?:uoncafe\s*[-–—]?\s*)?دفعة(?:\s|$)/iu.test(part)).join(' | ').trim();
+}
+function card(item){const title=item.title||t('ملخص أو اختبار','Summary or exam'),url=safeUrl(item.url||item.link||item.pdf_url),type=normalizedType(item)||'file',code=item.course_code||item.subject||'',s=stats.get(String(item.id))||{},avg=Number(s.average||item.rating||0),count=Number(s.total||0);const viewUrl='summary-viewer.html?id='+encodeURIComponent(item.id);const ratingButton=ratingModal?`<button class="btn" data-rate>⭐ ${t('تقييم','Rate')}</button>`:'';return `<article class="sum-card" data-id="${esc(item.id)}"><div class="sum-card-head"><span class="sum-type">${esc(typeLabel(type))}</span>${courseHref(item.course_code)?`<a class="sum-code" href="${courseHref(item.course_code)}" aria-label="${t('صفحة المادة','Course hub')} ${esc(code)}">${esc(code)} ↗</a>`:`<span class="sum-code">${esc(code)}</span>`}</div><h3>${esc(title)}</h3><p class="sum-desc">${esc(visibleDescription(item.description)||t('ملف دراسي مرفوع لطلاب المقرر.','A study file shared for students in this course.'))}</p>${ratingModal?`<div class="sum-rating-line"><span class="sum-stars">${starText(avg)}</span><span class="sum-rating-num">${avg?avg.toFixed(1):t('جديد','New')}</span><small>(${count} ${t('تقييم','ratings')})</small></div>`:''}<div class="sum-actions">${url?`<a class="btn primary" data-open="view" href="${esc(viewUrl)}">${t('فتح الملف','Open file')}</a>`:''}${ratingButton}${url?`<a class="btn" target="_blank" rel="noopener" href="${whatsappShare(title,new URL(viewUrl,location.href).href)}">${t('مشاركة','Share')}</a><button class="btn danger" data-report>${t('بلاغ','Report')}</button>`:''}<button class="btn sum-save" type="button" data-save aria-pressed="${savedIds.has(String(item.id))}">${savedIds.has(String(item.id))?t('محفوظ ✓','Saved ✓'):t('حفظ الملف','Save file')}</button></div></article>`}
+function render(){
+ if(loading||loadFailed)return;
+ const terms=normalizeSearch(search?.value).trim().split(/\s+/).filter(Boolean),college=collegeFilter?.value||'',type=typeFilter?.value||'';
+ const filtered=Boolean(terms.length||college||type||savedOnly);
+ syncSavedFilter();
+ const list=rows.filter(x=>(!savedOnly||savedIds.has(String(x.id)))&&(!college||x.college===college)&&(!type||normalizedType(x)===type)&&terms.every(term=>searchableText(x).includes(term)));
+ matches=list;visibleCount=Math.min(PAGE_SIZE,list.length);
+ syncResults();
+ items.innerHTML=list.length?list.slice(0,visibleCount).map(card).join(''):`<div class="sum-empty"><p>${savedOnly&&!terms.length&&!college&&!type?t('ما عندك ملفات محفوظة متاحة بعد. افتح كل الملفات واضغط «حفظ الملف».','No available saved files yet. Browse all files and choose Save file.'):filtered?t('ما حصلنا ملفات تطابق بحثك. جرّب اسم المادة أو رمزها.','No matching files. Try the course name or code.'):t('ما فيه ملفات متاحة حاليًا.','No files are available yet.')}</p>${filtered?`<button class="btn primary" type="button" data-reset-filters>${t('عرض كل الملفات','Show all files')}</button>`:''}</div>`;
+}
+
+function syncResults(){
+ if(resultStatus)resultStatus.textContent=t(`عرض ${visibleCount} من ${matches.length} نتيجة`,`Showing ${visibleCount} of ${matches.length} results`);
+ if(loadMore){loadMore.hidden=visibleCount>=matches.length;loadMore.disabled=false;loadMore.textContent=t(`عرض المزيد (${Math.min(PAGE_SIZE,matches.length-visibleCount)})`,`Show more (${Math.min(PAGE_SIZE,matches.length-visibleCount)})`)}
+}
+function showMore(){
+ if(loading||loadFailed||visibleCount>=matches.length)return;
+ const firstNew=visibleCount;
+ const batch=matches.slice(visibleCount,visibleCount+PAGE_SIZE);
+ items.insertAdjacentHTML('beforeend',batch.map(card).join(''));
+ visibleCount+=batch.length;syncResults();
+ // Continue keyboard navigation at the new cards, including when the button disappears.
+ items.querySelectorAll('.sum-card')[firstNew]?.querySelector('a,button')?.focus({preventScroll:true});
+}
+if(loadMore)loadMore.onclick=showMore;
+
+
 if(search)search.value=new URLSearchParams(location.search).get('q')||'';
-function clearAllFilters(){if(search)search.value='';if(collegeFilter)collegeFilter.value='';if(typeFilter)typeFilter.value='';render()}
-if(search)search.oninput=render;if(collegeFilter)collegeFilter.onchange=render;if(typeFilter)typeFilter.onchange=render;if(clearFilters)clearFilters.onclick=clearAllFilters;
+function clearAllFilters(){savedOnly=false;if(search)search.value='';if(collegeFilter)collegeFilter.value='';if(typeFilter)typeFilter.value='';renderNow()}
+if(search){search.oninput=scheduleSearch;search.addEventListener('search',renderNow)}if(collegeFilter)collegeFilter.onchange=renderNow;if(typeFilter)typeFilter.onchange=renderNow;if(clearFilters)clearFilters.onclick=clearAllFilters;
+
+if(savedFilter)savedFilter.onclick=()=>{savedOnly=!savedOnly;syncSavedFilter();renderNow()};
+window.addEventListener('storage',event=>{if(event.key!==SAVED_SUMMARIES_KEY&&event.key!==null)return;try{savedIds=readSavedSummaries(localStorage)}catch{savedIds=new Set()}syncSavedFilter();renderNow()});
 
 const openForm=$('#openForm'),closeForm=$('#closeForm');if(openForm)openForm.onclick=()=>openModal('submitModal');if(closeForm)closeForm.onclick=()=>closeModal('submitModal');const closeRating=$('#closeRating');if(closeRating)closeRating.onclick=()=>closeModal('ratingModal');
 document.querySelectorAll('.modal').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)closeModal(m.id)}));
@@ -46,7 +124,7 @@ function openRating(item){if(!ratingModal)return;activeItem=item;selectedRating=
 function syncPicker(){document.querySelectorAll('#ratingPicker [data-value]').forEach(b=>b.classList.toggle('active',Number(b.dataset.value)<=selectedRating))}
 if(ratingPicker)ratingPicker.onclick=e=>{const b=e.target.closest('[data-value]');if(!b)return;selectedRating=Number(b.dataset.value);syncPicker()};
 document.querySelectorAll('[data-recommend]').forEach(b=>b.onclick=()=>{selectedRecommended=b.dataset.recommend==='true';document.querySelectorAll('[data-recommend]').forEach(x=>x.classList.toggle('primary',x===b))});
-if(ratingForm)ratingForm.onsubmit=async e=>{e.preventDefault();if(!selectedRating)return toast(t('اختر عدد النجوم أولًا','Choose a star rating first'),true);const btn=e.submitter||ratingForm.querySelector('[type="submit"]');if(btn)btn.disabled=true;try{await rpc('uon_submit_resource_rating',{p_resource_table:'summaries',p_resource_id:String(activeItem.id),p_session_id:sessionId,p_rating:selectedRating,p_recommended:selectedRecommended,p_comment:$('#ratingComment')?.value.trim()||null,p_reviewer_name:$('#reviewerName')?.value.trim()||null});toast(t('تم حفظ تقييمك ⭐','Your rating was saved ⭐'));await loadStats();render();openRating(activeItem);trackEvent('summary_rating',{rating:selectedRating})}catch(error){toast(error.message||t('تعذر حفظ التقييم','Could not save the rating'),true)}finally{if(btn)btn.disabled=false}};
-items.onclick=async e=>{const cardEl=e.target.closest('[data-id]');if(!cardEl)return;const item=rows.find(x=>String(x.id)===cardEl.dataset.id);if(!item)return;if(e.target.closest('[data-rate]'))return openRating(item);if(e.target.closest('[data-report]')){const url=safeUrl(item.url||item.link||item.pdf_url);return reportBrokenLink({sourceTable:'summaries',sourceId:item.id,title:item.title,url})}const open=e.target.closest('[data-open]');if(open){rpc('uon_track_summary_open',{p_summary_id:item.id,p_kind:'view'}).catch(()=>{});item.views=Number(item.views||0)+1;trackEvent('summary_open',{id:item.id,course_code:item.course_code||item.subject||''})}};
+if(ratingForm)ratingForm.onsubmit=async e=>{e.preventDefault();if(!selectedRating)return toast(t('اختر عدد النجوم أولًا','Choose a star rating first'),true);const btn=e.submitter||ratingForm.querySelector('[type="submit"]');if(btn)btn.disabled=true;try{await rpc('uon_submit_resource_rating',{p_resource_table:'summaries',p_resource_id:String(activeItem.id),p_session_id:sessionId,p_rating:selectedRating,p_recommended:selectedRecommended,p_comment:$('#ratingComment')?.value.trim()||null,p_reviewer_name:$('#reviewerName')?.value.trim()||null});toast(t('تم حفظ تقييمك ⭐','Your rating was saved ⭐'));await loadStats();loading=false;items.setAttribute('aria-busy','false');render();openRating(activeItem);trackEvent('summary_rating',{rating:selectedRating})}catch(error){toast(error.message||t('تعذر حفظ التقييم','Could not save the rating'),true)}finally{if(btn)btn.disabled=false}};
+items.onclick=async e=>{if(e.target.closest('[data-retry]'))return load();if(e.target.closest('[data-reset-filters]')){clearAllFilters();search?.focus();return}const cardEl=e.target.closest('[data-id]');if(!cardEl)return;const item=rows.find(x=>String(x.id)===cardEl.dataset.id);if(!item)return;const saveButton=e.target.closest('[data-save]');if(saveButton)return toggleSaved(item,saveButton);if(e.target.closest('[data-rate]'))return openRating(item);if(e.target.closest('[data-report]')){const url=safeUrl(item.url||item.link||item.pdf_url);return reportBrokenLink({sourceTable:'summaries',sourceId:item.id,title:item.title,url})}const open=e.target.closest('[data-open]');if(open){rpc('uon_track_summary_open',{p_summary_id:item.id,p_kind:'view'}).catch(()=>{});item.views=Number(item.views||0)+1;trackEvent('summary_open',{id:item.id,course_code:item.course_code||item.subject||''})}};
 
 load();

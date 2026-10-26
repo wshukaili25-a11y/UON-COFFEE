@@ -54,7 +54,13 @@ export function setupV14Shell(){
  const m=document.querySelector('#v176SideMenu'),b=document.querySelector('#v176Backdrop');
  installFeatureNavigationGuard();
  loadFeatureState().then(()=>{if(h)applyFeatureVisibility(h);if(m)applyFeatureVisibility(m)});
- const open=()=>{m?.classList.add('open');b?.classList.add('open');document.body.classList.add('uon-menu-open')},close=()=>{m?.classList.remove('open');b?.classList.remove('open');document.body.classList.remove('uon-menu-open')};
+ let menuOpener=null;
+ const menuTriggers=[...document.querySelectorAll('[data-menu-open]')];
+ m?.setAttribute('role','dialog');m?.setAttribute('aria-label',currentLanguage()==='ar'?'قائمة الموقع':'Site menu');
+ if(m)m.inert=true;
+ menuTriggers.forEach(x=>{x.setAttribute('aria-controls','v176SideMenu');x.setAttribute('aria-expanded','false')});
+ const open=()=>{menuOpener=document.activeElement;if(m){m.inert=false;m.setAttribute('aria-modal','true')}m?.classList.add('open');b?.classList.add('open');document.body.classList.add('uon-menu-open');menuTriggers.forEach(x=>x.setAttribute('aria-expanded','true'));m?.querySelector('[data-menu-close]')?.focus()},close=()=>{const wasOpen=m?.classList.contains('open');m?.classList.remove('open');m?.removeAttribute('aria-modal');if(m)m.inert=true;b?.classList.remove('open');document.body.classList.remove('uon-menu-open');menuTriggers.forEach(x=>x.setAttribute('aria-expanded','false'));if(wasOpen)menuOpener?.focus()};
+ m?.addEventListener('keydown',e=>{if(e.key!=='Tab')return;const items=[...m.querySelectorAll('a[href],button:not([disabled])')].filter(x=>x.getClientRects().length);const first=items[0],last=items.at(-1);if(e.shiftKey&&document.activeElement===first){e.preventDefault();last?.focus()}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first?.focus()}});
  document.querySelectorAll('[data-menu-open]').forEach(x=>x.addEventListener('click',open));document.querySelectorAll('[data-menu-close]').forEach(x=>x.addEventListener('click',close));b?.addEventListener('click',close);document.addEventListener('keydown',e=>{if(e.key==='Escape')close()});m?.querySelectorAll('a').forEach(a=>a.addEventListener('click',close));
  document.querySelectorAll('[data-theme-toggle]').forEach(x=>x.addEventListener('click',()=>{const n=currentTheme()==='dark'?'light':'dark';localStorage.setItem(THEME_KEY,n);localStorage.setItem(LEGACY_THEME_KEY,n);applyTheme();applyLanguage()}));
  document.querySelectorAll('[data-language-toggle]').forEach(x=>x.addEventListener('click',()=>{const n=currentLanguage()==='ar'?'en':'ar';localStorage.setItem(LANG_KEY,n);localStorage.setItem(LEGACY_LANG_KEY,n);location.reload()}));
