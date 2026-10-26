@@ -25,6 +25,7 @@ return response};
  const history=[];
  let sending=false;
  let controller=null;
+ let userStopped=false;
  function stripGoogleUi(){
   document.querySelectorAll('.assistant-google-connect').forEach(el=>el.remove());
   document.querySelectorAll('.assistant-smart-actions').forEach(el=>{el.innerHTML='';el.hidden=true;el.style.display='none'});
@@ -165,6 +166,7 @@ return response};
   addMessage('user',raw);
   history.push({role:'user',content:raw});
   if(input)input.value='';
+  userStopped=false;
   setBusy(true);
   const typing=addTyping();
   controller=new AbortController();
@@ -185,7 +187,7 @@ return response};
    history.push({role:'assistant',content:data.answer});
   }catch(error){
    typing?.remove();
-   addMessage('bot',error?.name==='AbortError'?tr('تأخر الرد أكثر من المتوقع. حاول مرة أخرى.','The response took too long. Please try again.'):tr('تعذر الوصول إلى UON AI الآن. جرّب مرة أخرى بعد قليل.','UON AI is unavailable right now. Try again shortly.'));
+   addMessage('bot',error?.name==='AbortError'?(userStopped?tr('تم إيقاف الرد. تقدر تسأل سؤال ثاني.','Response stopped. You can ask another question.'):tr('تأخر الرد أكثر من المتوقع. حاول مرة أخرى.','The response took too long. Please try again.')):tr('تعذر الوصول إلى UON AI الآن. جرّب مرة أخرى بعد قليل.','UON AI is unavailable right now. Try again shortly.'));
   }finally{
    clearTimeout(timer);
    controller=null;
@@ -208,7 +210,7 @@ return response};
   form.addEventListener('submit',event=>{event.preventDefault();event.stopImmediatePropagation();void sendDirect()},true);
   input.addEventListener('keydown',event=>{if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();event.stopImmediatePropagation();void sendDirect()}},true);
   document.addEventListener('uon-assistant-ask',event=>{if(sending||!event.detail?.question)return;input.value=String(event.detail.question).slice(0,800);void sendDirect()});
-  document.querySelector('#assistantStop')?.addEventListener('click',()=>controller?.abort());
+  document.querySelector('#assistantStop')?.addEventListener('click',()=>{userStopped=true;controller?.abort()});
   document.querySelector('#assistantNewChat')?.addEventListener('click',()=>{history.length=0});
  }
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',installHandlers,{once:true});else installHandlers();
