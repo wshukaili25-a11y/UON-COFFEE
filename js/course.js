@@ -1,3 +1,4 @@
+import{mountCourseIntegrations,resourceDescription}from'./course-integrations.js';
 import{loadPractice,practiceSummary}from'./course-practice-data.js?v=74.0.0';
 import{mountCoursePractice}from'./course-practice.js?v=74.0.0';
 import{whatsappShare,reportBrokenLink,installErrorCapture,$,$$,esc,toast,rpc,uid,enforceUonMaintenance,watchUonMaintenance,trackEvent,safeHref,applyFeatureStates}from'./core.js?v=42.0.0';
@@ -16,10 +17,11 @@ const empty=(ar,en)=>`<div class="course-empty"><strong>${esc(t(ar,en))}</strong
 function itemUrl(x){const value=x.url||x.link||x.pdf_url||x.file_url||'';return value?safeHref(value,''):''}
 function resourceCard(item,type,table){
  const title=item.title||item.subject||item.target_name||t('محتوى','Content');
- const url=itemUrl(item);
- return `<article class="course-resource"><div><span class="student-label">${esc(type)}</span><h3>${esc(title)}</h3><p>${esc(item.description||item.college||item.comment||'')}</p></div><div class="course-resource-actions">${url?`<a class="btn primary" href="${esc(url)}" target="_blank" rel="noopener">${t('فتح','Open')}</a><a class="btn" href="${whatsappShare(title,url)}" target="_blank" rel="noopener">${t('مشاركة','Share')}</a>`:''}<button class="btn danger" data-report-table="${esc(table)}" data-report-id="${esc(item.id)}" data-report-title="${esc(title)}" data-report-url="${esc(url)}">${t('بلاغ','Report')}</button></div></article>`;
+ const originalUrl=itemUrl(item);
+ const url=table==='summaries'&&originalUrl?'summary-viewer.html?id='+encodeURIComponent(item.id):originalUrl;
+ return `<article class="course-resource"><div><span class="student-label">${esc(type)}</span><h3>${esc(title)}</h3><p>${esc(resourceDescription(item.description)||item.college||item.comment||'')}</p></div><div class="course-resource-actions">${url?`<a class="btn primary" href="${esc(url)}" ${table==='summaries'?'':'target="_blank" rel="noopener"'}>${t('فتح','Open')}</a>${table==='summaries'?`<button class="btn" type="button" data-course-email="${esc(item.id)}" hidden>إرسال بالبريد</button>`:''}<a class="btn" href="${whatsappShare(title,new URL(url,location.href).href)}" target="_blank" rel="noopener">${t('مشاركة','Share')}</a>`:''}<button class="btn danger" data-report-table="${esc(table)}" data-report-id="${esc(item.id)}" data-report-title="${esc(title)}" data-report-url="${esc(originalUrl)}">${t('بلاغ','Report')}</button></div></article>`;
 }
-const tabs=['overview','summaries','exams','groups','ratings','resources'];
+const tabs=['overview','summaries','exams','groups','ratings','resources','guide','assistant'];
 function openTab(name,{updateHash=true,focus=false}={}){
  if(!tabs.includes(name))name='overview';
  $$('[data-tab]').forEach(button=>{const active=button.dataset.tab===name;button.classList.toggle('active',active);button.setAttribute('aria-selected',String(active));button.tabIndex=active?0:-1;if(active&&focus)button.focus()});
@@ -94,7 +96,7 @@ function render(){
  $('#courseGroups').innerHTML=groups.length?groups.map(x=>resourceCard(x,t('مجموعة واتساب','WhatsApp group'),'whatsapp_groups')).join(''):empty('لا توجد مجموعات معتمدة بعد','No approved groups yet');
  $('#courseRatings').innerHTML=ratings.length?ratings.map(x=>`<article class="course-panel-card"><div class="course-rating-stars">${stars(x.overall||x.overall_rating)}</div><h3>${esc(x.target_name||title)}</h3><p>${esc(x.comment||t('بدون تعليق','No comment'))}</p></article>`).join(''):empty('لا توجد تقييمات معتمدة بعد','No approved ratings yet');
  $('#courseResources').innerHTML=resources.length?resources.map(x=>resourceCard(x,x.resource_type||t('مصدر','Resource'),'course_resources')).join(''):empty('لا توجد مصادر مضافة بعد','No resources added yet');
- rememberCourse(course);renderCourseWeek();bind();void applyFeatureStates(document);
+ rememberCourse(course);renderCourseWeek();bind();void applyFeatureStates(document);void mountCourseIntegrations(hub);
 }
 async function load(){
  try{hub=await rpc('uon_course_hub_v65',{p_code:code,p_language:lang()});if(!hub?.course)throw new Error(t('المقرر غير موجود','Course not found'));render();trackEvent('course_view_v42',{code})}

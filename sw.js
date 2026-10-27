@@ -1,4 +1,4 @@
-const VERSION = '75.2.0';
+const VERSION = '75.3.0';
 const STATIC_CACHE = `uonhub-static-${VERSION}`;
 const PAGE_CACHE = `uonhub-pages-${VERSION}`;
 const DATA_CACHE = `uonhub-data-${VERSION}`;
@@ -6,6 +6,7 @@ const USER_SAVED_CACHE = 'uonhub-user-saved-v1';
 const OFFLINE_URL = '/offline.html';
 
 const PRECACHE = [
+  '/js/course-integrations.js','/js/summary-email.js',
   '/css/hub-studio.css','/css/assistant-studio.css','/js/hub-studio-boot.js','/js/hub-studio.js','/js/assistant-studio.js','/js/saved-summaries.js','/js/gpa-draft.js',
   '/js/course-practice.js','/js/course-practice-data.js','/css/course-practice.css',
   '/js/schedule-generator.js',
