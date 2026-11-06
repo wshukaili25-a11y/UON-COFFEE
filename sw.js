@@ -8,7 +8,7 @@ const OFFLINE_URL = '/offline.html';
 const PRECACHE = [
   '/js/course-integrations.js','/js/summary-email.js',
   '/css/hub-studio.css','/css/assistant-studio.css','/js/hub-studio-boot.js','/js/hub-studio.js','/js/assistant-studio.js','/js/saved-summaries.js','/js/gpa-draft.js',
-  '/js/course-practice.js','/js/course-deadlines.js','/js/course-practice-data.js','/css/course-practice.css',
+  '/js/course-practice.js','/js/course-practice-data.js','/css/course-practice.css',
   '/js/schedule-generator.js',
   '/course.html','/js/course.js','/js/student-workspace.js','/css/student-workspace.css',
   '/js/assistant-cards.js','/css/assistant-cards.css',
@@ -24,7 +24,7 @@ const PRECACHE = [
   '/js/schedule-insights-v61.js','/js/schedule-smart-v63.js','/js/schedule-prefill-v63.js','/js/assistant-stream.js','/js/assistant-client-token.js','/js/assistant-smart-v63.js','/js/assistant-schedule-actions-v63.js','/js/assistant.js','/js/assistant-history.js','/js/assistant-redesign-v1.js','/js/assistant-places-proxy-v1.js',
   '/js/groups.js','/js/summaries.js','/js/gpa.js','/js/university-guide.js','/js/guide-redesign-v1.js','/js/contact-directory.js','/js/maintenance.js',
   '/js/google-connect-v641.js','/js/google-auth-session-v641.js','/js/google-auth-status-v641.js','/js/student-tasks-data.js','/js/tasks.js','/js/study-focus-data.js','/js/study-focus.js','/js/search.js','/js/go.js','/js/pwa-init.js','/js/tool-registry-v44.js','/js/platform-experience-v44.js',
-  '/js/app-capabilities-v48.js','/js/support-centers.js','/js/academic-calendar-data.js','/js/academic-calendar-page.js','/js/student-pulse.js','/js/user-dashboard.js','/js/notifications.js','/js/v20-experience.js','/js/security-guard-v48.js','/js/runtime-guard.js','/js/status.js','/js/courses.js',
+  '/js/app-capabilities-v48.js','/js/support-centers.js','/js/academic-calendar-data.js','/js/course-deadlines.js','/js/academic-calendar-page.js','/js/student-pulse.js','/js/user-dashboard.js','/js/notifications.js','/js/v20-experience.js','/js/security-guard-v48.js','/js/runtime-guard.js','/js/status.js','/js/courses.js',
   '/assets/uonhub-instagram-logo.svg','/assets/uonhub-logo-header-v1.svg','/assets/uonhub-logo-original-20260904.jpeg','/assets/whatsapp-official.svg','/assets/whatsapp-outline-white.svg','/assets/icons/uonhub-192-v75.png','/assets/icons/uonhub-512-v75.png','/assets/icons/uonhub-192-maskable-v75.png','/assets/icons/uonhub-512-maskable-v75.png'
 ];
 
