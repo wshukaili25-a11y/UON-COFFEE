@@ -4,6 +4,9 @@ import{mountCoursePractice}from'./course-practice.js?v=74.0.0';
 import{whatsappShare,reportBrokenLink,installErrorCapture,$,$$,esc,toast,rpc,uid,enforceUonMaintenance,watchUonMaintenance,trackEvent,safeHref,applyFeatureStates}from'./core.js?v=42.0.0';
 import{normalizeCourseCode,rememberCourse,courseClasses,mountStudentDock}from'./student-workspace.js?v=68.0.0';
 import{readSchedule,formatClassTime}from'./student-pulse.js?v=61.2.0';
+import{readStudentTasks}from'./student-tasks-data.js?v=63.0.0';
+import{ACADEMIC_EVENTS}from'./academic-calendar-data.js';
+import{courseDeadlines,nextExamWindow,daysUntil,countdownLabel,addExamHref}from'./course-deadlines.js?v=1.0.0';
 await enforceUonMaintenance();watchUonMaintenance();installErrorCapture();
 
 const code=normalizeCourseCode(new URLSearchParams(location.search).get('code'));
@@ -52,7 +55,15 @@ function renderCourseWeek(){
  const rows=courseClasses(readSchedule(),hub.course),days=['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس'];
  const englishDays=['Sunday','Monday','Tuesday','Wednesday','Thursday'];
  rows.sort((a,b)=>days.indexOf(a.day)-days.indexOf(b.day)||a.start.localeCompare(b.start));
- root.innerHTML=`<h2>${t('المادة في جدولك','This course in your schedule')}</h2>${rows.length?`<div class="course-week">${rows.map(row=>`<div class="course-week-row"><div><strong>${esc(lang()==='en'?(englishDays[days.indexOf(row.day)]||row.day):row.day)}</strong><small>${esc([row.room?`${t('القاعة','Room')} ${row.room}`:'',row.teacher||''].filter(Boolean).join(' · '))}</small></div><span dir="ltr">${esc(lang()==='en'?`${row.start} – ${row.end}`:`${formatClassTime(row.start)} – ${formatClassTime(row.end)}`)}</span></div>`).join('')}</div><p>${t('من جدولك المحفوظ على هذا الجهاز.','From your schedule saved on this device.')}</p>`:`<p>${t('ما عندك محاضرات محفوظة لهذه المادة على هذا الجهاز. أضفها من صفحة الجدول لتظهر هنا.','No classes for this course are saved on this device. Add them to your schedule to see them here.')}</p>`}<a class="btn" href="schedule.html">${t('افتح جدولي','Open my schedule')} ←</a>`;
+ root.innerHTML=`<h2>${t('المادة في جدولك','This course in your schedule')}</h2>${rows.length?`<div class="course-week">${rows.map(row=>`<div class="course-week-row"><div><strong>${esc(lang()==='en'?(englishDays[days.indexOf(row.day)]||row.day):row.day)}</strong><small>${esc([row.room?`${t('القاعة','Room')} ${row.room}`:'',row.teacher||''].filter(Boolean).join(' · '))}</small></div><span dir="ltr">${esc(lang()==='en'?`${row.start} – ${row.end}`:`${formatClassTime(row.start)} – ${formatClassTime(row.end)}`)}</span></div>`).join('')}</div><p>${t('من جدولك المحفوظ على هذا الجهاز.','From your schedule saved on this device.')}</p>`:`<p>${t('ما عندك محاضرات محفوظة لهذه المادة على هذا الجهاز. أضفها من صفحة الجدول لتظهر هنا.','No classes for this course are saved on this device. Add them to your schedule to see them here.')}</p>`}<a class="btn" href="schedule.html">${t('افتح جدولي','Open my schedule')} ←</a>${courseExamsHtml(hub.course.code)}`;
+}
+function courseExamsHtml(code){
+ const en=lang()==='en';let tasks=[];try{tasks=readStudentTasks()}catch{}
+ const items=courseDeadlines(tasks,code),win=nextExamWindow(ACADEMIC_EVENTS);
+ const fmt=v=>{try{return new Intl.DateTimeFormat(en?'en-GB':'ar-OM',{weekday:'short',day:'numeric',month:'short',hour:'numeric',minute:'2-digit'}).format(new Date(v))}catch{return''}};
+ const winLine=win?`<p class="course-exam-window">📅 ${esc(win.title)} — ${esc(daysUntil(win.start)<0?t('جارية الآن','Happening now'):countdownLabel(daysUntil(win.start),en))}</p>`:'';
+ const rows=items.map(x=>{const d=daysUntil(x.due);return`<div class="course-week-row${d<=2?' is-soon':''}"><div><strong>${esc(x.title)}</strong><small>${esc(fmt(x.due))}</small></div><span>${esc(countdownLabel(d,en))}</span></div>`}).join('');
+ return`<div class="course-exams" id="courseExamsDue"><h3>${t('اختباراتك وتسليماتك','Your exams & deadlines')}</h3>${winLine}${rows?`<div class="course-week">${rows}</div>`:`<p>${t('ما سجّلت موعد اختبار لهذه المادة. أضفه عشان يظهر هنا وفي لوحتك.','No exam saved for this course yet. Add it to see a countdown here and on your dashboard.')}</p>`}<a class="btn" href="${esc(addExamHref(code,en))}">＋ ${t('أضف موعد اختبار','Add an exam date')}</a></div>`;
 }
 function renderPracticeSummary(){
  const root=$('#coursePracticeSummary');if(!root)return;

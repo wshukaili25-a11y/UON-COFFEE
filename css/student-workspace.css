@@ -42,3 +42,10 @@ body[data-uon-page] .course-toolbar :is(input,select){background:var(--cw-bg);co
 body[data-uon-page="course"] :is(.btn,.v16-back-link){color:var(--cw-text);background:var(--cw-surface);border-color:var(--cw-border)}
 body[data-uon-page="course"] .btn.primary{color:#fff;background:#0b7a4b;border-color:#0b7a4b}
 body[data-uon-page="course"] .v16-back-link{display:inline-flex;margin-bottom:16px;color:var(--cw-accent);background:transparent}
+/* 2026-11 course page: exams & deadlines */
+.course-exams{margin-top:18px;padding-top:16px;border-top:1px solid var(--cw-border)}
+.course-exams h3{margin:0 0 8px;font-size:1.05rem}
+.course-exam-window{margin:0 0 10px;font-weight:700}
+.course-exams .course-week-row.is-soon{border-color:#d9a33a;background:rgba(217,163,58,.08)}
+.course-exams .course-week-row span{font-weight:800;white-space:nowrap}
+.course-exams .btn{margin-top:10px}
