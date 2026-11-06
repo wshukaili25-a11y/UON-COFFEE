@@ -3,7 +3,7 @@
 @media(min-width:901px){.sum-toolbar{grid-template-columns:minmax(160px,1fr) 190px 130px 150px auto auto}}
 .sum-chips{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:4px 0 10px}
 .sum-chips[hidden]{display:none}
-.sum-chips-label{color:var(--sum-muted);font-weight:800;font-size:14px;margin-inline-end:4px}
+.sum-chips-label{color:var(--sum-muted);font-weight:800;font-size:14px;margin-inline-end:4px;white-space:nowrap;flex:0 0 auto}
 .sum-chip{direction:ltr;display:inline-flex;align-items:center;gap:6px;min-height:36px;padding:6px 12px;border-radius:999px;border:1px solid var(--sum-line);background:var(--sum-card);color:var(--sum-text);font:inherit;font-weight:800;font-size:14px;cursor:pointer}
 .sum-chip small{color:var(--sum-muted);font-weight:700}
 .sum-chip:hover,.sum-chip:focus-visible{border-color:var(--sum-green)}
