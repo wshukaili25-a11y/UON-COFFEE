@@ -80,7 +80,7 @@ export function intent(question) {
   const q=normalize(question);
   if (/معدل|\bgpa\b|تراكمي|فصلي/.test(q)) return 'gpa';
   if (/خطتي|وش اسجل|ويش اسجل|رتب.*جدول|مواد.*متبقي/.test(q)) return 'plan';
-  if (/دكتور|دكاتر|استاذ|موظف|ايميل|بريد|مكتبه|رقمه|عميد|رئيس|\bdr\b|professor|staff|email|his office|her office/.test(q)) return 'people';
+  if (/دكتور|دكاتر|استاذ|موظف|ايميل|بريد|مكتبه|رقمه|عميد|رئيس|مدير|مديره|نائب مدير|منسق|منسقه|سكرتير|سكرتيره|\bdr\b|professor|staff|email|his office|her office|director|coordinator|head of/.test(q)) return 'people';
   if (/موعد|تقويم|متي|تاريخ|اختبار|اجازه|calendar|exam|semester/.test(q)) return 'calendar';
   if (/ماده|مساق|مقرر|متطلب|\b[a-z]{2,10}\s*\d{2,4}[a-z]?\b|course|prerequisite/.test(q)) return 'course';
   if (/لائحه|قانون|سياسه|غياب|حرمان|انسحاب|حذف|اضافه|policy|regulation/.test(q)) return 'policy';
