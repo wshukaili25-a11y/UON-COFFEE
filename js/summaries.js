@@ -75,7 +75,7 @@ function afterRender(){
 }
 function renderCourseChips(){
  if(!courseChips)return;const top=topCourses(rows,8);courseChips.hidden=!top.length;
- courseChips.innerHTML=top.length?`<span class="sum-chips-label">${t('الأكثر طلبًا:','Most used:')}</span>`+top.map(x=>`<button type="button" class="sum-chip" data-course-chip="${esc(x.code)}" aria-pressed="false">${esc(x.code)} <small>${x.files}</small></button>`).join(''):'';
+ courseChips.innerHTML=top.length?`<span class="sum-chips-label">${t('الأكثر طلبًا:','Most used:')}</span>`+top.map(x=>`<button type="button" class="sum-chip" data-course-chip="${esc(x.code)}" aria-pressed="false">${esc(x.code)}${x.files>1?` <small>${x.files}</small>`:''}</button>`).join(''):'';
  courseChips.querySelectorAll('[data-course-chip]').forEach(chip=>chip.onclick=()=>{const same=chip.getAttribute('aria-pressed')==='true';if(search)search.value=same?'':chip.dataset.courseChip;renderNow()});
 }
 
