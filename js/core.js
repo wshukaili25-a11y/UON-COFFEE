@@ -254,6 +254,11 @@ export function clearAdminSession(){
 }
 
 export async function trackEvent(eventType,metadata={}){
+ if(eventType==='page_view'){
+  // One page_view per page load: the first caller wins (page script or the auto tracker below).
+  if(window.__uonPageViewSent)return;
+  window.__uonPageViewSent=true;
+ }
  try{
   const sessionKey='uon_anon_session';
   let sessionId=localStorage.getItem(sessionKey);
@@ -426,3 +431,18 @@ export async function applyFeatureStates(root=document){
   return null;
  }
 }
+
+// Auto page_view for every public page that loads core.js (directly or via pwa-init.js).
+// Pages with their own page_view call keep their richer metadata when they fire first;
+// otherwise this fallback records the visit once, ~2.5s after load.
+(()=>{
+ try{
+  if(typeof window==='undefined'||window.__uonAutoPageView)return;
+  window.__uonAutoPageView=true;
+  const path=location.pathname;
+  if(/\/(admin|admin-ai-sources|owner-dashboard|tools-control|reset|security-test|studio-review|tool-preview|maintenance|offline|404)(?:\.html)?\/?$/.test(path))return;
+  if(document.body?.classList.contains('admin-page'))return;
+  const fire=()=>setTimeout(()=>{if(!window.__uonPageViewSent)void trackEvent('page_view',{page:path.replace(/^\/|\.html$/g,'')||'home',auto:true})},2500);
+  if(document.readyState==='complete')fire();else window.addEventListener('load',fire,{once:true});
+ }catch{}
+})();
