@@ -57,7 +57,7 @@ export function rankStaff(question, rows, fuzzy = true) {
 export function greetingReply(question, lang = 'ar') {
   const q = normalize(question).replace(/[\p{Extended_Pictographic}\p{Emoji_Modifier}\uFE0F\u200D]/gu, '').replace(/[!؟?.,،\s]+$/g,'').trim();
   const groups = [
-    [/^(?:حياك|حيك|حياك الله|الله يحييك|حيالله|حي الله|يا هلا|يا مرحبا|هلا|هلا والله|هلا بك|هلو|مرحبا|مرحبتين|مرحبا الساع|hi|hello|hey)$/, 'الله يحييك! كيف أقدر أساعدك؟', 'Hello! How can I help?'],
+    [/^(?:حياك|حيك|حياك الله|الله يحييك|حيالله|حي الله|يا هلا|يا مرحبا|هلا|هلا والله|هلا بك|هلو|مرحبا|مرحب|مرحبتين|مرحبا الساع|اهلا|اهلين|اهلا وسهلا|اهلا بك|hi|hello|hey)$/, 'الله يحييك! كيف أقدر أساعدك؟', 'Hello! How can I help?'],
     [/^(?:السلام عليكم|وعليكم السلام)$/, 'وعليكم السلام ورحمة الله! كيف أقدر أساعدك؟', 'Peace be upon you! How can I help?'],
     [/^(?:صباح الخير|صباح النور)$/, 'صباح النور! كيف أقدر أساعدك؟', 'Good morning! How can I help?'],
     [/^(?:مساء الخير|مساء النور)$/, 'مساء النور! كيف أقدر أساعدك؟', 'Good evening! How can I help?'],

@@ -24,3 +24,9 @@ test('hub cards stay out of unrelated questions', () => {
   assert.equal(hubSources('اشرح لي قانون نيوتن').length,0);
   assert.equal(hubSources('ساعدني أرتب جدولي بدون تعارض')[0].url,'/schedule.html');
 });
+
+import { greetingReply } from '../supabase/functions/uon-ai-chat-v64/conversation.mjs';
+test('common Omani greetings get an instant reply', () => {
+  for (const q of ['أهلين','اهلاً','أهلا وسهلا','مرحب','حيك']) assert.ok(greetingReply(q,'ar'),q);
+  assert.equal(greetingReply('اهلا ابي ايميل الدكتور','ar'),null);
+});
