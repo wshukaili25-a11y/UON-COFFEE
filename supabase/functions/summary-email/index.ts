@@ -2,10 +2,12 @@ import {emailTemplate,attachmentUrl,validEmail,cleanName,cleanSchedule,cleanPng}
 const base=Deno.env.get('SUPABASE_URL')||'';
 const service=Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')||'';
 const mailKey=Deno.env.get('RESEND_API_KEY')||'';
-const from=Deno.env.get('UON_EMAIL_FROM')||'';
+const from=Deno.env.get('UON_EMAIL_FROM')||'UON Hub <noreply@uonhub.space>';
 const replyTo=Deno.env.get('UON_EMAIL_REPLY_TO')||'';
-const pepper=Deno.env.get('UON_EMAIL_OTP_SECRET')||'';
-const enabled=Boolean(mailKey&&from&&pepper.length>=32&&Deno.env.get('UON_EMAIL_ENABLED')==='true');
+// OTP pepper: explicit secret if set, otherwise derived from the server-only service key.
+const pepper=Deno.env.get('UON_EMAIL_OTP_SECRET')||(service.length>=32?'uon-email-otp:v1:'+service:'');
+// Kill switch: set UON_EMAIL_ENABLED=false to turn delivery off without a deploy.
+const enabled=Boolean(mailKey&&from&&pepper.length>=32&&Deno.env.get('UON_EMAIL_ENABLED')!=='false');
 const publicKey='sb_publishable_gZ9tyM1udrkuQIXHqDtToQ_FyFmePgH';
 const uuid=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const maxBytes=12*1024*1024;
