@@ -64,9 +64,9 @@ test('name, email, clock and png helpers',()=>{
  assert.equal(cleanPng(png,100),null);
 });
 
-test('dialog greeting updates from the typed name',async()=>{
+test('dialog has no preview or sample name',async()=>{
  const src=(await import('node:fs')).readFileSync(new URL('../js/summary-email.js',import.meta.url),'utf8');
  const mod=await import('data:text/javascript,'+encodeURIComponent(src.replace(/^import.*?;\n/,'const esc=s=>s;\n')));
  assert.equal(mod.greeting('  محمد  '),'هلا محمد 👋');assert.equal(mod.greeting(''),'هلا … 👋');
- assert.match(src,/addEventListener\('input',updateGreeting\)/);
+ assert.doesNotMatch(src,/ue-preview|عبدالرحمن/);
 });
