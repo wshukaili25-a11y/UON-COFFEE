@@ -3,4 +3,4 @@ Allow: /
 Disallow: /admin.html
 Disallow: /maintenance.html
 
-Sitemap: https://uonhub.space/sitemap.xml
+Sitemap: https://www.uonhub.space/sitemap.xml

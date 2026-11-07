@@ -93,6 +93,10 @@ function render(){
  const {course,summaries=[],exams=[],groups=[],ratings=[],resources=[],prerequisites=[],programs=[],stats={}}=hub;
  const title=lang()==='en'?(course.name_en||course.name_ar||course.code):(course.name_ar||course.name_en||course.code);
  document.title=`${course.code} — ${title} | UON Hub`;
+ try{const url=`https://www.uonhub.space/course.html?code=${encodeURIComponent(course.code)}`;
+  let canon=document.querySelector('link[rel="canonical"]');if(!canon){canon=document.createElement('link');canon.rel='canonical';document.head.append(canon)}canon.href=url;
+  const desc=document.querySelector('meta[name="description"]');if(desc)desc.content=lang()==='en'?`${course.code} ${title} at University of Nizwa: summaries, past exams, WhatsApp groups, ratings and prerequisites on UON Hub.`:`${course.code} ${title} — جامعة نزوى: ملخصات واختبارات سابقة وقروبات واتساب وتقييمات ومتطلبات المقرر في UON Hub.`;
+ }catch{}
  $('#courseTitle').textContent=`${course.code} — ${title}`;
  $('#courseCollege').textContent=lang()==='en'?(course.college_en||course.college||'University course'):(course.college_ar||course.college||'مقرر جامعي');
  $('#courseMeta').innerHTML=[course.credit_hours!=null?`${course.credit_hours} ${t('ساعات معتمدة','credit hours')}`:null,course.level?`${t('المستوى','Level')} ${course.level}`:null,({university:t('متطلب جامعة','University requirement'),college:t('متطلب كلية','College requirement'),major:t('متطلب تخصص','Major requirement'),elective:t('اختياري','Elective'),service:t('مقرر خدمة','Service course')}[course.requirement_type]||course.requirement_type||null),programs.length?`${programs.length} ${t('برنامج مرتبط','linked programs')}`:null].filter(Boolean).map(v=>`<span>${esc(v)}</span>`).join('');
