@@ -1,4 +1,4 @@
-import {get} from './core.js?v=47.0.2';
+import {get} from './core.js';
 
 const STYLE_ID='uon47StudentToolsStyle';
 const VERSION='47.0.2';

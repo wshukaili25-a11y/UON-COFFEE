@@ -1,4 +1,4 @@
-import {toast,esc,enforceUonMaintenance,watchUonMaintenance} from './core.js?v=63.0.0';
+import {toast,esc,enforceUonMaintenance,watchUonMaintenance} from './core.js';
 import {STUDY_ACTIVE_KEY,addStudySession,formatStudyDuration,readStudySessions,readStudySettings,saveStudySettings,scheduleCourses,studyStats} from './study-focus-data.js?v=63.0.0';
 
 await enforceUonMaintenance();watchUonMaintenance();

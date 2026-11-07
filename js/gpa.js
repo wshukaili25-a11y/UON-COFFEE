@@ -1,5 +1,5 @@
 import {readGpaDraft,writeGpaDraft} from './gpa-draft.js';
-import {setupNav,enforceUonMaintenance,watchUonMaintenance,$} from './core.js?v=67.0.0';setupNav();await enforceUonMaintenance();watchUonMaintenance();
+import {setupNav,enforceUonMaintenance,watchUonMaintenance,$} from './core.js';setupNav();await enforceUonMaintenance();watchUonMaintenance();
 const lang=document.documentElement.lang==='en'?'en':'ar',en=lang==='en',t=(ar,enText)=>en?enText:ar;
 const grades={A:4,'A-':3.7,'B+':3.3,B:3,'B-':2.7,'C+':2.3,C:2,'C-':1.7,'D+':1.3,D:1,F:0};const body=$('#courses');
 const opts=(s='A')=>Object.entries(grades).map(([g])=>`<option ${g===s?'selected':''}>${g}</option>`).join('');

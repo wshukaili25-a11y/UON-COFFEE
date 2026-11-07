@@ -1,4 +1,4 @@
-import{toast,trackEvent,uid}from'./core.js?v=42.0.0';
+import{toast,trackEvent,uid}from'./core.js';
 
 function bootContentReports(){
  const ignore=['admin.html','owner-dashboard.html','maintenance.html','offline.html','404.html','reset.html'];

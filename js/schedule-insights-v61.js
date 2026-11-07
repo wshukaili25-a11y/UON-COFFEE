@@ -1,4 +1,4 @@
-import {esc} from './core.js?v=63.0.0';
+import {esc} from './core.js';
 
 const STORAGE_KEY='uon-v7-schedule';
 const DAYS=['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس'];

@@ -4,7 +4,7 @@ const MAX_SAVED=30;
 
 const maintenanceGuardPromise=(async()=>{
  try{
-  const{enforceUonMaintenance,watchUonMaintenance}=await import(`./core.js?v=${APP_VERSION}`);
+  const{enforceUonMaintenance,watchUonMaintenance}=await import(`./core.js`);
   const blocked=await enforceUonMaintenance();
   watchUonMaintenance();
   return blocked;

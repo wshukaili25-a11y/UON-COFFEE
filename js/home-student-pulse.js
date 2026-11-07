@@ -1,4 +1,4 @@
-import {esc,rpc} from './core.js?v=61.2.1';
+import {esc,rpc} from './core.js';
 import {currentAcademicPulse} from './student-pulse.js?v=61.2.0';
 
 function addStyle(){if(document.querySelector('link[data-home-student-pulse]'))return;const link=document.createElement('link');link.rel='stylesheet';link.href='/css/home-student-pulse.css?v=61.2.0';link.dataset.homeStudentPulse='1';document.head.append(link)}

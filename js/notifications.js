@@ -1,4 +1,4 @@
-import {fillCollege,$,$$,toast,enforceUonMaintenance,watchUonMaintenance,trackEvent} from './core.js?v=61.1.0';
+import {fillCollege,$,$$,toast,enforceUonMaintenance,watchUonMaintenance,trackEvent} from './core.js';
 import {runStudentPulse} from './student-pulse.js?v=61.1.0';
 
 await enforceUonMaintenance();watchUonMaintenance();

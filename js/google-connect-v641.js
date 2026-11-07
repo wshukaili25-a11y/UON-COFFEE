@@ -1,5 +1,5 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.110.8';
-import { $, setupNav, toast, enforceUonMaintenance, watchUonMaintenance } from './core.js?v=67.0.1';
+import { $, setupNav, toast, enforceUonMaintenance, watchUonMaintenance } from './core.js';
 import { setupV14Shell } from './v14-ui.js?v=67.0.1';
 import { getGoogleAuthStatus, googleAuthStatusText } from './google-auth-status-v641.js?v=67.0.1';
 

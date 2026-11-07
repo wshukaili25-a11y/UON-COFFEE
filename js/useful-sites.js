@@ -1,4 +1,4 @@
-import {get,esc,enforceUonMaintenance,watchUonMaintenance,applyFeatureStates,trackEvent} from './core.js?v=44.0.1';
+import {get,esc,enforceUonMaintenance,watchUonMaintenance,applyFeatureStates,trackEvent} from './core.js';
 
 const fallback=[
  {title_ar:'البوابة الأكاديمية',title_en:'Academic Portal',description_ar:'التسجيل والدرجات والخدمات الأكاديمية',description_en:'Registration, grades and academic services',category:'university',url:'https://portal.unizwa.edu.om/',icon:'🎓'},

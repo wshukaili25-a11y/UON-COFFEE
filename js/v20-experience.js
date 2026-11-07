@@ -1,4 +1,4 @@
-import {get,insert,esc,toast,trackEvent,rpc} from './core.js?v=67.0.1';
+import {get,insert,esc,toast,trackEvent,rpc} from './core.js';
 import {setupV14Shell} from './v14-ui.js?v=67.0.1';
 import './student-pulse.js?v=67.0.1';
 

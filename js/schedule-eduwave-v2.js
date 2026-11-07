@@ -1,4 +1,4 @@
-import {toast,esc,rpc} from './core.js?v=66.0.0';
+import {toast,esc,rpc} from './core.js';
 
 import{normalizeExtraction,generateProposals,saveGeneratedProfile}from'./schedule-generator.js?v=69.0.0';
 import{fetchScheduleParser}from'./schedule-eduwave-transport-v3.js?v=69.0.0';

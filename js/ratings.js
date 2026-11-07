@@ -1,4 +1,4 @@
-import{$,get,esc,toast,openModal,closeModal,notifyPending,enforceUonMaintenance,watchUonMaintenance,trackEvent,rpc}from'./core.js?v=38.0.0';
+import{$,get,esc,toast,openModal,closeModal,notifyPending,enforceUonMaintenance,watchUonMaintenance,trackEvent,rpc}from'./core.js';
 await enforceUonMaintenance();watchUonMaintenance();
 const SESSION_KEY='uon_rating_submission_session_v65';let sessionId=localStorage.getItem(SESSION_KEY);if(!sessionId){sessionId=crypto.randomUUID();localStorage.setItem(SESSION_KEY,sessionId)}
 let rows=[];const num=v=>Number(v)||0;const isTrue=v=>v===true||v==='true';

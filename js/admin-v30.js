@@ -3,7 +3,7 @@ import './admin-questions-v53.js?v=53.4.0';
 import './admin-marketplace-v53.js?v=53.4.0';
 import './admin-review-summary-v53.js?v=53.4.0';
 import './admin-support-centers-v60.js?v=60.1.0';
-import {toast} from './core.js?v=30.0.1';
+import {toast} from './core.js';
 import {adminRpc} from './admin-rpc-client.js?v=1.0.0';
 
 const passwordKey='uon_admin_password';

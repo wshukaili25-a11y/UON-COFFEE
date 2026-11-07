@@ -1,6 +1,6 @@
 import{canEmail,emailAvailable,openSummaryEmail}from'./summary-email.js';
 import {SAVED_SUMMARIES_KEY,readSavedSummaries,toggleSavedSummary} from './saved-summaries.js';
-import{whatsappShare,reportBrokenLink,installErrorCapture,setupNav,enforceUonMaintenance,watchUonMaintenance,$,get,notifyPending,toast,fillCollege,esc,openModal,closeModal,trackEvent,rpc}from'./core.js?v=67.0.0';
+import{whatsappShare,reportBrokenLink,installErrorCapture,setupNav,enforceUonMaintenance,watchUonMaintenance,$,get,notifyPending,toast,fillCollege,esc,openModal,closeModal,trackEvent,rpc}from'./core.js';
 import{courseHref}from'./student-workspace.js?v=68.0.0';
 import{compactCodes,sortRows,topCourses,readFilters,writeFilters,queryCourseCode}from'./summary-library.js?v=1.0.0';
 setupNav();await enforceUonMaintenance();watchUonMaintenance();installErrorCapture();

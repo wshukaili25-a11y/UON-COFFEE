@@ -1,4 +1,4 @@
-import {get,insert,update,remove,toast,esc,formatDate,trackEvent} from './core.js?v=31.1.0';
+import {get,insert,update,remove,toast,esc,formatDate,trackEvent} from './core.js';
 
 const $=(s,r=document)=>r.querySelector(s);
 const password=()=>sessionStorage.getItem('uon_admin_password')||'';

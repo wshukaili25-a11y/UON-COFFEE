@@ -25,7 +25,7 @@ const featureByPage={
 };
 async function loadFeatureState(){
  if(featureStatePromise)return featureStatePromise;
- featureStatePromise=import('./core.js?v=61.2.1').then(m=>m.getUonState()).then(s=>{featureStateMap=s?.features||{};featureVisibilityMap=s?.visibility||{};return s}).catch(e=>{featureStatePromise=null;console.warn('Feature guard state failed',e);return null});
+ featureStatePromise=import('./core.js').then(m=>m.getUonState()).then(s=>{featureStateMap=s?.features||{};featureVisibilityMap=s?.visibility||{};return s}).catch(e=>{featureStatePromise=null;console.warn('Feature guard state failed',e);return null});
  return featureStatePromise;
 }
 const featureKeys={courses:'courses',summaries:'summaries',groups:'groups',ratings:'ratings',guide:'university-guide',tools:'tools',gpa:'gpa',schedule:'schedule',calendar:'calendar',projects:'projects',useful:'useful-sites',assistant:'assistant',feedback:'feedback',confessions:'confessions',questions:'questions',marketplace:'marketplace',support:'support-centers'};

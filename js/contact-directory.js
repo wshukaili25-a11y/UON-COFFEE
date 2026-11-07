@@ -1,4 +1,4 @@
-import {esc} from './core.js?v=67.0.2';
+import {esc} from './core.js';
 
 const lang=localStorage.getItem('uon_language')==='en'?'en':'ar',en=lang==='en';
 const API='https://irkhvydgxpseflggbeqq.supabase.co/functions/v1/public-api-v67';

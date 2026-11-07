@@ -1,4 +1,4 @@
-import {setupNav,enforceUonMaintenance,watchUonMaintenance,$,toast,esc,uid} from './core.js?v=43.1.0';
+import {setupNav,enforceUonMaintenance,watchUonMaintenance,$,toast,esc,uid} from './core.js';
 
 setupNav();
 await enforceUonMaintenance();

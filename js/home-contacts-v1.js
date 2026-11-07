@@ -1,4 +1,4 @@
-import {rpc,esc} from './core.js?v=66.8.0';
+import {rpc,esc} from './core.js';
 
 const LANG_KEY='uon_language';
 const lang=localStorage.getItem(LANG_KEY)==='en'?'en':'ar';

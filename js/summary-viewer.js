@@ -1,4 +1,4 @@
-import {get,enforceUonMaintenance} from './core.js?v=67.0.0';
+import {get,enforceUonMaintenance} from './core.js';
 await enforceUonMaintenance();
 const title=document.getElementById('title'),status=document.getElementById('status'),frame=document.getElementById('viewer'),download=document.getElementById('download');
 const safe=value=>{try{const u=new URL(value);return u.protocol==='https:'?u:null}catch{return null}};

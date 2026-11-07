@@ -1,4 +1,4 @@
-import {esc,toast,trackEvent} from './core.js?v=63.0.0';
+import {esc,toast,trackEvent} from './core.js';
 import {readStudentTasks,saveStudentTask,removeStudentTask,toggleStudentTask,taskDueState,formatTaskDue} from './student-tasks-data.js?v=63.0.0';
 
 const form=document.querySelector('#taskForm');
