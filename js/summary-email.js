@@ -13,7 +13,7 @@ export function greeting(name){const n=cleanName(name);return n.length>=2?`هل�
 function readContact(){try{const v=JSON.parse(localStorage.getItem(CONTACT_KEY)||'{}');return{name:String(v.name||'').slice(0,80),email:String(v.email||'').slice(0,254)}}catch{return{name:'',email:''}}}
 function saveContact(name,email){try{localStorage.setItem(CONTACT_KEY,JSON.stringify({name,email}))}catch{}}
 
-const STYLE=`#uonEmailDialog{width:min(460px,calc(100% - 28px));max-height:calc(100dvh - 28px);overflow:auto;border:1px solid rgba(207,160,56,.45);border-radius:22px;padding:0;background:var(--studio-card,#fff);color:var(--studio-text,#163a2a);box-shadow:0 24px 60px rgba(0,0,0,.35)}
+const STYLE=`#uonEmailDialog{width:min(460px,calc(100% - 28px));max-height:calc(100dvh - 28px);overflow:auto;border:1px solid rgba(207,160,56,.45);border-radius:22px;padding:0;background:#fff;color:#163a2a;color-scheme:light;box-shadow:0 24px 60px rgba(0,0,0,.35)}
 #uonEmailDialog::backdrop{background:rgba(3,15,10,.62)}
 #uonEmailDialog form{padding:22px;display:grid;gap:12px;font-family:Tajawal,system-ui,sans-serif}
 #uonEmailDialog .ue-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
@@ -21,14 +21,11 @@ const STYLE=`#uonEmailDialog{width:min(460px,calc(100% - 28px));max-height:calc(
 #uonEmailDialog .ue-close{border:0;background:transparent;color:inherit;font-size:24px;line-height:1;cursor:pointer;padding:2px 6px}
 #uonEmailDialog .ue-stack:not([hidden]){display:grid;gap:12px}#uonEmailDialog [hidden]{display:none!important}
 #uonEmailDialog label{display:grid;gap:6px;font-weight:700;font-size:14px}
-#uonEmailDialog input{font:inherit;font-weight:500;padding:11px 13px;border-radius:12px;border:1px solid rgba(127,160,140,.5);background:var(--studio-input,#fff);color:inherit}
+#uonEmailDialog input{font:inherit;font-weight:500;padding:11px 13px;border-radius:12px;border:1px solid rgba(127,160,140,.5);background:#fff;color:#163a2a}
+#uonEmailDialog input::placeholder{color:#8a9b92}
+#uonEmailDialog label{color:#163a2a}
 #uonEmailDialog input:focus{outline:2px solid #CFA038;outline-offset:1px}
 #uonEmailDialog .ue-code{font-size:26px;letter-spacing:10px;text-align:center;font-weight:800}
-#uonEmailDialog .ue-preview{border-radius:16px;overflow:hidden;border:1px solid rgba(207,160,56,.4);background:#F6F2E7;color:#1C3A2E}
-#uonEmailDialog .ue-preview-top{background:#0B3B2C;color:#fff;padding:9px 14px;display:flex;justify-content:space-between;align-items:center;font-weight:900;border-bottom:3px solid #CFA038}
-#uonEmailDialog .ue-preview-top small{color:#CFA038;font-weight:700;font-size:11px}
-#uonEmailDialog .ue-preview-body{padding:10px 14px;font-size:14px;line-height:1.8;background:#fff}
-#uonEmailDialog .ue-preview-body b{color:#0B3B2C}
 #uonEmailDialog .ue-note{margin:0;font-size:12.5px;opacity:.75;line-height:1.7}
 #uonEmailDialog [data-status]{margin:0;min-height:1.4em;font-size:14px;font-weight:700}
 #uonEmailDialog [data-status].err{color:#c2410c}
@@ -39,7 +36,7 @@ const STYLE=`#uonEmailDialog{width:min(460px,calc(100% - 28px));max-height:calc(
 
 /**
  * kind: 'summary' | 'schedule'
- * title: shown in the dialog and the preview
+ * title: shown in the dialog
  * request(): extra fields for the request call ({summary_id} or {schedule})
  * verifyExtra(): optional async extra fields for the verify call ({image})
  */
@@ -52,9 +49,8 @@ export function openEmailDialog({kind='summary',title='',request,verifyExtra}){
  dialog.innerHTML=`<form novalidate>
  <div class="ue-head"><div><h2>أرسل ${what} إلى بريدك</h2><p class="ue-sub">${esc(title||'')}</p></div><button type="button" class="ue-close" data-close aria-label="إغلاق">×</button></div>
  <div class="ue-stack" data-details>
-  <label>اسمك<input name="name" autocomplete="name" minlength="2" maxlength="80" required placeholder="مثال: عبدالرحمن" value="${esc(contact.name)}"></label>
+  <label>اسمك<input name="name" autocomplete="name" minlength="2" maxlength="80" required placeholder="اكتب اسمك" value="${esc(contact.name)}"></label>
   <label>بريدك الإلكتروني<input name="email" type="email" autocomplete="email" inputmode="email" dir="ltr" maxlength="254" required placeholder="name@example.com" value="${esc(contact.email)}"></label>
-  <div class="ue-preview" aria-label="معاينة الرسالة"><div class="ue-preview-top"><span dir="ltr">UON Hub</span><small>معاينة الرسالة</small></div><div class="ue-preview-body"><div data-greet></div><div>${kind==='schedule'?'هذا <b>'+esc(title||'جدولك')+'</b> كما رتبته في UON Hub…':'أرفقنا لك ملف <b>«'+esc(title||'')+'»</b> بصيغة PDF…'}</div></div></div>
   <p class="ue-note">نرسل رمز تحقق لبريدك، وبعد إدخاله يصلك ${what}${kind==='summary'?' كملف PDF مرفق':' مع صورة له'}. يُستخدم بريدك لهذا الطلب فقط وتُحذف بيانات الطلب خلال 25 ساعة.</p>
  </div>
  <div class="ue-stack" data-verification hidden>
@@ -66,10 +62,8 @@ export function openEmailDialog({kind='summary',title='',request,verifyExtra}){
  <button class="ue-primary" type="submit">أرسل رمز التحقق</button>
  </form>`;
  document.body.append(dialog);
- const form=dialog.querySelector('form'),status=dialog.querySelector('[data-status]'),submit=form.querySelector('[type=submit]'),greet=dialog.querySelector('[data-greet]');
+ const form=dialog.querySelector('form'),status=dialog.querySelector('[data-status]'),submit=form.querySelector('[type=submit]');
  const setStatus=(msg,err=false)=>{status.textContent=msg;status.classList.toggle('err',err)};
- const updateGreeting=()=>{greet.textContent=greeting(form.elements.name.value)};updateGreeting();
- form.elements.name.addEventListener('input',updateGreeting);
  form.elements.code.addEventListener('input',()=>{form.elements.code.value=form.elements.code.value.replace(/\D/g,'').slice(0,6);if(form.elements.code.value.length===6&&!busy)form.requestSubmit()});
  dialog.querySelector('[data-close]').onclick=()=>dialog.close();
  dialog.addEventListener('close',()=>dialog.remove());
