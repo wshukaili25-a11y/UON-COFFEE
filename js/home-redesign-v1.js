@@ -2,6 +2,9 @@ import{esc,enforceUonMaintenance,watchUonMaintenance,getUonState,applyFeatureSta
 import{currentAcademicPulse,nextClass,formatClassTime}from'./student-pulse.js?v=61.2.0';
 
 import{recentCourses,courseHref,mountStudentDock}from'./student-workspace.js?v=68.0.0';
+import{examSeasonModel,renderExamSeason}from'./exam-season.js?v=1.0.0';
+import{ACADEMIC_EVENTS}from'./academic-calendar-data.js';
+import{readStudentTasks}from'./student-tasks-data.js?v=63.0.0';
 
 await enforceUonMaintenance();
 
@@ -119,6 +122,7 @@ function renderPersonalWorkspace(){
  const englishDays={'الأحد':'Sunday','الاثنين':'Monday','الثلاثاء':'Tuesday','الأربعاء':'Wednesday','الخميس':'Thursday'};
  node.innerHTML=klass?`<span class="workspace-label">${klass.state==='now'?t('محاضرتك الآن','In class now'):t('محاضرتك القادمة','Your next class')}</span><h2>${esc(klass.course||t('محاضرة','Class'))}</h2><p class="workspace-class-time">${esc(en?(englishDays[klass.day]||klass.day):klass.day)} <span dir="ltr"><bdi>${esc(en?klass.start:formatClassTime(klass.start))}</bdi> – <bdi>${esc(en?klass.end:formatClassTime(klass.end))}</bdi></span></p>${klass.room?`<p>${t('القاعة','Room')} · ${esc(klass.room)}</p>`:''}<a href="schedule.html" class="uon-rd-btn">${t('افتح جدولي','Open my schedule')} ←</a><small>${t('حسب جدولك المحفوظ على هذا الجهاز','From the schedule saved on this device')}</small>`:`<span class="workspace-label">${t('أسبوعك قدامك','Your week, at a glance')}</span><div class="workspace-schedule-mark" aria-hidden="true">▦</div><h2>${t('ابدأ بجدولك','Start with your schedule')}</h2><p>${t('أضف محاضراتك، وتلقّى المحاضرة القادمة هنا كل مرة ترجع.','Add your classes and see what’s next whenever you return.')}</p><a href="schedule.html" class="uon-rd-btn primary">${t('أضف جدولي','Add my schedule')} ←</a>`;
  const recent=document.querySelector('#rdRecentCourses'),rows=recentCourses();
+ try{let tasks=[];try{tasks=readStudentTasks()}catch{}renderExamSeason(document.querySelector('#rdExamSeason'),examSeasonModel({events:ACADEMIC_EVENTS,tasks,recent:rows,en}),en)}catch{}
  if(!recent)return;
  recent.hidden=!rows.length;
  recent.innerHTML=rows.length?`<div class="workspace-recent-heading"><h2>${t('رجوع سريع لموادك','Back to your courses')}</h2><span>${t('آخر ما تصفّحت على هذا الجهاز','Recently viewed on this device')}</span></div><div class="workspace-recent-list">${rows.map(row=>`<a href="${courseHref(row.code)}"><b dir="ltr">${esc(row.code)}</b><span>${esc(en?(row.name_en||row.name_ar):(row.name_ar||row.name_en))}</span><i aria-hidden="true">←</i></a>`).join('')}</div>`:'';
@@ -154,6 +158,7 @@ function mount(){
   <aside class="workspace-next" id="rdNextClass" data-feature="schedule" aria-label="${t('جدولك الدراسي','Your schedule')}"></aside>
  </div></section>
  <section class="uon-rd-container workspace-recent" id="rdRecentCourses" data-feature="courses" hidden></section>
+ <section class="exam-season" id="rdExamSeason" hidden></section>
  <section class="uon-rd-academic-wrap"><div class="uon-rd-container"><a class="uon-rd-academic" href="academic-calendar.html"><span class="uon-rd-academic-icon">${academic.icon}</span><div><small>${t('الموعد الأكاديمي','Academic date')}</small><strong>${esc(academic.text)}</strong></div><span class="uon-rd-academic-open">${t('عرض التقويم','Open calendar')} ←</span></a></div></section>
  <section class="uon-rd-section"><div class="uon-rd-container"><div class="uon-rd-section-head workspace-section-head"><div><span>${t('على طول','Straight to it')}</span><h2>${t('وش تحتاج اليوم؟','What do you need today?')}</h2></div><a href="courses.html" data-feature="courses">${t('استعرض المواد','Browse courses')} ←</a></div><div class="uon-rd-grid">${services.map(card).join('')}</div></div></section>
  <section class="uon-rd-support-section" data-feature="support-centers"><div class="uon-rd-container"><div class="uon-rd-section-head centered uon-rd-support-head"><span>${t('مراكز الدعم','Support centers')}</span><h2>${t('دعم أكاديمي لما تحتاجه','Academic support when you need it')}</h2><p>${t('أنجز للسنة التأسيسية، ومسالك التعلم لطلاب التخصص — والحجز من نفس المكان.','Anjiz for foundation students and Learning Pathways for major students — with booking in one place.')}</p></div><div class="uon-rd-support-grid" id="rdSupportCenters" aria-busy="true">${supportFallback.map(supportCard).join('')}</div></div></section>

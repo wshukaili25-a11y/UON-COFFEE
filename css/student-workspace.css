@@ -49,3 +49,20 @@ body[data-uon-page="course"] .v16-back-link{display:inline-flex;margin-bottom:16
 .course-exams .course-week-row.is-soon{border-color:#d9a33a;background:rgba(217,163,58,.08)}
 .course-exams .course-week-row span{font-weight:800;white-space:nowrap}
 .course-exams .btn{margin-top:10px}
+/* 2026-11 home: exam season card */
+.exam-season{margin:18px 0}
+.exam-season[hidden]{display:none}
+.exam-season-card{border:1px solid var(--uon-border,rgba(113,215,160,.22));border-radius:22px;padding:18px;background:linear-gradient(145deg,rgba(217,163,58,.10),rgba(8,20,14,.04))}
+.exam-season-kicker{display:inline-block;font-weight:800;font-size:13px;color:#b7811f;margin-bottom:4px}
+.exam-season-head h2{margin:0 0 12px;font-size:clamp(18px,2.4vw,22px);line-height:1.5}
+.exam-season-count{display:inline-block;margin-inline-start:6px;padding:2px 10px;border-radius:999px;background:#d9a33a;color:#1d1405;font-size:.8em;font-weight:900;white-space:nowrap}
+.exam-season-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}
+.exam-season-course{border:1px solid var(--uon-border,rgba(113,215,160,.22));border-radius:16px;padding:12px;background:var(--uon-card,rgba(255,255,255,.04))}
+.exam-season-course.is-soon{border-color:#d9a33a}
+.exam-season-code{display:flex;flex-direction:column;gap:2px;text-decoration:none;color:inherit}
+.exam-season-code b{font-size:16px;align-self:flex-start;unicode-bidi:isolate}
+.exam-season-code span{font-size:13px;color:var(--uon-muted,#8aa39a);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.exam-season-course p,.exam-season-empty{margin:8px 0;font-size:14px;line-height:1.7}
+.exam-season-actions{display:flex;flex-wrap:wrap;gap:8px}
+.exam-season-actions a{display:inline-flex;align-items:center;min-height:38px;padding:6px 12px;border-radius:12px;border:1px solid var(--uon-border,rgba(113,215,160,.22));text-decoration:none;color:inherit;font-weight:800;font-size:14px}
+.exam-season-actions a:hover,.exam-season-actions a:focus-visible{border-color:#d9a33a}
