@@ -2,6 +2,7 @@ import{canEmail,emailAvailable,openSummaryEmail}from'./summary-email.js';
 import {SAVED_SUMMARIES_KEY,readSavedSummaries,toggleSavedSummary} from './saved-summaries.js';
 import{whatsappShare,reportBrokenLink,installErrorCapture,setupNav,enforceUonMaintenance,watchUonMaintenance,$,get,notifyPending,toast,fillCollege,esc,openModal,closeModal,trackEvent,rpc}from'./core.js?v=67.0.0';
 import{courseHref}from'./student-workspace.js?v=68.0.0';
+import{compactCodes,sortRows,topCourses,readFilters,writeFilters,queryCourseCode}from'./summary-library.js?v=1.0.0';
 setupNav();await enforceUonMaintenance();watchUonMaintenance();installErrorCapture();
 
 const lang=document.documentElement.lang==='en'?'en':'ar',en=lang==='en';
@@ -46,7 +47,7 @@ let loading=false,loadFailed=false;
 const resultStatus=document.querySelector('#summaryResultsStatus');
 const loadMore=$('#summaryLoadMore'),PAGE_SIZE=24;
 let matches=[],visibleCount=0;
-const normalizeSearch=value=>String(value||'').normalize('NFKC').toLowerCase().replace(/[\u064B-\u065F\u0670ـ]/g,'').replace(/[أإآٱ]/g,'ا').replace(/ى/g,'ي');
+const normalizeSearch=compactCodes;
 let rows=[],stats=new Map(),activeItem=null,selectedRating=0,selectedRecommended=null;
 const SESSION_KEY='uon_anon_session';let sessionId=crypto.randomUUID();try{sessionId=localStorage.getItem(SESSION_KEY)||sessionId;localStorage.setItem(SESSION_KEY,sessionId)}catch{}
 const safeUrl=value=>{try{const u=new URL(String(value||''),location.origin);return ['https:','http:'].includes(u.protocol)?u.href:''}catch{return''}};
@@ -61,10 +62,24 @@ function searchableText(item){
  return searchIndex.get(item);
 }
 let searchTimer;
-function renderNow(){clearTimeout(searchTimer);render()}
-function scheduleSearch(){clearTimeout(searchTimer);if(loadMore)loadMore.disabled=true;searchTimer=setTimeout(render,120)}
+function renderNow(){clearTimeout(searchTimer);render();afterRender()}
+function scheduleSearch(){clearTimeout(searchTimer);if(loadMore)loadMore.disabled=true;searchTimer=setTimeout(()=>{render();afterRender()},120)}
+const sortFilter=$('#sortFilter'),courseChips=$('#summaryCourseChips');
+function currentFilters(){return{q:search?.value||'',college:collegeFilter?.value||'',type:typeFilter?.value||'',sort:sortFilter?.value||'newest'}}
+function applySort(){rows=sortRows(rows,sortFilter?.value||'newest',stats)}
+function afterRender(){
+ try{const next=writeFilters(location.search,currentFilters());if(next!==location.search)history.replaceState(null,'',location.pathname+next+location.hash)}catch{}
+ const code=queryCourseCode(search?.value||'');const empty=items.querySelector('.sum-empty');
+ if(code&&empty&&!matches.length&&!empty.querySelector('[data-request-file]'))empty.insertAdjacentHTML('beforeend',`<a class="btn" data-request-file href="${esc(courseHref?courseHref(code):'course.html?code='+encodeURIComponent(code))}">${t(`اطلب ملفات ${esc(code)}`,`Request ${esc(code)} files`)}</a>`);
+ courseChips?.querySelectorAll('[data-course-chip]').forEach(chip=>chip.setAttribute('aria-pressed',String(compactCodes(search?.value||'').replace(/\s+/g,'').toUpperCase()===chip.dataset.courseChip)));
+}
+function renderCourseChips(){
+ if(!courseChips)return;const top=topCourses(rows,8);courseChips.hidden=!top.length;
+ courseChips.innerHTML=top.length?`<span class="sum-chips-label">${t('الأكثر طلبًا:','Most used:')}</span>`+top.map(x=>`<button type="button" class="sum-chip" data-course-chip="${esc(x.code)}" aria-pressed="false">${esc(x.code)}${x.files>1?` <small>${x.files}</small>`:''}</button>`).join(''):'';
+ courseChips.querySelectorAll('[data-course-chip]').forEach(chip=>chip.onclick=()=>{const same=chip.getAttribute('aria-pressed')==='true';if(search)search.value=same?'':chip.dataset.courseChip;renderNow()});
+}
 
-async function load(){if(loading)return;loading=true;loadFailed=false;if(loadMore)loadMore.hidden=true;items.setAttribute('aria-busy','true');if(resultStatus)resultStatus.textContent='';items.innerHTML=`<div class="sum-loading">${t('جاري تحميل الملفات…','Loading files…')}</div>`;try{rows=await get('public_summaries','select=id,title,course_code,college,pdf_url,downloads,created_at,subject,tags,link,description,approved,url,views,rating,updated_at,resource_type,content_type,instructor_name,semester,academic_year,language,page_count&order=created_at.desc&limit=500');loading=false;items.setAttribute('aria-busy','false');render();if(ratingModal)void loadStats().then(refreshRatingLines);trackEvent('page_view',{page:'summaries',language:lang})}catch(error){loading=false;loadFailed=true;items.setAttribute('aria-busy','false');console.error('UON Hub summaries load failed:',error);items.innerHTML=`<div class="sum-empty"><p>${t('تعذر تحميل الملخصات حاليًا.','Could not load files right now.')}</p><button class="btn primary" type="button" data-retry>${t('إعادة المحاولة','Try again')}</button></div>`;toast(t('تعذر تحميل الملخصات حاليًا','Could not load files right now'),true)}}
+async function load(){if(loading)return;loading=true;loadFailed=false;if(loadMore)loadMore.hidden=true;items.setAttribute('aria-busy','true');if(resultStatus)resultStatus.textContent='';items.innerHTML=`<div class="sum-loading">${t('جاري تحميل الملفات…','Loading files…')}</div>`;try{rows=await get('public_summaries','select=id,title,course_code,college,pdf_url,downloads,created_at,subject,tags,link,description,approved,url,views,rating,updated_at,resource_type,content_type,instructor_name,semester,academic_year,language,page_count&order=created_at.desc&limit=500');loading=false;items.setAttribute('aria-busy','false');applySort();renderCourseChips();render();afterRender();if(ratingModal)void loadStats().then(()=>{refreshRatingLines();if(sortFilter?.value==='rated'){applySort();renderNow()}});trackEvent('page_view',{page:'summaries',language:lang})}catch(error){loading=false;loadFailed=true;items.setAttribute('aria-busy','false');console.error('UON Hub summaries load failed:',error);items.innerHTML=`<div class="sum-empty"><p>${t('تعذر تحميل الملخصات حاليًا.','Could not load files right now.')}</p><button class="btn primary" type="button" data-retry>${t('إعادة المحاولة','Try again')}</button></div>`;toast(t('تعذر تحميل الملخصات حاليًا','Could not load files right now'),true)}}
 async function loadStats(){stats.clear();const ids=rows.map(x=>String(x.id));if(!ids.length)return;try{const data=await rpc('uon_summary_rating_stats',{p_ids:ids});for(const s of data||[])stats.set(String(s.resource_id),s)}catch(error){console.warn('Rating stats unavailable',error)}}
 function refreshRatingLines(){
  // Update only rating text so a late response cannot replace focused file links.
@@ -110,9 +125,13 @@ function showMore(){
 if(loadMore)loadMore.onclick=showMore;
 
 
-if(search)search.value=new URLSearchParams(location.search).get('q')||'';
+if(search)search.value=readFilters(location.search).q;
+const initialFilters=readFilters(location.search);
+if(typeFilter&&initialFilters.type)typeFilter.value=initialFilters.type;
+if(sortFilter)sortFilter.value=initialFilters.sort;
+if(collegeFilter&&initialFilters.college&&[...collegeFilter.options].some(o=>o.value===initialFilters.college))collegeFilter.value=initialFilters.college;
 function clearAllFilters(){savedOnly=false;if(search)search.value='';if(collegeFilter)collegeFilter.value='';if(typeFilter)typeFilter.value='';renderNow()}
-if(search){search.oninput=scheduleSearch;search.addEventListener('search',renderNow)}if(collegeFilter)collegeFilter.onchange=renderNow;if(typeFilter)typeFilter.onchange=renderNow;if(clearFilters)clearFilters.onclick=clearAllFilters;
+if(search){search.oninput=scheduleSearch;search.addEventListener('search',renderNow)}if(collegeFilter)collegeFilter.onchange=renderNow;if(typeFilter)typeFilter.onchange=renderNow;if(clearFilters)clearFilters.onclick=clearAllFilters;if(sortFilter)sortFilter.onchange=()=>{applySort();renderNow()};
 
 if(savedFilter)savedFilter.onclick=()=>{savedOnly=!savedOnly;syncSavedFilter();renderNow()};
 window.addEventListener('storage',event=>{if(event.key!==SAVED_SUMMARIES_KEY&&event.key!==null)return;try{savedIds=readSavedSummaries(localStorage)}catch{savedIds=new Set()}syncSavedFilter();renderNow()});
