@@ -1,4 +1,4 @@
-import{get,esc,safeHref}from'./core.js?v=67.0.0';
+import{get,esc,safeHref}from'./core.js';
 import{canEmail,emailAvailable,openSummaryEmail}from'./summary-email.js';
 export function resourceDescription(value){return String(value||'').split(/\s*\|\s*/).filter(x=>!/^\s*(?:المصدر\s*:|(?:uoncafe\s*[-–—]?\s*)?دفعة|نسخة مستضافة|حقوق المحتوى)/i.test(x)).join(' | ')}
 export function courseQuestion(hub,question){const c=hub.course;return `المادة: ${c.code} — ${c.name_ar||c.name_en}.\nسؤال الطالب: ${question.slice(0,1200)}\nمحتوى منشور في UON Hub (عناوين مرجعية فقط؛ لا تفترض قراءة الملفات):\n${[...(hub.summaries||[]),...(hub.exams||[])].slice(0,6).map(x=>String(x.title||'').slice(0,80)).join('\n')}\nلا تختلق محتوى ملفات لم تقرأها. إذا لم تتوفر معلومة وضّح ذلك.`}

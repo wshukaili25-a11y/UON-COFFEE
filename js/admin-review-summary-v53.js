@@ -1,6 +1,6 @@
 import './admin-schedule-sections-v54.js?v=54.0.0';
 import './admin-notifications-v65.js?v=65.0.0';
-import {esc} from './core.js?v=53.3.0';
+import {esc} from './core.js';
 import {adminRpc} from './admin-rpc-client.js?v=1.0.0';
 
 const labels={

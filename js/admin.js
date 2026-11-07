@@ -1,6 +1,6 @@
 document.documentElement.classList.remove('maintenance-check');
 
-import {$,$$,get,insert,update,remove,rpc,toast,esc,edge,fillCollege,saveAdminSession,clearAdminSession,adminSession,formatDate} from './core.js?v=30.0.1';
+import {$,$$,get,insert,update,remove,rpc,toast,esc,edge,fillCollege,saveAdminSession,clearAdminSession,adminSession,formatDate} from './core.js';
 let authed=false;
 const ADMIN_SESSION_TTL=30*60*1000;
 

@@ -1,4 +1,4 @@
-import {esc,toast} from './core.js?v=30.0.1';
+import {esc,toast} from './core.js';
 
 const SUPABASE_URL='https://irkhvydgxpseflggbeqq.supabase.co';
 const PUBLISHABLE_KEY='sb_publishable_gZ9tyM1udrkuQIXHqDtToQ_FyFmePgH';

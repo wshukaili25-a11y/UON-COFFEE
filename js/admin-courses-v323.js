@@ -1,4 +1,4 @@
-import {toast,esc} from './core.js?v=32.3.0';
+import {toast,esc} from './core.js';
 
 const $=selector=>document.querySelector(selector);
 const API='https://irkhvydgxpseflggbeqq.supabase.co/functions/v1/course-admin-api-v32';

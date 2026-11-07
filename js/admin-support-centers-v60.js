@@ -1,4 +1,4 @@
-import {toast,esc} from './core.js?v=60.0.0';
+import {toast,esc} from './core.js';
 import {adminRpc} from './admin-rpc-client.js?v=1.0.0';
 
 const form=document.querySelector('#centerForm');

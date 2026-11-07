@@ -1,4 +1,4 @@
-import {toast,esc} from './core.js?v=64.7.0';
+import {toast,esc} from './core.js';
 const KEY='uon-v7-schedule',DAYS=['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس'],DAY_MAP={Sun:'الأحد',Mon:'الاثنين',Tue:'الثلاثاء',Wed:'الأربعاء',Thu:'الخميس'};
 const lectureModal=document.querySelector('#lectureModal'),eduwaveModal=document.querySelector('#eduwaveModal'),week=document.querySelector('#week');
 let selectedDay=muscatDay();

@@ -1,4 +1,4 @@
-import{rpc,toast,esc}from'./core.js?v=44.0.1';
+import{rpc,toast,esc}from'./core.js';
 
 async function waitForProfiles(){
  for(let attempt=0;attempt<100;attempt++){

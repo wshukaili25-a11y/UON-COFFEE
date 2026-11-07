@@ -13,7 +13,7 @@ function localLog(type,detail={}){
 }
 async function remoteLog(type,detail={}){
  try{
-  const {rpc}=await import('./core.js?v=48.0.0');
+  const {rpc}=await import('./core.js');
   await rpc('uon_record_security_event',{
    p_event_type:String(type).replace(/[^a-z0-9_.-]/gi,'-').toLowerCase().slice(0,80),
    p_severity:SEVERITY[type]||'low',

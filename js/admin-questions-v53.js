@@ -1,4 +1,4 @@
-import {esc,toast} from './core.js?v=53.3.0';
+import {esc,toast} from './core.js';
 import {adminRpc} from './admin-rpc-client.js?v=1.0.0';
 
 const select=document.querySelector('#pendingTable');

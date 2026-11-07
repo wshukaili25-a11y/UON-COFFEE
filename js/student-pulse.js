@@ -1,4 +1,4 @@
-import {get} from './core.js?v=61.1.0';
+import {get} from './core.js';
 import {nextAcademicEvent,eventState,daysUntil,formatAcademicDate,omanDate} from './academic-calendar-data.js?v=61.1.0';
 import {nextStudentTask,hoursUntilTask,formatTaskDue,taskDueState} from './student-tasks-data.js?v=61.1.0';
 

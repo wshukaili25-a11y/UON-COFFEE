@@ -1,4 +1,4 @@
-import{esc}from'./core.js?v=67.0.0';
+import{esc}from'./core.js';
 const endpoint='https://irkhvydgxpseflggbeqq.supabase.co/functions/v1/summary-email';
 const key='sb_publishable_gZ9tyM1udrkuQIXHqDtToQ_FyFmePgH';
 const errors={email_not_configured:'خدمة البريد قيد التجهيز حاليًا.',rate_limited:'انتظر دقيقة قبل إعادة الطلب. الحد 3 طلبات في الساعة.',invalid_input:'تأكد من الاسم وعنوان البريد.',invalid_code:'الرمز غير صحيح أو انتهت صلاحيته. لديك 5 محاولات كحد أقصى.',unsupported_pdf:'هذا العنصر مجلد أو رابط خارجي. افتح ملف PDF محددًا لإرساله.',too_large:'الملف أكبر من 12 ميجابايت. يمكنك تنزيله من صفحة الملف.',delivery_failed:'تعذر إكمال الإرسال. أعد الطلب لاحقًا.'};

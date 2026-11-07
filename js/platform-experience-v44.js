@@ -1,4 +1,4 @@
-import {rpc,notifyPending,toast,esc} from './core.js?v=44.0.0';
+import {rpc,notifyPending,toast,esc} from './core.js';
 import {getToolCatalog} from './tool-registry-v44.js?v=44.0.0';
 
 let booted=false;

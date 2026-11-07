@@ -1,4 +1,4 @@
-import {$,get,esc,enforceUonMaintenance,watchUonMaintenance,trackEvent,debounce,installErrorCapture,applyFeatureStates} from './core.js?v=32.4.1';
+import {$,get,esc,enforceUonMaintenance,watchUonMaintenance,trackEvent,debounce,installErrorCapture,applyFeatureStates} from './core.js';
 
 import{normalizeCourseCode,mountStudentDock}from'./student-workspace.js?v=68.0.0';
 await enforceUonMaintenance();

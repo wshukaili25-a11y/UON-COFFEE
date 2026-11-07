@@ -1,4 +1,4 @@
-import { setupNav,enforceUonMaintenance,watchUonMaintenance,$,get,notifyPending,toast,fillCollege,esc,openModal,closeModal,rpc } from './core.js?v=26.1';
+import { setupNav,enforceUonMaintenance,watchUonMaintenance,$,get,notifyPending,toast,fillCollege,esc,openModal,closeModal,rpc } from './core.js';
 import{courseHref}from'./student-workspace.js?v=68.0.0';
 setupNav(); await enforceUonMaintenance(); watchUonMaintenance();
 

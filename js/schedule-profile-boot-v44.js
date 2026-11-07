@@ -1,4 +1,4 @@
-import{rpc}from'./core.js?v=44.0.0';
+import{rpc}from'./core.js';
 import './schedule-ai-sync-v54.js';
 
 const LEGACY_KEY='uon-v7-schedule';

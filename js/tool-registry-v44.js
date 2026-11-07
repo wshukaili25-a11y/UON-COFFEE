@@ -1,4 +1,4 @@
-import {rpc,get,esc,toast,trackEvent,applyFeatureStates} from './core.js?v=44.0.1';
+import {rpc,get,esc,toast,trackEvent,applyFeatureStates} from './core.js';
 
 const SUPABASE_URL='https://irkhvydgxpseflggbeqq.supabase.co';
 const SUPABASE_KEY='sb_publishable_gZ9tyM1udrkuQIXHqDtToQ_FyFmePgH';

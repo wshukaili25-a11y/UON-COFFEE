@@ -1,4 +1,4 @@
-import{rpc,esc,toast}from'./core.js?v=44.1.0';
+import{rpc,esc,toast}from'./core.js';
 const params=new URLSearchParams(location.search),token=params.get('token')||'',mode=params.get('mode')==='mobile'?'mobile':'desktop',stage=document.querySelector('#preview44Stage'),grid=document.querySelector('#preview44Grid');
 stage.className=`preview44-stage ${mode}`;
 document.querySelectorAll('[data-mode]').forEach(button=>button.onclick=()=>{stage.className=`preview44-stage ${button.dataset.mode}`;history.replaceState(null,'',`?token=${encodeURIComponent(token)}&mode=${button.dataset.mode}`)});

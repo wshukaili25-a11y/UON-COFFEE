@@ -1,4 +1,4 @@
-import {get,esc,safeHref} from './core.js?v=67.0.0';
+import {get,esc,safeHref} from './core.js';
 
 const grid=document.querySelector('#supportCentersGrid');
 const count=document.querySelector('#supportCentersCount');

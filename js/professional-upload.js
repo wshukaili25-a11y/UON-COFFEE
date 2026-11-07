@@ -1,4 +1,4 @@
-import{fillCollege,uid,toast,trackEvent,enforceUonMaintenance,watchUonMaintenance}from'./core.js?v=42.0.0';
+import{fillCollege,uid,toast,trackEvent,enforceUonMaintenance,watchUonMaintenance}from'./core.js';
 await enforceUonMaintenance();watchUonMaintenance();
 const API='https://irkhvydgxpseflggbeqq.supabase.co/functions/v1/resource-upload-api';
 const form=document.querySelector('#resourceUploadForm');

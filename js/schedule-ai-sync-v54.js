@@ -1,4 +1,4 @@
-import {rpc} from './core.js?v=44.0.2';
+import {rpc} from './core.js';
 
 const SCHEDULE_KEY='uon-v7-schedule';
 const SESSION_KEY='uon_ai_session_v46';

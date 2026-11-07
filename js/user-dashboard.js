@@ -1,4 +1,4 @@
-import {esc,toast} from './core.js?v=62.1.0';
+import {esc,toast} from './core.js';
 import {nextClass,currentAcademicPulse,formatClassTime,readSchedule} from './student-pulse.js?v=62.1.0';
 import {STUDENT_TASKS_KEY,readStudentTasks,nextStudentTask,formatTaskDue,taskDueState} from './student-tasks-data.js?v=62.1.0';
 import {STUDY_SESSIONS_KEY,STUDY_SETTINGS_KEY,studyStats,formatStudyDuration} from './study-focus-data.js?v=62.1.0';

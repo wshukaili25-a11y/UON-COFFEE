@@ -1,4 +1,4 @@
-import{$,enforceUonMaintenance,watchUonMaintenance,trackEvent,applyFeatureStates}from'./core.js?v=64.1.0';
+import{$,enforceUonMaintenance,watchUonMaintenance,trackEvent,applyFeatureStates}from'./core.js';
 import{optionalGoogleAuthHeaders}from'./google-auth-session-v641.js?v=64.1.0';
 import{getGoogleAuthStatus,googleAuthStatusText}from'./google-auth-status-v641.js?v=64.1.0';
 const API='https://irkhvydgxpseflggbeqq.supabase.co/functions/v1/uon-ai-chat-v64';

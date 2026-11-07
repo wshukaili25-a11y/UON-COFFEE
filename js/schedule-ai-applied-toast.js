@@ -1,4 +1,4 @@
-import{toast}from'./core.js?v=43.1.0';
+import{toast}from'./core.js';
 const KEY='uon_ai_schedule_applied_v1';
 if(sessionStorage.getItem(KEY)==='1'){
  sessionStorage.removeItem(KEY);

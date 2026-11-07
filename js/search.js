@@ -1,4 +1,4 @@
-import{rpc,$,esc,debounce,enforceUonMaintenance,watchUonMaintenance,trackEvent}from'./core.js?v=44.0.0';
+import{rpc,$,esc,debounce,enforceUonMaintenance,watchUonMaintenance,trackEvent}from'./core.js';
 await enforceUonMaintenance();watchUonMaintenance();
 
 const input=$('#globalSearch'),results=$('#searchResults'),meta=$('#searchMeta'),filters=$('#searchFilters');

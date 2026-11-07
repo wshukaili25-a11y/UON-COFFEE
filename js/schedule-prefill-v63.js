@@ -1,4 +1,4 @@
-import {toast} from './core.js?v=63.0.0';
+import {toast} from './core.js';
 const params=new URLSearchParams(location.search);
 if(params.get('prefill')==='1'){
  const course=String(params.get('course')||'').trim().slice(0,24),days=String(params.get('days')||'').split(',').map(x=>x.trim()).filter(Boolean),start=String(params.get('start')||''),end=String(params.get('end')||''),room=String(params.get('room')||'').trim().slice(0,30),teacher=String(params.get('teacher')||'').trim().slice(0,80),type=['lecture','lab','tutorial','workshop','other'].includes(params.get('type'))?params.get('type'):'lecture';

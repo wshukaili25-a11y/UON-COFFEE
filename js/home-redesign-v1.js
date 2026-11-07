@@ -1,4 +1,4 @@
-import{esc,enforceUonMaintenance,watchUonMaintenance,getUonState,applyFeatureStates,trackEvent,trackClicks,get,safeHref,rpc}from'./core.js?v=61.2.1';
+import{esc,enforceUonMaintenance,watchUonMaintenance,getUonState,applyFeatureStates,trackEvent,trackClicks,get,safeHref,rpc}from'./core.js';
 import{currentAcademicPulse,nextClass,formatClassTime}from'./student-pulse.js?v=61.2.0';
 
 import{recentCourses,courseHref,mountStudentDock}from'./student-workspace.js?v=68.0.0';
