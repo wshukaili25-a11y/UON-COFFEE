@@ -164,4 +164,8 @@ html[data-hub-studio] .sum-more-wrap{display:flex;justify-content:center;padding
 html[data-hub-studio] #summaryLoadMore{min-width:180px}
 html[data-hub-studio] #summaryLoadMore[hidden]{display:none!important}
 /* Reserve the JS-rendered header's height so content does not jump on load (CLS). */
-body>header.site-header:empty{display:block;min-height:69px}
+body>header.site-header{display:block;min-height:69px}
+@media(min-width:701px){body>header.site-header{min-height:79px}}
+/* hub-studio.js prepends the "back to home" link into <main> after first paint; hold its space. */
+html[data-hub-studio] main:not(.uon-rd-home):not(:has(> .hub-home-link))::before{content:"";display:block;height:64px}
+@media(min-width:701px){html[data-hub-studio] main:not(.uon-rd-home):not(:has(> .hub-home-link))::before{height:66px}}
