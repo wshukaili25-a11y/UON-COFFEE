@@ -4,7 +4,7 @@ import { liveUniversitySearch } from './live-search.mjs';
 import { readSSE } from './stream.mjs';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.110.8';
 
-import { conversationHistory, retrievalQuestion, rankStaff, isCasual, intent, resolveStaff, staffFollowup, selectionIndex, staffCard, publicField, relevantContext, staffLookupMode, greetingReply, serviceTopic, cleanAnswerLinks, calendarContext } from './conversation.mjs';
+import { conversationHistory, retrievalQuestion, rankStaff, isCasual, intent, resolveStaff, staffFollowup, selectionIndex, staffCard, publicField, relevantContext, staffLookupMode, greetingReply, serviceTopic, cleanAnswerLinks, calendarContext, stripOpening } from './conversation.mjs';
 import { placementSources, hubSources, directServiceAnswer } from './services.mjs';
 import { hubIntent, resolveCourse, resolveProgram, summariesAnswer, groupsAnswer, planAnswer, courseAnswer, searchTerm, codeKey, SITE } from './hubdata.mjs';
 
@@ -215,7 +215,7 @@ async function gemini(q:string,lang:string,history:any[],searchQ:string,onDelta?
   if(!attempt.ok){if(onDelta)onDelta('');return unavailable();}
   await background(markSuccess(used));
   const links=ctx.filter((x:any)=>x.url).slice(0,4).map((x:any)=>({type:x.official?(lang==='en'?'Official source':'مصدر رسمي'):x.type,title:x.title,url:x.url,official:x.official}));
-  return{answer:cleanAnswerLinks(attempt.text),links,source_cards:ctx.filter((x:any)=>x.url).slice(0,4).map((x:any)=>({live:Boolean(x.live),cached:Boolean(x.cached),checked_at:x.checked_at,title:x.title,description:x.description.slice(0,500),url:x.url,type:x.type,official:x.official})),actions:[],suggestions:[],visual_guide:null,grounded:ctx.length>0,confidence:ctx.length?.85:.5,sources_count:ctx.length,mode:ctx.length?route:'chat',used_model:true,ai_provider:'google_gemini',ai_model:used,ai_model_version:attempt.modelVersion||undefined,connectors:{gemini:{used:true,provider:'Google Gemini',model:used,fallback,discovery:state.source}}};
+  return{answer:stripOpening(cleanAnswerLinks(attempt.text),q),links,source_cards:ctx.filter((x:any)=>x.url).slice(0,4).map((x:any)=>({live:Boolean(x.live),cached:Boolean(x.cached),checked_at:x.checked_at,title:x.title,description:x.description.slice(0,500),url:x.url,type:x.type,official:x.official})),actions:[],suggestions:[],visual_guide:null,grounded:ctx.length>0,confidence:ctx.length?.85:.5,sources_count:ctx.length,mode:ctx.length?route:'chat',used_model:true,ai_provider:'google_gemini',ai_model:used,ai_model_version:attempt.modelVersion||undefined,connectors:{gemini:{used:true,provider:'Google Gemini',model:used,fallback,discovery:state.source}}};
 }
 async function conversation(body:any,q:string){
   if(!uuid(body.session_id)||!uuid(body.client_token))return null;

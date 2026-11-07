@@ -197,3 +197,9 @@ export function calendarContext(question, events, today) {
     url:'https://uonhub.space/academic-calendar.html',official:false,score:0
   }));
 }
+
+// The model sometimes opens with a welcome even when told not to; drop it unless the student greeted first.
+export function stripOpening(answer, question) {
+  if (greetingReply(question)) return answer;
+  return String(answer || '').replace(/^\s*(?:(?:أهلًا|أهلاً|اهلا|أهلا|هلا|مرحبًا|مرحباً|مرحبا|حياك|يا هلا)(?:\s+(?:وسهلًا|وسهلاً|وسهلا|بك|فيك|والله|الله))*(?:\s+يا\s+(?:غالي|بطل|عزيزي|طالبي العزيز))?|(?:hi|hello|hey)(?:\s+there)?)\s*[!،,.]+\s*(?:😊\s*)?/i, '').replace(/^\s*(?:يا\s+(?:غالي|بطل))\s*[!،,.]\s*/, '');
+}

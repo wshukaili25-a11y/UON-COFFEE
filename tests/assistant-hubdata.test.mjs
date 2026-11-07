@@ -74,3 +74,12 @@ test('answers carry plain clickable links in the text',()=>{
 test('search term strips request words',()=>{
  assert.equal(searchTerm('اريد ملخصات pdf للانجلش لفل 1'),'انجلش لفل 1');
 });
+
+import {stripOpening} from '../supabase/functions/uon-ai-chat-v64/conversation.mjs';
+test('model welcome openers are removed unless the student greeted',()=>{
+ assert.equal(stripOpening('أهلاً بك يا غالي. تقدر تقدم من البوابة.','كيف اقدم عذر'),'تقدر تقدم من البوابة.');
+ assert.equal(stripOpening('أهلاً بك! بروتوكول TCP موثوق.','اشرح TCP'),'بروتوكول TCP موثوق.');
+ assert.equal(stripOpening('مرحباً بك! يمكنك العثور على المكتبة.','وين المكتبة'),'يمكنك العثور على المكتبة.');
+ assert.equal(stripOpening('أهلاً وسهلاً! كيف أقدر أساعدك؟','هلا'),'أهلاً وسهلاً! كيف أقدر أساعدك؟');
+ assert.equal(stripOpening('أهل الاختصاص يقولون كذا.','سؤال'),'أهل الاختصاص يقولون كذا.');
+});
