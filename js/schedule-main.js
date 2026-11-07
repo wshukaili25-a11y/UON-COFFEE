@@ -417,9 +417,8 @@ function fitText(context,text,maxWidth){
  return `${output}…`;
 }
 
-async function exportScheduleImage(){
- if(!rows.length)return;
- try{
+async function buildScheduleImageBlob(){
+  if(!rows.length)return null;
   await document.fonts?.ready;
   const width=2000;
   const margin=56;
@@ -502,6 +501,17 @@ async function exportScheduleImage(){
   context.fillText(t('تم إنشاء الجدول بواسطة UON Hub','Created with UON Hub'),width-margin,height-28);
   const blob=await new Promise(resolve=>canvas.toBlob(resolve,'image/png',1));
   if(!blob)throw new Error('image_export_failed');
+  return blob;
+}
+
+// Shared with the email feature (js/schedule-email.js).
+window.UONScheduleExport={imageBlob:buildScheduleImageBlob,rows:()=>rows.map(({course,day,start,end,room,teacher,type})=>({course,day,start,end,room,teacher,type}))};
+
+async function exportScheduleImage(){
+ if(!rows.length)return;
+ try{
+  const blob=await buildScheduleImageBlob();
+  if(!blob)return;
   downloadBlob(blob,`uonhub-schedule-${new Date().toISOString().slice(0,10)}.png`);
   toast(t('تم تصدير الجدول كصورة','Schedule exported as an image'));
  }catch(error){

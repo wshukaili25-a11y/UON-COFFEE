@@ -26,3 +26,6 @@ body.schedule-redesign{background:radial-gradient(circle at 80% 0,rgba(24,159,99
 #cancelEduwaveAnalysis[hidden]{display:none}
 .eduwave-dropzone:focus-visible{outline:3px solid var(--schedule-mint);outline-offset:3px}
 @media(max-width:430px){.eduwave-section-row{grid-template-columns:24px minmax(0,1fr);padding:10px}.eduwave-section-row em{grid-column:2}.eduwave-flow-actions .btn{min-height:48px;white-space:normal}.eduwave-course-fields input{width:100%;min-width:0}.schedule-modal{max-height:calc(100dvh - 16px);max-height:calc(100svh - 16px)}.eduwave-head{padding-inline:28px 0}.eduwave-head h2{font-size:1.5rem;line-height:1.5}}
+
+.schedule-board-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+#emailScheduleButton{border-color:rgba(207,160,56,.65);color:inherit;font-weight:800}
