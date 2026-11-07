@@ -10,6 +10,18 @@ export function placementSources(question) {
   ];
 }
 
+// UON Hub's own tools, offered as source cards when a student asks for study
+// files or help building a registration timetable. These are platform pages,
+// not official university records.
+export function hubSources(question) {
+  const q=normalize(question),out=[];
+  if(/شروحات|ملخص|ملخصات|ملفات الماده|ملفات المقرر|سلايدات|اختبارات سابقه|امتحانات سابقه|نماذج اختبار|summar|notes|slides|past exam|past paper/.test(q))
+    out.push({type:'خدمة UON Hub',title:'مكتبة الملخصات والملفات — UON Hub',description:'مكتبة UON Hub للملخصات والشروحات وملفات المقررات التي يشاركها الطلبة، مع بحث حسب رمز المقرر أو الكلية. يقدر الطالب يطلب ملفًا غير موجود أو يرفع ملفه للمراجعة.',url:'/summaries.html',official:false,score:0});
+  if(/تسجيل المقررات|تسجيل المواد|تسجيل المساقات|اسجل المقررات|اسجل المواد|اسجل مواد|جدولي|جدول دراسي|اسوي جدول|ابني جدول|رتب جدول|تعارض|الشعب المتاحه|timetable|schedule|register courses|course registration/.test(q))
+    out.push({type:'خدمة UON Hub',title:'مولّد الجدول الدراسي — UON Hub',description:'أداة في UON Hub تبني جدولًا بدون تعارض قبل التسجيل: أدخل المواد والشعب يدويًا أو ارفع صور الشعب المتاحة من EduWave. التسجيل الفعلي يتم في نظام الجامعة خلال فترة التسجيل المعلنة في التقويم الأكاديمي.',url:'/schedule.html',official:false,score:0});
+  return out;
+}
+
 export function directServiceAnswer(question, rows, language='ar') {
   const q=normalize(question),topic=serviceTopic(question),en=language==='en';
   const booking=/احجز|حجز|book|appointment|رابط|link/.test(q);
