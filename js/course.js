@@ -95,7 +95,8 @@ function render(){
  document.title=`${course.code} — ${title} | UON Hub`;
  try{const url=`https://www.uonhub.space/course.html?code=${encodeURIComponent(course.code)}`;
   let canon=document.querySelector('link[rel="canonical"]');if(!canon){canon=document.createElement('link');canon.rel='canonical';document.head.append(canon)}canon.href=url;
-  const desc=document.querySelector('meta[name="description"]');if(desc)desc.content=lang()==='en'?`${course.code} ${title} at University of Nizwa: summaries, past exams, WhatsApp groups, ratings and prerequisites on UON Hub.`:`${course.code} ${title} — جامعة نزوى: ملخصات واختبارات سابقة وقروبات واتساب وتقييمات ومتطلبات المقرر في UON Hub.`;
+  const setMeta=(sel,v)=>{const n=document.querySelector(sel);if(n)n.content=v};setMeta('meta[property="og:url"]',url);setMeta('meta[property="og:title"]',document.title);setMeta('meta[name="twitter:title"]',document.title);
+  const desc=document.querySelector('meta[name="description"]');if(desc)desc.content=lang()==='en'?`${course.code} ${title} at University of Nizwa: summaries, past exams, WhatsApp groups, ratings and prerequisites on UON Hub.`:`${course.code} ${title} — جامعة نزوى: ملخصات واختبارات سابقة وقروبات واتساب وتقييمات ومتطلبات المقرر في UON Hub.`;const d=desc?.content||'';setMeta('meta[property="og:description"]',d);setMeta('meta[name="twitter:description"]',d);
  }catch{}
  $('#courseTitle').textContent=`${course.code} — ${title}`;
  $('#courseCollege').textContent=lang()==='en'?(course.college_en||course.college||'University course'):(course.college_ar||course.college||'مقرر جامعي');

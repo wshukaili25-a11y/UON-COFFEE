@@ -33,3 +33,20 @@ test('sitemap lists www URLs for existing public pages and courses', () => {
   }
   assert.match(readFileSync('robots.txt', 'utf8'), /Sitemap: https:\/\/www\.uonhub\.space\/sitemap\.xml/);
 });
+
+test('public pages carry Open Graph / Twitter share tags', () => {
+  for (const file of PUBLIC) {
+    const html = readFileSync(file, 'utf8');
+    for (const tag of ['og:title', 'og:description', 'og:url', 'og:image']) assert.match(html, new RegExp(`property="${tag}" content="[^"]+"`), `${file} ${tag}`);
+    assert.match(html, /name="twitter:card" content="summary_large_image"/, file);
+    assert.equal((html.match(/property="og:title"/g) || []).length, 1, `${file} single og:title`);
+  }
+  assert.ok(existsSync('assets/og-uonhub-1200x630.jpg'));
+});
+
+test('homepage structured data is valid JSON with a site search action', () => {
+  const html = readFileSync('index.html', 'utf8');
+  const json = JSON.parse(html.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/)[1]);
+  const site = json['@graph'].find(x => x['@type'] === 'WebSite');
+  assert.match(site.potentialAction.target, /search\.html\?q=\{search_term_string\}$/);
+});
