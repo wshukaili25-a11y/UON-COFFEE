@@ -29,12 +29,12 @@ export function directServiceAnswer(question, rows, language='ar') {
     const source=rows.find(row=>serviceTopic(row.title)===topic&&row.type==='مركز دعم'&&/^https:\/\//.test(row.url));
     if(!source)return null;
     const name=en?(topic==='anjiz'?'Anjiz Center':'Learning Pathways Enhancement Center'):source.title;
-    return {answer:en?`You can book a session at ${name} using the booking link below. Open the university portal to view the available sessions and complete your booking.`:`تقدر تحجز موعد في ${name} من رابط الحجز أدناه. افتح بوابة الجامعة للاطلاع على الجلسات المتاحة وإكمال الحجز.`,sources:[source],mode:'service'};
+    return {answer:en?`Book a session at ${name} here:\n${source.url}\n\nThe page shows the available sessions; pick one and confirm.`:`احجز موعدك في ${name} من هنا:\n${source.url}\n\nبتظهر لك الجلسات المتاحة، اختر الموعد المناسب وأكّد الحجز.`,sources:[source],mode:'service'};
   }
   if(topic==='placement'&&/موعد|قاعه|وقت|تاريخ|متي|رابط|استعلام|وين|where|when|room|date|time|link/.test(q)&& !/تقسيم|درجات|درجه|نتيج|نتائج|score|result|mark/.test(q)){
     const source=rows.find(row=>row.url==='https://portal.unizwa.edu.om/info/fiexam.php');
     if(!source)return null;
-    return {answer:en?'To find your placement-test date, time and room, open the university enquiry page below and enter your university ID or civil ID there. Your personal test details appear in the portal; do not send your ID in this chat.':'لمعرفة موعد وقاعة اختبار تحديد المستوى، افتح صفحة الاستعلام الرسمية أدناه وأدخل رقمك الجامعي أو المدني في موقع الجامعة. بتظهر لك تفاصيل اختبارك هناك: اليوم والتاريخ والوقت والقاعة. لا ترسل رقمك في المحادثة.',sources:[source],mode:'service'};
+    return {answer:en?'To find your placement-test date, time and room, open the university enquiry page and enter your university ID or civil ID there:\n'+source.url+'\n\n Your personal test details appear in the portal; do not send your ID in this chat.':'لمعرفة موعد وقاعة اختبار تحديد المستوى، افتح صفحة الاستعلام الرسمية وأدخل رقمك الجامعي أو المدني في موقع الجامعة:\n'+source.url+'\n\n بتظهر لك تفاصيل اختبارك هناك: اليوم والتاريخ والوقت والقاعة. لا ترسل رقمك في المحادثة.',sources:[source],mode:'service'};
   }
   return null;
 }
