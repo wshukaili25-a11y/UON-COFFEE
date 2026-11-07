@@ -5,7 +5,7 @@ await enforceUonMaintenance();
 watchUonMaintenance();
 installErrorCapture();
 
-const state={courses:[],colleges:[],departments:[],programs:[],links:[],search:new URLSearchParams(location.search).get('q')||'',collegeId:'',departmentId:'',programId:'',sort:'code',view:localStorage.getItem('uon_course_view')||'grid'};
+const state={courses:[],colleges:[],departments:[],programs:[],links:[],search:new URLSearchParams(location.search).get('q')||'',collegeId:'',departmentId:'',programId:new URLSearchParams(location.search).get('program')||'',sort:'code',view:localStorage.getItem('uon_course_view')||'grid'};
 const text=value=>String(value??'').trim();
 const normalize=value=>text(value).normalize('NFKD').toLowerCase().replace(/[\u064b-\u065f\u0670]/g,'').replace(/[أإآ]/g,'ا');
 const nameAr=row=>text(row?.name_ar||row?.name_en||row?.name);
