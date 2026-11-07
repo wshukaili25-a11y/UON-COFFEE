@@ -48,7 +48,16 @@
  }).observe(document.body,{childList:true,subtree:true});
  // Legacy page bootstraps append styles after load; keep the single studio layer last.
  const style=document.querySelector('#hubStudioStyle');
- new MutationObserver(()=>{const styles=[...document.head.querySelectorAll('link[rel=stylesheet],style')];if(styles.at(-1)!==style)document.head.append(style)}).observe(document.head,{childList:true});
+ // Moving the studio <link> makes the browser re-load it, so the page briefly renders
+ // without studio styles and the layout jumps (CLS). Move late styles in front of it instead.
+ new MutationObserver(records=>{
+  if(!style||!style.isConnected)return;
+  for(const record of records)for(const node of record.addedNodes){
+   if(node===style||!(node instanceof Element))continue;
+   const isStyle=node.matches('style')||node.matches('link[rel=stylesheet]');
+   if(isStyle&&(style.compareDocumentPosition(node)&Node.DOCUMENT_POSITION_FOLLOWING))document.head.insertBefore(node,style);
+  }
+ }).observe(document.head,{childList:true});
  reduced.addEventListener('change',syncMotion);
  document.addEventListener('keydown',event=>{
   if(event.key==='Escape'){

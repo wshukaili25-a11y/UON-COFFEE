@@ -35,14 +35,17 @@
   .uon-rd-card-groups .uon-rd-card-icon{width:50px;height:50px;border-radius:16px;background:rgba(22,167,101,.10);border-color:rgba(22,167,101,.17);box-shadow:none}
   .uon-rd-card-groups .uon-rd-card-icon:before{content:none}
   .uon-rd-card-groups .uon-rd-card-icon img{width:29px;height:29px;filter:none}
+  /* Reserve space for JS-rendered regions so the page does not jump while loading (CLS). */
+  body>header.site-header:empty{display:block;min-height:69px}
+  main[aria-busy="true"]:empty{display:block;min-height:100vh;min-height:100svh}
   @media(max-width:900px){.uon-rd-actions{margin-inline-start:auto}}
   @media(hover:none){.uon-rd-card:hover{transform:none;border-color:var(--uon-border);background:linear-gradient(145deg,rgba(15,31,23,.78),rgba(8,20,14,.86))}}
   @media(max-width:620px){#rdManagedFooter{padding-top:26px;padding-bottom:34px}#rdManagedFooter .uon-rd-footer-main{gap:12px}#rdManagedFooter .uon-rd-footer-prayer{font-size:20px}#rdManagedFooter .uon-rd-footer-credit{font-size:18px}#rdManagedFooter .uon-rd-footer-handle{font-size:20px}#rdManagedFooter .uon-rd-footer-rights{font-size:15px}.uon-rd-card-featured{min-height:112px}.uon-rd-logo{width:39px;height:39px;flex-basis:39px}.uon-rd-brand strong{font-size:17px}}
  </style>
 <link rel="stylesheet" href="/css/student-workspace.css?v=68.0.0">
- <link rel="stylesheet" href="/css/hub-studio.css?v=1.0.0" id="hubStudioStyle">
+ <link rel="stylesheet" href="/css/hub-studio.css?v=1.1.0" id="hubStudioStyle">
  <script src="/js/hub-studio-boot.js?v=1.0.0"></script>
- <script src="/js/hub-studio.js?v=1.0.0" defer></script>
+ <script src="/js/hub-studio.js?v=1.1.0" defer></script>
 </head>
 <body>
  <header class="site-header"></header>
