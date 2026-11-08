@@ -253,11 +253,31 @@ export function clearAdminSession(){
  sessionStorage.removeItem('uon_admin_password');
 }
 
+// Where a visit came from: UTM tags, external referrer, or an in-app browser
+// (Instagram/WhatsApp/TikTok/Snapchat often hide the referrer). First touch is
+// kept for the browser session so later pages keep the original source.
+export function visitSource(){
+ try{
+  const params=new URLSearchParams(location.search),utm={};
+  for(const k of ['utm_source','utm_medium','utm_campaign','utm_content'])if(params.get(k))utm[k.slice(4)]=params.get(k).slice(0,60);
+  let ref='';try{const h=document.referrer?new URL(document.referrer).hostname.replace(/^www\./,''):'';if(h&&!/(^|\.)uonhub\.space$/.test(h)&&h!==location.hostname)ref=h.slice(0,80)}catch{}
+  const ua=navigator.userAgent||'';
+  const app=/Instagram/i.test(ua)?'instagram':/WhatsApp/i.test(ua)?'whatsapp':/musical_ly|TikTok|BytedanceWebview/i.test(ua)?'tiktok':/Snapchat/i.test(ua)?'snapchat':/FBAN|FBAV/i.test(ua)?'facebook':/Twitter/i.test(ua)?'x':'';
+  const now={...(Object.keys(utm).length?utm:{}),...(ref?{ref}:{}),...(app?{app}:{})};
+  const key='uon_first_touch';
+  let first=null;try{first=JSON.parse(sessionStorage.getItem(key)||'null')}catch{}
+  if(!first&&Object.keys(now).length){first=now;try{sessionStorage.setItem(key,JSON.stringify(now))}catch{}}
+  const source=now.source||first?.source||(now.app||first?.app)||(now.ref||first?.ref)||'direct';
+  return {source:String(source).slice(0,60),...now,...(first&&first!==now?{first}:{})};
+ }catch{return {source:'unknown'}}
+}
+
 export async function trackEvent(eventType,metadata={}){
  if(eventType==='page_view'){
   // One page_view per page load: the first caller wins (page script or the auto tracker below).
   if(window.__uonPageViewSent)return;
   window.__uonPageViewSent=true;
+  metadata={...(metadata&&typeof metadata==='object'?metadata:{}),visit:visitSource()};
  }
  try{
   const sessionKey='uon_anon_session';

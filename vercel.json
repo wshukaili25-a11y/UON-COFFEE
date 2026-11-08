@@ -117,12 +117,21 @@
       "source": "/studio-review.html",
       "destination": "/index.html",
       "permanent": false
+    },
+    {
+      "source": "/c/:code",
+      "destination": "/course.html?code=:code",
+      "permanent": false
     }
   ],
   "rewrites": [
     {
       "source": "/go/:slug",
       "destination": "/go.html?slug=:slug"
+    },
+    {
+      "source": "/ig",
+      "destination": "/ig.html"
     },
     {
       "source": "/schedule",
