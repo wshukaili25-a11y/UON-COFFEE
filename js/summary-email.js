@@ -3,6 +3,7 @@ import{esc}from'./core.js';
 const endpoint='https://irkhvydgxpseflggbeqq.supabase.co/functions/v1/summary-email';
 const key='sb_publishable_gZ9tyM1udrkuQIXHqDtToQ_FyFmePgH';
 const CONTACT_KEY='uon-email-contact-v1';
+export const MARKETING_LABEL='أوافق على وصول إعلانات وتحديثات UON Hub إلى بريدي، وأقدر ألغي الاشتراك في أي وقت.';
 const errors={email_not_configured:'خدمة البريد قيد التجهيز حاليًا.',rate_limited:'انتظر دقيقة قبل إعادة الطلب. الحد 3 طلبات في الساعة لكل بريد.',invalid_input:'تأكد من الاسم (حرفان على الأقل) وعنوان البريد.',invalid_schedule:'تعذر قراءة الجدول. تأكد أن فيه مادة واحدة على الأقل بأوقات صحيحة.',invalid_code:'الرمز غير صحيح أو انتهت صلاحيته. لديك 5 محاولات كحد أقصى.',unsupported_pdf:'هذا العنصر مجلد أو رابط خارجي. افتح ملف PDF محددًا لإرساله.',too_large:'الملف أكبر من 12 ميجابايت. يمكنك تنزيله من صفحة الملف.',delivery_failed:'تعذر إكمال الإرسال. أعد الطلب لاحقًا.'};
 async function api(body){const r=await fetch(endpoint,{method:'POST',headers:{'content-type':'application/json',apikey:key},body:JSON.stringify(body),signal:AbortSignal.timeout(55000)});let d={};try{d=await r.json()}catch{}if(!r.ok)throw Error(errors[d.error]||'تعذر الاتصال بخدمة البريد.');return d}
 let statusPromise=null;
@@ -32,6 +33,8 @@ const STYLE=`#uonEmailDialog{width:min(460px,calc(100% - 28px));max-height:calc(
 #uonEmailDialog .ue-primary{font:inherit;font-weight:800;border:0;border-radius:14px;padding:13px;background:#0B3B2C;color:#fff;cursor:pointer}
 #uonEmailDialog .ue-primary:disabled{opacity:.6;cursor:wait}
 #uonEmailDialog .ue-link{font:inherit;border:0;background:none;color:inherit;text-decoration:underline;cursor:pointer;opacity:.8;justify-self:start;padding:0}
+#uonEmailDialog .ue-check{display:flex;align-items:flex-start;gap:9px;font-weight:600;font-size:13px;line-height:1.7;cursor:pointer}
+#uonEmailDialog .ue-check input{width:18px;height:18px;margin-top:3px;padding:0;accent-color:#0B3B2C;flex:none}
 #uonEmailDialog .ue-done{text-align:center;padding:10px 0}#uonEmailDialog .ue-done span{font-size:44px}`;
 
 /**
@@ -51,7 +54,8 @@ export function openEmailDialog({kind='summary',title='',request,verifyExtra}){
  <div class="ue-stack" data-details>
   <label>اسمك<input name="name" autocomplete="name" minlength="2" maxlength="80" required placeholder="اكتب اسمك" value="${esc(contact.name)}"></label>
   <label>بريدك الإلكتروني<input name="email" type="email" autocomplete="email" inputmode="email" dir="ltr" maxlength="254" required placeholder="name@example.com" value="${esc(contact.email)}"></label>
-  <p class="ue-note">نرسل رمز تحقق لبريدك، وبعد إدخاله يصلك ${what}${kind==='summary'?' كملف PDF مرفق':' مع صورة له'}. يُستخدم بريدك لهذا الطلب فقط وتُحذف بيانات الطلب خلال 25 ساعة.</p>
+  <p class="ue-note">نرسل رمز تحقق لبريدك، وبعد إدخاله يصلك ${what}${kind==='summary'?' كملف PDF مرفق':' مع صورة له'}. تُحذف بيانات الطلب خلال 25 ساعة، وما نستخدم بريدك لأي شي ثاني إلا إذا اخترت الاشتراك تحت.</p>
+  <label class="ue-check"><input type="checkbox" name="marketing"><span>${MARKETING_LABEL}</span></label>
  </div>
  <div class="ue-stack" data-verification hidden>
   <label>رمز التحقق<input class="ue-code" name="code" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6}" maxlength="6" dir="ltr" placeholder="••••••"></label>
@@ -70,7 +74,7 @@ export function openEmailDialog({kind='summary',title='',request,verifyExtra}){
  dialog.showModal();
  (contact.name?form.elements.email:form.elements.name).focus();
  let requestId='',busy=false;
- function reset(){requestId='';form.elements.name.disabled=false;form.elements.email.disabled=false;form.elements.code.value='';dialog.querySelector('[data-details]').hidden=false;dialog.querySelector('[data-verification]').hidden=true;submit.textContent='أرسل رمز التحقق';setStatus('')}
+ function reset(){requestId='';form.elements.name.disabled=false;form.elements.email.disabled=false;form.elements.marketing.disabled=false;form.elements.code.value='';dialog.querySelector('[data-details]').hidden=false;dialog.querySelector('[data-verification]').hidden=true;submit.textContent='أرسل رمز التحقق';setStatus('')}
  dialog.querySelector('[data-reset]').onclick=()=>{if(!busy)reset()};
  form.onsubmit=async e=>{
   e.preventDefault();if(busy)return;
@@ -82,9 +86,9 @@ export function openEmailDialog({kind='summary',title='',request,verifyExtra}){
   busy=true;submit.disabled=true;setStatus(requestId?'جاري التحقق والإرسال…':'جاري إرسال الرمز…');
   try{
    if(!requestId){
-    const data=await api({action:'request',kind,name,email,...request()});
+    const data=await api({action:'request',kind,name,email,marketing:form.elements.marketing.checked===true,...request()});
     requestId=data.request_id;saveContact(name,email);
-    form.elements.name.disabled=true;form.elements.email.disabled=true;
+    form.elements.name.disabled=true;form.elements.email.disabled=true;form.elements.marketing.disabled=true;
     dialog.querySelector('[data-details]').hidden=true;dialog.querySelector('[data-verification]').hidden=false;
     submit.textContent=kind==='schedule'?'تحقق وأرسل الجدول':'تحقق وأرسل الملخص';
     setStatus('أرسلنا الرمز إلى '+email);form.elements.code.focus();

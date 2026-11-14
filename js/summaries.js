@@ -2,7 +2,7 @@ import{canEmail,emailAvailable,openSummaryEmail}from'./summary-email.js';
 import {SAVED_SUMMARIES_KEY,readSavedSummaries,toggleSavedSummary} from './saved-summaries.js';
 import{whatsappShare,reportBrokenLink,installErrorCapture,setupNav,enforceUonMaintenance,watchUonMaintenance,$,get,notifyPending,toast,fillCollege,esc,openModal,closeModal,trackEvent,rpc}from'./core.js';
 import{courseHref}from'./student-workspace.js?v=68.0.0';
-import{compactCodes,sortRows,topCourses,readFilters,writeFilters,queryCourseCode}from'./summary-library.js?v=1.0.0';
+import{compactCodes,sortRows,topCourses,readFilters,writeFilters,queryCourseCode,groupByCourse,groupKey}from'./summary-library.js?v=1.1.0';
 setupNav();await enforceUonMaintenance();watchUonMaintenance();installErrorCapture();
 
 const lang=document.documentElement.lang==='en'?'en':'ar',en=lang==='en';
@@ -46,7 +46,7 @@ void emailAvailable().then(ready=>{emailReady=ready;if(ready&&!loading)renderNow
 let loading=false,loadFailed=false;
 const resultStatus=document.querySelector('#summaryResultsStatus');
 const loadMore=$('#summaryLoadMore'),PAGE_SIZE=24;
-let matches=[],visibleCount=0;
+let matches=[],visibleCount=0,activeGroup='',groupView=false;
 const normalizeSearch=compactCodes;
 let rows=[],stats=new Map(),activeItem=null,selectedRating=0,selectedRecommended=null;
 const SESSION_KEY='uon_anon_session';let sessionId=crypto.randomUUID();try{sessionId=localStorage.getItem(SESSION_KEY)||sessionId;localStorage.setItem(SESSION_KEY,sessionId)}catch{}
@@ -65,7 +65,7 @@ let searchTimer;
 function renderNow(){clearTimeout(searchTimer);render();afterRender()}
 function scheduleSearch(){clearTimeout(searchTimer);if(loadMore)loadMore.disabled=true;searchTimer=setTimeout(()=>{render();afterRender()},120)}
 const sortFilter=$('#sortFilter'),courseChips=$('#summaryCourseChips');
-function currentFilters(){return{q:search?.value||'',college:collegeFilter?.value||'',type:typeFilter?.value||'',sort:sortFilter?.value||'newest'}}
+function currentFilters(){return{q:search?.value||'',college:collegeFilter?.value||'',type:typeFilter?.value||'',sort:sortFilter?.value||'newest',course:activeGroup}}
 function applySort(){rows=sortRows(rows,sortFilter?.value||'newest',stats)}
 function afterRender(){
  try{const next=writeFilters(location.search,currentFilters());if(next!==location.search)history.replaceState(null,'',location.pathname+next+location.hash)}catch{}
@@ -97,16 +97,30 @@ function refreshRatingLines(){
 function visibleDescription(value){
  return String(value||'').split(/\s*\|\s*/).filter(part=>!/^\s*(?:المصدر\s*:|(?:uoncafe\s*[-–—]?\s*)?دفعة\b|نسخة مستضافة على UON Hub|حقوق المحتوى لأصحابه)/iu.test(part)&&!/^\s*(?:uoncafe\s*[-–—]?\s*)?دفعة(?:\s|$)/iu.test(part)).join(' | ').trim();
 }
-function card(item){const title=item.title||t('ملخص أو اختبار','Summary or exam'),url=safeUrl(item.url||item.link||item.pdf_url),type=normalizedType(item)||'file',code=item.course_code||item.subject||'',s=stats.get(String(item.id))||{},avg=Number(s.average||item.rating||0),count=Number(s.total||0);const viewUrl='summary-viewer.html?id='+encodeURIComponent(item.id);const ratingButton=ratingModal?`<button class="btn" data-rate>⭐ ${t('تقييم','Rate')}</button>`:'';return `<article class="sum-card" data-id="${esc(item.id)}"><div class="sum-card-head"><span class="sum-type">${esc(typeLabel(type))}</span>${courseHref(item.course_code)?`<a class="sum-code" href="${courseHref(item.course_code)}" aria-label="${t('صفحة المادة','Course hub')} ${esc(code)}">${esc(code)} ↗</a>`:`<span class="sum-code">${esc(code)}</span>`}</div><h3>${esc(title)}</h3><p class="sum-desc">${esc(visibleDescription(item.description)||t('ملف دراسي مرفوع لطلاب المقرر.','A study file shared for students in this course.'))}</p>${ratingModal?`<div class="sum-rating-line"><span class="sum-stars">${starText(avg)}</span><span class="sum-rating-num">${avg?avg.toFixed(1):t('جديد','New')}</span><small>(${count} ${t('تقييم','ratings')})</small></div>`:''}<div class="sum-actions">${url?`<a class="btn primary" data-open="view" href="${esc(viewUrl)}">${t('فتح الملف','Open file')}</a>`:''}${ratingButton}${url?`<a class="btn" target="_blank" rel="noopener" href="${whatsappShare(title,new URL(viewUrl,location.href).href)}">${t('مشاركة','Share')}</a><button class="btn danger" data-report>${t('بلاغ','Report')}</button>`:''}${emailReady&&canEmail(item)?`<button class="btn" type="button" data-email>إرسال بالبريد</button>`:''}<button class="btn sum-save" type="button" data-save aria-pressed="${savedIds.has(String(item.id))}">${savedIds.has(String(item.id))?t('محفوظ ✓','Saved ✓'):t('حفظ الملف','Save file')}</button></div></article>`}
+function card(item){const title=item.title||t('ملخص أو اختبار','Summary or exam'),shown=activeGroup&&title.includes(' | ')?title.slice(title.indexOf(' | ')+3):title,url=safeUrl(item.url||item.link||item.pdf_url),type=normalizedType(item)||'file',code=item.course_code||item.subject||'',s=stats.get(String(item.id))||{},avg=Number(s.average||item.rating||0),count=Number(s.total||0);const viewUrl='summary-viewer.html?id='+encodeURIComponent(item.id);const ratingButton=ratingModal?`<button class="btn" data-rate>⭐ ${t('تقييم','Rate')}</button>`:'';return `<article class="sum-card" data-id="${esc(item.id)}"><div class="sum-card-head"><span class="sum-type">${esc(typeLabel(type))}</span>${courseHref(item.course_code)?`<a class="sum-code" href="${courseHref(item.course_code)}" aria-label="${t('صفحة المادة','Course hub')} ${esc(code)}">${esc(code)} ↗</a>`:`<span class="sum-code">${esc(code)}</span>`}</div><h3>${esc(shown)}</h3><p class="sum-desc">${esc(visibleDescription(item.description)||t('ملف دراسي مرفوع لطلاب المقرر.','A study file shared for students in this course.'))}</p>${ratingModal?`<div class="sum-rating-line"><span class="sum-stars">${starText(avg)}</span><span class="sum-rating-num">${avg?avg.toFixed(1):t('جديد','New')}</span><small>(${count} ${t('تقييم','ratings')})</small></div>`:''}<div class="sum-actions">${url?`<a class="btn primary" data-open="view" href="${esc(viewUrl)}">${t('فتح الملف','Open file')}</a>`:''}${ratingButton}${url?`<a class="btn" target="_blank" rel="noopener" href="${whatsappShare(title,new URL(viewUrl,location.href).href)}">${t('مشاركة','Share')}</a><button class="btn danger" data-report>${t('بلاغ','Report')}</button>`:''}${emailReady&&canEmail(item)?`<button class="btn" type="button" data-email>إرسال بالبريد</button>`:''}<button class="btn sum-save" type="button" data-save aria-pressed="${savedIds.has(String(item.id))}">${savedIds.has(String(item.id))?t('محفوظ ✓','Saved ✓'):t('حفظ الملف','Save file')}</button></div></article>`}
+const typeCount=(n,ar,enLabel)=>n?`<span>${n} ${t(ar,enLabel)}</span>`:'';
+function groupLabel(g){return g.key==='__other__'?t('ملفات عامة','General files'):(g.name||g.code)}
+function groupCard(g){const label=groupLabel(g),showCode=g.code&&g.code!==label;return `<button type="button" class="sum-group" data-group="${esc(g.key)}" aria-label="${esc(label)} — ${g.files} ${t('ملف','files')}"><span class="sum-group-top"><span class="sum-group-icon" aria-hidden="true">📚</span>${showCode?`<span class="sum-code">${esc(g.code)}</span>`:''}</span><strong class="sum-group-name">${esc(label)}</strong><span class="sum-group-count">${g.files} ${g.files===1?t('ملف','file'):t('ملفات','files')}</span><span class="sum-group-types">${typeCount(g.types.exam,'اختبار','exams')}${typeCount(g.types.summary,'ملخص','summaries')}${typeCount(g.types.notes,'ملاحظات','notes')}</span><span class="sum-group-open">${t('عرض الملفات ←','View files →')}</span></button>`}
+function groupHeader(){if(!activeGroup)return'';const g=groupByCourse(rows.filter(x=>groupKey(x)===activeGroup))[0];if(!g)return'';const label=groupLabel(g);return `<div class="sum-group-bar"><button type="button" class="btn" data-group-back>${t('→ كل المواد','← All courses')}</button><div><strong>${esc(label)}</strong>${g.code&&g.code!==label?` <span class="sum-code">${esc(g.code)}</span>`:''}<small> · ${g.files} ${g.files===1?t('ملف','file'):t('ملفات','files')}</small></div></div>`}
+function openGroup(key){activeGroup=key;if(search)search.value='';renderNow();items.scrollIntoView({behavior:'smooth',block:'start'});items.querySelector('[data-group-back]')?.focus({preventScroll:true})}
 function render(){
  if(loading||loadFailed)return;
  const terms=normalizeSearch(search?.value).trim().split(/\s+/).filter(Boolean),college=collegeFilter?.value||'',type=typeFilter?.value||'';
  const filtered=Boolean(terms.length||college||type||savedOnly);
  syncSavedFilter();
- const list=rows.filter(x=>(!savedOnly||savedIds.has(String(x.id)))&&(!college||x.college===college)&&(!type||normalizedType(x)===type)&&terms.every(term=>searchableText(x).includes(term)));
+ groupView=!filtered&&!activeGroup;
+ if(groupView){
+  const groups=groupByCourse(rows,sortFilter?.value||'newest');
+  matches=[];visibleCount=0;
+  if(resultStatus)resultStatus.textContent=t(`${groups.length} مادة · ${rows.length} ملف`,`${groups.length} courses · ${rows.length} files`);
+  if(loadMore)loadMore.hidden=true;
+  items.innerHTML=groups.length?groups.map(groupCard).join(''):`<div class="sum-empty"><p>${t('ما فيه ملفات متاحة حاليًا.','No files are available yet.')}</p></div>`;
+  return;
+ }
+ const list=rows.filter(x=>(!activeGroup||groupKey(x)===activeGroup)&&(!savedOnly||savedIds.has(String(x.id)))&&(!college||x.college===college)&&(!type||normalizedType(x)===type)&&terms.every(term=>searchableText(x).includes(term)));
  matches=list;visibleCount=Math.min(PAGE_SIZE,list.length);
  syncResults();
- items.innerHTML=list.length?list.slice(0,visibleCount).map(card).join(''):`<div class="sum-empty"><p>${savedOnly&&!terms.length&&!college&&!type?t('ما عندك ملفات محفوظة متاحة بعد. افتح كل الملفات واضغط «حفظ الملف».','No available saved files yet. Browse all files and choose Save file.'):filtered?t('ما حصلنا ملفات تطابق بحثك. جرّب اسم المادة أو رمزها.','No matching files. Try the course name or code.'):t('ما فيه ملفات متاحة حاليًا.','No files are available yet.')}</p>${filtered?`<button class="btn primary" type="button" data-reset-filters>${t('عرض كل الملفات','Show all files')}</button>`:''}</div>`;
+ items.innerHTML=groupHeader()+(list.length?list.slice(0,visibleCount).map(card).join(''):`<div class="sum-empty"><p>${savedOnly&&!terms.length&&!college&&!type?t('ما عندك ملفات محفوظة متاحة بعد. افتح كل الملفات واضغط «حفظ الملف».','No available saved files yet. Browse all files and choose Save file.'):filtered?t('ما حصلنا ملفات تطابق بحثك. جرّب اسم المادة أو رمزها.','No matching files. Try the course name or code.'):t('ما فيه ملفات متاحة حاليًا.','No files are available yet.')}</p>${filtered?`<button class="btn primary" type="button" data-reset-filters>${t('عرض كل الملفات','Show all files')}</button>`:''}</div>`);
 }
 
 function syncResults(){
@@ -128,9 +142,9 @@ if(loadMore)loadMore.onclick=showMore;
 if(search)search.value=readFilters(location.search).q;
 const initialFilters=readFilters(location.search);
 if(typeFilter&&initialFilters.type)typeFilter.value=initialFilters.type;
-if(sortFilter)sortFilter.value=initialFilters.sort;
+if(sortFilter)sortFilter.value=initialFilters.sort;activeGroup=initialFilters.course||'';
 if(collegeFilter&&initialFilters.college&&[...collegeFilter.options].some(o=>o.value===initialFilters.college))collegeFilter.value=initialFilters.college;
-function clearAllFilters(){savedOnly=false;if(search)search.value='';if(collegeFilter)collegeFilter.value='';if(typeFilter)typeFilter.value='';renderNow()}
+function clearAllFilters(){savedOnly=false;activeGroup='';if(search)search.value='';if(collegeFilter)collegeFilter.value='';if(typeFilter)typeFilter.value='';renderNow()}
 if(search){search.oninput=scheduleSearch;search.addEventListener('search',renderNow)}if(collegeFilter)collegeFilter.onchange=renderNow;if(typeFilter)typeFilter.onchange=renderNow;if(clearFilters)clearFilters.onclick=clearAllFilters;if(sortFilter)sortFilter.onchange=()=>{applySort();renderNow()};
 
 if(savedFilter)savedFilter.onclick=()=>{savedOnly=!savedOnly;syncSavedFilter();renderNow()};
@@ -147,6 +161,6 @@ function syncPicker(){document.querySelectorAll('#ratingPicker [data-value]').fo
 if(ratingPicker)ratingPicker.onclick=e=>{const b=e.target.closest('[data-value]');if(!b)return;selectedRating=Number(b.dataset.value);syncPicker()};
 document.querySelectorAll('[data-recommend]').forEach(b=>b.onclick=()=>{selectedRecommended=b.dataset.recommend==='true';document.querySelectorAll('[data-recommend]').forEach(x=>x.classList.toggle('primary',x===b))});
 if(ratingForm)ratingForm.onsubmit=async e=>{e.preventDefault();if(!selectedRating)return toast(t('اختر عدد النجوم أولًا','Choose a star rating first'),true);const btn=e.submitter||ratingForm.querySelector('[type="submit"]');if(btn)btn.disabled=true;try{await rpc('uon_submit_resource_rating',{p_resource_table:'summaries',p_resource_id:String(activeItem.id),p_session_id:sessionId,p_rating:selectedRating,p_recommended:selectedRecommended,p_comment:$('#ratingComment')?.value.trim()||null,p_reviewer_name:$('#reviewerName')?.value.trim()||null});toast(t('تم حفظ تقييمك ⭐','Your rating was saved ⭐'));await loadStats();loading=false;items.setAttribute('aria-busy','false');render();openRating(activeItem);trackEvent('summary_rating',{rating:selectedRating})}catch(error){toast(error.message||t('تعذر حفظ التقييم','Could not save the rating'),true)}finally{if(btn)btn.disabled=false}};
-items.onclick=async e=>{if(e.target.closest('[data-retry]'))return load();if(e.target.closest('[data-reset-filters]')){clearAllFilters();search?.focus();return}const cardEl=e.target.closest('[data-id]');if(!cardEl)return;const item=rows.find(x=>String(x.id)===cardEl.dataset.id);if(!item)return;if(e.target.closest('[data-email]'))return openSummaryEmail(item);const saveButton=e.target.closest('[data-save]');if(saveButton)return toggleSaved(item,saveButton);if(e.target.closest('[data-rate]'))return openRating(item);if(e.target.closest('[data-report]')){const url=safeUrl(item.url||item.link||item.pdf_url);return reportBrokenLink({sourceTable:'summaries',sourceId:item.id,title:item.title,url})}const open=e.target.closest('[data-open]');if(open){rpc('uon_track_summary_open',{p_summary_id:item.id,p_kind:'view'}).catch(()=>{});item.views=Number(item.views||0)+1;trackEvent('summary_open',{id:item.id,course_code:item.course_code||item.subject||''})}};
+items.onclick=async e=>{if(e.target.closest('[data-retry]'))return load();const groupBtn=e.target.closest('[data-group]');if(groupBtn)return openGroup(groupBtn.dataset.group);if(e.target.closest('[data-group-back]')){activeGroup='';renderNow();return}if(e.target.closest('[data-reset-filters]')){clearAllFilters();search?.focus();return}const cardEl=e.target.closest('[data-id]');if(!cardEl)return;const item=rows.find(x=>String(x.id)===cardEl.dataset.id);if(!item)return;if(e.target.closest('[data-email]'))return openSummaryEmail(item);const saveButton=e.target.closest('[data-save]');if(saveButton)return toggleSaved(item,saveButton);if(e.target.closest('[data-rate]'))return openRating(item);if(e.target.closest('[data-report]')){const url=safeUrl(item.url||item.link||item.pdf_url);return reportBrokenLink({sourceTable:'summaries',sourceId:item.id,title:item.title,url})}const open=e.target.closest('[data-open]');if(open){rpc('uon_track_summary_open',{p_summary_id:item.id,p_kind:'view'}).catch(()=>{});item.views=Number(item.views||0)+1;trackEvent('summary_open',{id:item.id,course_code:item.course_code||item.subject||''})}};
 
 load();

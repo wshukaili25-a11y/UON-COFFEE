@@ -78,16 +78,18 @@ export function readFilters(search) {
     college: (p.get('college') || '').slice(0, 120),
     type: ['summary', 'exam', 'notes'].includes(p.get('type')) ? p.get('type') : '',
     sort: SORT_MODES.includes(sort) ? sort : 'newest',
+    course: (p.get('course') || '').slice(0, 120),
   };
 }
 
 export function writeFilters(baseSearch, filters) {
   const p = new URLSearchParams(baseSearch || '');
-  for (const key of ['q', 'college', 'type', 'sort']) p.delete(key);
+  for (const key of ['q', 'college', 'type', 'sort', 'course']) p.delete(key);
   if (filters.q) p.set('q', filters.q.trim());
   if (filters.college) p.set('college', filters.college);
   if (filters.type) p.set('type', filters.type);
   if (filters.sort && filters.sort !== 'newest') p.set('sort', filters.sort);
+  if (filters.course) p.set('course', filters.course);
   const out = p.toString();
   return out ? `?${out}` : '';
 }
@@ -96,4 +98,43 @@ export function writeFilters(baseSearch, filters) {
 export function queryCourseCode(query) {
   const terms = searchTerms(query);
   return terms.length === 1 && /^[a-z]{2,10}\d{2,4}[a-z]?$/.test(terms[0]) ? terms[0].toUpperCase() : '';
+}
+
+// Group files by course (code, or course name when there is no code) for the
+// default "by course" view, like a shelf per course with a file count.
+export function groupKey(item) {
+  const key = courseKey(item);
+  return key || '__other__';
+}
+
+function mostCommon(values) {
+  const counts = new Map();
+  for (const v of values) if (v) counts.set(v, (counts.get(v) || 0) + 1);
+  let best = '', n = 0;
+  for (const [v, c] of counts) if (c > n) { best = v; n = c; }
+  return best;
+}
+
+export function groupByCourse(rows, mode = 'newest') {
+  const groups = new Map();
+  for (const item of rows) {
+    const key = groupKey(item);
+    const g = groups.get(key) || { key, items: [], types: { exam: 0, summary: 0, notes: 0 }, latest: 0, score: 0 };
+    g.items.push(item);
+    const type = String(item.resource_type || item.content_type || '').toLowerCase();
+    if (type in g.types) g.types[type] += 1;
+    g.latest = Math.max(g.latest, time(item.created_at));
+    g.score += popularity(item);
+    groups.set(key, g);
+  }
+  const list = [...groups.values()].map(g => {
+    const code = mostCommon(g.items.map(i => /^[A-Z]{2,10}\d{2,4}[A-Z]?$/.test(String(i.course_code || '').replace(/\s+/g, '').toUpperCase()) ? String(i.course_code).replace(/\s+/g, '').toUpperCase() : ''));
+    const subject = mostCommon(g.items.map(i => (i.subject && !/^[A-Z]{2,10}\s?\d{2,4}[A-Z]?$/i.test(i.subject)) ? i.subject : ''));
+    return { key: g.key, code, name: subject || code || '', files: g.items.length, types: g.types, latest: g.latest, score: g.score };
+  });
+  const other = g => (g.key === '__other__' ? 1 : 0);
+  if (mode === 'popular' || mode === 'rated') list.sort((a, b) => other(a) - other(b) || b.score - a.score || b.files - a.files);
+  else if (mode === 'course') list.sort((a, b) => other(a) - other(b) || (a.code || a.name).localeCompare(b.code || b.name, 'ar'));
+  else list.sort((a, b) => other(a) - other(b) || b.latest - a.latest || b.files - a.files);
+  return list;
 }
