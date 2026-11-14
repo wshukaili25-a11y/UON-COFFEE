@@ -31,14 +31,29 @@ test('top courses ignore non-codes and rank by use', () => {
 });
 
 test('filters round-trip through the URL and reject junk', () => {
-  const f = { q: 'INFS205', college: 'كلية العلوم الصحية', type: 'exam', sort: 'popular' };
+  const f = { q: 'INFS205', college: 'كلية العلوم الصحية', type: 'exam', sort: 'popular', course: 'MATH212' };
   assert.deepEqual(readFilters(writeFilters('', f)), f);
   assert.equal(writeFilters('?id=7', { q: '', college: '', type: '', sort: 'newest' }), '?id=7');
-  assert.deepEqual(readFilters('?type=evil&sort=drop'), { q: '', college: '', type: '', sort: 'newest' });
+  assert.deepEqual(readFilters('?type=evil&sort=drop'), { q: '', college: '', type: '', sort: 'newest', course: '' });
 });
 
 test('request CTA only for a single course code', () => {
   assert.equal(queryCourseCode('infs 205'), 'INFS205');
   assert.equal(queryCourseCode('ملخص رياضيات'), '');
   assert.equal(queryCourseCode('INFS205 MATH101'), '');
+});
+
+test('groupByCourse makes one shelf per course with counts', async () => {
+  const { groupByCourse, groupKey } = await import('../js/summary-library.js');
+  const rows = [
+    { id: 1, course_code: 'MATH212', subject: 'تفاضل وتكامل 2', content_type: 'exam', created_at: '2026-10-01' },
+    { id: 2, course_code: 'MATH 212', subject: 'تفاضل وتكامل 2', content_type: 'summary', created_at: '2026-10-03' },
+    { id: 3, course_code: null, subject: 'علم الأنسجة', content_type: 'notes', created_at: '2026-09-01' },
+    { id: 4, course_code: null, subject: null, content_type: 'summary', created_at: '2026-11-01' },
+  ];
+  const groups = groupByCourse(rows);
+  assert.equal(groups.length, 3);
+  assert.deepEqual(groups[0], { key: 'MATH212', code: 'MATH212', name: 'تفاضل وتكامل 2', files: 2, types: { exam: 1, summary: 1, notes: 0 }, latest: Date.parse('2026-10-03'), score: 0 });
+  assert.equal(groups.at(-1).key, '__other__', 'uncategorised files sink to the end');
+  assert.equal(groupKey(rows[2]), groupByCourse([rows[2]])[0].key);
 });

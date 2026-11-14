@@ -70,3 +70,24 @@ test('dialog has no preview or sample name',async()=>{
  assert.equal(mod.greeting('  محمد  '),'هلا محمد 👋');assert.equal(mod.greeting(''),'هلا … 👋');
  assert.doesNotMatch(src,/ue-preview|عبدالرحمن/);
 });
+
+test('opt-in: unsubscribe footer only when subscribed, consent wording matches the dialog',async()=>{
+ const {MARKETING_CONSENT}=await import('../supabase/functions/summary-email/email.mjs');
+ const fs=await import('node:fs');
+ const dialog=fs.readFileSync(new URL('../js/summary-email.js',import.meta.url),'utf8');
+ assert.ok(dialog.includes(`MARKETING_LABEL='${MARKETING_CONSENT}'`),'stored consent text = text the student saw');
+ assert.match(dialog,/<input type="checkbox" name="marketing">/,'box is unchecked by default');
+ assert.doesNotMatch(dialog,/name="marketing" checked/);
+ const plain=emailTemplate({kind:'summary',name:'سارة',title:'ملخص',id:'1'});
+ assert.doesNotMatch(plain.html,/إلغاء الاشتراك/);
+ const url='https://www.uonhub.space/unsubscribe.html?t=00000000-0000-0000-0000-000000000000';
+ for(const t of [emailTemplate({kind:'summary',name:'سارة',title:'ملخص',id:'1',unsubscribe:url}),emailTemplate({kind:'schedule',name:'سارة',schedule:cleanSchedule({title:'جدولي',rows}),unsubscribe:url})]){
+  assert.ok(t.html.includes(url));assert.ok(t.text.includes(url));
+ }
+});
+
+test('footer promise matches subscription state',()=>{
+ assert.match(emailTemplate({kind:'summary',name:'سارة',title:'x',id:'1'}).html,/لن نرسل لك رسائل أخرى/);
+ const sub=emailTemplate({kind:'summary',name:'سارة',title:'x',id:'1',unsubscribe:'https://www.uonhub.space/unsubscribe.html?t=00000000-0000-0000-0000-000000000000'}).html;
+ assert.doesNotMatch(sub,/لن نرسل لك رسائل أخرى/);assert.match(sub,/اخترت الاشتراك/);
+});

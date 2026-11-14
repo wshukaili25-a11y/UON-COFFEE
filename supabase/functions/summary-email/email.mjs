@@ -56,7 +56,7 @@ function scheduleHtml(rows){
 
 function button(href,label){return `<table role="presentation" style="margin:18px 0 6px"><tr><td style="background:${C.green};border-radius:12px"><a href="${href}" style="display:inline-block;padding:13px 26px;color:#fff;text-decoration:none;font-weight:800;font-size:15px;font-family:${FONT}">${label}</a></td></tr></table>`}
 
-function layout({preheader,heading,name,content}){
+function layout({preheader,heading,name,content,subscribed=false}){
  return `<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light"><title>${escapeHtml(heading)}</title></head>
 <body style="margin:0;padding:0;background:${C.cream};font-family:${FONT};color:${C.text}">
 <div style="display:none;max-height:0;overflow:hidden;opacity:0">${escapeHtml(preheader)}</div>
@@ -73,7 +73,7 @@ function layout({preheader,heading,name,content}){
 ${content}
 </td></tr>
 <tr><td style="padding:8px 26px 26px"><div style="border-top:1px solid ${C.line};padding-top:16px;font-size:14px;line-height:1.9">بالتوفيق في دراستك،<br><strong style="color:${C.green}">فريق UON Hub</strong><br><span style="color:${C.muted}">كل ما يحتاجه طالب جامعة نزوى في مكان واحد</span></div></td></tr>
-<tr><td style="background:${C.cream};padding:16px 26px;font-size:11px;line-height:1.8;color:${C.muted}">وصلتك هذه الرسالة لأنك طلبتها من موقع UON Hub وأكدت بريدك برمز التحقق. لن نرسل لك رسائل أخرى.<br>UON Hub مشروع طلابي مستقل وغير تابع رسميًا لجامعة نزوى. حقوق المحتوى لأصحابه.<br><a href="${SITE}" style="color:${C.green2}">uonhub.space</a> · <a href="https://www.instagram.com/uonhub/" style="color:${C.green2}">@uonhub</a></td></tr>
+<tr><td style="background:${C.cream};padding:16px 26px;font-size:11px;line-height:1.8;color:${C.muted}">وصلتك هذه الرسالة لأنك طلبتها من موقع UON Hub وأكدت بريدك برمز التحقق.${subscribed?' واخترت الاشتراك في إعلانات UON Hub، وتقدر تلغيه من الرابط أعلاه.':' لن نرسل لك رسائل أخرى.'}<br>UON Hub مشروع طلابي مستقل وغير تابع رسميًا لجامعة نزوى. حقوق المحتوى لأصحابه.<br><a href="${SITE}" style="color:${C.green2}">uonhub.space</a> · <a href="https://www.instagram.com/uonhub/" style="color:${C.green2}">@uonhub</a></td></tr>
 </table></td></tr></table></body></html>`;
 }
 
@@ -81,7 +81,10 @@ ${content}
  * kind: 'otp' | 'summary' | 'schedule'
  * subject: what is being sent ('summary' or 'schedule') for the OTP message.
  */
-export function emailTemplate({kind,name,title,otp,id,subject='summary',schedule,hasImage=false}){
+/** Exact wording shown next to the opt-in box; stored with each consent record. */
+export const MARKETING_CONSENT='أوافق على وصول إعلانات وتحديثات UON Hub إلى بريدي، وأقدر ألغي الاشتراك في أي وقت.';
+function unsubscribeHtml(url){return url?`<p style="margin:16px 0 0;color:${C.muted};font-size:12px">اشتركت في إعلانات UON Hub. ما تبغاها؟ <a href="${escapeHtml(url)}" style="color:${C.muted}">إلغاء الاشتراك</a></p>`:''}
+export function emailTemplate({kind,name,title,otp,id,subject='summary',schedule,hasImage=false,unsubscribe=''}){
  // Backward compatible call shape: {name,title,otp} or {name,title,id}.
  if(!kind)kind=otp?'otp':'summary';
  const what=subject==='schedule'?'جدولك الدراسي':`ملف «${escapeHtml(title)}»`;
@@ -93,13 +96,13 @@ export function emailTemplate({kind,name,title,otp,id,subject='summary',schedule
  }
  if(kind==='schedule'){
   const {rows,title:scheduleTitle}=schedule;
-  const content=`<p style="margin:0 0 6px">هذا <strong>${escapeHtml(scheduleTitle)}</strong> كما رتبته في UON Hub.${hasImage?' أرفقنا لك نسخة صورة أيضًا، احفظها في هاتفك.':''}</p>${scheduleHtml(rows)}${button(SITE+'/schedule.html','افتح جدولك في UON Hub')}`;
+  const content=`<p style="margin:0 0 6px">هذا <strong>${escapeHtml(scheduleTitle)}</strong> كما رتبته في UON Hub.${hasImage?' أرفقنا لك نسخة صورة أيضًا، احفظها في هاتفك.':''}</p>${scheduleHtml(rows)}${button(SITE+'/schedule.html','افتح جدولك في UON Hub')}${unsubscribeHtml(unsubscribe)}`;
   const plain=DAYS.map(d=>{const l=rows.filter(r=>r.day===d);return l.length?d+'\n'+l.map(r=>`- ${r.course}: ${formatClock(r.start)} – ${formatClock(r.end)}${r.room?' · '+r.room:''}`).join('\n'):''}).filter(Boolean).join('\n\n');
-  return {subject:`🗓️ ${scheduleTitle} | UON Hub`,html:layout({preheader:'جدولك الدراسي جاهز',heading:'جدولك الدراسي جاهز',name,content}),text:`هلا ${name}\n\n${plain}\n\n${SITE}/schedule.html\n— فريق UON Hub`};
+  return {subject:`🗓️ ${scheduleTitle} | UON Hub`,html:layout({preheader:'جدولك الدراسي جاهز',heading:'جدولك الدراسي جاهز',name,content,subscribed:Boolean(unsubscribe)}),text:`هلا ${name}\n\n${plain}\n\n${SITE}/schedule.html${unsubscribe?'\nإلغاء الاشتراك في الإعلانات: '+unsubscribe:''}\n— فريق UON Hub`};
  }
  const href=`${SITE}/summary-viewer.html?id=${encodeURIComponent(id)}`;
- const content=`<p style="margin:0 0 6px">أرفقنا لك ملف <strong>«${escapeHtml(title)}»</strong> بصيغة PDF في هذه الرسالة. نتمنى لك مذاكرة موفقة.</p>${button(href,'افتح الملف في UON Hub')}<p style="margin:10px 0 0;color:${C.muted};font-size:13px">تجد المزيد من الملخصات والاختبارات السابقة لموادك في صفحة الملخصات على الموقع.</p>`;
- return {subject:`📚 ${title} | UON Hub`,html:layout({preheader:'ملخصك مرفق في الرسالة',heading:'ملخصك جاهز للمذاكرة',name,content}),text:`هلا ${name}\nملف ${title} مرفق.\n${href}\n— فريق UON Hub`};
+ const content=`<p style="margin:0 0 6px">أرفقنا لك ملف <strong>«${escapeHtml(title)}»</strong> بصيغة PDF في هذه الرسالة. نتمنى لك مذاكرة موفقة.</p>${button(href,'افتح الملف في UON Hub')}<p style="margin:10px 0 0;color:${C.muted};font-size:13px">تجد المزيد من الملخصات والاختبارات السابقة لموادك في صفحة الملخصات على الموقع.</p>${unsubscribeHtml(unsubscribe)}`;
+ return {subject:`📚 ${title} | UON Hub`,html:layout({preheader:'ملخصك مرفق في الرسالة',heading:'ملخصك جاهز للمذاكرة',name,content,subscribed:Boolean(unsubscribe)}),text:`هلا ${name}\nملف ${title} مرفق.\n${href}${unsubscribe?'\nإلغاء الاشتراك في الإعلانات: '+unsubscribe:''}\n— فريق UON Hub`};
 }
 
 /** Accept a base64 PNG made by the browser (schedule image). Returns base64 or null. */

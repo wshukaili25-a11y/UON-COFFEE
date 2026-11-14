@@ -11,3 +11,17 @@
 .sum-chip[aria-pressed="true"] small{color:rgba(255,255,255,.85)}
 .sum-empty [data-request-file]{margin-top:8px}
 @media(max-width:640px){.sum-chips{flex-wrap:nowrap;overflow-x:auto;padding-bottom:4px;scrollbar-width:none}.sum-chips::-webkit-scrollbar{display:none}.sum-chip{flex:0 0 auto}}
+/* Course shelves: one card per course with a file count (default view). */
+.sum-group{all:unset;box-sizing:border-box;cursor:pointer;display:flex;flex-direction:column;gap:8px;padding:18px;border:1px solid var(--sum-line);border-radius:23px;background:linear-gradient(155deg,var(--sum-card),var(--sum-card-2));color:var(--sum-text);min-height:168px;transition:.18s ease;text-align:start}
+.sum-group:hover{transform:translateY(-2px);border-color:rgba(48,194,121,.38)}
+.sum-group:focus-visible{outline:2px solid #CFA038;outline-offset:2px}
+.sum-group-top{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.sum-group-icon{font-size:22px}
+.sum-group-name{font-size:19px;line-height:1.5;font-weight:900;overflow-wrap:anywhere}
+.sum-group-count{color:#CFA038;font-weight:900;font-size:15px}
+.sum-group-types{display:flex;flex-wrap:wrap;gap:6px}
+.sum-group-types span{font-size:12px;font-weight:800;padding:4px 9px;border-radius:999px;background:rgba(25,172,106,.11);border:1px solid rgba(48,194,121,.15);color:var(--sum-green-soft)}
+.sum-group-open{margin-top:auto;font-weight:800;font-size:14px;color:var(--sum-green-soft)}
+.sum-group-bar{grid-column:1/-1;display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:12px 14px;border:1px solid var(--sum-line);border-radius:18px;background:var(--sum-card)}
+.sum-group-bar strong{font-size:18px}.sum-group-bar small{color:var(--sum-muted)}
+@media(hover:none){.sum-group:hover{transform:none}}
